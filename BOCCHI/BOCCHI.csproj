@@ -3,7 +3,7 @@
     <PropertyGroup>
         <Version>0.0.0.1</Version>
         <Description></Description>
-        <PackageProjectUrl>https://github.com/OhKannaDuh/PluginTemplate</PackageProjectUrl>
+        <PackageProjectUrl>https://github.com/OhKannaDuh/BOCCHI</PackageProjectUrl>
         <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
         <IsPackable>false</IsPackable>
         <NoWarn>$(NoWarn);4014</NoWarn>

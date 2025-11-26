@@ -1,6 +1,6 @@
 .vs/
-PluginTemplate/obj/
-PluginTemplate/bin/
+BOCCHI/obj/
+BOCCHI/bin/
 *.user
-PluginTemplate/.env
+BOCCHI/.env
 node_modules/

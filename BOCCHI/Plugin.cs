@@ -9,7 +9,7 @@ using Ocelot;
 // using Ocelot.Rotation.Services;
 // using Ocelot.UI.Services;
 
-namespace PluginTemplate;
+namespace BOCCHI;
 
 public sealed class Plugin(IDalamudPluginInterface plugin) : OcelotPlugin(plugin)
 {
