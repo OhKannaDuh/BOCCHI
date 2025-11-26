@@ -1,0 +1,68 @@
+name: Initialize Template
+
+on:
+    push:
+        branches: [master]
+
+permissions:
+    contents: write
+
+jobs:
+    setup:
+        if: github.repository != 'OhKannaDuh/PluginTemplate' && !contains(github.event.head_commit.message, '[skip init]')
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Set naming variables
+              if: hashFiles('.initialized') == ''
+              run: |
+                  REPO_NAME="${GITHUB_REPOSITORY##*/}"
+                  INTERNAL_NAME="$REPO_NAME"
+                  DISPLAY_NAME=$(echo "$REPO_NAME" | sed 's/\([a-z]\)\([A-Z]\)/\1 \2/g')
+                  SNAKE_NAME=$(echo "$DISPLAY_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/ /_/g')
+                  echo "INTERNAL_NAME=$INTERNAL_NAME" >> $GITHUB_ENV
+                  echo "DISPLAY_NAME=$DISPLAY_NAME" >> $GITHUB_ENV
+                  echo "SNAKE_NAME=$SNAKE_NAME" >> $GITHUB_ENV
+
+            - name: Replace placeholders in files
+              if: hashFiles('.initialized') == ''
+              run: |
+                  # Replace PluginTemplate with INTERNAL_NAME
+                  sed -i "s/PluginTemplate/${INTERNAL_NAME}/g" bin/release.sh .gitignore PluginTemplate/PluginTemplate.csproj
+                  sed -i "s/PluginTemplate/${INTERNAL_NAME}/g" PluginTemplate/*.cs
+
+                  # Replace PluginTemplate with DISPLAY_NAME
+                  sed -i "s/PluginTemplate/${DISPLAY_NAME}/g" Translations/en/windows.config.json Translations/en/windows.main.json README.md
+                  sed -i 's/"Name": "PluginTemplate"/"Name": "'"${DISPLAY_NAME}"'"/' PluginTemplate/PluginTemplate.json
+                  sed -i "s/get => \"PluginTemplate\";/get => \"${DISPLAY_NAME}\";/g" PluginTemplate/Plugin.cs
+
+                  # Replace lowercase plugintemplate with SNAKE_NAME
+                  sed -i "s/plugintemplate/${SNAKE_NAME}/g" PluginTemplate/Plugin.cs
+
+            - name: Rename files and folders
+              if: hashFiles('.initialized') == ''
+              run: |
+                  mv PluginTemplate/PluginTemplate.json PluginTemplate/${INTERNAL_NAME}.json
+                  mv PluginTemplate/PluginTemplate.csproj PluginTemplate/${INTERNAL_NAME}.csproj
+                  mv PluginTemplate ${INTERNAL_NAME}
+
+            - name: Create solution and add project
+              if: hashFiles('.initialized') == ''
+              run: |
+                  dotnet new sln -n "${INTERNAL_NAME}"
+                  dotnet sln "${INTERNAL_NAME}.sln" add "${INTERNAL_NAME}/${INTERNAL_NAME}.csproj"
+
+            - name: Mark as initialized and commit changes
+              if: hashFiles('.initialized') == ''
+              run: |
+                  echo "Initialization complete" > .initialized
+                  git config user.name "github-actions"
+                  git config user.email "github-actions@github.com"
+                  git add .
+                  git commit -m "Initialize project from template" || echo "No changes to commit"
+                  git push origin HEAD:master

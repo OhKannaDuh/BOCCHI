@@ -1,0 +1,11 @@
+{
+    "Author": "Faye",
+    "Name": "PluginTemplate",
+    "InternalName": "PluginTemplate",
+    "Punchline": "",
+    "Description": "",
+    "IconUrl": "https://raw.githubusercontent.com/OhKannaDuh/PluginTemplate/refs/heads/master/assets/icon.png",
+    "ApplicableVersion": "any",
+    "DalamudApiLevel": 13,
+    "Tags": []
+}

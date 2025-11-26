@@ -1,0 +1,6 @@
+.vs/
+PluginTemplate/obj/
+PluginTemplate/bin/
+*.user
+PluginTemplate/.env
+node_modules/

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Dalamud.NET.Sdk/13.0.0">
+    <PropertyGroup>
+        <Version>0.0.0.1</Version>
+        <Description></Description>
+        <PackageProjectUrl>https://github.com/OhKannaDuh/PluginTemplate</PackageProjectUrl>
+        <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
+        <IsPackable>false</IsPackable>
+        <NoWarn>$(NoWarn);4014</NoWarn>
+        <PathMap>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))=$(MSBuildProjectName)/</PathMap>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <Platforms>AnyCPU;x64</Platforms>
+        <PlatformTarget>x64</PlatformTarget>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <DalamudLibPath Condition="$([MSBuild]::IsOSPlatform('Windows'))">$(appdata)\XIVLauncher\addon\Hooks\dev\</DalamudLibPath>
+        <DalamudLibPath Condition="$([MSBuild]::IsOSPlatform('Linux'))">$(HOME)/.xlcore/dalamud/Hooks/dev/</DalamudLibPath>
+        <DalamudLibPath Condition="$([MSBuild]::IsOSPlatform('OSX'))">$(HOME)/Library/Application Support/XIV on Mac/dalamud/Hooks/dev/</DalamudLibPath>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+        <DefineConstants>DEBUG;TRACE;</DefineConstants>
+    </PropertyGroup>
+
+    <!-- Translations -->
+    <ItemGroup>
+        <None Include="..\Ocelot\Translations\**">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <Link>Translations\%(RecursiveDir)ocelot.%(Filename)%(Extension)</Link>
+        </None>
+        <None Include="..\Translations\**">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <Link>Translations\%(RecursiveDir)%(Filename)%(Extension)</Link>
+        </None>
+    </ItemGroup>
+
+    <!-- Ocelot -->
+    <ItemGroup Condition="'$(Configuration)' == 'Debug'">
+        <ProjectReference Include="../Ocelot/Ocelot/Ocelot.csproj" />
+        <!-- <ProjectReference Include="../Ocelot/Ocelot.Chain/Ocelot.Chain.csproj" /> -->
+        <!-- <ProjectReference Include="../Ocelot/Ocelot.ECommons/Ocelot.ECommons.csproj" /> -->
+        <!-- <ProjectReference Include="../Ocelot/Ocelot.Mechanic/Ocelot.Mechanic.csproj" /> -->
+        <!-- <ProjectReference Include="../Ocelot/Ocelot.Pathfinding/Ocelot.Pathfinding.csproj" /> -->
+        <!-- <ProjectReference Include="../Ocelot/Ocelot.Pictomancy/Ocelot.Pictomancy.csproj" /> -->
+        <!-- <ProjectReference Include="../Ocelot/Ocelot.Rotation/Ocelot.Rotation.csproj" /> -->
+        <!-- <ProjectReference Include="../Ocelot/Ocelot.UI/Ocelot.UI.csproj" /> -->
+    </ItemGroup>
+    <ItemGroup Condition="'$(Configuration)' == 'Release'">
+        <PackageReference Include="FFXIVOcelot" Version="2.1.0" />
+        <!-- <PackageReference Include="FFXIVOcelot.Chain" Version="0.2.0" /> -->
+        <!-- <PackageReference Include="FFXIVOcelot.ECommons" Version="0.2.0" /> -->
+        <!-- <PackageReference Include="FFXIVOcelot.Mechanic" Version="0.2.0" /> -->
+        <!-- <PackageReference Include="FFXIVOcelot.Pathfinding" Version="0.2.0" /> -->
+        <!-- <PackageReference Include="FFXIVOcelot.Pictomancy" Version="0.2.0" /> -->
+        <!-- <PackageReference Include="FFXIVOcelot.Rotation" Version="0.2.0" /> -->
+        <!-- <PackageReference Include="FFXIVOcelot.UI" Version="0.2.0" /> -->
+    </ItemGroup>
+</Project>
