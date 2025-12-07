@@ -35,7 +35,7 @@
         <ProjectReference Include="../Ocelot/Ocelot/Ocelot.csproj"/>
     </ItemGroup>
     <ItemGroup Condition="'$(Configuration)' == 'Release'">
-        <PackageReference Include="FFXIVOcelot" Version="1.1.0"/>
+        <PackageReference Include="FFXIVOcelot" Version="1.1.1"/>
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="TextCopy" Version="6.2.1"/>

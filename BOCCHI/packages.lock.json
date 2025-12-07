@@ -16,9 +16,9 @@
       },
       "FFXIVOcelot": {
         "type": "Direct",
-        "requested": "[1.1.0, )",
-        "resolved": "1.1.0",
-        "contentHash": "gYZ1ucTQWSFUywK8QZbRbLcAb+4foUrKzwGN5ywyZ8H70hDz2OIcZfIA7TLLzvud+I80/DwN8rLOiZHsySSgPA==",
+        "requested": "[1.1.1, )",
+        "resolved": "1.1.1",
+        "contentHash": "L02Z7ugoT8ygRvREDVLLaCO9pJ8pn7Qd06egqWgp1WTbu6mT9y4WUNFF5fKeC7eoPWqfBIfnIT3ZEKVVBsZiMg==",
         "dependencies": {
           "Ecommons": "3.0.0.17-api13",
           "Pictomancy": "0.0.1"
