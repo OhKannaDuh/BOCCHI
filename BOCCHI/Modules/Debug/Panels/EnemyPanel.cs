@@ -27,14 +27,14 @@ public class EnemyPanel : Panel
         {
             foreach (var enemy in enemies)
             {
-                if (ImGui.CollapsingHeader($"{enemy.Name} - {enemy.DataId}##{enemy.ObjectIndex}"))
+                if (ImGui.CollapsingHeader($"{enemy.Name} - {enemy.BaseId}##{enemy.ObjectIndex}"))
                 {
                     OcelotUi.Indent(() =>
                     {
                         ImGui.Text($"Name: {enemy.Name.TextValue}");
                         ImGui.Text($"GameObjectId: {enemy.GameObjectId:X}");
                         ImGui.Text($"EntityId: {enemy.EntityId:X}");
-                        ImGui.Text($"DataId: {enemy.DataId}");
+                        ImGui.Text($"BaseId: {enemy.BaseId}");
                         ImGui.Text($"OwnerId: {enemy.OwnerId}");
                         ImGui.Text($"ObjectIndex: {enemy.ObjectIndex}");
                         ImGui.Text($"ObjectKind: {enemy.ObjectKind}");

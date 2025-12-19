@@ -29,6 +29,12 @@ public enum PlayerStatus : uint
     PhantomChemist = 4367,
     PhantomOracle = 4368,
     PhantomThief = 4369,
+    // 7.4 additions
+    QuickerStep = 4799, // Dancer buff
+    PhantomMysticKnight = 4803,
+    PhantomGladiator = 4804,
+    PhantomDancer = 4805,
+    
 }
 
 public static class StatusListExtensions
@@ -51,7 +57,7 @@ public static class StatusListExtensions
         return false;
     }
 
-    public static Status? Get(this StatusList current, PlayerStatus status)
+    public static IStatus? Get(this StatusList current, PlayerStatus status)
     {
         return current.FirstOrDefault(s => s.StatusId == (uint)status);
     }

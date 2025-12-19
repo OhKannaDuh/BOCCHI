@@ -41,6 +41,9 @@ public class Job
                 JobId.Chemist => Chemist,
                 JobId.Oracle => Oracle,
                 JobId.Thief => Thief,
+                JobId.MysticKnight => MysticKnight,
+                JobId.Gladiator => Gladiator,
+                JobId.Dancer => Dancer,
                 _ => Freelancer,
             };
         }
@@ -90,4 +93,10 @@ public class Job
     public readonly static Job Oracle = new(JobId.Oracle, PlayerStatus.PhantomOracle);
 
     public readonly static Job Thief = new(JobId.Thief, PlayerStatus.PhantomThief);
+    
+    public readonly static Job MysticKnight = new(JobId.MysticKnight, PlayerStatus.PhantomMysticKnight);
+    
+    public readonly static Job Gladiator = new(JobId.Gladiator, PlayerStatus.PhantomGladiator);
+    
+    public readonly static Job Dancer = new(JobId.Dancer, PlayerStatus.PhantomDancer);
 }

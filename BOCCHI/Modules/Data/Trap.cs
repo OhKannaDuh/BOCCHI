@@ -6,7 +6,7 @@ public class Trap(IGameObject obj, string hash)
 {
     public uint Identifier
     {
-        get => obj.DataId;
+        get => obj.BaseId;
     }
 
     public Position Position

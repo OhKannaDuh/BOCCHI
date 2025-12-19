@@ -15,4 +15,7 @@ public enum JobId
     Chemist = 10,
     Oracle = 11,
     Thief = 12,
+    MysticKnight = 13,
+    Gladiator = 14,
+    Dancer = 15,
 }

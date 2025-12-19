@@ -13,7 +13,7 @@ public class Treasure(IGameObject obj)
 {
     public uint Id
     {
-        get => obj.DataId;
+        get => obj.BaseId;
     }
 
     private TreasureFlags LastFlags = TreasureFlags.None;
@@ -48,7 +48,7 @@ public class Treasure(IGameObject obj)
 
     private XIVTreasure? GetData()
     {
-        return Svc.Data.GetExcelSheet<XIVTreasure>().ToList().FirstOrDefault(t => t.RowId == obj.DataId);
+        return Svc.Data.GetExcelSheet<XIVTreasure>().ToList().FirstOrDefault(t => t.RowId == obj.BaseId);
     }
 
     public bool IsValid()

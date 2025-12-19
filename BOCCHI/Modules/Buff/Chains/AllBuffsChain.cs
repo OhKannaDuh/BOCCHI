@@ -14,6 +14,7 @@ public class AllBuffsChain(BuffModule module) : ChainFactory
             .Then(new KnightBuffChain(module))
             .Then(new MonkBuffChain(module))
             .Then(new BardBuffChain(module))
+            .Then(new DancerBuffChain(module))
             .Then(StartingJob.ChangeToChain);
 
         return chain;

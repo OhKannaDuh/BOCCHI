@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Dalamud.NET.Sdk/13.0.0">
+<Project Sdk="Dalamud.NET.Sdk/14.0.1">
     <PropertyGroup>
         <Version>0.0.0.1</Version>
         <Description>A helper for Occult Crescent.</Description>
@@ -35,7 +35,7 @@
         <ProjectReference Include="../Ocelot/Ocelot/Ocelot.csproj"/>
     </ItemGroup>
     <ItemGroup Condition="'$(Configuration)' == 'Release'">
-        <PackageReference Include="FFXIVOcelot" Version="1.1.1"/>
+        <PackageReference Include="FFXIVOcelot" Version="1.1.2"/>
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="TextCopy" Version="6.2.1"/>

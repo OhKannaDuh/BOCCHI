@@ -1,27 +1,27 @@
 {
   "version": 1,
   "dependencies": {
-    "net9.0-windows7.0": {
+    "net10.0-windows7.0": {
       "DalamudPackager": {
         "type": "Direct",
-        "requested": "[13.0.0, )",
-        "resolved": "13.0.0",
-        "contentHash": "Mb3cUDSK/vDPQ8gQIeuCw03EMYrej1B4J44a1AvIJ9C759p9XeqdU9Hg4WgOmlnlPe0G7ILTD32PKSUpkQNa8w=="
+        "requested": "[14.0.0, )",
+        "resolved": "14.0.0",
+        "contentHash": "9c1q/eAeAs82mkQWBOaCvbt3GIQxAIadz5b/7pCXDIy9nHPtnRc+tDXEvKR+M36Wvi7n+qBTevRupkLUQp6DFA=="
       },
       "DotNet.ReproducibleBuilds": {
         "type": "Direct",
-        "requested": "[1.2.25, )",
-        "resolved": "1.2.25",
-        "contentHash": "xCXiw7BCxHJ8pF6wPepRUddlh2dlQlbr81gXA72hdk4FLHkKXas7EH/n+fk5UCA/YfMqG1Z6XaPiUjDbUNBUzg=="
+        "requested": "[1.2.39, )",
+        "resolved": "1.2.39",
+        "contentHash": "fcFN01tDTIQqDuTwr1jUQK/geofiwjG5DycJQOnC72i1SsLAk1ELe+apBOuZ11UMQG8YKFZG1FgvjZPbqHyatg=="
       },
       "FFXIVOcelot": {
         "type": "Direct",
-        "requested": "[1.1.1, )",
-        "resolved": "1.1.1",
-        "contentHash": "L02Z7ugoT8ygRvREDVLLaCO9pJ8pn7Qd06egqWgp1WTbu6mT9y4WUNFF5fKeC7eoPWqfBIfnIT3ZEKVVBsZiMg==",
+        "requested": "[1.1.2, )",
+        "resolved": "1.1.2",
+        "contentHash": "Pk3bnLtJ0BznK94/WbP7v9y5C10VqPJZ3HW4Z8JQQ9jwPO8mipd/Kjzo6ULMbDYUVFtSA7dnw6stDLabnxw8Fg==",
         "dependencies": {
-          "Ecommons": "3.0.0.17-api13",
-          "Pictomancy": "0.0.1"
+          "Ecommons": "3.1.0.2",
+          "Pictomancy": "0.0.2"
         }
       },
       "TextCopy": {
@@ -35,8 +35,8 @@
       },
       "ECommons": {
         "type": "Transitive",
-        "resolved": "3.0.0.17-api13",
-        "contentHash": "r7MblEmo2zOksX2qiapL7eFhGYnXZOvu4QOb6zd8LHApjde3c+iF/JVowqUWxaAz4yS+M/bvrppsfJNIdRLm2A=="
+        "resolved": "3.1.0.2",
+        "contentHash": "NFVf3G23lRGnZ7xEIFWzXc61LHfLfkyw2NwYc/sYoldehzurPc49Kg4DbVksqSyhEknsTTD0LkpcxPNV16ziUw=="
       },
       "Microsoft.Extensions.DependencyInjection.Abstractions": {
         "type": "Transitive",
@@ -58,8 +58,8 @@
       },
       "Pictomancy": {
         "type": "Transitive",
-        "resolved": "0.0.1",
-        "contentHash": "o40yKEYUsUmHLGEyfi2dzrPJBaiYGAL6Jwc32NOZUx9znXvwL0RS2A3AOGzi4wHhTEfTesLuU5yNIs60hT4ayg==",
+        "resolved": "0.0.2",
+        "contentHash": "th7LcwtMgGWbhfZu7cyKYQKIOpRHzC/O9YvbWy5FSEs0zs1rgC/jgFg1MuX6F4XireR3XJgmg+RcHY+TCKBpsw==",
         "dependencies": {
           "SharpDX.D3DCompiler": "4.2.0",
           "SharpDX.Direct2D1": "4.2.0",

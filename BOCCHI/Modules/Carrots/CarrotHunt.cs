@@ -27,7 +27,7 @@ public class CarrotHunt(CarrotsModule module) : Hunter(module)
             .Where(o => o is
             {
                 ObjectKind: ObjectKind.EventObj,
-                DataId: (uint)OccultObjectType.Carrot,
+                BaseId: (uint)OccultObjectType.Carrot,
                 IsDead: false,
             } && o.IsValid());
     }
@@ -92,6 +92,6 @@ public class CarrotHunt(CarrotsModule module) : Hunter(module)
 
     private IEnumerable<IEventObj> GetBunnyChests()
     {
-        return Svc.Objects.OfType<IEventObj>().Where(o => o.DataId == (uint)OccultObjectType.BunnyChest);
+        return Svc.Objects.OfType<IEventObj>().Where(o => o.BaseId == (uint)OccultObjectType.BunnyChest);
     }
 }

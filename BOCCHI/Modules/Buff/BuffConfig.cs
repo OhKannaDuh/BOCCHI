@@ -15,6 +15,8 @@ public class BuffConfig : ModuleConfig
     [Checkbox] [IllegalModeCompatible] public bool ApplyEnduringFortitude { get; set; } = true;
 
     [Checkbox] [IllegalModeCompatible] public bool ApplyFleetfooted { get; set; } = true;
+    
+    [Checkbox] [IllegalModeCompatible] public bool ApplyQuickerStep { get; set; } = false;
 
     [IntRange(0, 25)]
     [IllegalModeCompatible]

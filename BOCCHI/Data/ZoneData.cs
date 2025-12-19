@@ -86,14 +86,14 @@ public static class ZoneData
 
         return Svc.Objects
             .Where(o => o.ObjectKind == ObjectKind.EventObj)
-            .Where(o => AethernetData.All().Select((datum) => datum.DataId).Contains(o.DataId))
+            .Where(o => AethernetData.All().Select((datum) => datum.BaseId).Contains(o.BaseId))
             .Where(o => Vector3.Distance(o.Position, playerPos) <= range)
             .ToList();
     }
 
     public static bool IsNearAethernetShard(Aethernet aethernet, float range = 4.3f)
     {
-        return GetNearbyAethernetShards(range).Any(o => o.DataId == aethernet.GetData().DataId);
+        return GetNearbyAethernetShards(range).Any(o => o.BaseId == aethernet.GetData().BaseId);
     }
 
     public static IList<IGameObject> GetNearbyKnowledgeCrystal(float range = 4.5f)
@@ -102,7 +102,7 @@ public static class ZoneData
 
         return Svc.Objects
             .Where(o => o.ObjectKind == ObjectKind.EventObj)
-            .Where(o => o.DataId == (uint)OccultObjectType.KnowledgeCrystal)
+            .Where(o => o.BaseId == (uint)OccultObjectType.KnowledgeCrystal)
             .Where(o => Vector3.Distance(o.Position, playerPos) <= range)
             .ToList();
     }

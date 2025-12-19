@@ -68,6 +68,11 @@ public class BuffManager
             buffs.Add((uint)PlayerStatus.RomeosBallad);
         }
 
+        if (module.Config.ApplyQuickerStep)
+        {
+            buffs.Add((uint)PlayerStatus.QuickerStep);
+        }
+
         var statuses = Player.Status.Where(s => buffs.Contains(s.StatusId)).ToList();
         return statuses.Count == 0 ? 0 : statuses.Select(status => (int)status.RemainingTime).Min();
     }

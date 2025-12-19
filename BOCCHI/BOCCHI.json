@@ -1,11 +1,11 @@
 {
-    "Author": "Faye",
-    "Name": "Better Occult Crescent & Chest Helper Interface",
-    "InternalName": "BOCCHI",
-    "Punchline": "BOCCHI is here to smooth out your Occult Crescent experience.",
-    "Description": "BOCCHI is here to smooth out your Occult Crescent experience.\n- No more of that pesky 'walking' or 'finding chests'. That's for losers.\n- A cute little Fate and CE panel that'll tell you what rewards it gives AND help you automatically path to it, wowee.\n- An extre illegal 'illegal mode' for those of you that would rather be touching grass or playing a game with worthwhile content.",
-    "IconUrl": "https://raw.githubusercontent.com/OhKannaDuh/OccultCrescentHelper/refs/heads/master/assets/icon.png",
-    "ApplicableVersion": "any",
-    "DalamudApiLevel": 13,
-    "Tags": ["BOCCHI", "Occult Crescent", "Occult", "Crescent", "Illegal", "Critical Encounter", "Fate", "Faye", "BOCCHER", "OCH"]
+  "Author": "Faye",
+  "Name": "Better Occult Crescent & Chest Helper Interface",
+  "InternalName": "BOCCHI",
+  "Punchline": "BOCCHI is here to smooth out your Occult Crescent experience.",
+  "Description": "BOCCHI is here to smooth out your Occult Crescent experience.\n- No more of that pesky 'walking' or 'finding chests'. That's for losers.\n- A cute little Fate and CE panel that'll tell you what rewards it gives AND help you automatically path to it, wowee.\n- An extre illegal 'illegal mode' for those of you that would rather be touching grass or playing a game with worthwhile content.",
+  "IconUrl": "https://raw.githubusercontent.com/OhKannaDuh/OccultCrescentHelper/refs/heads/master/assets/icon.png",
+  "ApplicableVersion": "any",
+  "DalamudApiLevel": 14,
+  "Tags": [ "BOCCHI", "Occult Crescent", "Occult", "Crescent", "Illegal", "Critical Encounter", "Fate", "Faye", "BOCCHER", "OCH" ]
 }

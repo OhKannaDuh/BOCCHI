@@ -24,7 +24,7 @@ public class AethernetData
 
     public Aethernet Aethernet;
 
-    public uint DataId;
+    public uint BaseId;
 
     public Vector3 Position;
 
@@ -83,7 +83,7 @@ public static class AethernetExtensions
                 return new AethernetData
                 {
                     Aethernet = Aethernet.BaseCamp,
-                    DataId = 2014664,
+                    BaseId = 2014664,
                     Position = ZoneData.Aetherytes[ZoneData.SOUTHHORN],
                     Destination = new Vector3(835.3f, 73f, -695.9f),
                 };
@@ -91,7 +91,7 @@ public static class AethernetExtensions
                 return new AethernetData
                 {
                     Aethernet = Aethernet.TheWanderersHaven,
-                    DataId = 2014665,
+                    BaseId = 2014665,
                     Position = new Vector3(-173.02f, 8.19f, -611.14f),
                     Destination = new Vector3(-169.1f, 6.5f, -609.4f),
                 };
@@ -99,7 +99,7 @@ public static class AethernetExtensions
                 return new AethernetData
                 {
                     Aethernet = Aethernet.CrystallizedCaverns,
-                    DataId = 2014666,
+                    BaseId = 2014666,
                     Position = new Vector3(-358.14f, 101.98f, -120.96f),
                     Destination = new Vector3(-354.6f, 100f, -120.7f),
                 };
@@ -107,7 +107,7 @@ public static class AethernetExtensions
                 return new AethernetData
                 {
                     Aethernet = Aethernet.Eldergrowth,
-                    DataId = 2014667,
+                    BaseId = 2014667,
                     Position = new Vector3(306.94f, 105.18f, 305.65f),
                     Destination = new Vector3(-302.3f, 103f, 306f),
                 };
@@ -115,7 +115,7 @@ public static class AethernetExtensions
                 return new AethernetData
                 {
                     Aethernet = Aethernet.Stonemarsh,
-                    DataId = 2014744,
+                    BaseId = 2014744,
                     Position = new Vector3(-384.12f, 99.20f, 281.42f),
                     Destination = new Vector3(-384f, 97.2f, 278.1f),
                 };

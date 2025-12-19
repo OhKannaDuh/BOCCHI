@@ -11,6 +11,6 @@ public static class IEventObjEx
         var y = (float)Math.Round(obj.Position.Y, 2);
         var z = (float)Math.Round(obj.Position.Z, 2);
 
-        return $"{obj.DataId}:{x:F2},{y:F2},{z:F2}";
+        return $"{obj.BaseId}:{x:F2},{y:F2},{z:F2}";
     }
 }

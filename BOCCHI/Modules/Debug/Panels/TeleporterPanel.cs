@@ -29,7 +29,7 @@ public class TeleporterPanel : Panel
                     {
                         foreach (var shard in ZoneData.GetNearbyAethernetShards())
                         {
-                            var data = AethernetData.All().First(o => o.DataId == shard.DataId);
+                            var data = AethernetData.All().First(o => o.BaseId == shard.BaseId);
                             ImGui.TextUnformatted(data.Aethernet.ToFriendlyString());
                         }
                     });

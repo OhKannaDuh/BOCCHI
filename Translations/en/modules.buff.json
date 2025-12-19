@@ -15,6 +15,10 @@
           "label": "Apply Fleetfooted",
           "tooltip": "Apply the Phantom Monk Buff, Fleetfooted"
         },
+        "apply_quicker_step": {
+          "label": "Apply Quicker Step",
+          "tooltip": "Apply the Phantom Dancer Buff, Quicker Step"
+        },
         "reapply_threshold": {
           "label": "Reapply Threshold",
           "tooltip": "The number of minutes remaining on the lowest buff to refresh them all during automatic execution."

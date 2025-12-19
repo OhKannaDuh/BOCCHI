@@ -52,7 +52,7 @@ public class DataModule : Module
         }
 
         var traps = Svc.Objects.OfType<IEventObj>()
-            .Where(o => o.DataId is (uint)OccultObjectType.Trap or (uint)OccultObjectType.BigTrap);
+            .Where(o => o.BaseId is (uint)OccultObjectType.Trap or (uint)OccultObjectType.BigTrap);
         foreach (var trap in traps)
         {
             api.SendTrapData(trap);
