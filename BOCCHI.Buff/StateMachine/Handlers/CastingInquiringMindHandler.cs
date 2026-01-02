@@ -19,7 +19,7 @@ public class CastingInquiringMindHandler(
     public override void Enter()
     {
         base.Enter();
-        lastCast = DateTime.MinValue - TimeSpan.FromSeconds(3);
+        lastCast = DateTime.MinValue;
     }
 
     public override BuffState? Handle()

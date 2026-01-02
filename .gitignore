@@ -4,3 +4,5 @@ BOCCHI/bin/
 *.user
 BOCCHI/.env
 node_modules/
+BOCCHI*/obj
+BOCCHI*/bin

@@ -6,6 +6,7 @@ using BOCCHI.Common.Config;
 using BOCCHI.Common.Data.SupportJobs;
 using BOCCHI.Common.Data.Zones;
 using BOCCHI.Common.Services;
+using BOCCHI.Common.Steps;
 using BOCCHI.Config;
 using BOCCHI.CriticalEncounters;
 using BOCCHI.Currency;
@@ -15,6 +16,8 @@ using BOCCHI.Experience;
 using BOCCHI.Fates;
 using BOCCHI.Renderers;
 using BOCCHI.Services;
+using BOCCHI.Services.Materia;
+using BOCCHI.Services.Repair;
 using Dalamud.Configuration;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
@@ -56,6 +59,12 @@ public sealed class Plugin(IDalamudPluginInterface plugin, IPluginLog logger) : 
         services.AddSingleton<ISupportJobChanger, SupportJobChanger>();
 
         services.AddSingleton<IZoneProvider, ZoneProvider>();
+
+        services.AddSingleton<UnmountStep>();
+        services.AddSingleton<RepairStep>();
+        services.AddSingleton<IRepairService, RepairService>();
+        services.AddSingleton<ExtractStep>();
+        services.AddSingleton<IMateriaExtractionService, MateriaExtractionService>();
 
         services.AddSingleton<TeleportToAethernetChain>();
 

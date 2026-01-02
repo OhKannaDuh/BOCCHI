@@ -17,9 +17,9 @@ public enum AutomatorState
     ApplyingBuffs,
 
     // Repair our equipped gear
-    // Repairing,
+    Repairing,
     // Extract materia from our equipped gear
-    // ExtractingMateria,
+    ExtractingMateria,
 
     // Deciding if we should do fates/CEs/Mob farming/Tresure hunting etc.
     ChoosingActivity,

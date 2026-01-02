@@ -10,6 +10,7 @@ using Dalamud.Plugin.Services;
 using ECommons.Throttlers;
 using Ocelot.Actions;
 using Ocelot.Extensions;
+using Ocelot.Services.Pathfinding;
 using Ocelot.States.Score;
 
 namespace BOCCHI.Automator.StateMachine.Handlers;
@@ -19,6 +20,7 @@ public class InFateHandler(
     IFateContext context,
     IObjectTable objects,
     ICondition conditions,
+    IPathfinder pathfinder,
     ITargetManager targetManager
 ) : ScoreStateHandler<AutomatorState, StatePriority>(AutomatorState.InFate)
 {
@@ -57,6 +59,7 @@ public class InFateHandler(
             if (EzThrottler.Throttle("InFate::Unmount") && Actions.Unmount.CanCast())
             {
                 Actions.Unmount.Cast();
+                pathfinder.Stop();
             }
         }
     }

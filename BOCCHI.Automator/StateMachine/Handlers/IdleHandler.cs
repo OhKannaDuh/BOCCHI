@@ -60,14 +60,14 @@ public class IdleHandler(
 
         var aetheryte = zone.GetAetherytePosition();
         var distance = player.Position.Distance2D(aetheryte);
-        const float maxInteractDistance = 4.2f;
+        const float maxInteractDistance = 2.5f;
 
         if (distance <= maxInteractDistance)
         {
             return;
         }
 
-        var goal = aetheryte.GetApproachPosition(player.Position, maxInteractDistance - 0.5f, 30f);
+        var goal = aetheryte.GetApproachPosition(player.Position, maxInteractDistance, 30f);
         pathfinder.PathfindAndMoveTo(new PathfinderConfig(goal));
     }
 
