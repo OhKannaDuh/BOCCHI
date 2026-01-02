@@ -1,24 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Dalamud.NET.Sdk/13.0.0">
+<Project Sdk="Dalamud.NET.Sdk/14.0.1">
     <PropertyGroup>
+        <AssemblyName>BOCCHI</AssemblyName>
         <Version>0.0.0.1</Version>
-        <Description></Description>
-        <PackageProjectUrl>https://github.com/OhKannaDuh/BOCCHI</PackageProjectUrl>
-        <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
         <IsPackable>false</IsPackable>
-        <NoWarn>$(NoWarn);4014</NoWarn>
-        <PathMap>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))=$(MSBuildProjectName)/</PathMap>
-    </PropertyGroup>
-
-    <PropertyGroup>
-        <Platforms>AnyCPU;x64</Platforms>
-        <PlatformTarget>x64</PlatformTarget>
-    </PropertyGroup>
-
-    <PropertyGroup>
-        <DalamudLibPath Condition="$([MSBuild]::IsOSPlatform('Windows'))">$(appdata)\XIVLauncher\addon\Hooks\dev\</DalamudLibPath>
-        <DalamudLibPath Condition="$([MSBuild]::IsOSPlatform('Linux'))">$(HOME)/.xlcore/dalamud/Hooks/dev/</DalamudLibPath>
-        <DalamudLibPath Condition="$([MSBuild]::IsOSPlatform('OSX'))">$(HOME)/Library/Application Support/XIV on Mac/dalamud/Hooks/dev/</DalamudLibPath>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
@@ -37,25 +22,18 @@
         </None>
     </ItemGroup>
 
-    <!-- Ocelot -->
-    <ItemGroup Condition="'$(Configuration)' == 'Debug'">
-        <ProjectReference Include="../Ocelot/Ocelot/Ocelot.csproj" />
-        <!-- <ProjectReference Include="../Ocelot/Ocelot.Chain/Ocelot.Chain.csproj" /> -->
-        <!-- <ProjectReference Include="../Ocelot/Ocelot.ECommons/Ocelot.ECommons.csproj" /> -->
-        <!-- <ProjectReference Include="../Ocelot/Ocelot.Mechanic/Ocelot.Mechanic.csproj" /> -->
-        <!-- <ProjectReference Include="../Ocelot/Ocelot.Pathfinding/Ocelot.Pathfinding.csproj" /> -->
-        <!-- <ProjectReference Include="../Ocelot/Ocelot.Pictomancy/Ocelot.Pictomancy.csproj" /> -->
-        <!-- <ProjectReference Include="../Ocelot/Ocelot.Rotation/Ocelot.Rotation.csproj" /> -->
-        <!-- <ProjectReference Include="../Ocelot/Ocelot.UI/Ocelot.UI.csproj" /> -->
+    <ItemGroup>
+        <ProjectReference Include="../BOCCHI.Common/BOCCHI.Common.csproj"/>
+        <ProjectReference Include="../BOCCHI.Automator/BOCCHI.Automator.csproj"/>
+
+        <ProjectReference Include="../BOCCHI.Experience/BOCCHI.Experience.csproj"/>
+        <ProjectReference Include="../BOCCHI.Currency/BOCCHI.Currency.csproj"/>
+        <ProjectReference Include="../BOCCHI.Buff/BOCCHI.Buff.csproj"/>
+        <ProjectReference Include="../BOCCHI.Fates/BOCCHI.Fates.csproj"/>
+        <ProjectReference Include="../BOCCHI.CriticalEncounters/BOCCHI.CriticalEncounters.csproj"/>
     </ItemGroup>
-    <ItemGroup Condition="'$(Configuration)' == 'Release'">
-        <PackageReference Include="FFXIVOcelot" Version="2.1.0" />
-        <!-- <PackageReference Include="FFXIVOcelot.Chain" Version="0.2.0" /> -->
-        <!-- <PackageReference Include="FFXIVOcelot.ECommons" Version="0.2.0" /> -->
-        <!-- <PackageReference Include="FFXIVOcelot.Mechanic" Version="0.2.0" /> -->
-        <!-- <PackageReference Include="FFXIVOcelot.Pathfinding" Version="0.2.0" /> -->
-        <!-- <PackageReference Include="FFXIVOcelot.Pictomancy" Version="0.2.0" /> -->
-        <!-- <PackageReference Include="FFXIVOcelot.Rotation" Version="0.2.0" /> -->
-        <!-- <PackageReference Include="FFXIVOcelot.UI" Version="0.2.0" /> -->
+
+    <ItemGroup>
+        <PackageReference Include="ClientStructsExposed.UnknownFieldGenerator" Version="0.1.3"/>
     </ItemGroup>
 </Project>

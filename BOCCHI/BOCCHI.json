@@ -6,6 +6,6 @@
     "Description": "",
     "IconUrl": "https://raw.githubusercontent.com/OhKannaDuh/PluginTemplate/refs/heads/master/assets/icon.png",
     "ApplicableVersion": "any",
-    "DalamudApiLevel": 13,
+    "DalamudApiLevel": 14,
     "Tags": []
 }

@@ -1,5 +1,60 @@
 <Project>
     <PropertyGroup>
-        <PathMap>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)Ocelot'))=/</PathMap>
+        <TargetFramework>net10.0-windows</TargetFramework>
+        <LangVersion>preview</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+        <DebugType>embedded</DebugType>
+        <PackageProjectUrl>https://github.com/OhKannaDuh/BOCCHI</PackageProjectUrl>
+        <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
+        <IsPackable>true</IsPackable>
+        <NoWarn>$(NoWarn);4014</NoWarn>
+        <PathMap>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))=$(MSBuildProjectName)/</PathMap>
     </PropertyGroup>
+
+    <PropertyGroup>
+        <Platforms>AnyCPU;x64</Platforms>
+        <PlatformTarget>x64</PlatformTarget>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <DalamudLibPath Condition="$([MSBuild]::IsOSPlatform('Windows'))">$(appdata)\XIVLauncher\addon\Hooks\dev\</DalamudLibPath>
+        <DalamudLibPath Condition="$([MSBuild]::IsOSPlatform('Linux'))">$(HOME)/.xlcore/dalamud/Hooks/dev/</DalamudLibPath>
+        <DalamudLibPath Condition="$([MSBuild]::IsOSPlatform('OSX'))">$(HOME)/Library/Application Support/XIV on Mac/dalamud/Hooks/dev/</DalamudLibPath>
+    </PropertyGroup>
+    <ItemGroup>
+        <Reference Include="Dalamud" HintPath="$(DalamudLibPath)Dalamud.dll" Private="False"/>
+        <Reference Include="Dalamud.Bindings.ImGui" HintPath="$(DalamudLibPath)Dalamud.Bindings.ImGui.dll" Private="False"/>
+        <Reference Include="Lumina" HintPath="$(DalamudLibPath)Lumina.dll" Private="False"/>
+        <Reference Include="Lumina.Excel" HintPath="$(DalamudLibPath)Lumina.Excel.dll" Private="False"/>
+        <Reference Include="FFXIVClientStructs" HintPath="$(DalamudLibPath)FFXIVClientStructs.dll" Private="False"/>
+        <Reference Include="InteropGenerator.Runtime" HintPath="$(DalamudLibPath)InteropGenerator.Runtime.dll" Private="False"/>
+        <Reference Include="Newtonsoft.Json" HintPath="$(DalamudLibPath)Newtonsoft.Json.dll" Private="False"/>
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(Configuration)' == 'Debug'">
+        <ProjectReference Include="../Ocelot/Ocelot/Ocelot.csproj"/>
+         <ProjectReference Include="../Ocelot/Ocelot.Chain/Ocelot.Chain.csproj" />
+         <ProjectReference Include="../Ocelot/Ocelot.ECommons/Ocelot.ECommons.csproj" />
+        <!-- <ProjectReference Include="../Ocelot/Ocelot.Mechanic/Ocelot.Mechanic.csproj" /> -->
+        <ProjectReference Include="../Ocelot/Ocelot.Pathfinding/Ocelot.Pathfinding.csproj"/>
+         <ProjectReference Include="../Ocelot/Ocelot.Pictomancy/Ocelot.Pictomancy.csproj" />
+        <!-- <ProjectReference Include="../Ocelot/Ocelot.Rotation/Ocelot.Rotation.csproj" /> -->
+        <ProjectReference Include="../Ocelot/Ocelot.UI/Ocelot.UI.csproj"/>
+    </ItemGroup>
+    <ItemGroup Condition="'$(Configuration)' == 'Release'">
+        <PackageReference Include="FFXIVOcelot" Version="3.1.0"/>
+         <PackageReference Include="FFXIVOcelot.Chain" Version="1.1.0" />
+         <PackageReference Include="FFXIVOcelot.ECommons" Version="1.2.0" />
+        <!-- <PackageReference Include="FFXIVOcelot.Mechanic" Version="1.1.0" /> -->
+        <PackageReference Include="FFXIVOcelot.Pathfinding" Version="1.1.0"/>
+         <PackageReference Include="FFXIVOcelot.Pictomancy" Version="1.1.0" />
+        <!-- <PackageReference Include="FFXIVOcelot.Rotation" Version="1.1.0" /> -->
+        <PackageReference Include="FFXIVOcelot.UI" Version="1.1.0"/>
+    </ItemGroup>
 </Project>

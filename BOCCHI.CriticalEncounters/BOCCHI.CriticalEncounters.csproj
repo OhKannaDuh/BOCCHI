@@ -1,0 +1,10 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\BOCCHI.Common\BOCCHI.Common.csproj"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ClientStructsExposed.UnknownFieldGenerator" Version="0.1.3"/>
+    <Reference Include="InteropGenerator.Runtime" HintPath="$(DalamudLibPath)InteropGenerator.Runtime.dll" Private="False"/>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,1 @@
+﻿global using FateData = Lumina.Excel.Sheets.Fate;
