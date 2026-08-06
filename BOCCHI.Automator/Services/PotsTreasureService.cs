@@ -39,8 +39,6 @@ public class PotsTreasureService
 
     private static readonly TimeSpan ManualTreasureOverride = TimeSpan.FromMinutes(5);
 
-    private const int PotsTreasureHuntMaxLevel = 50;
-
     private readonly HashSet<uint> visitedTreasureNodes = [];
 
     private DateTimeOffset nextTreasureHuntAt = DateTimeOffset.MinValue;
@@ -172,7 +170,7 @@ public class PotsTreasureService
                 return;
             }
 
-            hunter.ConfigureManagedRun(visitedTreasureNodes, PotsTreasureHuntMaxLevel);
+            hunter.ConfigureManagedRun(visitedTreasureNodes);
             hunter.StartManaged();
             huntWasRunning = hunter.Running;
             logger.Info("Pots & Treasure: started treasure hunt filler");
