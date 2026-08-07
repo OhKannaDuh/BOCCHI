@@ -6,6 +6,10 @@
       "label": "语言",
       "tooltip": "BOCCHI 窗口与消息使用的语言。"
     },
+    "open_on_occult_crescent_entry": {
+      "label": "进入 Occult Crescent 时打开 BOCCHI",
+      "tooltip": "进入 South Horn 或 North Horn 时自动打开 BOCCHI 主窗口。"
+    },
     "show_experience_tracker": {
       "label": "显示经验值统计",
       "tooltip": "在主窗口中显示经验值面板。"

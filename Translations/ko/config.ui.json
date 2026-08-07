@@ -6,6 +6,10 @@
       "label": "언어",
       "tooltip": "BOCCHI 창과 메시지에 쓰는 언어입니다."
     },
+    "open_on_occult_crescent_entry": {
+      "label": "Occult Crescent 입장 시 BOCCHI 열기",
+      "tooltip": "남쪽 뿔 또는 북쪽 뿔에 입장하면 BOCCHI 메인 창을 자동으로 엽니다."
+    },
     "show_experience_tracker": {
       "label": "경험치 추적기 표시",
       "tooltip": "메인 창에 경험치 패널을 표시합니다."

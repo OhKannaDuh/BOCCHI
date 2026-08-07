@@ -69,6 +69,7 @@ public sealed class Plugin(IDalamudPluginInterface plugin, IPluginLog logger) : 
         services.AddSingleton<IConfigRenderer, ConfigRenderer>();
         services.AddSingleton<IAutomationModeGuard, AutomationModeGuard>();
         services.AddSingleton<OperationalStatusBar>();
+        services.AddSingleton<OccultCrescentWindowAutoOpener>();
         services.AddSingleton<IMainWindowTitleBarContributor, IllegalModeTitleBarContributor>();
         services.AddSingleton<IMainWindowTitleBarContributor, KofiTitleBarContributor>();
         services.AddSingleton<IFieldRenderer<MobMultiSelectAttribute>, MobMultiSelectRenderer>();

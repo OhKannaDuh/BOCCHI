@@ -6,6 +6,10 @@
       "label": "Language",
       "tooltip": "Language used for BOCCHI’s windows and messages."
     },
+    "open_on_occult_crescent_entry": {
+      "label": "Open BOCCHI on Occult Crescent entry",
+      "tooltip": "Automatically open the BOCCHI main window when entering South or North Horn."
+    },
     "show_experience_tracker": {
       "label": "Show experience tracker",
       "tooltip": "Show the experience panel in the main window."

@@ -44,6 +44,8 @@ public class UIConfig : IAutoConfig
     [EnumSelectDisplay<UILanguage, UILanguageDisplay>]
     public UILanguage Language { get; set; } = UILanguage.English;
 
+    [Checkbox] public bool OpenOnOccultCrescentEntry { get; set; } = false;
+
     [Checkbox] public bool ShowExperienceTracker { get; set; } = true;
 
     [Checkbox] public bool ShowExperienceTrackerGraph { get; set; } = false;

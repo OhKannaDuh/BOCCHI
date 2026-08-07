@@ -6,6 +6,10 @@
       "label": "言語",
       "tooltip": "BOCCHI のウィンドウとメッセージに使う言語です。"
     },
+    "open_on_occult_crescent_entry": {
+      "label": "クレセントアイル入場時に BOCCHI を開く",
+      "tooltip": "南征編または北征編に入ったとき、BOCCHI のメインウィンドウを自動で開きます。"
+    },
     "show_experience_tracker": {
       "label": "経験値トラッカーを表示",
       "tooltip": "メインウィンドウに経験値パネルを表示します。"
