@@ -19,7 +19,8 @@ using Ocelot.States.Score;
 namespace BOCCHI.Automator.StateMachine.Handlers;
 
 /// <summary>
-///     Hold near a preparing CE until Battle. Travel delivers via PathCalculator; this state never vnavs.
+///     Hold near a CE after arrival. Travel delivers via PathCalculator; this state prevents leaving
+///     for another activity while the arrived CE moves from preparation into Battle.
 /// </summary>
 public class WaitingForCriticalEncounterHandler
 (
@@ -30,6 +31,7 @@ public class WaitingForCriticalEncounterHandler
     IVNavmeshIpc vnav,
     IChainManager manager,
     ICriticalEncounterRepository repo,
+    ICriticalEncounterContext context,
     AutomatorConfig config
 ) : ScoreStateHandler<AutomatorState, StatePriority>(AutomatorState.WaitingForCriticalEncounter)
 {
@@ -40,13 +42,32 @@ public class WaitingForCriticalEncounterHandler
             return StatePriority.Never;
         }
 
-        if (!TryGetPreparingGoal(out CriticalEncounter ce))
+        if (!TryGetGoalEncounter(out CriticalEncounter ce))
         {
             return StatePriority.Never;
         }
 
-        float waitRadius = MathF.Max(1f, ce.Radius);
+        float combatRadius = NavigationConstants.CriticalEncounterRedRadius(ce.Radius);
+        float waitRadius = NavigationConstants.CriticalEncounterWaitRadius(combatRadius);
         if (player.Position.Distance2D(ce.Position) >= waitRadius)
+        {
+            return StatePriority.Never;
+        }
+
+        if (ce.IsActive())
+        {
+            if (context.GetCriticalEncounterId() == ce.Id)
+            {
+                return StatePriority.Never;
+            }
+
+            return memory.TryRemember<WaitingForCriticalEncounterMemory>(out WaitingForCriticalEncounterMemory wait)
+                   && wait.IsFor(ce.Id)
+                ? StatePriority.VeryHigh
+                : StatePriority.Never;
+        }
+
+        if (!ce.IsPreparing())
         {
             return StatePriority.Never;
         }
@@ -60,17 +81,36 @@ public class WaitingForCriticalEncounterHandler
         base.Enter();
         StopNavigation();
         memory.Forget<GoalPathStepMemory>();
-        memory.TryAdd(new WaitingForCriticalEncounterMemory());
+
+        if (TryGetGoalEncounter(out CriticalEncounter ce))
+        {
+            memory.Forget<WaitingForCriticalEncounterMemory>();
+            memory.TryAdd(new WaitingForCriticalEncounterMemory(ce.Id));
+        }
     }
 
     public override void Handle()
     {
-        if (!memory.TryRemember<WaitingForCriticalEncounterMemory>(out _))
+        if (!memory.TryRemember<WaitingForCriticalEncounterMemory>(out WaitingForCriticalEncounterMemory wait))
         {
             return;
         }
 
-        if (!TryGetPreparingGoal(out _))
+        if (!TryGetGoalEncounter(out CriticalEncounter ce))
+        {
+            return;
+        }
+
+        if (!wait.IsFor(ce.Id))
+        {
+            return;
+        }
+
+        if (ce.IsActive())
+        {
+            wait.MarkBattleStarted();
+        }
+        else if (!ce.IsPreparing())
         {
             return;
         }
@@ -86,7 +126,7 @@ public class WaitingForCriticalEncounterHandler
         }
     }
 
-    private bool TryGetPreparingGoal(out CriticalEncounter ce)
+    private bool TryGetGoalEncounter(out CriticalEncounter ce)
     {
         ce = null!;
 
@@ -97,12 +137,12 @@ public class WaitingForCriticalEncounterHandler
         }
 
         CriticalEncounter? found = repo.SnapshotWithoutForkedTower().FirstOrDefault(c => c.Id == ceGoal.id);
-        if (found is not { } preparing || !preparing.IsPreparing())
+        if (found is not { } encounter)
         {
             return false;
         }
 
-        ce = preparing;
+        ce = encounter;
         return true;
     }
 

@@ -49,9 +49,11 @@ public static class NavigationConstants
     public static float CriticalEncounterYellowRadius(float paddedRadius) =>
         MathF.Max(0f, paddedRadius - CriticalEncounterYellowInset);
 
-    /// <summary>Padded green radius used as CE wait / travel-arrival area (live blue proxy).</summary>
+    public const float CriticalEncounterWaitRadiusYalms = 22f;
+
+    /// <summary>CE wait / travel-arrival radius. Keep tighter than the padded debug ring so Battle starts inside the live join area.</summary>
     public static float CriticalEncounterWaitRadius(float combatRadius) =>
-        MathF.Max(1f, combatRadius + CriticalEncounterRadiusPadding);
+        CriticalEncounterWaitRadiusYalms;
 }
 
 public static class NavigationApproach

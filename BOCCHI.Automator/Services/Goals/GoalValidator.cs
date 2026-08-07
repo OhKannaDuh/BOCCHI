@@ -4,6 +4,7 @@ using BOCCHI.Common.Config;
 using BOCCHI.Common.Data.CriticalEncounters;
 using BOCCHI.Common.Data.Fates;
 using BOCCHI.Common.Data.Goals;
+using BOCCHI.Common.Data.StateMemory;
 using BOCCHI.Common.Data.Zones;
 using BOCCHI.Common.Services;
 
@@ -20,7 +21,8 @@ public class GoalValidator
     PotsConfig potsConfig,
     CriticalEncountersConfig criticalEncountersConfig,
     IPotCycleTracker potCycle,
-    IAutomatorContext automatorContext
+    IAutomatorContext automatorContext,
+    IAutomatorMemory memory
 ) : IGoalValidator
 {
     public bool Validate(IGoal goal)
@@ -53,10 +55,31 @@ public class GoalValidator
             return false;
         }
 
-        // Keep while Register/Warmup. During Battle only if this character is participating
-        // (player EventId) — zone CurrentEventId alone is not enough; outside players cannot join.
-        return ce.IsPreparing()
-               || (ce.IsActive() && criticalEncounterContext.GetCriticalEncounterId() == id);
+        if (ce.IsPreparing())
+        {
+            return true;
+        }
+
+        if (!ce.IsActive())
+        {
+            return false;
+        }
+
+        // During Battle, prefer the player's CE event id. If we had already reached the CE wait
+        // area before it started, keep the goal so we do not path out to another activity.
+        if (criticalEncounterContext.GetCriticalEncounterId() == id)
+        {
+            return true;
+        }
+
+        if (!memory.TryRemember<WaitingForCriticalEncounterMemory>(out WaitingForCriticalEncounterMemory wait)
+            || !wait.IsFor(id))
+        {
+            return false;
+        }
+
+        wait.MarkBattleStarted();
+        return true;
     }
 
     private bool ValidateFate(FateId id)

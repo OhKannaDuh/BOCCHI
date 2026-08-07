@@ -83,18 +83,21 @@ public class PathCalculator
         }
 
         float ceCombatRadius = 0f;
+        float ceWaitRadius = 0f;
         if (goal.GoalType is CriticalEncounterGoal ceGoalForRadius)
         {
             ceCombatRadius = zone.GetCriticalEncounterData()
                 .FirstOrDefault(a => a.Id == ceGoalForRadius.id.Value)?.CombatRadius ?? 0f;
+            ceWaitRadius = ceCombatRadius > 0f
+                ? NavigationConstants.CriticalEncounterWaitRadius(ceCombatRadius)
+                : 0f;
         }
 
         Vector3 arrivalCheck = potPrepositionStandOff ?? pathGoal.Position;
         float distanceToGoal = player.Position.Distance2D(arrivalCheck);
         if (ceCombatRadius > 0f)
         {
-            float waitRadius = NavigationConstants.CriticalEncounterWaitRadius(ceCombatRadius);
-            if (distanceToGoal <= waitRadius)
+            if (distanceToGoal <= ceWaitRadius)
             {
                 logger.Debug("Inside CE wait area.");
                 return [];
@@ -116,7 +119,7 @@ public class PathCalculator
             ? player.Position.Distance2D(camp.Position)
             : float.MaxValue;
         bool nearCriticalEncounter = ceCombatRadius > 0f
-                                     && distanceToGoal <= NavigationConstants.CriticalEncounterWaitRadius(ceCombatRadius);
+                                     && distanceToGoal <= ceWaitRadius;
         if (!nearCriticalEncounter
             && distanceToGoal > NavigationConstants.MaxDirectWalkDistance
             && distanceToGoal >= distToCamp * 0.5f)
