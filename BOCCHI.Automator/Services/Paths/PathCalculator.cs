@@ -129,7 +129,11 @@ public class PathCalculator
 
         GraphTraverser traverser = new(graph, pathfinder, logger);
         // Teleport-first: from camp this is usually instant (no vnav). DirectWalk only for short hops.
-        traverser.AddCalculator(new WalkTeleportWalkCalculator());
+        if (!config.DisableTeleportWalkPathing)
+        {
+            traverser.AddCalculator(new WalkTeleportWalkCalculator());
+        }
+
         traverser.AddCalculator(new DirectWalkCalculator());
 
         // Don't offer Return when already closer to the goal than to camp — that caused #84 loops.

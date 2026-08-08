@@ -39,33 +39,40 @@ public class AutomatorConfig : IAutoConfig
     public bool SprintOnAetheryteApproach { get; set; } = true;
 
     /// <summary>
-    ///     Stay mounted while a CE is preparing; dismount when it starts (#127).
+    ///     Never teleport-then-walk to reach a FATE/CE (blocked while in combat from nearby mobs).
+    ///     DirectWalk is still used when it's the shorter route.
     /// </summary>
     [Checkbox(Order = 9)]
+    public bool DisableTeleportWalkPathing { get; set; } = false;
+
+    /// <summary>
+    ///     Stay mounted while a CE is preparing; dismount when it starts (#127).
+    /// </summary>
+    [Checkbox(Order = 10)]
     public bool StayMountedWhileWaitingForCe { get; set; } = false;
 
     /// <summary>
     ///     After FATE/CE: Return, teleport to the nearest aetheryte for the next activity, mount,
     ///     then stop — no auto-walk (#139 / replaces #109 full-path requirement).
     /// </summary>
-    [Checkbox(Order = 10)]
+    [Checkbox(Order = 11)]
     public bool StopAfterReturn { get; set; } = false;
 
     /// <summary>
     ///     When the current phantom job is maxed, switch to the next unlocked non-maxed job.
     /// </summary>
-    [Checkbox(Order = 11)]
+    [Checkbox(Order = 12)]
     public bool PhantomJobsLevelingMode { get; set; } = false;
 
     /// <summary>
     ///     After FATE/CE: if raisable corpses are nearby, raise with the selected phantom job then continue.
     ///     No bodies → no swap / no wait; Illegal Mode continues as usual.
     /// </summary>
-    [Checkbox(Order = 12)]
+    [Checkbox(Order = 13)]
     public bool EnableTriageMode { get; set; } = false;
 
     /// <summary>Which phantom job Triage Mode swaps to for raises (falls back if not unlocked).</summary>
-    [TriageRaiseJob(Order = 13)]
+    [TriageRaiseJob(Order = 14)]
     public TriageRaiseJobPreference PreferredTriageRaiseJob { get; set; } = TriageRaiseJobPreference.PhantomChemist;
 
     /// <summary>
@@ -73,28 +80,28 @@ public class AutomatorConfig : IAutoConfig
     /// </summary>
     public bool EnableCompletionistMode { get; set; } = false;
 
-    [Checkbox(Order = 14)]
+    [Checkbox(Order = 15)]
     public bool ShouldCastTreasureSight { get; set; } = false;
 
-    [IntRange(60, 600, Order = 15)]
+    [IntRange(60, 600, Order = 16)]
     public int TreasureSightRecastIntervalSeconds { get; set; } = 120;
 
     /// <summary>
     ///     Upper bound (seconds) for the random 2..max wait before Return after a FATE/CE.
     /// </summary>
-    [IntRange(2, 60, Order = 16)]
+    [IntRange(2, 60, Order = 17)]
     public int MaxRemoteIdleTimeSeconds { get; set; } = 10;
 
     /// <summary>
     ///     Upper bound (seconds) for a random 0..max idle at camp before teleporting to a FATE/CE (#138).
     ///     0 = leave immediately.
     /// </summary>
-    [IntRange(0, 60, Order = 17)]
+    [IntRange(0, 60, Order = 18)]
     public int MaxBaseTeleportDelaySeconds { get; set; } = 0;
 
     /// <summary>
     ///     Repair equipped gear when any piece falls to or below this condition (%).
     /// </summary>
-    [IntRange(1, 99, Order = 18)]
+    [IntRange(1, 99, Order = 19)]
     public int AutoRepairThreshold { get; set; } = 30;
 }
