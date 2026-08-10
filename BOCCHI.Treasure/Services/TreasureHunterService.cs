@@ -1386,7 +1386,20 @@ public class TreasureHunterService
         StepDistance = dist2d;
 
         if (present == null)
+        {
+            if (CanTrustEmptyPad(layoutDestination, step.NodeId) && ConfirmEmptyPad(step.NodeId))
             {
+                log.Info(
+                    "Treasure hunt: no live coffer at layout {NodeId} — skipping and recalculating",
+                    step.NodeId);
+                checkedNodeIds.Add(step.NodeId);
+                LastCheckedNodeId = step.NodeId;
+                ClearEmptyPadCandidate();
+                ResetStuckWatch();
+                RecalculateRoute();
+                return false;
+            }
+
             // Still see a hunt coffer on radar — don't empty-skip (Nearby peel used to abandon ~50y out).
             if (HasUnopenedLiveHuntCofferNearPlayer(HuntDistances.NearbyLiveDivertRange))
             {
@@ -1412,19 +1425,6 @@ public class TreasureHunterService
                     return false;
                 }
             }
-            else if (CanTrustEmptyPad(layoutDestination, step.NodeId) && ConfirmEmptyPad(step.NodeId))
-            {
-                log.Info(
-                    "Treasure hunt: no live coffer at layout {NodeId} — skipping and recalculating",
-                    step.NodeId);
-                checkedNodeIds.Add(step.NodeId);
-                LastCheckedNodeId = step.NodeId;
-                ClearEmptyPadCandidate();
-                ResetStuckWatch();
-                RecalculateRoute();
-                return false;
-            }
-
             if (present == null)
             {
                 if (!vnav.IsRunning() && dist2d > OpenTreasureCofferChain.PreferredOpenDistance)
