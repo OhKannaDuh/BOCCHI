@@ -22,18 +22,11 @@ public class FatesConfig : IAutoConfig
     public bool IsFateEnabled(uint fateId) => !DisabledFateIds.Contains(fateId);
 
     /// <summary>
-    ///     Prefer pot FATEs / farm pot chests imply Magic Pot FATEs are allowed for Illegal Mode,
-    ///     even if they were left unchecked under Allowed FATEs.
+    ///     Illegal Mode always respects Allowed FATEs. Pot options only affect priority,
+    ///     prepositioning, and post-FATE chest farming for Magic Pot FATEs that are still enabled.
     /// </summary>
     public bool IsFateEnabledForIllegalMode(uint fateId, bool isPotFate, bool preferPotFates, bool shouldFarmPotChests)
-    {
-        if (IsFateEnabled(fateId))
-        {
-            return true;
-        }
-
-        return isPotFate && (preferPotFates || shouldFarmPotChests);
-    }
+        => IsFateEnabled(fateId);
 
     /// <summary>
     ///     Pot fallback cutoffs only apply when pot farming is on AND the predicted next pot FATE is enabled.

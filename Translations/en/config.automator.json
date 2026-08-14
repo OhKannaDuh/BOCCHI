@@ -18,11 +18,11 @@
     },
     "prefer_pot_fates": {
       "label": "Prefer pot FATEs",
-      "tooltip": "Pick Magic Pot FATEs when choosing what to do, and allow those FATEs even if they are unchecked under Allowed FATEs. Also turns on pot timing and waiting near pots (see Pot timing)."
+      "tooltip": "Pick enabled Magic Pot FATEs first when choosing what to do. Disabled Magic Pot FATEs under Allowed FATEs are still skipped. Also turns on pot timing and waiting near pots (see Pot timing)."
     },
     "should_farm_pot_chests": {
       "label": "Farm pot chests after pot FATEs",
-      "tooltip": "After a pot FATE ends (not between waves), wait for Cache Me If You Can, drink Magical Elixir, and follow the compass. Keeps going while Cache Me is up; stops when that buff is gone. If you have no buff, elixir, or hints, it visits known chest spots instead. Also allows pot FATEs for Illegal Mode even if they are unchecked under Allowed FATEs. Extra reroll chests are under Pot timing."
+      "tooltip": "After an enabled pot FATE ends (not between waves), wait for Cache Me If You Can, drink Magical Elixir, and follow the compass. Keeps going while Cache Me is up; stops when that buff is gone. If you have no buff, elixir, or hints, it visits known chest spots instead. Extra reroll chests are under Pot timing."
     },
     "should_preposition_to_pots": {
       "label": "Wait near pots before they spawn",

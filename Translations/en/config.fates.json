@@ -7,7 +7,7 @@
   "fields": {
     "disabled_fate_ids": {
       "label": "Allowed FATEs",
-      "tooltip": "Uncheck a FATE to skip it. Prefer pot FATEs / Farm pot chests still run Magic Pot FATEs even if those are unchecked here.",
+      "tooltip": "Uncheck a FATE to skip it. Illegal Mode will not run unchecked Magic Pot FATEs, even when Prefer pot FATEs or Farm pot chests is enabled.",
       "empty": "No FATEs listed for this zone."
     }
   }
