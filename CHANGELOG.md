@@ -1,23 +1,22 @@
 # 4.2.0.10
 
 ### Mob Farmer
-- Pull buffs no longer swap through Dancer / Geomancer / Monk without casting (and no longer skip Ringing Respite after Battle Bell)
+- Pull buffs no longer swap through Dancer / Geomancer / Monk without casting (Ringing Respite after Battle Bell is not skipped)
 
 ### Carrot Hunt
-- Fortune Carrot no longer logs "used" and skips the pad when the game rejected the use (retries until cast / inventory drop)
+- Fortune Carrot no longer says it was used and skips the pad when the use failed — it retries instead
 - Auto shopping pauses Carrot Hunt and resumes where it left off (same as treasure hunt)
 
 ### Pot chests
-- Ninja Hide arms earlier when walking to pot / 2nd-chance pads surrounded by high-Knowledge mobs (needs Use Ninja Hide on)
+- With Use Ninja Hide on, Hide arms earlier when walking to pot / 2nd-chance pads surrounded by strong enemies
 
-### Logs
-- In-plugin log viewer (Config → Logs, main window list icon, or `/bocchi logs`)
-- Debug lines are captured automatically (no need to set Dalamud log level to Debug)
-- Copy all BOCCHI logs includes version, combat rotation, loaded plugins, active modes, Illegal Mode state, and zone
-- Extra Debug for stuck triage: Illegal Mode state changes, Return/pot-farm enter, treasure hunt pause/idle reasons, combat AI enable/skip, shopping phases
+### Ninja Hide
+- Crescent Haunts no longer block Hide (they were wrongly skipped)
 
 ### Repair
-- Mender NPC repair no longer leaves Illegal Mode stuck on Repairing forever (timeout + short skip; falls back to self-repair if no mender nearby)
+- Mender NPC repair no longer leaves Illegal Mode stuck on Repairing forever — it backs off and tries again later, and falls back to self-repair if no mender is nearby
 
-### Treasure / Hide
-- Crescent Haunts no longer block Ninja Hide (they were wrongly treated as seeing through Hide)
+### Logs
+- New Logs page under Config (also the list icon on the main window, or `/bocchi logs`)
+- Copy all includes Debug lines automatically — you do not need to set Dalamud to Debug
+- Copy all also includes version, combat rotation, loaded plugins, what’s running, and zone (for Discord help)
