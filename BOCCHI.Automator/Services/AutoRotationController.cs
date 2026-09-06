@@ -6,6 +6,7 @@ using BOCCHI.Common.Services;
 using Dalamud.Plugin.Services;
 using Ocelot.Ipc.RotationSolverReborn;
 using Ocelot.Rotation.Services;
+using Ocelot.Services.Logger;
 using Ocelot.Services.PlayerState;
 using Ocelot.Services.PluginStatus;
 
@@ -25,9 +26,13 @@ public class AutoRotationController(
     IPluginStatus pluginStatus,
     IRotationSolverRebornIpc rsr,
     ISupportJobFactory supportJobs,
-    IAutomatorMemory memory
+    IAutomatorMemory memory,
+    ILogger<AutoRotationController> logger
 )
 {
+    private CombatActivity? lastEnabledActivity;
+
+    private string? lastSyncSkipReason;
     /// <summary>
     ///     Pot chest farming owns the character outright — it walks to reveals and opens them, and
     ///     leftover AutoTarget / AI movement from the pot FATE fights that. The FATE is usually still
@@ -59,9 +64,9 @@ public class AutoRotationController(
     /// </summary>
     public void OnRevived() => session.ClearJobAppliedCache();
 
-    public void EnableForFate() => session.Enable(CombatActivity.Fate);
+    public void EnableForFate() => EnableActivity(CombatActivity.Fate);
 
-    public void EnableForCriticalEncounter() => session.Enable(CombatActivity.CriticalEncounter);
+    public void EnableForCriticalEncounter() => EnableActivity(CombatActivity.CriticalEncounter);
 
     /// <summary>
     ///     Fight back while pot chest farming. The AI deliberately owns movement here: the farm does
@@ -69,7 +74,7 @@ public class AutoRotationController(
     ///     player, so letting the AI dodge takes the pot out of AoE with us. The pot can be
     ///     destroyed and the run lost with it, which is the real reason this matters (#188).
     /// </summary>
-    public void EnableForSelfDefence() => session.Enable(CombatActivity.Fate);
+    public void EnableForSelfDefence() => EnableActivity(CombatActivity.Fate);
 
     /// <summary>
     ///     Drop combat automation while travelling. Normally a no-op inside a FATE/CE, since the
@@ -84,9 +89,22 @@ public class AutoRotationController(
             && memory.TryRemember<SuspendTravelForActivityMemory>(out SuspendTravelForActivityMemory _)
             && (criticalEncounters.IsInCriticalEncounter() || fates.IsInFate()))
         {
+            if (lastSyncSkipReason != "keep-in-activity")
+            {
+                lastSyncSkipReason = "keep-in-activity";
+                logger.Debug("Combat AI Disable skipped — still In FATE/CE with travel suspended");
+            }
+
             return;
         }
 
+        if (lastEnabledActivity is not null)
+        {
+            logger.Debug("Combat AI Disable (was {Activity})", lastEnabledActivity);
+            lastEnabledActivity = null;
+        }
+
+        lastSyncSkipReason = null;
         session.Disable();
     }
 
@@ -98,12 +116,28 @@ public class AutoRotationController(
         session.Tick(CurrentPhantomJobId());
     }
 
+    private void EnableActivity(CombatActivity activity)
+    {
+        if (lastEnabledActivity != activity)
+        {
+            logger.Debug(
+                "Combat AI Enable activity={Activity} recipe={Recipe}",
+                activity,
+                config.CombatAutorotation);
+            lastEnabledActivity = activity;
+            lastSyncSkipReason = null;
+        }
+
+        session.Enable(activity);
+    }
+
     private void SyncActivityCombat()
     {
         // Without this the per-tick sync re-enables the rotation immediately: pot chest farming
         // usually runs while still standing in the pot FATE.
         if (CombatSuppressedByActivity)
         {
+            LogSyncSkip("pot-farm");
             return;
         }
 
@@ -113,6 +147,7 @@ public class AutoRotationController(
             || memory.TryRemember<WaitingForCriticalEncounterMemory>(out WaitingForCriticalEncounterMemory _)
             || memory.TryRemember<WaitingForPotFateMemory>(out WaitingForPotFateMemory _))
         {
+            LogSyncSkip("path-or-wait");
             return;
         }
 
@@ -120,6 +155,7 @@ public class AutoRotationController(
         // (SuspendTravel). Otherwise a CE you ride past keeps BOCCHI AI CE + RSR on (#200).
         if (!memory.TryRemember<SuspendTravelForActivityMemory>(out SuspendTravelForActivityMemory _))
         {
+            LogSyncSkip("no-suspend-travel");
             return;
         }
 
@@ -127,14 +163,25 @@ public class AutoRotationController(
         if (memory.TryRemember<CommittedCriticalEncounterMemory>(out CommittedCriticalEncounterMemory _)
             || criticalEncounters.IsInCriticalEncounter())
         {
-            session.Enable(CombatActivity.CriticalEncounter);
+            EnableActivity(CombatActivity.CriticalEncounter);
             return;
         }
 
         if (fates.IsInFate())
         {
-            session.Enable(CombatActivity.Fate);
+            EnableActivity(CombatActivity.Fate);
         }
+    }
+
+    private void LogSyncSkip(string reason)
+    {
+        if (lastSyncSkipReason == reason)
+        {
+            return;
+        }
+
+        lastSyncSkipReason = reason;
+        logger.Debug("Combat AI Sync skipped: {Reason}", reason);
     }
 
     private static CombatRotationRecipe ToRecipe(CombatAutorotation value) => value switch

@@ -159,10 +159,23 @@ public class ReturningHandler
 
             memory.Forget<ReturningStateMemory>();
             memory.TryAdd(new ReturningStateMemory(delay));
+            logger.Debug(
+                "Enter Returning delay={Delay:F1}s surveyPending={Survey} mounted={Mounted} combat={Combat} pos={Pos:F0}",
+                delay.TotalSeconds,
+                memory.TryRemember<AutomaticTreasureSurveyMemory>(out AutomaticTreasureSurveyMemory s1) && s1.PendingSurvey,
+                conditions[ConditionFlag.Mounted],
+                conditions[ConditionFlag.InCombat],
+                player.Position);
         }
         else
         {
             memory.TryAdd(new ReturningStateMemory(TimeSpan.Zero));
+            logger.Debug(
+                "Enter Returning delay=0s (fresh latch) surveyPending={Survey} mounted={Mounted} combat={Combat} pos={Pos:F0}",
+                memory.TryRemember<AutomaticTreasureSurveyMemory>(out AutomaticTreasureSurveyMemory s2) && s2.PendingSurvey,
+                conditions[ConditionFlag.Mounted],
+                conditions[ConditionFlag.InCombat],
+                player.Position);
         }
     }
 
@@ -278,6 +291,7 @@ public class ReturningHandler
         {
             pathfinder.Stop();
             vnav.Stop();
+            logger.Debug("Casting Return to camp");
             Actions.Return.Cast();
             return;
         }

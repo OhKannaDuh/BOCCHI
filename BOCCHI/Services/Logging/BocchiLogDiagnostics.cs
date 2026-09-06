@@ -58,9 +58,21 @@ public sealed class BocchiLogDiagnostics
             "Modes: "
             + $"Illegal={OnOff(Automator.Enabled)} "
             + $"MobFarmer={OnOff(Farmer.Running)} "
-            + $"TreasureHunt={OnOff(hunter.Running)} "
+            + $"TreasureHunt={OnOff(hunter.Running)}"
+            + (hunter.Running ? $"(paused={OnOff(hunter.Paused)})" : string.Empty)
+            + " "
             + $"CarrotHunt={OnOff(carrotHunter.Running)} "
             + $"Shopping={OnOff(shopping)}");
+
+        string illegalState = Automator.CurrentState?.ToString()
+            ?? (Automator.SuspendedForTreasure
+                ? "Suspended(Treasure)"
+                : Automator.SuspendedForShopping
+                    ? "Suspended(Shopping)"
+                    : Automator.Enabled
+                        ? "off-tick"
+                        : "off");
+        sb.AppendLine($"IllegalState: {illegalState}");
 
         IZone zone = zones.GetZone();
         string zoneName = zone.ZoneId switch

@@ -224,22 +224,46 @@ public class TreasureHunterService
 
         if (Paused)
         {
+            if (EzThrottler.Throttle("TreasureHunt::IdlePaused", 5000))
+            {
+                log.Debug(
+                    "Treasure hunt idle: Paused step={Step} vnavRunning={Vnav} mounted={Mounted}",
+                    DescribeCurrentStep(),
+                    vnav.IsRunning(),
+                    conditions[ConditionFlag.Mounted]);
+            }
+
             return;
         }
 
         if (conditions[ConditionFlag.Unconscious])
         {
             SoftStopMovement();
+            if (EzThrottler.Throttle("TreasureHunt::IdleUnconscious", 5000))
+            {
+                log.Debug("Treasure hunt idle: Unconscious");
+            }
+
             return;
         }
 
         if (config.SkipUnsafeTreasureWindows && IsUnsafeTreasureWindow())
         {
+            if (EzThrottler.Throttle("TreasureHunt::IdleUnsafe", 5000))
+            {
+                log.Debug("Treasure hunt idle: Unsafe window (SkipUnsafeTreasureWindows)");
+            }
+
             return;
         }
 
         if (!IsVnavReady)
         {
+            if (EzThrottler.Throttle("TreasureHunt::IdleNoVnav", 5000))
+            {
+                log.Debug("Treasure hunt idle: vnavmesh not ready");
+            }
+
             return;
         }
 
@@ -249,6 +273,11 @@ public class TreasureHunterService
         {
             // Interact often drops Hide; stay stealthed while the open chain runs near threats.
             MaintainNinjaHideDuringInteract();
+            if (EzThrottler.Throttle("TreasureHunt::IdleOpenChain", 5000))
+            {
+                log.Debug("Treasure hunt idle: open chain running step={Step}", DescribeCurrentStep());
+            }
+
             return;
         }
 
@@ -256,11 +285,21 @@ public class TreasureHunterService
         {
             if (pathPlanner.State != HuntPathfinderState.FileLoaded)
             {
+                if (EzThrottler.Throttle("TreasureHunt::IdlePlanner", 5000))
+                {
+                    log.Debug("Treasure hunt idle: path planner state={State}", pathPlanner.State);
+                }
+
                 return;
             }
 
             if (!planningRoute)
             {
+                if (EzThrottler.Throttle("TreasureHunt::IdlePlannerIdle", 5000))
+                {
+                    log.Debug("Treasure hunt idle: planner loaded but not planning route");
+                }
+
                 return;
             }
 
@@ -700,6 +739,10 @@ public class TreasureHunterService
         Paused = true;
         SoftStopMovement();
         stopwatch.Stop();
+        log.Debug(
+            "Treasure hunt Pause step={Step} vnavRunning={Vnav}",
+            DescribeCurrentStep(),
+            vnav.IsRunning());
     }
 
     public void Resume()
@@ -714,6 +757,8 @@ public class TreasureHunterService
         {
             stopwatch.Start();
         }
+
+        log.Debug("Treasure hunt Resume step={Step}", DescribeCurrentStep());
     }
 
     public void ResumeNearPlayer()
@@ -728,6 +773,8 @@ public class TreasureHunterService
         {
             stopwatch.Start();
         }
+
+        log.Debug("Treasure hunt ResumeNearPlayer step={Step}", DescribeCurrentStep());
 
         if (!TryGetResumeCoffer(out uint resumeId, out Vector3 resumePos))
         {
@@ -761,6 +808,17 @@ public class TreasureHunterService
         }
 
         return steps[StepIndex];
+    }
+
+    private string DescribeCurrentStep()
+    {
+        HuntPathfinderStep? step = GetCurrentStep();
+        if (step is null)
+        {
+            return planningRoute ? "planning" : $"none (idx={StepIndex}/{steps.Count})";
+        }
+
+        return $"{step.Type}/node={step.NodeId}";
     }
 
     public bool TryGetResumeCoffer(out uint nodeId, out Vector3 position)

@@ -64,6 +64,21 @@ public sealed class ShoppingService
     }
 
     private Phase phase = Phase.Idle;
+
+    private void SetPhase(Phase next, string? detail = null)
+    {
+        if (phase == next)
+        {
+            return;
+        }
+
+        logger.Debug(
+            "[Shopping] {Old} → {New}{Detail}",
+            phase,
+            next,
+            string.IsNullOrEmpty(detail) ? string.Empty : $" ({detail})");
+        phase = next;
+    }
     private DateTimeOffset buyCooldownUntil = DateTimeOffset.MinValue;
     private bool priorityClaimed;
     private int desiredMenuIndex;
@@ -125,7 +140,7 @@ public sealed class ShoppingService
             {
                 // Already at the antiquarian with the shop open — finish buys or close.
                 ClaimPriority();
-                phase = Phase.Buying;
+                SetPhase(Phase.Buying);
                 TryHandleOpenShop(zoneId);
                 return;
             }
@@ -143,7 +158,7 @@ public sealed class ShoppingService
             && (HasPendingGoals(zoneId) || phase == Phase.Buying || priorityClaimed))
         {
             ClaimPriority();
-            phase = Phase.Buying;
+            SetPhase(Phase.Buying);
             TryHandleOpenShop(zoneId);
             return;
         }
@@ -203,7 +218,7 @@ public sealed class ShoppingService
         float distance = npc.Position.Distance2D(player.Position);
         if (distance > VendorInteractRange)
         {
-            phase = Phase.Approaching;
+            SetPhase(Phase.Approaching);
             if (vnav.IsNavmeshReady() && EzThrottler.Throttle("Shopping::Path", 1000))
             {
                 // Path to the vendor (stable). A rotating GetApproachPosition stand-off near the
@@ -222,7 +237,7 @@ public sealed class ShoppingService
 
         approachTarget = null;
         vnav.Stop();
-        phase = Phase.OpeningMenu;
+        SetPhase(Phase.OpeningMenu);
         unsafe
         {
             if (gui.GetAddonByName("SelectIconString", 1).Address != nint.Zero)
@@ -265,7 +280,7 @@ public sealed class ShoppingService
 
     private void AbortShopping(bool resumeAutomation)
     {
-        phase = Phase.Idle;
+        SetPhase(Phase.Idle);
         openedMenuIndex = null;
         approachTarget = null;
         skippedMissingRows.Clear();
@@ -298,7 +313,7 @@ public sealed class ShoppingService
 
     private void TickTeleport()
     {
-        phase = Phase.Traveling;
+        SetPhase(Phase.Traveling);
         if (teleportChain is not { IsCompleted: true })
         {
             return;
@@ -314,7 +329,7 @@ public sealed class ShoppingService
 
     private void TryTravelToCamp(IZone zone, uint preferredAethernetId)
     {
-        phase = Phase.Traveling;
+        SetPhase(Phase.Traveling);
 
         if (AetheryteApproach.IsAtPlaceName(zone, preferredAethernetId, player.Position)
             || zone.IsInBasecamp())
@@ -391,7 +406,7 @@ public sealed class ShoppingService
                     desiredMenuIndex = wrongPay.MenuIndex;
                     openedMenuIndex = null;
                     ResetTabHunt();
-                    phase = Phase.OpeningMenu;
+                    SetPhase(Phase.OpeningMenu);
                     logger.Debug(
                         $"[Shopping] {wrongPay.Name} listed for currency {listedCurrency}, want {wrongPay.CurrencyItemId} — switching menu {wrongPay.MenuIndex}");
                 }
@@ -421,7 +436,7 @@ public sealed class ShoppingService
                     desiredMenuIndex = switchTo.MenuIndex;
                     openedMenuIndex = null;
                     ResetTabHunt();
-                    phase = Phase.OpeningMenu;
+                    SetPhase(Phase.OpeningMenu);
                     logger.Debug($"[Shopping] switching to menu {desiredMenuIndex}");
                 }
 

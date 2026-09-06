@@ -13,7 +13,8 @@
 ### Logs
 - In-plugin log viewer (Config → Logs, main window list icon, or `/bocchi logs`)
 - Debug lines are captured automatically (no need to set Dalamud log level to Debug)
-- Copy all BOCCHI logs includes version, combat rotation, loaded plugins, active modes, and zone
+- Copy all BOCCHI logs includes version, combat rotation, loaded plugins, active modes, Illegal Mode state, and zone
+- Extra Debug for stuck triage: Illegal Mode state changes, Return/pot-farm enter, treasure hunt pause/idle reasons, combat AI enable/skip, shopping phases
 
 ### Repair
 - Mender NPC repair no longer leaves Illegal Mode stuck on Repairing forever (timeout + short skip; falls back to self-repair if no mender nearby)

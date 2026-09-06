@@ -77,6 +77,8 @@ public class Automator
     public AutomatorState? CurrentState =>
         IsActive && !SuspendedForTreasure && !SuspendedForShopping ? StateMachine.State : null;
 
+    private AutomatorState? lastLoggedState;
+
     public void OnStop() => StopAutomation();
 
     public void SetSuspendedForTreasure(bool suspended)
@@ -86,6 +88,11 @@ public class Automator
             return;
         }
 
+        logger.Debug(
+            "Illegal Mode suspend for treasure hunt: {Was} → {Now} (state was {State})",
+            SuspendedForTreasure,
+            suspended,
+            CurrentState?.ToString() ?? "null");
         SuspendedForTreasure = suspended;
         if (!suspended)
         {
@@ -105,6 +112,11 @@ public class Automator
             return;
         }
 
+        logger.Debug(
+            "Illegal Mode suspend for shopping: {Was} → {Now} (state was {State})",
+            SuspendedForShopping,
+            suspended,
+            CurrentState?.ToString() ?? "null");
         SuspendedForShopping = suspended;
         if (!suspended)
         {
@@ -347,6 +359,7 @@ public class Automator
         if (memory.TryRemember<NavigationInterruptedMemory>(out NavigationInterruptedMemory _))
         {
             StateMachine.Update();
+            LogStateTransitionIfNeeded();
             return;
         }
 
@@ -387,6 +400,22 @@ public class Automator
         }
 
         StateMachine.Update();
+        LogStateTransitionIfNeeded();
+    }
+
+    private void LogStateTransitionIfNeeded()
+    {
+        AutomatorState? now = StateMachine.State;
+        if (now == lastLoggedState)
+        {
+            return;
+        }
+
+        logger.Debug(
+            "Illegal Mode state {Prev} → {Next}",
+            lastLoggedState?.ToString() ?? "null",
+            now?.ToString() ?? "null");
+        lastLoggedState = now;
     }
 
     private void DisableDueToLeavingOccultCrescent()
@@ -420,6 +449,8 @@ public class Automator
         {
             StateMachine.Reset();
         }
+
+        lastLoggedState = null;
     }
 
     private void TryStartPendingPotChestFarm()

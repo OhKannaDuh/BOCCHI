@@ -198,6 +198,15 @@ public class FarmingPotChestsHandler
         lastPathDestination = null;
         pandoraAutoOpen.Hold();
         ClearNinjaHideRequirement();
+
+        bool hasFarm = memory.TryRemember<PotChestFarmMemory>(out PotChestFarmMemory farm);
+        logger.Debug(
+            "Enter pot chest farm fate={Fate} mode={Mode} phase={Phase} remaining={Remaining}/{Total}",
+            hasFarm ? farm.FateId.Value.ToString() : "?",
+            hasFarm ? farm.Mode.ToString() : "?",
+            hasFarm ? farm.Phase.ToString() : "?",
+            hasFarm ? farm.RemainingChests : 0,
+            hasFarm ? farm.TotalChests : 0);
     }
 
     public override void Exit(AutomatorState next)
