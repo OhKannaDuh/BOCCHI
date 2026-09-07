@@ -2,7 +2,7 @@ using System.Numerics;
 
 namespace BOCCHI.Common.Data.Zones;
 
-/// <summary>Fixed annulus around the knowledge crystal for buff casting.</summary>
+/// <summary>Disk around the knowledge crystal for buff casting (approach uses RadiusMin).</summary>
 public readonly record struct BuffZone(Vector3 Center, float RadiusMin, float RadiusMax)
 {
     /// <summary>True inside the outer buff radius (includes standing on the crystal).</summary>
@@ -30,9 +30,6 @@ public readonly record struct BuffZone(Vector3 Center, float RadiusMin, float Ra
         return new Vector3(Center.X + (dx * scale), Center.Y, Center.Z + (dz * scale));
     }
 }
-
-/// <summary>Expedition Antiquarian vendor used for currency shopping.</summary>
-public readonly record struct ShoppingVendorData(uint DataId, uint PreferredAethernetId);
 
 /// <summary>Visible coffer / treasure-route safety + area→aethernet hints.</summary>
 public sealed class TreasureRoutePolicy

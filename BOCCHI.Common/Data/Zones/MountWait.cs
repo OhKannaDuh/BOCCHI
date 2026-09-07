@@ -18,9 +18,8 @@ public static class MountWait
 
     /// <summary>
     ///     Skip auto-mount near camp only when the route still ends by the crystal.
-    ///     Longer FATE/CE legs (e.g. Company of Stone) should mount before leaving camp.
     /// </summary>
-    public static bool ShouldSuppressMountNearCamp(IZone zone, Vector3 destination) =>
+    private static bool ShouldSuppressMountNearCamp(IZone zone, Vector3 destination) =>
         destination.Distance2D(zone.GetAetherytePosition())
         <= NavigationConstants.CampRadius + NavigationConstants.MountMinDistance;
 

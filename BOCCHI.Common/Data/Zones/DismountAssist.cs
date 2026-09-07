@@ -30,10 +30,8 @@ public static class DismountAssist
 
     /// <summary>
     ///     Mid mount / dismount animation (MountOrOrnamentTransition, Mounting, Mounting71).
-    ///     Flag.Mounted can still be false here — callers that treated that as "on foot" raced
-    ///     Treasure Sight and finished the cast wait without ever issuing Occult Treasuresight.
     /// </summary>
-    public static bool IsMountTransition(ICondition conditions) =>
+    private static bool IsMountTransition(ICondition conditions) =>
         conditions[ConditionFlag.Mounting]
         || conditions[ConditionFlag.Mounting71]
         || conditions[ConditionFlag.MountOrOrnamentTransition];

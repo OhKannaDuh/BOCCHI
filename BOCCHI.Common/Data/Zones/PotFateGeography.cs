@@ -2,6 +2,7 @@ namespace BOCCHI.Common.Data.Zones;
 
 /// <summary>
 ///     Geographic north/south for each Occult Crescent pot FATE pair (within the zone, not Horn).
+///     IDs match <c>GetPotFateData()</c> on South Horn / North Horn (lower world Z = north).
 /// </summary>
 public static class PotFateGeography
 {

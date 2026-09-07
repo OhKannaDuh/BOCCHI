@@ -49,20 +49,4 @@ public static class ZoneGraphStatusUi
                 return true;
         }
     }
-
-    public static void Draw(IZone zone, ITranslator<MainWindow> translator)
-    {
-        if (!TryFormat(zone, translator, out string label, out string value, out bool emphasize))
-        {
-            return;
-        }
-
-        BocchiUi.StatusChipKind kind = emphasize
-            ? BocchiUi.StatusChipKind.Warn
-            : zone.GraphLoadState == ZoneGraphLoadState.Ready
-                ? BocchiUi.StatusChipKind.Ok
-                : BocchiUi.StatusChipKind.Muted;
-
-        BocchiUi.DrawStatusChip($"{label}: {value}", kind);
-    }
 }

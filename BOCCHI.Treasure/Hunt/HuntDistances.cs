@@ -18,13 +18,13 @@ public static class HuntDistances
     public const float LayoutProximityRadiusSq = LayoutProximityRadius * LayoutProximityRadius;
 
     /// <summary>Same-pad double-spawn recheck after opening a bunny.</summary>
-    public const float SamePadRecheckRadius = 20f;
-
-    public const float SamePadRecheckRadiusSq = SamePadRecheckRadius * SamePadRecheckRadius;
+    public const float SamePadRecheckRadiusSq = 20f * 20f;
 
     /// <summary>
     ///     Carrot Hunt: trust an empty pad this close without a nearby live carrot.
-    ///     Treasure Hunt empty skips use <c>TreasureConfig.EmptyPadTrustDistance</c>.
+    ///     Treasure Hunt empty-skip distance comes from <c>TreasureConfig.EmptyPadTrustDistance</c>;
+    ///     divert peel still uses <see cref="EmptyPadSkipRadius"/> so it does not U-turn off a pad
+    ///     that is about to empty-skip.
     /// </summary>
     public const float EmptyPadSkipRadius = 100f;
 

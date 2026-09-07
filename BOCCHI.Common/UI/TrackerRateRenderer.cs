@@ -21,7 +21,7 @@ public static class TrackerRateRenderer
         }
     }
 
-    public static void PlotPerHourHistory(float[] history, string id, float height = 30f)
+    private static void PlotPerHourHistory(float[] history, string id, float height = 30f)
     {
         if (history.Length <= 0)
         {

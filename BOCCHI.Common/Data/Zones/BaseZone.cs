@@ -90,8 +90,6 @@ public abstract class BaseZone
 
     public virtual TreasureRoutePolicy GetTreasureRoutePolicy() => new();
 
-    public virtual ShoppingVendorData? GetShoppingVendor() => null;
-
     public List<KnowledgeCrystalData> GetNearbyKnowledgeCrystals()
     {
         if (objects.LocalPlayer is not { } player)

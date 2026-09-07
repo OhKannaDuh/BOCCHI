@@ -98,8 +98,6 @@ public interface IZone
 
     TreasureRoutePolicy GetTreasureRoutePolicy() => new();
 
-    ShoppingVendorData? GetShoppingVendor() => null;
-
     Task<ZoneGraph> GetGraph();
 
     /// <summary>Current path-map load lifecycle for UI / diagnostics.</summary>

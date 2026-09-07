@@ -139,9 +139,6 @@ public static class OccultCurrencies
     public static bool IsGoldCurrency(uint itemId) =>
         itemId == GoldPieceItemId || itemId == GoldObolItemId;
 
-    public static bool IsAmuletCurrency(uint itemId) =>
-        itemId == NorthHornCipherItemId;
-
     public static bool IsTrackedCurrency(uint itemId) =>
         IsSilverCurrency(itemId) || IsGoldCurrency(itemId);
 }

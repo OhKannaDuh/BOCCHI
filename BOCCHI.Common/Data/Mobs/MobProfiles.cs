@@ -1,10 +1,8 @@
-using BOCCHI.Common.Data.OccultCrescent;
-
 namespace BOCCHI.Common.Data.Mobs;
 
 /// <summary>
-///     Authored mob weakness / spawn / aggro data. Mob Farmer still selects from
-///     <see cref="MobData.MobsWithSpawnCondition"/>; aggro is used for debug rings and pull spacing.
+///     Authored mob metadata. Runtime currently uses aggro for Mob Farmer debug rings only;
+///     weakness / CC / level / spawn fields are kept for reference and future filters.
 /// </summary>
 public static class MobProfiles
 {
@@ -15,55 +13,11 @@ public static class MobProfiles
 
     private static readonly Dictionary<Mob, MobProfile> Profiles = BuildProfiles();
 
-    public static bool TryGet(Mob mob, out MobProfile profile) => Profiles.TryGetValue(mob, out profile);
-
     public static MobAggro GetAggro(Mob mob) =>
         Profiles.TryGetValue(mob, out MobProfile profile) ? profile.Aggro : MobAggro.Unknown;
 
     public static MobAggro GetAggro(uint nameId) =>
         MobData.TryFromNameId(nameId, out Mob mob) ? GetAggro(mob) : MobAggro.Unknown;
-
-    public static MobElement GetWeaknesses(Mob mob) =>
-        Profiles.TryGetValue(mob, out MobProfile profile) ? profile.Weaknesses : MobElement.None;
-
-    public static bool IsWeakTo(Mob mob, MobElement element) =>
-        element != MobElement.None && (GetWeaknesses(mob) & element) != 0;
-
-    public static byte GetLevel(Mob mob) =>
-        Profiles.TryGetValue(mob, out MobProfile profile) ? profile.Level : (byte)0;
-
-    public static MobSpawnCondition GetSpawnCondition(Mob mob) =>
-        Profiles.TryGetValue(mob, out MobProfile profile) ? profile.SpawnCondition : MobSpawnCondition.None;
-
-    public static MobSusceptibility GetSusceptibilities(Mob mob) =>
-        Profiles.TryGetValue(mob, out MobProfile profile) ? profile.Susceptible : MobSusceptibility.None;
-
-    public static bool IsSusceptibleTo(Mob mob, MobSusceptibility flag) =>
-        flag != MobSusceptibility.None && (GetSusceptibilities(mob) & flag) == flag;
-
-    /// <summary>Maps elemental weakness flags to OC weakness status IDs (5322–5325).</summary>
-    public static IEnumerable<ushort> GetWeaknessStatusIds(MobElement elements)
-    {
-        if (elements.HasFlag(MobElement.Fire))
-        {
-            yield return PhantomDebuffs.FireWeakness;
-        }
-
-        if (elements.HasFlag(MobElement.Ice))
-        {
-            yield return PhantomDebuffs.IceWeakness;
-        }
-
-        if (elements.HasFlag(MobElement.Thunder))
-        {
-            yield return PhantomDebuffs.LightningWeakness;
-        }
-
-        if (elements.HasFlag(MobElement.Wind))
-        {
-            yield return PhantomDebuffs.WindWeakness;
-        }
-    }
 
     private static Dictionary<Mob, MobProfile> BuildProfiles()
     {

@@ -1,36 +1,35 @@
 # 4.2.0.11
 
 ### Pot timer
-- Next / active pot FATEs show North or South within the zone (Persistent Pots / Daylight Pottery = North; Pleading Pots / In a Pot of Bother = South)
+- Upcoming and active pot FATEs show North or South in the zone (Persistent Pots / Daylight Pottery = North; Pleading Pots / In a Pot of Bother = South)
 
 ### Mob Farmer
-- Pot travel no longer sits idle after planning Return (Return runs even while Pots & Treasure is managing the pot window)
-- Gather timeout now ends gathering and fights packs you already have, instead of only applying after you start stacking
-- Tanks no longer re-cast Provoke / gap closer / ranged pull on mobs that already have you
-- Treasure Sight casts on the first yield opportunity instead of waiting a full interval first
+- No longer idles after deciding to Return during pot travel — Return actually runs
+- Gather timeout now stops gathering and fights what you already pulled (not only after stacking starts)
+- Tanks stop re-using Provoke / gap closer / ranged pull on mobs that already have you
+- Treasure Sight can cast on the first chance instead of waiting a full timer first
 
 ### Ninja Hide
-- Crescent Haunts no longer trigger Hide (they see through it — walking stealthed into them was worse than running past)
-- Far-northeast North Horn coffers (crowded ridge) no longer lateral-nudge into packs when stuck; with Hide on, those pads also start Hide farther out
+- Crescent Haunts no longer trigger Hide (they see through it — walking stealthed into them was worse)
+- Crowded far-northeast North Horn coffers: stuck recovery no longer sidesteps into packs; with Hide on, Hide also starts farther out on those pads
 
 ### Treasure Hunt
-- Stuck recovery no longer sideways-nudges while Hidden / near route threats (nudge was breaking Hide into aggro)
+- Stuck recovery no longer sidesteps while you are Hidden or next to route threats (that was dropping Hide into aggro)
 
 ### Illegal Mode
-- Combat targeting (RSR Henched) no longer flips On/Off every tick during FATEs and CEs
-- Allowed FATEs (e.g. The Winged Terror) now stay saved across reloads / zone entry
-- No longer mounts for the short walk from pot wait into a live pot FATE before combat
+- Combat targeting no longer flickers On/Off every tick in FATEs and CEs
+- Allowed FATEs (e.g. The Winged Terror) stay saved after reload / zone entry
+- No longer mounts for the short walk from pot wait into a live pot FATE
 
 ### Auto shopping
-- Uses Knightshopper only (configure your Occult Crescent list there); the in-plugin shopping list and camp travel/buy path are removed
-- Returns to base camp first when you are out in the field, then starts Knightshopper
-- No longer starts while you are registered for / in a CE, waiting for a CE or pot, or mid pot-chest farm
-- Emergency Stop also cancels Knightshopper shopping
-- Dependencies tab shows Knightshopper under Shopping
-- Debug: `/bocchi debug shop` Returns to camp if needed, then starts Knightshopper (`shop status` / `shop cancel`)
+- Shopping is Knightshopper only — set your Occult Crescent list there (the old in-plugin list is gone)
+- If you are out in the field, BOCCHI Returns to base camp first, then starts Knightshopper
+- Will not start during a FATE/CE, while waiting for a CE or pot, or mid pot-chest farm
+- Emergency Stop also cancels Knightshopper
+- Dependencies lists Knightshopper under Shopping
 
 ### Pot chests
-- Pot chest farming can start while auto treasure hunt had Illegal Mode suspended (no longer waits until the hunt fully stops)
+- Pot chest farming can start even if treasure hunt had paused Illegal Mode (no longer waits for the hunt to fully stop)
 
 ### Gear repair
-- Mender NPC repair no longer stops early when the Repair All button is still disabled but gear still needs repair (walk-up-and-leave)
+- Mender repair no longer walks up and leaves while gear still needs Repair All

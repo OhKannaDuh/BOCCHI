@@ -24,9 +24,9 @@ public static unsafe class OccultCrescentHelper
 
     public static int GetGoldPieces() => GetCurrencyCount(OccultCurrencies.GoldPieceItemId);
 
-    public static int GetSilverObols() => GetCurrencyCount(OccultCurrencies.SilverObolItemId);
+    private static int GetSilverObols() => GetCurrencyCount(OccultCurrencies.SilverObolItemId);
 
-    public static int GetGoldObols() => GetCurrencyCount(OccultCurrencies.GoldObolItemId);
+    private static int GetGoldObols() => GetCurrencyCount(OccultCurrencies.GoldObolItemId);
 
     /// <summary>Active horn silver currency (pieces on South, obols on North).</summary>
     public static int GetActiveSilver(ZoneId zone) =>

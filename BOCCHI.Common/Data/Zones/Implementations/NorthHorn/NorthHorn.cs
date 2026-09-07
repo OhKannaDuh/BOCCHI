@@ -155,9 +155,6 @@ public class NorthHorn
         new(-893f, 780f, -981.803f),
     ];
 
-    public override ShoppingVendorData? GetShoppingVendor() =>
-        new(1059485, BaseCamp.Id);
-
     public override TreasureRoutePolicy GetTreasureRoutePolicy() =>
         new();
 

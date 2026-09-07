@@ -145,9 +145,6 @@ public class SouthHorn
     public override BuffZone? GetBuffZone() =>
         new(new Vector3(836.07f, 73.12f, -709.45f), 2.5f, 4.5f);
 
-    public override ShoppingVendorData? GetShoppingVendor() =>
-        new(1053614, BaseCamp.Id);
-
     public override TreasureRoutePolicy GetTreasureRoutePolicy() =>
         new()
         {

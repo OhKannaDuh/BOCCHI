@@ -30,9 +30,9 @@ public static class BocchiChat
         chat.PrintError(Format(message));
     }
 
-    public static string Format(string message) => $"{Tag} {Strip(message)}";
+    private static string Format(string message) => $"{Tag} {Strip(message)}";
 
-    public static string Strip(string message)
+    private static string Strip(string message)
     {
         if (message.StartsWith($"{Tag} ", StringComparison.Ordinal))
         {
