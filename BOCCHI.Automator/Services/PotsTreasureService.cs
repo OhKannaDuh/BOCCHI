@@ -1,4 +1,5 @@
 using BOCCHI.Automator.Data;
+using BOCCHI.Automator.Services.PotTreasure;
 using BOCCHI.Common;
 using BOCCHI.Common.Config;
 using BOCCHI.Common.Data.Fates;
@@ -8,6 +9,7 @@ using BOCCHI.Common.Data.Zones;
 using BOCCHI.Common.Services;
 using BOCCHI.Treasure.Services;
 using Dalamud.Plugin.Services;
+using Ocelot.Extensions;
 using Ocelot.Lifecycle;
 using Ocelot.Services.Logger;
 using Ocelot.Services.Translation;
@@ -30,6 +32,7 @@ public class PotsTreasureService
     IZoneProvider zones,
     IGoalFactory goalFactory,
     IAutomationModeGuard modeGuard,
+    IObjectTable objects,
     IChatGui chat,
     UIConfig uiConfig,
     PotsConfig potsConfig,
@@ -378,6 +381,16 @@ public class PotsTreasureService
         }
 
         if (memory.TryRemember<PotChestFarmMemory>(out PotChestFarmMemory _))
+        {
+            return true;
+        }
+
+        if (memory.TryRemember<PendingPotChestFarmMemory>(out PendingPotChestFarmMemory _))
+        {
+            return true;
+        }
+
+        if (objects.LocalPlayer?.StatusList.Has(PotTreasureIds.TreasureBuffStatusId) == true)
         {
             return true;
         }

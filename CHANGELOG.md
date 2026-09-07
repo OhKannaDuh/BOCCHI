@@ -1,22 +1,20 @@
-# 4.2.0.10
-
-### Mob Farmer
-- Pull buffs no longer swap through Dancer / Geomancer / Monk without casting (Ringing Respite after Battle Bell is not skipped)
-
-### Carrot Hunt
-- Fortune Carrot no longer says it was used and skips the pad when the use failed — it retries instead
-- Auto shopping pauses Carrot Hunt and resumes where it left off (same as treasure hunt)
-
-### Pot chests
-- With Use Ninja Hide on, Hide arms earlier when walking to pot / 2nd-chance pads surrounded by strong enemies
+# 4.2.0.11
 
 ### Ninja Hide
-- Crescent Haunts no longer block Hide (they were wrongly skipped)
+- Crescent Haunts no longer trigger Hide (they see through it — walking stealthed into them was worse than running past)
 
-### Repair
-- Mender NPC repair no longer leaves Illegal Mode stuck on Repairing forever — it backs off and tries again later, and falls back to self-repair if no mender is nearby
+### Illegal Mode
+- Combat targeting (RSR Henched) no longer flips On/Off every tick during FATEs and CEs
 
-### Logs
-- New Logs page under Config (also the list icon on the main window, or `/bocchi logs`)
-- Copy all includes Debug lines automatically — you do not need to set Dalamud to Debug
-- Copy all also includes version, combat rotation, loaded plugins, what’s running, and zone (for Discord help)
+### Auto shopping
+- Uses Knightshopper only (configure your Occult Crescent list there); the in-plugin shopping list and camp travel/buy path are removed
+- Can start from outside base camp when Knightshopper handles travel
+- No longer starts while you are registered for / in a CE, waiting for a CE or pot, or mid pot-chest farm
+- Emergency Stop also cancels Knightshopper shopping
+- Dependencies tab shows Knightshopper under Shopping
+
+### Pot chests
+- Pot chest farming can start while auto treasure hunt had Illegal Mode suspended (no longer waits until the hunt fully stops)
+
+### Gear repair
+- Mender NPC repair no longer stops early when the Repair All button is still disabled but gear still needs repair (walk-up-and-leave)

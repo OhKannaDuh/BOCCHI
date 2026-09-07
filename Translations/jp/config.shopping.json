@@ -1,10 +1,13 @@
 {
   "label": "買い物",
-  "tooltip": "銀貨または金貨がしきい値に達したら遠征古物商から自動購入します。FATE/CE中は開始しません。",
+  "tooltip": "銀貨または金貨がしきい値に達したら他の自動化を一時停止し、Knightshopper のオカルトクレセント買い物リストを開始します。Knightshopper が必要です（依存関係を参照）。FATE/CE中は開始しません。",
+  "sections": {
+    "auto": "自動買い物"
+  },
   "fields": {
     "enable_auto_shop": {
       "label": "自動買い物を有効化",
-      "tooltip": "オン：銀貨または金貨がしきい値に達し、FATE/CE中でなければ、他の自動化を一時停止し、キャンプへ行って買い物リストを購入します。トレジャーハントやモブファーム待機中は中断できますが、プル中・戦闘中はしません。\nオフ：自動買い物しません。"
+      "tooltip": "オン：銀貨または金貨がしきい値に達し、FATE/CE中でなければ、他の自動化を一時停止し、Knightshopper のオカルトクレセント買い物リストを開始します。品目は Knightshopper で設定します。トレジャーハントやモブファーム待機中は中断できますが、プル中・戦闘中はしません。Knightshopper が無い／未準備なら何もしません。\nオフ：自動買い物しません。"
     },
     "silver_threshold": {
       "label": "銀のしきい値",
@@ -13,49 +16,6 @@
     "gold_threshold": {
       "label": "金のしきい値",
       "tooltip": "南ホーンは金貨、北ホーンは金オボルがこの値に達したら買い物を開始。FATE/CE中、およびモブファームのプル中・戦闘中は開始しません。0＝金では開始しない。"
-    },
-    "reserve_silver": {
-      "label": "銀の最低残高",
-      "tooltip": "この量より銀を使いません。"
-    },
-    "reserve_gold": {
-      "label": "金の最低残高",
-      "tooltip": "この量より金を使いません。"
-    },
-    "shopping_order": {
-      "label": "買い物リスト",
-      "tooltip": "Keep（在庫維持）/ Buy（回数）/ Sink（余剰消費）。空＝自動買い物しない。",
-      "when_ready": "開始条件",
-      "when_ready_hint": "銀または金がしきい値に達したら買い物します（FATE/CE中、モブファームのプル中・戦闘中は除く）。最低残高は使いません。",
-      "silver": "銀",
-      "gold": "金",
-      "zone_south": "南の角では銀片・金片を使います。",
-      "zone_north": "北の角では銀オボル・金オボルを使います。",
-      "zone_any": "通貨の種類はいるオカルトクレセントのゾーンに従います。",
-      "add": "商品を追加",
-      "clear": "リストをクリア",
-      "empty": "リストは空です — カタログから追加してください。",
-      "search_hint": "商品を検索…",
-      "already_listed": "すでにリストにあります。",
-      "owned": "所持済",
-      "missing": "未所持",
-      "repeatable": "繰り返し可",
-      "col_name": "名前",
-      "col_have": "所持",
-      "col_cost": "価格",
-      "col_unlock": "解禁",
-      "col_keep": "Keep",
-      "col_keep_hint": "インベントリがこの数になるまで補充します（毎回）。",
-      "col_buy": "Buy",
-      "col_buy_hint": "この回数だけ買って停止します（買うたびに減ります）。",
-      "col_keep_buying": "Sink",
-      "col_keep_buying_hint": "Keep/Buyの後、余剰通貨でこの1品を買い続けます（Sinkはリストに1つのみ）。",
-      "modes_help": "Keep：インベントリがこの数になるまで買う（毎回補充）。\nBuy：この回数だけ買って停止（減っていく）。\nSink：Keep/Buyの後、この1品だけ余剰通貨で買い続ける（Sinkは1つのみ）。",
-      "currency_pick": "支払い通貨",
-      "currency_pick_hint": "複数の通貨で買える商品です。自動買い物で使う通貨にチェックを入れてください。複数選択時は払える方を使います。",
-      "currency_silver": "銀",
-      "currency_gold": "金",
-      "currency_amulet": "アミュレット"
     }
   }
 }

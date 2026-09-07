@@ -7,7 +7,14 @@ namespace BOCCHI.Common.Services;
 
 public interface ICriticalEncounterContext
 {
+    /// <summary>Participating in a CE that is in Battle (not Register/Warmup).</summary>
     bool IsInCriticalEncounter();
+
+    /// <summary>
+    ///     Player EventId matches a live CE in Register, Warmup, or Battle — shopping / travel
+    ///     must not pull you out once you are registered.
+    /// </summary>
+    bool IsRegisteredOrInCriticalEncounter();
 
     CriticalEncounterId? GetCriticalEncounterId();
 

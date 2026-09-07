@@ -348,9 +348,31 @@ public class Automator
             return;
         }
 
-        if (SuspendedForTreasure || SuspendedForShopping)
+        if (SuspendedForShopping)
         {
             return;
+        }
+
+        // Treasure hunt soft-suspend must not block pot-chest latch: when the pot FATE ends (or
+        // Cache Me is up), TryStartPending / EnsurePotChestFarm never ran and chests waited until
+        // the hunt fully stopped (Godfrey).
+        if (SuspendedForTreasure)
+        {
+            TryStartPendingPotChestFarm();
+            EnsurePotChestFarmForBuff();
+            if (!memory.TryRemember<PotChestFarmMemory>(out PotChestFarmMemory _))
+            {
+                return;
+            }
+
+            ITreasureHunter hunt = hunterFactory();
+            if (hunt.Running && !hunt.Paused)
+            {
+                hunt.Pause();
+                logger.Debug("Paused treasure hunt — pot chest farm latched while Illegal Mode was suspended");
+            }
+
+            SetSuspendedForTreasure(false);
         }
 
         autoRotation.Tick();

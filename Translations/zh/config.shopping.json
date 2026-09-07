@@ -1,10 +1,13 @@
 {
   "label": "购物",
-  "tooltip": "银币或金币达到阈值时，自动从远征古董商购买。FATE/CE 进行中不会开始。",
+  "tooltip": "银币或金币达到阈值时，暂停其他自动化并启动 Knightshopper 的 Occult Crescent 购物清单。需要 Knightshopper（见依赖项）。FATE/CE 进行中不会开始。",
+  "sections": {
+    "auto": "自动购物"
+  },
   "fields": {
     "enable_auto_shop": {
       "label": "启用自动购物",
-      "tooltip": "开：银币或金币达到阈值且不在 FATE/CE 中时，暂停其他自动化，前往营地按购物清单购买。可打断寻宝和刷怪待机；不会打断拉怪/战斗中。\n关：不自动购物。"
+      "tooltip": "开：银币或金币达到阈值且不在 FATE/CE 中时，暂停其他自动化并启动 Knightshopper 的 Occult Crescent 购物清单。物品在 Knightshopper 中配置。可打断寻宝和刷怪待机；不会打断拉怪/战斗中。若未安装或未就绪 Knightshopper 则不操作。\n关：不自动购物。"
     },
     "silver_threshold": {
       "label": "银币阈值",
@@ -13,49 +16,6 @@
     "gold_threshold": {
       "label": "金币阈值",
       "tooltip": "南角金币、北角金奥博达到该值时开始购物。FATE/CE 进行中、刷怪拉怪/战斗中不会开始。0 = 不因金币开始。"
-    },
-    "reserve_silver": {
-      "label": "银币保留",
-      "tooltip": "银币不低于此数量。"
-    },
-    "reserve_gold": {
-      "label": "金币保留",
-      "tooltip": "金币不低于此数量。"
-    },
-    "shopping_order": {
-      "label": "购物清单",
-      "tooltip": "Keep（维持库存）/ Buy（购买次数）/ Sink（花掉多余货币）。空 = 不自动购物。",
-      "when_ready": "触发条件",
-      "when_ready_hint": "银或金达到阈值时开始购物（FATE/CE 进行中、刷怪拉怪/战斗中除外）。保留数量不会花掉。",
-      "silver": "银",
-      "gold": "金",
-      "zone_south": "南角使用银片/金片。",
-      "zone_north": "北角使用银奥布/金奥布。",
-      "zone_any": "货币类型随你所在的神秘新月区域而定。",
-      "add": "添加商店物品",
-      "clear": "清空列表",
-      "empty": "列表为空 — 请从目录添加。",
-      "search_hint": "搜索商店物品…",
-      "already_listed": "已在列表中。",
-      "owned": "已拥有",
-      "missing": "未拥有",
-      "repeatable": "可重复",
-      "col_name": "名称",
-      "col_have": "持有",
-      "col_cost": "价格",
-      "col_unlock": "解锁",
-      "col_keep": "Keep",
-      "col_keep_hint": "买到背包里有这么多为止（每次购物都会补）。",
-      "col_buy": "Buy",
-      "col_buy_hint": "只买这么多次后停止（每次购买会倒数）。",
-      "col_keep_buying": "Sink",
-      "col_keep_buying_hint": "Keep/Buy 完成后，用剩余货币一直买这一件（列表里只能有一个 Sink）。",
-      "modes_help": "Keep：买到背包里有这么多为止（每次都会补）。\nBuy：只买这么多次后停止（会倒数）。\nSink：Keep/Buy 完成后，用剩余货币一直买这一件（只能设一个 Sink）。",
-      "currency_pick": "支付货币",
-      "currency_pick_hint": "该物品可用多种货币购买。勾选自动购物允许使用的货币；若勾选多个，会优先用付得起的那种。",
-      "currency_silver": "银",
-      "currency_gold": "金",
-      "currency_amulet": "护符"
     }
   }
 }

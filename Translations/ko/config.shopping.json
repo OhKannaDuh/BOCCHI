@@ -1,10 +1,13 @@
 {
   "label": "쇼핑",
-  "tooltip": "은화 또는 금화가 임계값에 도달하면 원정 골동품상에서 자동 구매합니다. FATE/CE 중에는 시작하지 않습니다.",
+  "tooltip": "은화 또는 금화가 임계값에 도달하면 다른 자동화를 잠시 멈추고 Knightshopper의 Occult Crescent 쇼핑 목록을 시작합니다. Knightshopper가 필요합니다(의존성 참조). FATE/CE 중에는 시작하지 않습니다.",
+  "sections": {
+    "auto": "자동 쇼핑"
+  },
   "fields": {
     "enable_auto_shop": {
       "label": "자동 쇼핑 사용",
-      "tooltip": "켜기: 은화나 금화가 임계값에 도달했고 FATE/CE 중이 아니면, 다른 자동화를 잠시 멈추고 캠프로 가서 쇼핑 목록을 구매합니다. 보물찾기나 몹 파머 대기 중에는 중단할 수 있지만, 풀/전투 중에는 하지 않습니다.\n끄기: 자동 쇼핑하지 않습니다."
+      "tooltip": "켜기: 은화나 금화가 임계값에 도달했고 FATE/CE 중이 아니면, 다른 자동화를 잠시 멈추고 Knightshopper의 Occult Crescent 쇼핑 목록을 시작합니다. 품목은 Knightshopper에서 설정합니다. 보물찾기나 몹 파머 대기 중에는 중단할 수 있지만, 풀/전투 중에는 하지 않습니다. Knightshopper가 없거나 준비되지 않으면 아무 것도 하지 않습니다.\n끄기: 자동 쇼핑하지 않습니다."
     },
     "silver_threshold": {
       "label": "은 임계값",
@@ -13,49 +16,6 @@
     "gold_threshold": {
       "label": "금 임계값",
       "tooltip": "남뿔은 금화·북뿔은 금 오볼이 이 값에 도달하면 쇼핑을 시작합니다. FATE/CE 중, 몹 파머 풀/전투 중에는 시작하지 않습니다. 0 = 금으로는 시작하지 않음."
-    },
-    "reserve_silver": {
-      "label": "은 최소 보유",
-      "tooltip": "이 양 아래로 은을 쓰지 않습니다."
-    },
-    "reserve_gold": {
-      "label": "금 최소 보유",
-      "tooltip": "이 양 아래로 금을 쓰지 않습니다."
-    },
-    "shopping_order": {
-      "label": "쇼핑 목록",
-      "tooltip": "Keep(재고) / Buy(횟수) / Sink(잉여 소진). 비어 있으면 자동 쇼핑하지 않습니다.",
-      "when_ready": "시작 조건",
-      "when_ready_hint": "은 또는 금이 임계값에 도달하면 쇼핑합니다(FATE/CE 중, 몹 파머 풀/전투 중 제외). 최소 보유량은 쓰지 않습니다.",
-      "silver": "은",
-      "gold": "금",
-      "zone_south": "남쪽 뿔은 은/금 조각을 사용합니다.",
-      "zone_north": "북쪽 뿔은 은/금 오볼을 사용합니다.",
-      "zone_any": "화폐 종류는 있는 오컬트 크레센트 지역을 따릅니다.",
-      "add": "상점 아이템 추가",
-      "clear": "목록 비우기",
-      "empty": "목록이 비어 있습니다 — 카탈로그에서 추가하세요.",
-      "search_hint": "상점 아이템 검색…",
-      "already_listed": "이미 목록에 있습니다.",
-      "owned": "보유",
-      "missing": "미보유",
-      "repeatable": "반복 가능",
-      "col_name": "이름",
-      "col_have": "보유",
-      "col_cost": "비용",
-      "col_unlock": "해금",
-      "col_keep": "Keep",
-      "col_keep_hint": "인벤토리가 이 개수가 될 때까지 보충합니다(매 방문).",
-      "col_buy": "Buy",
-      "col_buy_hint": "이 횟수만 사고 중단합니다(살 때마다 줄어듦).",
-      "col_keep_buying": "Sink",
-      "col_keep_buying_hint": "Keep/Buy 이후 남은 화폐로 이 아이템만 계속 삽니다(Sink는 목록에 하나만).",
-      "modes_help": "Keep: 인벤토리가 이 개수가 될 때까지 구매(매 방문 보충).\nBuy: 이 횟수만 사고 중단(줄어듦).\nSink: Keep/Buy 이후 이 한 아이템만 남은 화폐로 계속 구매(Sink는 하나만).",
-      "currency_pick": "결제 화폐",
-      "currency_pick_hint": "여러 화폐로 살 수 있는 아이템입니다. 자동 쇼핑에 쓸 화폐를 체크하세요. 여러 개면 지불 가능한 쪽을 고릅니다.",
-      "currency_silver": "은",
-      "currency_gold": "금",
-      "currency_amulet": "아뮬렛"
     }
   }
 }

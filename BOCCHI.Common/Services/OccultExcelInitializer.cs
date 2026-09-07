@@ -1,6 +1,5 @@
 using BOCCHI.Common.Data.Aethernet;
 using BOCCHI.Common.Data.OccultCrescent;
-using BOCCHI.Common.Data.Shopping;
 using Dalamud.Plugin.Services;
 using Ocelot.Lifecycle;
 
@@ -18,6 +17,5 @@ public sealed class OccultExcelInitializer(IDataManager data) : IOnStart
         PhantomBuffs.Initialize(data);
         PhantomJobStatuses.Initialize(data);
         ReturnYesNo.Initialize(data);
-        ShopCatalog.Initialize(data);
     }
 }

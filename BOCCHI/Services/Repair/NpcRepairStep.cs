@@ -1,4 +1,5 @@
 using System.Numerics;
+using BOCCHI.Common.Services;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Plugin.Services;
@@ -26,7 +27,8 @@ public class NpcRepairStep
     IObjectTable objects,
     IDataManager data,
     IPlayer player,
-    IVNavmeshIpc vnav
+    IVNavmeshIpc vnav,
+    IRepairService repairService
 ) : ChainRecipe(chains)
 {
     public override string Name => "NpcRepair";
@@ -81,7 +83,13 @@ public class NpcRepairStep
 
             if (!repair->RepairAllButton->IsEnabled)
             {
-                // Nothing left to repair — close and finish (Artisan does the same).
+                // Button disabled while gear still needs repair = UI not ready / wrong state.
+                // Do not treat as success (that was "walk to NPC, leave without repairing").
+                if (repairService.ShouldRepair())
+                {
+                    return StepResult.Failure("RepairAll not ready");
+                }
+
                 if (EzThrottler.Throttle("NpcRepair::Close", 500))
                 {
                     repair->AtkUnitBase.FireCallbackInt(-1);

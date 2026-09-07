@@ -62,7 +62,12 @@ public class AutoRotationController(
     ///     After raise: drop job apply latches so the next In CE / Sync Enable re-issues RSR Henched
     ///     (RSR can ignore Henched while unconscious while we still cached success).
     /// </summary>
-    public void OnRevived() => session.ClearJobAppliedCache();
+    public void OnRevived()
+    {
+        session.ClearJobAppliedCache();
+        // Force the next Sync to call Enable again (do not skip as "already Fate").
+        lastEnabledActivity = null;
+    }
 
     public void EnableForFate() => EnableActivity(CombatActivity.Fate);
 
@@ -118,16 +123,18 @@ public class AutoRotationController(
 
     private void EnableActivity(CombatActivity activity)
     {
-        if (lastEnabledActivity != activity)
+        // Re-issuing Enable every tick made RSR flip Targeting Henched ↔ Off in FATEs (Lumi).
+        if (lastEnabledActivity == activity)
         {
-            logger.Debug(
-                "Combat AI Enable activity={Activity} recipe={Recipe}",
-                activity,
-                config.CombatAutorotation);
-            lastEnabledActivity = activity;
-            lastSyncSkipReason = null;
+            return;
         }
 
+        logger.Debug(
+            "Combat AI Enable activity={Activity} recipe={Recipe}",
+            activity,
+            config.CombatAutorotation);
+        lastEnabledActivity = activity;
+        lastSyncSkipReason = null;
         session.Enable(activity);
     }
 

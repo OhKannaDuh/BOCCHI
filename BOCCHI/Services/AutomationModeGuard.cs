@@ -5,6 +5,7 @@ using BOCCHI.Common.Config;
 using BOCCHI.Common.Services;
 using BOCCHI.MobFarmer.Data;
 using BOCCHI.MobFarmer.Services;
+using BOCCHI.Services.Shopping;
 using BOCCHI.Treasure.Services;
 using Dalamud.Plugin.Services;
 using Ocelot.Chain;
@@ -29,7 +30,8 @@ public class AutomationModeGuard
     IChainManager chains,
     IChatGui chat,
     UIConfig uiConfig,
-    ITranslator<MainWindow> translator
+    ITranslator<MainWindow> translator,
+    Func<IShoppingService> shoppingFactory
 ) : IAutomationModeGuard
 {
     private IAutomator Automator => automatorFactory();
@@ -226,6 +228,19 @@ public class AutomationModeGuard
         {
             treasurePausedForShopping = false;
             carrotPausedForShopping = false;
+
+            // Shopping owns vnav independently of Illegal Mode — stop it first or pathing continues.
+            shoppingFactory().ForceStop();
+            if (Automator.SuspendedForShopping)
+            {
+                Automator.SetSuspendedForShopping(false);
+            }
+
+            if (Farmer.Running && Farmer.Suspended && Farmer.YieldReason == FarmerYieldReason.Shopping)
+            {
+                Farmer.SetSuspended(false);
+            }
+
             StopIllegalOrCompletionist();
 
             if (PotsTreasure.Running)

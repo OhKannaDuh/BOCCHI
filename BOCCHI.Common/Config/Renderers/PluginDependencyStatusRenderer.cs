@@ -1,5 +1,6 @@
 using System.Reflection;
 using BOCCHI.Common.Config.Fields;
+using BOCCHI.Common.Ipc.Knightshopper;
 using BOCCHI.Common.UI;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Plugin;
@@ -19,6 +20,7 @@ public sealed class PluginDependencyStatusRenderer(
     IVNavmeshIpc vnav,
     IBossModIpc bossMod,
     ILifestreamIpc lifestream,
+    IKnightshopperIpc knightshopper,
     IRotationSolverRebornIpc rsr,
     AutomatorConfig automator
 ) : IFieldRenderer<PluginDependencyStatusAttribute>
@@ -36,6 +38,13 @@ public sealed class PluginDependencyStatusRenderer(
         ImGui.Spacing();
         Draw("vnavmesh", "vnavmesh", translator, VnavStatus);
         Draw("Lifestream", "Lifestream", translator, (_, t) => IpcStatus(lifestream.IsAvailable, t));
+
+        ImGui.Spacing();
+        BocchiUi.SectionTitle(T(translator, "shopping"));
+        ImGui.Spacing();
+        BocchiUi.MutedWrapped(T(translator, "shopping_intro"));
+        ImGui.Spacing();
+        Draw("Knightshopper", "Knightshopper", translator, (_, t) => IpcStatus(knightshopper.IsAvailable, t));
 
         ImGui.Spacing();
         BocchiUi.SectionTitle(T(translator, "optional"));

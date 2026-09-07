@@ -1,10 +1,13 @@
 {
   "label": "Shopping",
-  "tooltip": "Auto-buy from the Expedition Antiquarian when silver or gold hits a threshold. Never starts during a FATE or CE.",
+  "tooltip": "When silver or gold hits a threshold, pause other automation and let Knightshopper buy your Occult Crescent list. Needs Knightshopper (see Dependencies). Never starts during a FATE or CE.",
+  "sections": {
+    "auto": "Auto-shop"
+  },
   "fields": {
     "enable_auto_shop": {
       "label": "Enable auto-shop",
-      "tooltip": "On: when silver or gold is at its threshold (and you are not in a FATE or CE), pause other automation, go to camp, and buy from your shopping list. Can interrupt treasure hunting and idle Mob Farmer waits; not mid-pull or mid-fight.\nOff: never auto-shop."
+      "tooltip": "On: when silver or gold is at its threshold (and you are not in a FATE or CE), pause other automation and start Knightshopper’s Occult Crescent shopping list. Configure items in Knightshopper. Can interrupt treasure hunting and idle Mob Farmer waits; not mid-pull or mid-fight. Does nothing if Knightshopper is missing or not ready.\nOff: never auto-shop."
     },
     "silver_threshold": {
       "label": "Silver threshold",
@@ -13,49 +16,6 @@
     "gold_threshold": {
       "label": "Gold threshold",
       "tooltip": "Start shopping when gold pieces (South Horn) or gold obols (North Horn) reach this. Never during a FATE or CE, or mid Mob Farmer pull/fight. 0 = never start from gold."
-    },
-    "reserve_silver": {
-      "label": "Keep at least (silver)",
-      "tooltip": "Do not spend silver below this amount."
-    },
-    "reserve_gold": {
-      "label": "Keep at least (gold)",
-      "tooltip": "Do not spend gold below this amount."
-    },
-    "shopping_order": {
-      "label": "Shopping list",
-      "tooltip": "Keep stock, Buy a set count, or Keep Buying as a currency sink. Empty = do not auto-shop.",
-      "when_ready": "When ready",
-      "when_ready_hint": "Shop when silver or gold reaches its threshold (not during a FATE/CE, or mid Mob Farmer pull/fight). Keep at least leaves a reserve unspent.",
-      "silver": "Silver",
-      "gold": "Gold",
-      "zone_south": "South Horn uses silver/gold pieces.",
-      "zone_north": "North Horn uses silver/gold obols.",
-      "zone_any": "Currency type follows the Occult Crescent zone you are in.",
-      "add": "Add shop items",
-      "clear": "Clear list",
-      "empty": "No items — add from the catalog.",
-      "search_hint": "Search shop items…",
-      "already_listed": "Already on your list.",
-      "owned": "Owned",
-      "missing": "Missing",
-      "repeatable": "Repeatable",
-      "col_name": "Name",
-      "col_have": "Have",
-      "col_cost": "Cost",
-      "col_unlock": "Unlock",
-      "col_keep": "Keep",
-      "col_keep_hint": "Restock until your inventory has this many (every shopping trip).",
-      "col_buy": "Buy",
-      "col_buy_hint": "Buy this many more times, then stop (counts down after each purchase).",
-      "col_keep_buying": "Sink",
-      "col_keep_buying_hint": "After Keep and Buy are done, spend leftover currency on this item. Only one Sink on the list.",
-      "modes_help": "Keep: restock until you have this many.\nBuy: buy this many times, then stop.\nSink: after Keep/Buy, keep spending on this one item (only one Sink allowed).",
-      "currency_pick": "Pay with",
-      "currency_pick_hint": "This item can be bought with more than one currency. Check which ones auto-shop may use. If several are checked, it picks one you can afford.",
-      "currency_silver": "Silver",
-      "currency_gold": "Gold",
-      "currency_amulet": "Amulet"
     }
   }
 }

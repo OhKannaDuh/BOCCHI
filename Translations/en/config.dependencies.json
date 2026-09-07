@@ -3,8 +3,10 @@
   "fields": {
     "status": {
       "label": "Status",
-      "intro": "Travel plugins must be ready. For combat, only what you picked under General → Combat needs to be ready.",
+      "intro": "Travel plugins must be ready. For combat, only what you picked under General → Combat needs to be ready. Auto-shop needs Knightshopper.",
       "required": "Travel",
+      "shopping": "Shopping",
+      "shopping_intro": "Auto-shop starts Knightshopper’s Occult Crescent list when your silver/gold threshold is hit. Configure the list in Knightshopper.",
       "optional": "Combat",
       "optional_intro": "Wrath Combo and Rotation Solver Reborn also need BossMod or BossMod Reborn.",
       "using": "Using {0}",

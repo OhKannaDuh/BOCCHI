@@ -1,4 +1,5 @@
 using System.Numerics;
+using BOCCHI.Common.Data.Mobs;
 using BOCCHI.Common.Services;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Plugin.Services;
@@ -15,6 +16,9 @@ public static class KnowledgeThreat
     public const uint OccultIsleblazerBaseId = 17900;
 
     public const float IsleblazerUnhideDistance = 5f;
+
+    /// <summary>Crescent Haunt — sees through Hide; do not arm Hide for it (Mocha / Godfrey, 4.2.0.11).</summary>
+    public static readonly uint CrescentHauntNameId = (uint)Mob.Haunt;
 
     /// <summary>Mounted Hide starts this much earlier so we can dismount first.</summary>
     public const float MountedThreatEnterBonus = 5f;
@@ -86,7 +90,9 @@ public static class KnowledgeThreat
             }
 
             // Isleblazer: proximity / unhide handled separately — not a Hide target.
-            if (battle.BaseId == OccultIsleblazerBaseId)
+            // Haunt: sees through Hide — walking stealthed into them is worse than running past.
+            if (battle.BaseId == OccultIsleblazerBaseId
+                || battle.NameId == CrescentHauntNameId)
             {
                 continue;
             }

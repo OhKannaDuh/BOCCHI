@@ -9,6 +9,7 @@ using BOCCHI.Common.Data.Zones;
 using BOCCHI.Common.Data.Zones.Graph.Factory;
 using BOCCHI.Common.Data.Zones.Implementations.NorthHorn;
 using BOCCHI.Common.Data.Zones.Implementations.SouthHorn;
+using BOCCHI.Common.Ipc.Knightshopper;
 using BOCCHI.Common.Services;
 using BOCCHI.Common.Steps;
 using BOCCHI.Config;
@@ -94,7 +95,6 @@ public sealed class Plugin(IDalamudPluginInterface plugin, IPluginLog logger) : 
         services.AddSingleton<IFieldRenderer<TriageRaiseJobAttribute>, TriageRaiseJobRenderer>();
         services.AddSingleton<IFieldRenderer<BossModPresetOptionsAttribute>, BossModPresetOptionsRenderer>();
         services.AddSingleton<IFieldRenderer<FarmSpotListAttribute>, FarmSpotListRenderer>();
-        services.AddSingleton<IFieldRenderer<ShopShoppingListAttribute>, ShopShoppingListRenderer>();
         services.AddSingleton<MobFarmerYieldService>();
 
         services.AddSingleton<MessageOfTheDayService>();
@@ -138,7 +138,10 @@ public sealed class Plugin(IDalamudPluginInterface plugin, IPluginLog logger) : 
         services.AddSingleton<NpcRepairStep>();
         services.AddSingleton<IRepairService, RepairService>();
         services.AddSingleton<AethernetTeleportChain>();
+        services.AddSingleton<IKnightshopperIpc, KnightshopperIpc>();
         services.AddSingleton<ShoppingService>();
+        services.AddSingleton<IShoppingService>(sp => sp.GetRequiredService<ShoppingService>());
+        services.AddSingleton<Func<IShoppingService>>(sp => () => sp.GetRequiredService<IShoppingService>());
         services.LoadTrackersModule();
         services.LoadWorldModule();
         services.LoadBuffModule();
@@ -230,9 +233,6 @@ public sealed class Plugin(IDalamudPluginInterface plugin, IPluginLog logger) : 
     {
         cfg.FatesConfig.DisabledFateIds ??= [];
         cfg.CriticalEncountersConfig.DisabledCriticalEncounterIds ??= [];
-        cfg.ShoppingConfig.PreferredItemIds ??= [];
-        cfg.ShoppingConfig.ShoppingOrder ??= [];
-        cfg.ShoppingConfig.Shopping ??= new();
         cfg.MobFarmerConfig.Mobs ??= [];
         SanitizeAutomatorConfig(cfg.AutomatorConfig);
         SanitizeTreasureConfig(cfg.TreasureConfig);
@@ -303,61 +303,6 @@ public sealed class Plugin(IDalamudPluginInterface plugin, IPluginLog logger) : 
     {
         shopping.SilverThreshold = Math.Clamp(shopping.SilverThreshold, 0, 9999);
         shopping.GoldThreshold = Math.Clamp(shopping.GoldThreshold, 0, 9999);
-        shopping.ReserveSilver = Math.Clamp(shopping.ReserveSilver, 0, 9999);
-        shopping.ReserveGold = Math.Clamp(shopping.ReserveGold, 0, 9999);
-        shopping.ShoppingOrder ??= [];
-        shopping.Shopping ??= new();
-        shopping.PreferredItemIds ??= [];
-
-        // Migrate legacy checkbox picks → Buy 1 each.
-        if (shopping.PreferredItemIds.Count > 0 && shopping.ShoppingOrder.Count == 0)
-        {
-            foreach (uint itemId in shopping.PreferredItemIds)
-            {
-                if (shopping.Shopping.ContainsKey(itemId))
-                {
-                    continue;
-                }
-
-                shopping.Shopping[itemId] = new ShopListEntry { BuyAmount = 1 };
-                shopping.ShoppingOrder.Add(itemId);
-            }
-
-            shopping.PreferredItemIds.Clear();
-        }
-
-        // Drop order entries with no settings; drop orphan settings.
-        shopping.ShoppingOrder.RemoveAll(id => !shopping.Shopping.ContainsKey(id));
-        foreach (uint orphan in shopping.Shopping.Keys.Except(shopping.ShoppingOrder).ToList())
-        {
-            shopping.Shopping.Remove(orphan);
-        }
-
-        // Only one Keep Buying sink.
-        bool sawSink = false;
-        foreach (uint id in shopping.ShoppingOrder)
-        {
-            if (!shopping.Shopping.TryGetValue(id, out ShopListEntry? entry) || entry is null)
-            {
-                continue;
-            }
-
-            entry.KeepAmount = Math.Max(0, entry.KeepAmount);
-            entry.BuyAmount = Math.Max(0, entry.BuyAmount);
-            if (!entry.KeepBuying)
-            {
-                continue;
-            }
-
-            if (sawSink)
-            {
-                entry.KeepBuying = false;
-            }
-            else
-            {
-                sawSink = true;
-            }
-        }
     }
 
 }

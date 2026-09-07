@@ -49,6 +49,10 @@ public class RepairingHandler(
     {
         base.Enter();
         startedUtc = DateTime.UtcNow;
+        log.Debug(
+            "Enter Repairing stillNeedsRepair={Needs} inCamp={InCamp}",
+            repair.ShouldRepair(),
+            zones.GetZone().IsInBasecamp());
         // Manage() so we can CancelWhere on timeout / Exit.
         task = chains.Manage(repair.Repair());
     }
@@ -59,6 +63,7 @@ public class RepairingHandler(
 
         if (task is { IsCompleted: false })
         {
+            log.Debug("Exit Repairing → {Next} — cancelling in-flight Repairs chain", next);
             chains.CancelWhere(name => name == ChainName);
         }
 
@@ -102,14 +107,20 @@ public class RepairingHandler(
             return;
         }
 
-        bool ok = result.IsSuccess && !repair.ShouldRepair();
+        bool stillNeeds = repair.ShouldRepair();
+        bool ok = result.IsSuccess && !stillNeeds;
         if (!ok)
         {
             log.Warning(
-                "Repair did not finish ({State}{Detail}) — backing off for {Backoff}s so Illegal Mode can continue",
+                "Repair did not finish ({State}{Detail}, stillNeeds={Still}) — backing off for {Backoff}s so Illegal Mode can continue",
                 result.State,
                 string.IsNullOrEmpty(result.ErrorMessage) ? string.Empty : $": {result.ErrorMessage}",
+                stillNeeds,
                 (int)FailureBackoff.TotalSeconds);
+        }
+        else
+        {
+            log.Debug("Repair finished successfully");
         }
 
         FinishAttempt(ok);

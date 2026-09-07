@@ -55,6 +55,7 @@ public class RepairService(
 
         if (ShouldUseMender(menderNearby))
         {
+            log.Debug("Repair chain: mender NPC (nearby={Nearby})", menderNearby);
             chain.Then<NpcRepairStep>();
         }
         else
@@ -64,6 +65,9 @@ public class RepairService(
                 log.Warning("Mender NPC selected but none nearby — falling back to self-repair");
             }
 
+            log.Debug("Repair chain: self-repair (method={Method}, menderNearby={Nearby})",
+                config.AutoRepairMethod,
+                menderNearby);
             chain.Then<RepairStep>();
         }
 

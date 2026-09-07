@@ -3,8 +3,10 @@
   "fields": {
     "status": {
       "label": "状態",
-      "intro": "移動用プラグインは準備完了である必要があります。戦闘は「一般 → 戦闘」で選んだものだけ準備完了なら十分です。",
+      "intro": "移動用プラグインは準備完了である必要があります。戦闘は「一般 → 戦闘」で選んだものだけ準備完了なら十分です。自動買い物には Knightshopper が必要です。",
       "required": "移動",
+      "shopping": "買い物",
+      "shopping_intro": "自動買い物は銀／金のしきい値で Knightshopper のオカルトクレセントリストを開始します。品目は Knightshopper で設定します。",
       "optional": "戦闘",
       "optional_intro": "Wrath Combo と Rotation Solver Reborn には BossMod または BossMod Reborn も必要です。",
       "using": "使用中：{0}",
