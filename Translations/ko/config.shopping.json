@@ -1,13 +1,13 @@
 {
   "label": "쇼핑",
-  "tooltip": "은화 또는 금화가 임계값에 도달하면 다른 자동화를 잠시 멈추고 Knightshopper의 Occult Crescent 쇼핑 목록을 시작합니다. Knightshopper가 필요합니다(의존성 참조). FATE/CE 중에는 시작하지 않습니다.",
+  "tooltip": "은화 또는 금화가 임계값에 도달하면 다른 자동화를 잠시 멈추고, 필요하면 본진으로 리턴한 뒤 Knightshopper의 Occult Crescent 쇼핑 목록을 시작합니다. Knightshopper가 필요합니다(의존성 참조). FATE/CE 중에는 시작하지 않습니다.",
   "sections": {
     "auto": "자동 쇼핑"
   },
   "fields": {
     "enable_auto_shop": {
       "label": "자동 쇼핑 사용",
-      "tooltip": "켜기: 은화나 금화가 임계값에 도달했고 FATE/CE 중이 아니면, 다른 자동화를 잠시 멈추고 Knightshopper의 Occult Crescent 쇼핑 목록을 시작합니다. 품목은 Knightshopper에서 설정합니다. 보물찾기나 몹 파머 대기 중에는 중단할 수 있지만, 풀/전투 중에는 하지 않습니다. Knightshopper가 없거나 준비되지 않으면 아무 것도 하지 않습니다.\n끄기: 자동 쇼핑하지 않습니다."
+      "tooltip": "켜기: 은화나 금화가 임계값에 도달했고 FATE/CE 중이 아니면, 다른 자동화를 잠시 멈추고 필드에 있으면 본진으로 리턴한 뒤 Knightshopper의 Occult Crescent 쇼핑 목록을 시작합니다. 품목은 Knightshopper에서 설정합니다. 보물찾기나 몹 파머 대기 중에는 중단할 수 있지만, 풀/전투 중에는 하지 않습니다. Knightshopper가 없거나 준비되지 않으면 아무 것도 하지 않습니다.\n끄기: 자동 쇼핑하지 않습니다."
     },
     "silver_threshold": {
       "label": "은 임계값",

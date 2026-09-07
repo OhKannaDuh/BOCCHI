@@ -20,8 +20,30 @@ public static class TreasureHuntPathOverrides
         (ZoneId.NorthHorn, 2072u),
     ];
 
+    /// <summary>
+    ///     Far-northeast sinking ridge — dense packs break Hide / kill on approach.
+    ///     Map ~33–38x, ~2–4y (2010 / 2054 / 2055 / 2057).
+    /// </summary>
+    private static readonly HashSet<(ZoneId Zone, uint NodeId)> DensePackApproachNodes =
+    [
+        (ZoneId.NorthHorn, 2010u),
+        (ZoneId.NorthHorn, 2054u),
+        (ZoneId.NorthHorn, 2055u),
+        (ZoneId.NorthHorn, 2057u),
+    ];
+
+    /// <summary>
+    ///     Minimum Hide enter distance on <see cref="DensePackApproachNodes"/> (yalms).
+    ///     User config still wins when set higher.
+    /// </summary>
+    public const float DensePackHideEnterYalms = 25f;
+
     /// <summary>True when this pad is knowingly unreachable and must be left out of the route.</summary>
     public static bool IsUnreachable(ZoneId zone, uint nodeId) => UnreachableNodes.Contains((zone, nodeId));
+
+    /// <summary>True when approaching this pad should avoid stuck lateral nudges and Hide earlier.</summary>
+    public static bool IsDensePackApproach(ZoneId zone, uint nodeId) =>
+        DensePackApproachNodes.Contains((zone, nodeId));
 
     /// <summary>Reach before opening the coffer.</summary>
     private static readonly Dictionary<(ZoneId Zone, uint NodeId), Vector3[]> ApproachByNode = new()

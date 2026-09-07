@@ -1,4 +1,5 @@
 using BOCCHI.Common.Config;
+using BOCCHI.Common.Extensions;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Plugin.Services;
 using ECommons.Throttlers;
@@ -9,7 +10,11 @@ using Action = Ocelot.Actions.Action;
 namespace BOCCHI.MobFarmer.Services;
 
 /// <summary>Tank ranged / Provoke / gap closer during Gathering. No-op on non-tanks.</summary>
-public sealed class FarmerPullAssist(MobFarmerConfig config, IPlayer player, ITargetManager targets)
+public sealed class FarmerPullAssist(
+    MobFarmerConfig config,
+    IPlayer player,
+    ITargetManager targets,
+    IObjectTable objects)
 {
     public const float PullRange = 20f;
 
@@ -37,6 +42,12 @@ public sealed class FarmerPullAssist(MobFarmerConfig config, IPlayer player, ITa
     public bool TryPull(IBattleNpc current)
     {
         if (!player.IsTank())
+        {
+            return false;
+        }
+
+        // Already on us — do not re-cast Provoke / gap / ranged every PullRange tick.
+        if (current.IsTargetingPlayer(objects.LocalPlayer))
         {
             return false;
         }

@@ -93,7 +93,7 @@
     },
     "knowledge_threat_enter_distance": {
       "label": "该距离内开始隐遁（米）",
-      "tooltip": "危险敌人进入该距离时开始隐遁。骑乘时会提前 5 米开始。"
+      "tooltip": "危险敌人进入该距离时开始隐遁。骑乘时会提前 5 米开始。北角部分密集宝箱点会自动更早开始隐遁。"
     },
     "knowledge_threat_exit_distance": {
       "label": "远于该距离前保持隐遁（米）",

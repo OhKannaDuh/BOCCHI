@@ -938,6 +938,26 @@ public class TreasureHunterService
 
     private void TryIssueStuckNudge(HuntPathfinderStep step)
     {
+        ZoneId zoneId = zones.GetZone().ZoneId;
+
+        // Lateral nudge into NE sinking packs pulls / breaks Hide (Discord: far NE ~34x 3–4y).
+        if (TreasureHuntPathOverrides.IsDensePackApproach(zoneId, step.NodeId))
+        {
+            log.Debug(
+                "Treasure hunt stuck near {NodeId} — skipping lateral nudge (dense-pack pad); waiting for skip timeout",
+                step.NodeId);
+            return;
+        }
+
+        if (config.UseNinjaHideOnDangerousRoutes
+            && (ninjaHide.IsStealthed || ninjaHideRequired || StillThreatenedForRemount()))
+        {
+            log.Debug(
+                "Treasure hunt stuck near {NodeId} — skipping lateral nudge while Hidden / threatened",
+                step.NodeId);
+            return;
+        }
+
         Vector3 dest = walkLiveBindNodeId == step.NodeId && walkLiveBindPosition is { } live
             ? live
             : TryGetLayout(step.NodeId, out TreasureLayoutDatum layout)
@@ -2229,14 +2249,24 @@ public class TreasureHunterService
 
     private void UpdateNinjaHideRequired()
     {
+        float enter = config.KnowledgeThreatEnterDistance;
+        float exit = config.KnowledgeThreatExitDistance;
+
+        if (GetCurrentStep() is { Type: HuntPathfinderStepType.WalkToNode } walk
+            && TreasureHuntPathOverrides.IsDensePackApproach(zones.GetZone().ZoneId, walk.NodeId))
+        {
+            enter = Math.Max(enter, TreasureHuntPathOverrides.DensePackHideEnterYalms);
+            exit = Math.Max(exit, enter + 10f);
+        }
+
         ninjaHideRequired = ninjaHideRouteGate.UpdateRequired(
             objects,
             player.Position,
             ninjaHideRequired,
             ninjaHide.IsMounted,
             config.KnowledgeHideOffset,
-            config.KnowledgeThreatEnterDistance,
-            config.KnowledgeThreatExitDistance);
+            enter,
+            exit);
     }
 
     private bool StillThreatenedForRemount() =>

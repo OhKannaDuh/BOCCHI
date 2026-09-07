@@ -6,7 +6,7 @@
       "intro": "赶路插件必须就绪。战斗只需「常规 → 战斗」中所选的插件就绪即可。自动购物需要 Knightshopper。",
       "required": "赶路",
       "shopping": "购物",
-      "shopping_intro": "自动购物在银/金达到阈值时启动 Knightshopper 的 Occult Crescent 清单。物品在 Knightshopper 中配置。",
+      "shopping_intro": "自动购物在银/金达到阈值时，若不在大本营则先 Return，再启动 Knightshopper 的 Occult Crescent 清单。物品在 Knightshopper 中配置。",
       "optional": "战斗",
       "optional_intro": "Wrath Combo 和 Rotation Solver Reborn 还需要 BossMod 或 BossMod Reborn。",
       "using": "正在使用 {0}",

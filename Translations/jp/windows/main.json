@@ -71,7 +71,11 @@
     "south_horn": "南征編",
     "north_horn": "北征編",
     "south_horn_short": "南",
-    "north_horn_short": "北"
+    "north_horn_short": "北",
+    "geo_north": "北側",
+    "geo_south": "南側",
+    "geo_north_short": "北側",
+    "geo_south_short": "南側"
   },
   "goals": {
     "fate": "FATE: {0}",

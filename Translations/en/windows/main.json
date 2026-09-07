@@ -71,7 +71,11 @@
     "south_horn": "South Horn",
     "north_horn": "North Horn",
     "south_horn_short": "SH",
-    "north_horn_short": "NH"
+    "north_horn_short": "NH",
+    "geo_north": "North",
+    "geo_south": "South",
+    "geo_north_short": "N",
+    "geo_south_short": "S"
   },
   "goals": {
     "fate": "FATE: {0}",

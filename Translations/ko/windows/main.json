@@ -71,7 +71,11 @@
     "south_horn": "남부",
     "north_horn": "북부",
     "south_horn_short": "남",
-    "north_horn_short": "북"
+    "north_horn_short": "북",
+    "geo_north": "북쪽",
+    "geo_south": "남쪽",
+    "geo_north_short": "북쪽",
+    "geo_south_short": "남쪽"
   },
   "goals": {
     "fate": "돌발: {0}",

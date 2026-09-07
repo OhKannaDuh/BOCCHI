@@ -1,13 +1,13 @@
 {
   "label": "购物",
-  "tooltip": "银币或金币达到阈值时，暂停其他自动化并启动 Knightshopper 的 Occult Crescent 购物清单。需要 Knightshopper（见依赖项）。FATE/CE 进行中不会开始。",
+  "tooltip": "银币或金币达到阈值时，暂停其他自动化；若不在大本营则先 Return，再启动 Knightshopper 的 Occult Crescent 购物清单。需要 Knightshopper（见依赖项）。FATE/CE 进行中不会开始。",
   "sections": {
     "auto": "自动购物"
   },
   "fields": {
     "enable_auto_shop": {
       "label": "启用自动购物",
-      "tooltip": "开：银币或金币达到阈值且不在 FATE/CE 中时，暂停其他自动化并启动 Knightshopper 的 Occult Crescent 购物清单。物品在 Knightshopper 中配置。可打断寻宝和刷怪待机；不会打断拉怪/战斗中。若未安装或未就绪 Knightshopper 则不操作。\n关：不自动购物。"
+      "tooltip": "开：银币或金币达到阈值且不在 FATE/CE 中时，暂停其他自动化；若在野外则先 Return 回大本营，再启动 Knightshopper 的 Occult Crescent 购物清单。物品在 Knightshopper 中配置。可打断寻宝和刷怪待机；不会打断拉怪/战斗中。若未安装或未就绪 Knightshopper 则不操作。\n关：不自动购物。"
     },
     "silver_threshold": {
       "label": "银币阈值",

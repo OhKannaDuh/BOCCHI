@@ -1,13 +1,13 @@
 {
   "label": "Shopping",
-  "tooltip": "When silver or gold hits a threshold, pause other automation and let Knightshopper buy your Occult Crescent list. Needs Knightshopper (see Dependencies). Never starts during a FATE or CE.",
+  "tooltip": "When silver or gold hits a threshold, pause other automation, Return to base camp if needed, then let Knightshopper buy your Occult Crescent list. Needs Knightshopper (see Dependencies). Never starts during a FATE or CE.",
   "sections": {
     "auto": "Auto-shop"
   },
   "fields": {
     "enable_auto_shop": {
       "label": "Enable auto-shop",
-      "tooltip": "On: when silver or gold is at its threshold (and you are not in a FATE or CE), pause other automation and start Knightshopper’s Occult Crescent shopping list. Configure items in Knightshopper. Can interrupt treasure hunting and idle Mob Farmer waits; not mid-pull or mid-fight. Does nothing if Knightshopper is missing or not ready.\nOff: never auto-shop."
+      "tooltip": "On: when silver or gold is at its threshold (and you are not in a FATE or CE), pause other automation, Return to base camp if you are out in the field, then start Knightshopper’s Occult Crescent shopping list. Configure items in Knightshopper. Can interrupt treasure hunting and idle Mob Farmer waits; not mid-pull or mid-fight. Does nothing if Knightshopper is missing or not ready.\nOff: never auto-shop."
     },
     "silver_threshold": {
       "label": "Silver threshold",

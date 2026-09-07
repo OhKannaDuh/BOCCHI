@@ -2,6 +2,8 @@ using BOCCHI.Automator.Data;
 using BOCCHI.Automator.Services;
 using BOCCHI.Common;
 using BOCCHI.Common.Config;
+using BOCCHI.Common.Data.Fates;
+using BOCCHI.Common.Data.Goals;
 using BOCCHI.Common.Data.Paths;
 using BOCCHI.Common.Data.StateMemory;
 using BOCCHI.Common.Data.Zones;
@@ -11,11 +13,13 @@ using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Plugin.Services;
 using ECommons.Throttlers;
 using Ocelot.Chain;
+using Ocelot.Extensions;
 using Ocelot.Services.Logger;
 using Ocelot.Services.Pathfinding;
 using Ocelot.Services.Translation;
 using Ocelot.States.Score;
 using Ocelot.Windows;
+using System.Numerics;
 
 namespace BOCCHI.Automator.StateMachine.Handlers;
 
@@ -149,7 +153,7 @@ public class PathfindingHandler
                     conditions,
                     objects,
                     destination,
-                    movement.ShouldAutoMount,
+                    ShouldAutoMountToward(destination, zone),
                     movement.PreferredMountId,
                     zone.IsInBasecamp(),
                     zone);
@@ -278,6 +282,33 @@ public class PathfindingHandler
         }
 
         return delay.IsReady();
+    }
+
+    /// <summary>
+    ///     Stay on foot for the short hop from pot preposition into a live pot FATE.
+    ///     Mounting there (often ~25–35y) just delays hitting mobs.
+    /// </summary>
+    private bool ShouldAutoMountToward(Vector3 destination, IZone zone)
+    {
+        if (!movement.ShouldAutoMount)
+        {
+            return false;
+        }
+
+        if (objects.LocalPlayer is not { } player)
+        {
+            return true;
+        }
+
+        if (!memory.TryRemember<GoalMemory>(out GoalMemory goal)
+            || goal.Goal.GoalType is not FateGoal fateGoal
+            || !zone.IsPotFate(fateGoal.id.Value))
+        {
+            return true;
+        }
+
+        float toGoal = player.Position.Distance2D(destination);
+        return toGoal > NavigationConstants.PotPrepositionMaxRadius * 1.5f;
     }
 
     private void BeginMountThenPause(string reason)

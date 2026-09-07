@@ -58,7 +58,10 @@ public static class PotTimerUi
             string zone = ZoneShort(snap.TerritoryTypeId, translator);
             if (snap.CurrentActivePotFateId != 0)
             {
-                parts.Add($"{zone} {translator.T(".pot_timer.chip_active")}");
+                string active = GeoShort(snap.CurrentActivePotFateId, translator) is { } geo
+                    ? $"{zone} {geo} {translator.T(".pot_timer.chip_active")}"
+                    : $"{zone} {translator.T(".pot_timer.chip_active")}";
+                parts.Add(active);
                 continue;
             }
 
@@ -67,7 +70,10 @@ public static class PotTimerUi
                 continue;
             }
 
-            parts.Add($"{zone} {FormatClock(Remaining(snap))}");
+            string next = GeoShort(snap.PredictedNextPotFateId, translator) is { } nextGeo
+                ? $"{zone} {nextGeo} {FormatClock(Remaining(snap))}"
+                : $"{zone} {FormatClock(Remaining(snap))}";
+            parts.Add(next);
         }
 
         return parts.Count == 0 ? null : string.Join(" · ", parts);
@@ -84,7 +90,7 @@ public static class PotTimerUi
         {
             BocchiUi.LabelledValue(
                 $"{zone} — {translator.T(".pot_timer.active")}",
-                FateName(sheet, snap.CurrentActivePotFateId));
+                FateLabel(sheet, snap.CurrentActivePotFateId, translator));
             return;
         }
 
@@ -95,7 +101,7 @@ public static class PotTimerUi
 
         BocchiUi.LabelledValue(
             $"{zone} — {translator.T(".pot_timer.next")}",
-            $"{FateName(sheet, snap.PredictedNextPotFateId)} · {FormatClock(Remaining(snap))}");
+            $"{FateLabel(sheet, snap.PredictedNextPotFateId, translator)} · {FormatClock(Remaining(snap))}");
     }
 
     private static TimeSpan Remaining(PotCycleSnapshot snap)
@@ -120,6 +126,15 @@ public static class PotTimerUi
             _ => $"#{territoryTypeId}",
         };
 
+    private static string FateLabel(
+        ExcelSheet<XIVFate> sheet,
+        int fateId,
+        ITranslator<MainWindow> translator)
+    {
+        string name = FateName(sheet, fateId);
+        return GeoLabel(fateId, translator) is { } geo ? $"{name} ({geo})" : name;
+    }
+
     private static string FateName(ExcelSheet<XIVFate> sheet, int fateId)
     {
         try
@@ -132,6 +147,26 @@ public static class PotTimerUi
             return $"#{fateId}";
         }
     }
+
+    private static string? GeoLabel(int fateId, ITranslator<MainWindow> translator) =>
+        PotFateGeography.TryGetSide(fateId, out PotFateGeography.Side side)
+            ? side switch
+            {
+                PotFateGeography.Side.North => translator.T(".pot_timer.geo_north"),
+                PotFateGeography.Side.South => translator.T(".pot_timer.geo_south"),
+                _ => null,
+            }
+            : null;
+
+    private static string? GeoShort(int fateId, ITranslator<MainWindow> translator) =>
+        PotFateGeography.TryGetSide(fateId, out PotFateGeography.Side side)
+            ? side switch
+            {
+                PotFateGeography.Side.North => translator.T(".pot_timer.geo_north_short"),
+                PotFateGeography.Side.South => translator.T(".pot_timer.geo_south_short"),
+                _ => null,
+            }
+            : null;
 
     private static string FormatClock(TimeSpan value)
     {

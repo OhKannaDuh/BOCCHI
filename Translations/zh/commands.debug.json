@@ -1,3 +1,3 @@
 {
-  "help": "调试辅助。/bocchi debug ce [id] — CE 移动/等待判定（停在错误位置时运行）。/bocchi debug pos — 复制路径途经点。/bocchi debug ai-preset — 若缺少 BOCCHI AI 的 BossMod 预设则创建。"
+  "help": "调试辅助。/bocchi debug ce [id] — CE 移动/等待判定（停在错误位置时运行）。/bocchi debug pos — 复制路径途经点。/bocchi debug shop — 若不在大本营则先 Return，再启动 Knightshopper 的 Occult Crescent 清单（status|cancel）。/bocchi debug ai-preset — 若缺少 BOCCHI AI 的 BossMod 预设则创建。"
 }

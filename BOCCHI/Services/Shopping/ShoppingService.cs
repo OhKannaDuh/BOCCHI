@@ -1,19 +1,26 @@
 using BOCCHI.Common.Config;
+using BOCCHI.Common.Data.Aethernet;
 using BOCCHI.Common.Data.OccultCrescent;
 using BOCCHI.Common.Data.StateMemory;
 using BOCCHI.Common.Data.Zones;
 using BOCCHI.Common.Ipc.Knightshopper;
 using BOCCHI.Common.Services;
 using BOCCHI.MobFarmer.Services;
+using Dalamud.Game.ClientState.Conditions;
+using Dalamud.Plugin.Services;
+using Ocelot.Chain;
+using Ocelot.Ipc.VNavmesh;
 using Ocelot.Lifecycle;
 using Ocelot.Services.Logger;
+using Ocelot.Services.Pathfinding;
+using Ocelot.Services.PlayerState;
+using System.Numerics;
 
 namespace BOCCHI.Services.Shopping;
 
 /// <summary>
-/// When currency thresholds are hit, soft-suspend other automation and hand shopping to
-/// Knightshopper (Occult Crescent list). No built-in travel/buy — KS handles that, including
-/// from outside base camp.
+/// When currency thresholds are hit (or debug force-start), soft-suspend other automation,
+/// Return to central base camp if needed, then hand shopping to Knightshopper (Occult Crescent list).
 /// </summary>
 public sealed class ShoppingService(
     ShoppingConfig config,
@@ -24,16 +31,28 @@ public sealed class ShoppingService(
     ICriticalEncounterContext criticalEncounters,
     IAutomatorMemory memory,
     Func<IMobFarmer> farmerFactory,
+    IChainManager chainManager,
+    IChainFactory chains,
+    ICondition conditions,
+    IGameGui gui,
+    IPathfinder pathfinder,
+    IVNavmeshIpc vnav,
+    IPlayer player,
     ILogger<ShoppingService> logger
 ) : IShoppingService, IOnUpdate
 {
+    private const string ReturnChainPrefix = "Shopping::Return";
+
     private IMobFarmer Farmer => farmerFactory();
 
     private Guid? operationId;
+    private Task<ChainResult>? returnChain;
     private bool priorityClaimed;
+    private bool forcedSession;
     private DateTimeOffset buyCooldownUntil = DateTimeOffset.MinValue;
 
-    public bool IsActive => priorityClaimed || operationId is not null;
+    public bool IsActive =>
+        priorityClaimed || operationId is not null || returnChain is not null || forcedSession;
 
     public UpdateLimit UpdateLimit =>
         new()
@@ -55,9 +74,73 @@ public sealed class ShoppingService(
         AbortShopping(resumeAutomation: false, cancelKnightshopper: true);
     }
 
+    /// <inheritdoc />
+    public bool TryForceStart(out string detail)
+    {
+        if (!knightshopper.IsAvailable)
+        {
+            detail = "Knightshopper IPC not available (plugin loaded?).";
+            return false;
+        }
+
+        IZone zone = zones.GetZone();
+        if (!zone.IsOccultCrescentZone())
+        {
+            detail = "Not in Occult Crescent.";
+            return false;
+        }
+
+        if (IsActive)
+        {
+            detail = DescribeStatus();
+            return false;
+        }
+
+        if (ShouldDeferForActivity())
+        {
+            detail = "Busy with FATE/CE / pot wait / pot-chest farm — try again when idle.";
+            return false;
+        }
+
+        if (knightshopper.IsBusy)
+        {
+            detail = "Knightshopper is already busy.";
+            return false;
+        }
+
+        forcedSession = true;
+        ClaimPriority();
+        BeginReturnOrShop(zone);
+        detail = zone.IsInBasecamp()
+            ? "At base camp — starting Knightshopper."
+            : "Returning to base camp, then Knightshopper.";
+        return true;
+    }
+
+    /// <inheritdoc />
+    public string DescribeStatus()
+    {
+        string phase = operationId is not null
+            ? "Knightshopper running"
+            : returnChain is not null
+                ? "returning to base camp"
+                : forcedSession || priorityClaimed
+                    ? "preparing"
+                    : "idle";
+
+        string ks = operationId is { } id
+            ? FormatKnightshopperStatus(id)
+            : $"available={knightshopper.IsAvailable} busy={knightshopper.IsBusy}";
+
+        IZone zone = zones.GetZone();
+        Vector3 p = player.Position;
+        return $"Shopping {phase} — zone={zone.ZoneId} camp={zone.IsInBasecamp()} "
+            + $"forced={forcedSession} pos=<{p.X:0.##}, {p.Y:0.##}, {p.Z:0.##}> — {ks}";
+    }
+
     public void Update()
     {
-        if (!config.EnableAutoShop)
+        if (!config.EnableAutoShop && !forcedSession)
         {
             if (IsActive)
             {
@@ -94,6 +177,24 @@ public sealed class ShoppingService(
             return;
         }
 
+        if (returnChain is not null)
+        {
+            TickReturn(zone);
+            return;
+        }
+
+        // Forced session already claimed priority but is waiting (e.g. combat walk-in).
+        if (forcedSession && priorityClaimed)
+        {
+            BeginReturnOrShop(zone);
+            return;
+        }
+
+        if (forcedSession)
+        {
+            return;
+        }
+
         if (ShouldDeferForActivity())
         {
             return;
@@ -121,6 +222,112 @@ public sealed class ShoppingService(
             return;
         }
 
+        ClaimPriority();
+        BeginReturnOrShop(zone);
+    }
+
+    private void BeginReturnOrShop(IZone zone)
+    {
+        if (zone.IsInBasecamp())
+        {
+            TryStartKnightshopper();
+            return;
+        }
+
+        if (conditions[ConditionFlag.InCombat] || conditions[ConditionFlag.Unconscious])
+        {
+            // Return cannot cast — walk toward camp until we can.
+            EnsureWalkTowardCamp(zone);
+            return;
+        }
+
+        if (returnChain is not null)
+        {
+            return;
+        }
+
+        pathfinder.Stop();
+        vnav.Stop();
+        logger.Debug("[Shopping] Returning to base camp before Knightshopper");
+        returnChain = chainManager.Manage(
+            ReturnToBaseCamp.Append(
+                chains.Create(ReturnChainPrefix),
+                zones,
+                conditions,
+                gui,
+                pathfinder,
+                vnav));
+    }
+
+    private void TickReturn(IZone zone)
+    {
+        if (returnChain is null)
+        {
+            return;
+        }
+
+        if (ShouldDeferForActivity())
+        {
+            logger.Debug("[Shopping] aborted — FATE/CE activity during Return");
+            AbortShopping(resumeAutomation: true, cancelKnightshopper: true);
+            return;
+        }
+
+        // Combat mid-Return: cancel chain and walk in.
+        if (conditions[ConditionFlag.InCombat] || conditions[ConditionFlag.Unconscious])
+        {
+            CancelReturnChain();
+            EnsureWalkTowardCamp(zone);
+            return;
+        }
+
+        if (!returnChain.IsCompleted)
+        {
+            return;
+        }
+
+        bool ok = returnChain.IsCompletedSuccessfully
+            && returnChain.Result.IsSuccess
+            && zone.IsInBasecamp();
+        string? error = returnChain.IsCompletedSuccessfully
+            ? returnChain.Result.ErrorMessage
+            : returnChain.Exception?.Message;
+        returnChain = null;
+
+        if (!ok)
+        {
+            logger.Debug(
+                "[Shopping] Return unfinished ({Message}) — retrying",
+                error ?? "?");
+            BeginReturnOrShop(zone);
+            return;
+        }
+
+        logger.Debug("[Shopping] Arrived at base camp");
+        TryStartKnightshopper();
+    }
+
+    private void EnsureWalkTowardCamp(IZone zone)
+    {
+        ClaimPriority();
+        Vector3 standOff = zone.GetMainAetheryte().GetCampStandOffPosition(player.Position);
+        if (!vnav.IsRunning() && !vnav.IsPathfinding())
+        {
+            vnav.PathfindAndMoveCloseTo(standOff, false, AethernetNavigation.PathfindArrivalRadius);
+        }
+    }
+
+    private void TryStartKnightshopper()
+    {
+        if (knightshopper.IsBusy)
+        {
+            logger.Debug("[Shopping] Knightshopper busy after Return — waiting");
+            return;
+        }
+
+        pathfinder.Stop();
+        vnav.Stop();
+
         StartResponse start = knightshopper.Start(CurrencyId.OccultCrescent);
         if (!start.Started)
         {
@@ -134,8 +341,11 @@ public sealed class ShoppingService(
                 or StartResult.InvalidCurrency)
             {
                 buyCooldownUntil = DateTimeOffset.UtcNow + TimeSpan.FromSeconds(30);
+                AbortShopping(resumeAutomation: true, cancelKnightshopper: false);
+                return;
             }
 
+            // Busy / transient — keep session and retry next tick.
             return;
         }
 
@@ -205,7 +415,7 @@ public sealed class ShoppingService(
 
         priorityClaimed = true;
         modeGuard.EnsureExclusive(AutomationMode.Shopping);
-        logger.Debug("[Shopping] soft-suspended other automation for Knightshopper");
+        logger.Debug("[Shopping] soft-suspended other automation for shopping");
     }
 
     private void FinishShopping()
@@ -221,6 +431,10 @@ public sealed class ShoppingService(
         Guid? id = operationId;
         operationId = null;
         priorityClaimed = false;
+        forcedSession = false;
+        CancelReturnChain();
+        pathfinder.Stop();
+        vnav.Stop();
 
         if (cancelKnightshopper && id is { } cancelId)
         {
@@ -231,6 +445,25 @@ public sealed class ShoppingService(
         {
             modeGuard.NotifyShoppingEnded();
         }
+    }
+
+    private void CancelReturnChain()
+    {
+        if (returnChain is null)
+        {
+            return;
+        }
+
+        chainManager.CancelWhere(name => name.StartsWith(ReturnChainPrefix, StringComparison.Ordinal));
+        returnChain = null;
+    }
+
+    private string FormatKnightshopperStatus(Guid id)
+    {
+        PurchaseStatus status = knightshopper.GetStatus(id);
+        bool running = knightshopper.IsRunning(id);
+        return $"op={id:N} running={running} state={status.State} "
+            + $"item={status.CurrentIndex + 1}/{status.TotalItems} id={status.CurrentItemId} — {status.Message}";
     }
 
     private bool IsTriageActive() =>

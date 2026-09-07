@@ -62,6 +62,14 @@ public class ReturningHandler
             return StatePriority.Never;
         }
 
+        // Pathfinding already dequeued Return — honor the latch before Pots & Treasure Never.
+        // Managed pot travel (Mob Farmer yield) hands Return here; skipping would leave Pathfinding
+        // idle with no Teleport/Walk (South Horn pot / #King Godfrey).
+        if (memory.TryRemember<ReturningStateMemory>(out ReturningStateMemory _))
+        {
+            return StatePriority.VeryHigh;
+        }
+
         // Treasure hunt is the idle filler in Pots & Treasure — never Return-to-camp.
         if (automator.IsPotsAndTreasure)
         {
@@ -79,13 +87,6 @@ public class ReturningHandler
         if (TriageSession.IsActive(memory))
         {
             return StatePriority.Never;
-        }
-
-        // Pathfinding already dequeued Return — this latch must win even if a map hunt was
-        // just latched, or Teleport starts from the field and Lifestream fires short of camp.
-        if (memory.TryRemember<ReturningStateMemory>(out ReturningStateMemory _))
-        {
-            return StatePriority.VeryHigh;
         }
 
         // Map-hunt filler (no Treasure Sight): hunt owns opportunistic Return / routing while

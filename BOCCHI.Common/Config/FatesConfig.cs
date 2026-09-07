@@ -1,4 +1,5 @@
 using BOCCHI.Common.Config.Fields;
+using Newtonsoft.Json;
 using Ocelot.Config;
 using Ocelot.Config.Fields;
 
@@ -15,12 +16,14 @@ public class FatesConfig : IAutoConfig
     [IntRange(0, 100, Order = 0, Section = "skip")]
     public int MaxFateProgressPercent { get; set; } = 50;
 
+    /// <summary>
+    ///     FATEs the player turned off. Replace on load — Newtonsoft's default appends into the
+    ///     property initializer, which re-disabled The Winged Terror (#1965) every reload after
+    ///     the user had enabled it (empty JSON array left the default id in place).
+    /// </summary>
     [DisabledFateIds(Order = 1, Section = "allowlist")]
-    public HashSet<uint> DisabledFateIds { get; set; } =
-    [
-        // South Horn — dangerous / usually skipped by default
-        1965 // The Winged Terror
-    ];
+    [JsonProperty(ObjectCreationHandling = ObjectCreationHandling.Replace)]
+    public HashSet<uint> DisabledFateIds { get; set; } = [];
 
     public bool IsFateEnabled(uint fateId) => !DisabledFateIds.Contains(fateId);
 

@@ -6,7 +6,7 @@
       "intro": "이동 플러그인은 준비되어야 합니다. 전투는 일반 → 전투에서 고른 것만 준비되면 됩니다. 자동 쇼핑에는 Knightshopper가 필요합니다.",
       "required": "이동",
       "shopping": "쇼핑",
-      "shopping_intro": "자동 쇼핑은 은/금 임계값에서 Knightshopper의 Occult Crescent 목록을 시작합니다. 품목은 Knightshopper에서 설정합니다.",
+      "shopping_intro": "자동 쇼핑은 은/금 임계값에서, 필요하면 본진으로 리턴한 뒤 Knightshopper의 Occult Crescent 목록을 시작합니다. 품목은 Knightshopper에서 설정합니다.",
       "optional": "전투",
       "optional_intro": "Wrath Combo와 Rotation Solver Reborn은 BossMod 또는 BossMod Reborn도 필요합니다.",
       "using": "사용 중: {0}",

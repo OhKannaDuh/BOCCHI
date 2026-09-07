@@ -13,6 +13,7 @@ using BOCCHI.Common.Data.Zones;
 using BOCCHI.Common.Data.Zones.Graph;
 using BOCCHI.Common.Services;
 using BOCCHI.Debug;
+using BOCCHI.Services.Shopping;
 using Dalamud.Plugin.Services;
 using Ocelot.Rotation.Services;
 using Ocelot.Rotation.Services.BossMod;
@@ -34,6 +35,7 @@ public unsafe class DebugCommand
     IZoneProvider zones,
     IDataManager data,
     CriticalEncounterGeometry geometry,
+    IShoppingService shopping,
     IChatGui chat,
     UIConfig uiConfig,
     ITranslator<DebugCommand> translator
@@ -82,11 +84,71 @@ public unsafe class DebugCommand
             case "ce":
                 PrintCriticalEncounterMeasurement(context.Args.Length > 1 ? context.Args[1] : null);
                 break;
+            case "shop":
+            case "shopping":
+            case "knightshopper":
+            case "ks":
+                DebugShopping(context.Args.Length > 1 ? context.Args[1] : null);
+                break;
             default:
                 chat.PrintError(
-                    "Usage: /bocchi debug [open|close|toggle|ai-preset|pos|chests|instance|currency|ce [id]]");
+                    "Usage: /bocchi debug [open|close|toggle|ai-preset|pos|chests|instance|currency|ce [id]|shop [status|cancel]]");
                 break;
         }
+    }
+
+    /// <summary>
+    ///     Return to base camp if needed, then start Knightshopper’s Occult Crescent list
+    ///     (no currency threshold; works with auto-shop off).
+    ///     <c>/bocchi debug shop</c> · <c>shop status</c> · <c>shop cancel</c>
+    /// </summary>
+    private void DebugShopping(string? sub)
+    {
+        string action = (sub ?? "start").ToLowerInvariant();
+        if (action is "help" or "?")
+        {
+            BocchiChat.Print(
+                chat,
+                uiConfig,
+                "Usage: /bocchi debug shop [status|cancel] — Return to base camp, then Knightshopper Occult Crescent list.");
+            return;
+        }
+
+        if (action is "status" or "st")
+        {
+            BocchiChat.Print(chat, uiConfig, shopping.DescribeStatus());
+            return;
+        }
+
+        if (action is "cancel" or "stop")
+        {
+            if (!shopping.IsActive)
+            {
+                BocchiChat.PrintError(chat, uiConfig, "Shopping is not active.");
+                return;
+            }
+
+            shopping.ForceStop();
+            BocchiChat.Print(chat, uiConfig, "Shopping cancelled (Return / Knightshopper stopped).");
+            return;
+        }
+
+        if (action is not ("start" or "run" or "go"))
+        {
+            BocchiChat.PrintError(
+                chat,
+                uiConfig,
+                "Usage: /bocchi debug shop [status|cancel]");
+            return;
+        }
+
+        if (!shopping.TryForceStart(out string detail))
+        {
+            BocchiChat.PrintError(chat, uiConfig, detail);
+            return;
+        }
+
+        BocchiChat.Print(chat, uiConfig, detail);
     }
 
     /// <summary>

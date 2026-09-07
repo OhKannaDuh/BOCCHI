@@ -71,7 +71,11 @@
     "south_horn": "新月岛南部",
     "north_horn": "新月岛北部",
     "south_horn_short": "南部",
-    "north_horn_short": "北部"
+    "north_horn_short": "北部",
+    "geo_north": "北侧",
+    "geo_south": "南侧",
+    "geo_north_short": "北侧",
+    "geo_south_short": "南侧"
   },
   "goals": {
     "fate": "危命任务：{0}",

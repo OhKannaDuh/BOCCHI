@@ -82,13 +82,21 @@ public sealed class MobFarmerYieldService
         {
             sawRunning = true;
             nextHuntAt = DateTimeOffset.UtcNow + HuntIntervalMinutes;
-            nextSightAt = DateTimeOffset.UtcNow + SightIntervalMinutes;
+            // Cast Sight as soon as yield is allowed — do not wait a full interval first.
+            nextSightAt = DateTimeOffset.MinValue;
         }
 
         if (farmer.Suspended)
         {
             TickSuspended();
             return;
+        }
+
+        // Finish an in-flight Sight chain even if packs are nearby again (otherwise Sight
+        // completion never clears and the farmer stays suspended / looks like Sight "never casts").
+        if (startedSight && sightChain is { IsCompleted: true })
+        {
+            FinishSightChain();
         }
 
         if (!farmer.CanAcceptYield)
@@ -162,19 +170,9 @@ public sealed class MobFarmerYieldService
                 break;
 
             case FarmerYieldReason.TreasureSight:
-                if (startedSight && sightChain is { IsCompleted: true } task)
+                if (startedSight && sightChain is { IsCompleted: true })
                 {
-                    startedSight = false;
-                    bool success = task.Result.IsSuccess;
-                    sightChain = null;
-                    TryRestorePendingSightJob();
-                    pendingSightRestoreJob = null;
-                    nextSightAt = DateTimeOffset.UtcNow
-                                    + (success ? SightIntervalMinutes : TimeSpan.FromMinutes(1));
-                    if (farmer.Suspended)
-                    {
-                        farmer.SetSuspended(false);
-                    }
+                    FinishSightChain();
                 }
 
                 break;
@@ -295,6 +293,19 @@ public sealed class MobFarmerYieldService
             chains.Create("MobFarmer::TreasureSight")
                 .Then<HuntTreasureSightChain>());
         return true;
+    }
+
+    private void FinishSightChain()
+    {
+        startedSight = false;
+        sightChain = null;
+        TryRestorePendingSightJob();
+        pendingSightRestoreJob = null;
+        nextSightAt = DateTimeOffset.UtcNow + SightIntervalMinutes;
+        if (farmer.Suspended && farmer.YieldReason == FarmerYieldReason.TreasureSight)
+        {
+            farmer.SetSuspended(false);
+        }
     }
 
     private void TryRestorePendingSightJob()

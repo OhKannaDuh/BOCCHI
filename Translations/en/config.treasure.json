@@ -93,7 +93,7 @@
     },
     "knowledge_threat_enter_distance": {
       "label": "Start Hide within (yalms)",
-      "tooltip": "Start Hide when a dangerous enemy is this close. While mounted, starts 5 yalms earlier."
+      "tooltip": "Start Hide when a dangerous enemy is this close. While mounted, starts 5 yalms earlier. A few crowded North Horn pads start Hide farther out automatically."
     },
     "knowledge_threat_exit_distance": {
       "label": "Keep Hide until farther than (yalms)",

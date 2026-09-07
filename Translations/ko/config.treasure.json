@@ -93,7 +93,7 @@
     },
     "knowledge_threat_enter_distance": {
       "label": "이 거리 이내에서 은신 시작(일름)",
-      "tooltip": "위험한 적이 이 거리 안으로 오면 은신 시작. 탑승 중에는 5일름 더 일찍 시작."
+      "tooltip": "위험한 적이 이 거리 안으로 오면 은신 시작. 탑승 중에는 5일름 더 일찍 시작. 노스 혼의 밀집 패드에서는 자동으로 더 멀리서 시작."
     },
     "knowledge_threat_exit_distance": {
       "label": "이 거리보다 멀어질 때까지 은신 유지(일름)",

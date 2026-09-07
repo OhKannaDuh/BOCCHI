@@ -1,3 +1,3 @@
 {
-  "help": "Debug helpers. /bocchi debug ce [id] — CE travel/wait diagnostics (stand where it stops wrong). /bocchi debug pos — copy a path via-point. /bocchi debug ai-preset — create BOCCHI AI BossMod presets if missing."
+  "help": "Debug helpers. /bocchi debug ce [id] — CE travel/wait diagnostics (stand where it stops wrong). /bocchi debug pos — copy a path via-point. /bocchi debug shop — Return to base camp if needed, then Knightshopper Occult Crescent list (status|cancel). /bocchi debug ai-preset — create BOCCHI AI BossMod presets if missing."
 }

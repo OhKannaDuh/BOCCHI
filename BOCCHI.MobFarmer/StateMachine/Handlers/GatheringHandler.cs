@@ -57,6 +57,16 @@ public class GatheringHandler
             return FarmerPhase.Stacking;
         }
 
+        // Gather timeout: stop chasing more packs and fight what we have (UI "Gather timeout").
+        if (config.StackingTimeoutSeconds > 0
+            && TimeInState >= TimeSpan.FromSeconds(config.StackingTimeoutSeconds)
+            && inCombat.Count > 0)
+        {
+            pathfinder.Stop();
+            stuckAssist.Reset();
+            return FarmerPhase.Stacking;
+        }
+
         if (notInCombat.Count == 0)
         {
             pathfinder.Stop();

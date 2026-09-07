@@ -1,3 +1,3 @@
 {
-  "help": "디버그용입니다. /bocchi debug ce [id] — CE 이동·대기 판정(멈춘 자리에서 실행). /bocchi debug pos — 경로 좌표 복사. /bocchi debug ai-preset — BOCCHI AI BossMod 프리셋이 없으면 생성."
+  "help": "디버그용입니다. /bocchi debug ce [id] — CE 이동·대기 판정(멈춘 자리에서 실행). /bocchi debug pos — 경로 좌표 복사. /bocchi debug shop — 필요하면 본진으로 리턴한 뒤 Knightshopper Occult Crescent 목록 시작(status|cancel). /bocchi debug ai-preset — BOCCHI AI BossMod 프리셋이 없으면 생성."
 }
