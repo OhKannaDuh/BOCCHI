@@ -15,6 +15,7 @@ using Ocelot.Services.Logger;
 using Ocelot.Services.Pathfinding;
 using Ocelot.Services.PlayerState;
 using System.Numerics;
+using System.Text.RegularExpressions;
 
 namespace BOCCHI.Services.Shopping;
 
@@ -399,10 +400,38 @@ public sealed class ShoppingService(
     /// <summary>
     /// Knightshopper reports success with a message like
     /// "Insufficient OccultCrescent for … Need N, have M" when nothing was bought.
+    /// Prefer the currency enum name + need/have counts (stable across UI languages);
+    /// keep the English "Insufficient" wording as a fallback.
     /// </summary>
-    private static bool LooksLikeInsufficientFunds(string? message) =>
-        !string.IsNullOrEmpty(message)
-        && message.Contains("Insufficient", StringComparison.OrdinalIgnoreCase);
+    private static bool LooksLikeInsufficientFunds(string? message)
+    {
+        if (string.IsNullOrEmpty(message))
+        {
+            return false;
+        }
+
+        if (message.Contains("Insufficient", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        // CurrencyId.ToString() stays "OccultCrescent"; item name may be localized.
+        if (!message.Contains(nameof(CurrencyId.OccultCrescent), StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        Match counts = NeedHaveCounts.Match(message);
+        return counts.Success
+               && long.TryParse(counts.Groups[1].Value, out long need)
+               && long.TryParse(counts.Groups[2].Value, out long have)
+               && need > have;
+    }
+
+    /// <summary>Trailing need/have integers from Knightshopper's unaffordable finish line.</summary>
+    private static readonly Regex NeedHaveCounts = new(
+        @"(\d+)\D+(\d+)\.?\s*$",
+        RegexOptions.CultureInvariant | RegexOptions.Compiled);
 
     private void AbortShopping(bool resumeAutomation, bool cancelKnightshopper)
     {
