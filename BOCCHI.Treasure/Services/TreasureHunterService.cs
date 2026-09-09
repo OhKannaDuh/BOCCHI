@@ -80,12 +80,6 @@ public class TreasureHunterService
     /// <summary>How long to wait for WideText after casting Treasure Sight.</summary>
     private static readonly TimeSpan SightCountWait = TimeSpan.FromSeconds(8);
 
-    /// <summary>First stuck recovery: lateral nudge around blocking geometry (#156).</summary>
-    private static readonly TimeSpan StuckNudgeTimeout = TimeSpan.FromSeconds(12);
-
-    /// <summary>How long to tolerate no progress toward a coffer before skipping that node.</summary>
-    private static readonly TimeSpan StuckNodeTimeout = TimeSpan.FromSeconds(30);
-
     /// <summary>Skip an unreachable hunt via after this long with no progress.</summary>
     private static readonly TimeSpan StuckViaTimeout = TimeSpan.FromSeconds(10);
 
@@ -100,6 +94,15 @@ public class TreasureHunterService
     ///     same wall (1805 loop: neighbour coffer on radar blocked the normal empty-skip).
     /// </summary>
     private const float StuckEmptySkipRadius = 15f;
+
+    private readonly WalkStuckWatch padStuckWatch = new(new WalkStuckWatch.Options(
+        NudgeAfter: TimeSpan.FromSeconds(12),
+        EscalateAfter: TimeSpan.FromSeconds(30),
+        MaxEscalations: 0));
+
+    private readonly EmptyPadConfirm emptyPadConfirm = new();
+
+    private readonly CampReturnSession campReturn = new("TreasureHunt::Return");
 
     /// <summary>
     ///     Do not re-issue the same vnav dest until this elapses. Covers both the
@@ -139,12 +142,6 @@ public class TreasureHunterService
     private static readonly TimeSpan FreshSightReuseWindow = TimeSpan.FromSeconds(45);
     private HashSet<uint> excludedNodeIdsForNextRun = [];
     private int? maxLevelOverrideForNextRun;
-    private uint? stuckWatchNodeId;
-    private float stuckWatchBestDistance = float.MaxValue;
-    private DateTime stuckWatchStartedUtc = DateTime.MinValue;
-    private bool stuckNudgeIssued;
-    private uint? emptyPadCandidateNodeId;
-    private DateTime emptyPadCandidateSinceUtc = DateTime.MinValue;
 
     /// <summary>Force this pad as TSP start on the next plan (Nearby divert / reclaim).</summary>
     private uint? pendingPreferStartNode;
@@ -876,6 +873,7 @@ public class TreasureHunterService
         pathfinder.Stop();
         vnav.Stop();
         activeChain = null;
+        campReturn.Detach();
         ClearNavigateIssue();
         ClearNavigateClosingLatch();
         ResetStuckWatch();
@@ -885,55 +883,27 @@ public class TreasureHunterService
     {
         if (distance <= StuckDetectionMinDistance)
         {
-            ResetStuckWatch();
+            padStuckWatch.Reset();
             return false;
         }
 
-        // Pathfind has not started moving yet — don't count compute time as a stuck walk.
-        if (vnav.IsPathfinding())
+        switch (padStuckWatch.Tick(step.NodeId, distance, pathfinding: vnav.IsPathfinding()))
         {
-            return false;
+            case WalkStuckWatch.Action.Nudge:
+                TryIssueStuckNudge(step);
+                return true;
+            case WalkStuckWatch.Action.GiveUp:
+                log.Warning(
+                    "Treasure hunt appears stuck reaching coffer {NodeId}; excluding it and recalculating the route",
+                    step.NodeId);
+                checkedNodeIds.Add(step.NodeId);
+                stuckSkippedNodeIds.Add(step.NodeId);
+                LastCheckedNodeId = step.NodeId;
+                FinishCurrentPad();
+                return true;
+            default:
+                return false;
         }
-
-        DateTime now = DateTime.UtcNow;
-        if (stuckWatchNodeId != step.NodeId)
-        {
-            StartStuckWatch(step.NodeId, distance, now);
-            return false;
-        }
-
-        // Progress is distance to the goal, not absolute movement. Restart the clock with it —
-        // otherwise the timeout measures "time since the walk began" and any pad further away than
-        // StuckNodeTimeout of travel gets skipped while still closing on it.
-        if (distance < stuckWatchBestDistance - StuckProgressThreshold)
-        {
-            stuckWatchBestDistance = distance;
-            stuckWatchStartedUtc = now;
-            stuckNudgeIssued = false;
-            return false;
-        }
-
-        if (!stuckNudgeIssued && now - stuckWatchStartedUtc >= StuckNudgeTimeout)
-        {
-            stuckNudgeIssued = true;
-            TryIssueStuckNudge(step);
-            return true;
-        }
-
-        if (now - stuckWatchStartedUtc < StuckNodeTimeout)
-        {
-            return false;
-        }
-
-        log.Warning(
-            "Treasure hunt appears stuck reaching coffer {NodeId}; excluding it and recalculating the route",
-            step.NodeId);
-        checkedNodeIds.Add(step.NodeId);
-        stuckSkippedNodeIds.Add(step.NodeId);
-        LastCheckedNodeId = step.NodeId;
-        ResetStuckWatch();
-        FinishCurrentPad();
-        return true;
     }
 
     private void TryIssueStuckNudge(HuntPathfinderStep step)
@@ -946,6 +916,7 @@ public class TreasureHunterService
             log.Debug(
                 "Treasure hunt stuck near {NodeId} — skipping lateral nudge (dense-pack pad); waiting for skip timeout",
                 step.NodeId);
+            PauseStuckApproachWithoutNudge();
             return;
         }
 
@@ -955,6 +926,7 @@ public class TreasureHunterService
             log.Debug(
                 "Treasure hunt stuck near {NodeId} — skipping lateral nudge while Hidden / threatened",
                 step.NodeId);
+            PauseStuckApproachWithoutNudge();
             return;
         }
 
@@ -987,13 +959,27 @@ public class TreasureHunterService
     }
 
     /// <summary>
+    ///     Hide / dense-pack cannot use a lateral nudge — stop grinding the wall and skip the pad
+    ///     sooner instead of waiting the full escalate window with vnav still running.
+    /// </summary>
+    private void PauseStuckApproachWithoutNudge()
+    {
+        pathfinder.Stop();
+        vnav.Stop();
+        ClearNavigateClosingLatch();
+        // Hold repath long enough to cover CapEscalateAfter so we do not immediately walk back in.
+        holdNavigateUntilUtc = DateTime.UtcNow + TimeSpan.FromSeconds(10);
+        padStuckWatch.CapEscalateAfter(TimeSpan.FromSeconds(8));
+    }
+
+    /// <summary>
     ///     Stuck on a pad with no live coffer — skip it. Neighbour chests on radar used to
     ///     pin us here: empty-skip required a streamed neighbour near <em>this</em> pad,
     ///     divert required one in layout range, and neither fired so we re-queued forever.
     /// </summary>
     private bool TrySkipEmptyAfterStuckNudge(HuntPathfinderStep step, Vector3 layoutDestination, float dist2d)
     {
-        if (!stuckNudgeIssued || !IsSameFloor(layoutDestination) || dist2d > StuckEmptySkipRadius)
+        if (!padStuckWatch.NudgeIssued || !IsSameFloor(layoutDestination) || dist2d > StuckEmptySkipRadius)
         {
             return false;
         }
@@ -1005,27 +991,13 @@ public class TreasureHunterService
         checkedNodeIds.Add(step.NodeId);
         stuckSkippedNodeIds.Add(step.NodeId);
         LastCheckedNodeId = step.NodeId;
-        ClearEmptyPadCandidate();
-        ResetStuckWatch();
+        emptyPadConfirm.Clear();
+        padStuckWatch.Reset();
         FinishCurrentPad();
         return true;
     }
 
-    private void StartStuckWatch(uint nodeId, float distance, DateTime now)
-    {
-        stuckWatchNodeId = nodeId;
-        stuckWatchBestDistance = distance;
-        stuckWatchStartedUtc = now;
-        stuckNudgeIssued = false;
-    }
-
-    private void ResetStuckWatch()
-    {
-        stuckWatchNodeId = null;
-        stuckWatchBestDistance = float.MaxValue;
-        stuckWatchStartedUtc = DateTime.MinValue;
-        stuckNudgeIssued = false;
-    }
+    private void ResetStuckWatch() => padStuckWatch.Reset();
 
     private void ResetViaStuckWatch()
     {
@@ -1869,7 +1841,7 @@ public class TreasureHunterService
         // Match the open chain: mesh often parks just outside 2y. After a stuck nudge,
         // chest / prop collision can leave you 3–5y out — still interactable.
         const float StuckOpenSlack = 3.5f;
-        float openSlack = stuckNudgeIssued
+        float openSlack = padStuckWatch.NudgeIssued
             ? StuckOpenSlack
             : OpenTreasureCofferChain.OpenAttemptSlack;
         if (dist2d > OpenTreasureCofferChain.PreferredOpenDistance + openSlack
@@ -1919,77 +1891,33 @@ public class TreasureHunterService
     private bool HandleReturnToBaseCamp()
     {
         StepDistance = 0f;
-        IZone zone = zones.GetZone();
-        bool inCombat = conditions[ConditionFlag.InCombat];
 
-        // Return cannot cast in combat — walk toward camp until it drops, then cast.
-        if (inCombat)
-        {
-            if (activeChain != null)
-            {
-                chainManager.CancelWhere(name => name.StartsWith("TreasureHunt::Return", StringComparison.Ordinal));
-                activeChain = null;
-            }
-
-            SprintAssist.MaybeCast(movementConfig.SprintOnAetheryteApproach, zone.IsInBasecamp());
-
-            if (!vnav.IsRunning() && !vnav.IsPathfinding())
-            {
-                Vector3 standOff = zone.GetMainAetheryte().GetCampStandOffPosition(player.Position);
-                log.Debug("Treasure hunt: in combat after last coffer — walking toward camp until Return is usable");
-                vnav.PathfindAndMoveCloseTo(standOff, false, AethernetNavigation.PathfindArrivalRadius);
-            }
-
-            return false;
-        }
-
-        if (vnav.IsRunning())
-        {
-            vnav.Stop();
-        }
-
+        // Unconscious: cannot Return or walk — wait for raise / mode pause.
         if (conditions[ConditionFlag.Unconscious])
         {
             return false;
         }
 
-        if (activeChain != null)
-        {
-            if (!activeChain.IsCompleted)
+        IZone zone = zones.GetZone();
+        CampReturnSession.TickResult result = campReturn.Tick(
+            zone,
+            player.Position,
+            blockedFromReturn: conditions[ConditionFlag.InCombat],
+            zones,
+            conditions,
+            gui,
+            pathfinder,
+            vnav,
+            chainManager,
+            chains,
+            waitForPathfindIdleOnArrive: true,
+            onCombatWalk: () =>
             {
-                return false;
-            }
+                SprintAssist.MaybeCast(movementConfig.SprintOnAetheryteApproach, zone.IsInBasecamp());
+                log.Debug("Treasure hunt: in combat after last coffer — walking toward camp until Return is usable");
+            });
 
-            bool returned = activeChain.IsCompletedSuccessfully && zone.IsInBasecamp();
-            activeChain = null;
-            if (!returned)
-            {
-                return false;
-            }
-        }
-
-        if (zone.IsInBasecamp())
-        {
-            // SimpleMove rejects a stacked move-to while Return's last pathfind is still
-            // queued. Wait until that slot is free so the first camp pad actually starts.
-            if (vnav.IsPathfinding())
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        activeChain = chainManager.Manage(
-            ReturnToBaseCamp.Append(
-                chains.Create("TreasureHunt::Return"),
-                zones,
-                conditions,
-                gui,
-                pathfinder,
-                vnav));
-
-        return false;
+        return result == CampReturnSession.TickResult.Arrived;
     }
 
     private bool HandleWalkToAethernet(HuntPathfinderStep step)
@@ -2345,24 +2273,10 @@ public class TreasureHunterService
         return count;
     }
 
-    private bool ConfirmEmptyPad(uint nodeId)
-    {
-        DateTime now = DateTime.UtcNow;
-        if (emptyPadCandidateNodeId != nodeId)
-        {
-            emptyPadCandidateNodeId = nodeId;
-            emptyPadCandidateSinceUtc = now;
-            return false;
-        }
+    private bool ConfirmEmptyPad(uint nodeId) =>
+        emptyPadConfirm.Tick(nodeId, HuntDistances.EmptyPadConfirmDelay);
 
-        return now - emptyPadCandidateSinceUtc >= HuntDistances.EmptyPadConfirmDelay;
-    }
-
-    private void ClearEmptyPadCandidate()
-    {
-        emptyPadCandidateNodeId = null;
-        emptyPadCandidateSinceUtc = DateTime.MinValue;
-    }
+    private void ClearEmptyPadCandidate() => emptyPadConfirm.Clear();
 
     private void ClearWalkLiveBind()
     {

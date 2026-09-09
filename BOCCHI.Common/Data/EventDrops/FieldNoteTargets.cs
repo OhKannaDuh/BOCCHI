@@ -115,67 +115,15 @@ public static class FieldNoteTargets
             _ => [],
         };
 
-    public static bool TryGetNoteForFate(uint fateId, out MonsterNote note)
-    {
-        if (SouthHornEventDrops.TryGetFate(fateId, out EventDropInfo sh) && sh.Notes is { } shNote)
-        {
-            note = shNote;
-            return true;
-        }
+    public static bool TryGetNoteForFate(uint fateId, out MonsterNote note) =>
+        OccultEventDrops.TryGetNoteForFate(fateId, out note);
 
-        if (NorthHornEventDrops.TryGetFate(fateId, out EventDropInfo nh) && nh.Notes is { } nhNote)
-        {
-            note = nhNote;
-            return true;
-        }
+    public static bool TryGetNoteForCriticalEncounter(uint encounterId, out MonsterNote note) =>
+        OccultEventDrops.TryGetNoteForCriticalEncounter(encounterId, out note);
 
-        note = default;
-        return false;
-    }
+    public static bool TryGetDropsForFate(ZoneId zoneId, uint fateId, out EventDropInfo drops) =>
+        OccultEventDrops.TryGetFate(zoneId, fateId, out drops);
 
-    public static bool TryGetNoteForCriticalEncounter(uint encounterId, out MonsterNote note)
-    {
-        if (SouthHornEventDrops.TryGetCriticalEncounter(encounterId, out EventDropInfo sh)
-            && sh.Notes is { } shNote)
-        {
-            note = shNote;
-            return true;
-        }
-
-        if (NorthHornEventDrops.TryGetCriticalEncounter(encounterId, out EventDropInfo nh)
-            && nh.Notes is { } nhNote)
-        {
-            note = nhNote;
-            return true;
-        }
-
-        note = default;
-        return false;
-    }
-
-    public static bool TryGetDropsForFate(ZoneId zoneId, uint fateId, out EventDropInfo drops)
-    {
-        return zoneId switch
-        {
-            ZoneId.SouthHorn => SouthHornEventDrops.TryGetFate(fateId, out drops),
-            ZoneId.NorthHorn => NorthHornEventDrops.TryGetFate(fateId, out drops),
-            _ => None(out drops),
-        };
-    }
-
-    public static bool TryGetDropsForCriticalEncounter(ZoneId zoneId, uint encounterId, out EventDropInfo drops)
-    {
-        return zoneId switch
-        {
-            ZoneId.SouthHorn => SouthHornEventDrops.TryGetCriticalEncounter(encounterId, out drops),
-            ZoneId.NorthHorn => NorthHornEventDrops.TryGetCriticalEncounter(encounterId, out drops),
-            _ => None(out drops),
-        };
-    }
-
-    private static bool None(out EventDropInfo drops)
-    {
-        drops = default;
-        return false;
-    }
+    public static bool TryGetDropsForCriticalEncounter(ZoneId zoneId, uint encounterId, out EventDropInfo drops) =>
+        OccultEventDrops.TryGetCriticalEncounter(zoneId, encounterId, out drops);
 }

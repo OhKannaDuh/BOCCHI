@@ -298,7 +298,8 @@ public class NorthHorn
                     new(new(47.6f, 3.8843424f, -218.3f), 99),
                     new(new(-269.6122f, 107.93719f, 875.6997f), 99),
                     new(new(-15.89468f, 4.0000005f, -20.29277f), 99),
-                    new(new(-747.4032f, 28.970308f, -492.1095f), 99),
+                    // Map ~6.1, 11.4 (was ~6.5, 11.6 / <-747.4, -492.1>; Eureka Linker)
+                    new(new(-769.25f, 28.97f, -504.51f), 99),
                     // Map ~15.3, 21.5 — next to carrot #1; EurekaTracker counter 74. Missing from
                     // earlier lists so the farm swept nearby pads and never walked here.
                     new(new(-259.6f, 3.6823246f, 56.9f), 99),

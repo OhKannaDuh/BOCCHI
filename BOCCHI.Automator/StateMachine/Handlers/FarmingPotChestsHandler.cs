@@ -67,7 +67,13 @@ public class FarmingPotChestsHandler
     ///     Extra radius around the pot / 2nd-chance pad when deciding to Hide before walking in
     ///     (on-player enter alone is too late once the pack has already aggroed).
     /// </summary>
-    private const float PotChestHideApproachLead = 30f;
+    private const float PotChestHideApproachLead = 55f;
+
+    /// <summary>
+    ///     Floor for on-player Hide enter during pot travel — shared treasure default (10y) is too
+    ///     tight when mounted packs pull before the gate ticks.
+    /// </summary>
+    private const float PotChestHideThreatEnterFloor = 18f;
 
     /// <summary>On-pad distance for the elixir probe (not coffer interact range).</summary>
     private const float CandidateProbeRadius = 5f;
@@ -248,6 +254,7 @@ public class FarmingPotChestsHandler
             }
 
             bool interrupt = false;
+            bool hidePrepInterrupt = false;
             if (farm.Mode == PotChestFarmMode.Smart
                 && farm.Phase is (PotChestFarmPhase.SearchingCandidates
                     or PotChestFarmPhase.ElixirAtCenter
@@ -268,6 +275,19 @@ public class FarmingPotChestsHandler
                 interrupt = true;
             }
 
+            // PathStep hops can run tens of seconds; Hide was only gated when issuing the hop.
+            // Poll mid-travel so packs on the way in arm Hide before aggro, not only at the pad.
+            if (!interrupt
+                && farm.Phase is (PotChestFarmPhase.SearchingCandidates
+                    or PotChestFarmPhase.ElixirAtCenter)
+                && lastPathDestination is { } hideDest
+                && !ApplyNinjaHideGate(hideDest))
+            {
+                logger.Debug("Pot treasure: Hide prep mid-travel — pausing path");
+                interrupt = true;
+                hidePrepInterrupt = true;
+            }
+
             if (!interrupt)
             {
                 return;
@@ -277,10 +297,18 @@ public class FarmingPotChestsHandler
             pathfinder.Stop();
             activeChain = null;
             ClearTravelPlan();
-            preferDirectApproach = false;
             lastPathIssueAt = DateTimeOffset.MinValue;
-            lastPathDestination = null;
             ResetApproachWatch();
+            if (hidePrepInterrupt)
+            {
+                // Keep lastPathDestination so EnsurePathing resumes the same pad after Hide.
+                preferDirectApproach = true;
+            }
+            else
+            {
+                preferDirectApproach = false;
+                lastPathDestination = null;
+            }
         }
 
         // PathStep hops often complete as canceled when vnav stops short of the issued point
@@ -1396,16 +1424,21 @@ public class FarmingPotChestsHandler
         return false;
     }
 
+    private float PotHideThreatEnterDistance() =>
+        Math.Max(treasureConfig.KnowledgeThreatEnterDistance, PotChestHideThreatEnterFloor);
+
     private void UpdateNinjaHideRequired(Vector3? approachingDestination = null)
     {
+        float enter = PotHideThreatEnterDistance();
+        float exit = Math.Max(treasureConfig.KnowledgeThreatExitDistance, enter);
         ninjaHideRequired = ninjaHideRouteGate.UpdateRequired(
             objects,
             player.Position,
             ninjaHideRequired,
             ninjaHide.IsMounted,
             treasureConfig.KnowledgeHideOffset,
-            treasureConfig.KnowledgeThreatEnterDistance,
-            treasureConfig.KnowledgeThreatExitDistance);
+            enter,
+            exit);
 
         // Player-radius gate alone Hides too late for pot / 2nd-chance pads in packs — also arm
         // when high-Knowledge mobs sit around the chest we are walking to.
@@ -1435,7 +1468,7 @@ public class FarmingPotChestsHandler
         }
 
         int hideAt = KnowledgeThreat.HideAtOrAbove(foray, treasureConfig.KnowledgeHideOffset);
-        float lead = treasureConfig.KnowledgeThreatEnterDistance
+        float lead = PotHideThreatEnterDistance()
                      + KnowledgeThreat.MountedThreatEnterBonus
                      + PotChestHideApproachLead;
         return KnowledgeThreat.TryFindThreat(objects, destination, hideAt, lead, out _, out _);

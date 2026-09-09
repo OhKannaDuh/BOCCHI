@@ -34,34 +34,7 @@
     "emergency_stop_done": "[BOCCHI] 긴급 정지",
     "goal": "목표",
     "current_step": "현재 단계",
-    "chests": "항아리 상자",
-    "automator_states": {
-      "entry": "시작 중",
-      "idle": "대기",
-      "dead": "전투불능",
-      "in_combat": "전투 중",
-      "casting_treasure_sight": "마기 보물 탐색 시전 중",
-      "applying_buffs": "버프 적용 중",
-      "repairing": "수리 중",
-      "choosing_activity": "다음 할 일 고르는 중",
-      "returning": "거점으로 돌아가는 중",
-      "pathfinding": "이동 중",
-      "in_fate": "돌발 중",
-      "waiting_for_critical_encounter": "비상 조우 대기 중",
-      "waiting_for_pot_fate": "항아리 대기 중",
-      "in_critical_encounter": "비상 조우 중",
-      "returning_to_job": "원래 잡으로 바꾸는 중",
-      "leveling_phantom_job": "서포트 잡 전환 중",
-      "farming_pot_chests": "항아리 상자 수집 중",
-      "triaging": "부활 중"
-    },
-    "farmer_phases": {
-      "waiting": "대기",
-      "buffing": "버프 중",
-      "gathering": "적 끌어모으는 중",
-      "stacking": "무리 모으는 중",
-      "fighting": "전투 중"
-    }
+    "chests": "항아리 상자"
   },
   "pot_timer": {
     "active": "항아리 돌발 진행 중",

@@ -10,10 +10,8 @@ using FFXIVClientStructs.Interop;
 using FFXIVClientStructs.STD;
 using Ocelot.Services.UI;
 using System.Numerics;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using TreasureSheet = Lumina.Excel.Sheets.Treasure;
 
 namespace BOCCHI.Debug.Panels;
 
@@ -154,7 +152,6 @@ public sealed class TreasureLocationsExportPanel
 
     private unsafe void RefreshFromLayout(IZone zone)
     {
-        treasures.Clear();
         LayoutManager* layout = LayoutWorld.Instance()->ActiveLayout;
         if (layout == null)
         {
@@ -163,46 +160,17 @@ public sealed class TreasureLocationsExportPanel
 
         if (!layout->InstancesByType.TryGetValue(
                 InstanceType.Treasure,
-                out Pointer<StdMap<ulong, Pointer<ILayoutInstance>>> mapPtr,
+                out Pointer<StdMap<ulong, Pointer<ILayoutInstance>>> _,
                 false))
         {
             throw new InvalidOperationException("No treasure layout instances.");
         }
 
-        List<TreasureData> authored = zone.GetTreasureData();
-        bool hasPositionData = authored.Exists(d => d.Position.HasValue);
-        var sheet = data.GetExcelSheet<TreasureSheet>();
-
-        foreach (ILayoutInstance* instance in mapPtr.Value->Values)
+        treasures.Clear();
+        foreach (LayoutTreasureScan.Spot spot in LayoutTreasureScan.CollectBronzeSilver(zone, data))
         {
-            Transform* transform = instance->GetTransformImpl();
-            Vector3 position = transform->Translation;
-            if (position.Y <= -10f && !hasPositionData)
-            {
-                continue;
-            }
-
-            uint treasureRowId = Unsafe.Read<uint>((byte*)instance + 0x30);
-            if (!sheet.TryGetRow(treasureRowId, out TreasureSheet row))
-            {
-                continue;
-            }
-
-            uint sgbId = row.SGB.RowId;
-            if (!TreasureCoffer.IsBronzeOrSilverSgb(sgbId))
-            {
-                continue;
-            }
-
-            if (hasPositionData && !authored.Any(d => d.Matches(treasureRowId, position)))
-            {
-                continue;
-            }
-
-            treasures.Add(new LayoutTreasure(treasureRowId, position, sgbId));
+            treasures.Add(new LayoutTreasure(spot.DataId, spot.Position, spot.SgbId));
         }
-
-        treasures.Sort((a, b) => a.DataId.CompareTo(b.DataId));
     }
 
     private List<string> WriteLocationsJson(

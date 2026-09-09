@@ -1,23 +1,16 @@
 using BOCCHI.Common.Data.Aethernet;
 using BOCCHI.Common.Data.Zones;
-using BOCCHI.Common.Data.Zones.Graph;
 using BOCCHI.Treasure.Hunt;
 using BOCCHI.Treasure.Services;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
-using FFXIVClientStructs.FFXIV.Client.LayoutEngine;
-using FFXIVClientStructs.Interop;
-using FFXIVClientStructs.STD;
-using Lumina.Excel.Sheets;
 using Ocelot.Ipc.VNavmesh;
 using Ocelot.Services.UI;
 using System.Diagnostics;
 using System.Numerics;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using TreasureSheet = Lumina.Excel.Sheets.Treasure;
 
 namespace BOCCHI.Debug.Panels;
 
@@ -226,48 +219,13 @@ public sealed class TreasureHuntPrecomputePanel
         }
     }
 
-    private unsafe void RefreshTreasures(IZone zone)
+    private void RefreshTreasures(IZone zone)
     {
         treasures.Clear();
-        LayoutManager* layout = LayoutWorld.Instance()->ActiveLayout;
-        if (layout == null)
+        foreach (LayoutTreasureScan.Spot spot in LayoutTreasureScan.CollectBronzeSilver(zone, data))
         {
-            return;
+            treasures.Add(new TreasureSpot(spot.DataId, spot.Position, spot.SgbId));
         }
-
-        if (!layout->InstancesByType.TryGetValue(InstanceType.Treasure, out Pointer<StdMap<ulong, Pointer<ILayoutInstance>>> mapPtr, false))
-        {
-            return;
-        }
-
-        List<TreasureData> authored = zone.GetTreasureData();
-        bool hasPositionData = authored.Exists(d => d.Position.HasValue);
-
-        foreach(ILayoutInstance* instance in mapPtr.Value->Values)
-        {
-            Transform* transform = instance->GetTransformImpl();
-            Vector3 position = transform->Translation;
-            if (position.Y <= -10f && !hasPositionData)
-            {
-                continue;
-            }
-
-            uint treasureRowId = Unsafe.Read<uint>((byte*)instance + 0x30);
-            uint sgbId = data.GetExcelSheet<TreasureSheet>().GetRow(treasureRowId).SGB.RowId;
-            if (!TreasureCoffer.IsBronzeOrSilverSgb(sgbId))
-            {
-                continue;
-            }
-
-            if (hasPositionData && !authored.Any(d => d.Matches(treasureRowId, position)))
-            {
-                continue;
-            }
-
-            treasures.Add(new(treasureRowId, position, sgbId));
-        }
-
-        treasures.Sort((a, b) => a.Id.CompareTo(b.Id));
     }
 
     private List<string> WriteOutputs(ZoneId zoneId, string json)

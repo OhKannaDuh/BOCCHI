@@ -7,7 +7,6 @@ using BOCCHI.Treasure.Data;
 using Dalamud.Plugin;
 using Ocelot.Lifecycle;
 using Ocelot.Services.Logger;
-using System.Globalization;
 using System.Net.Http;
 using System.Numerics;
 using System.Text;
@@ -32,17 +31,6 @@ public sealed class CarrotLocationSyncService
     public const string ApiBaseUrl = PotCycleSyncService.ApiBaseUrl;
 
     public const string ApiUrl = ApiBaseUrl + "/api/v1/carrot-locations";
-
-    private static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(15) };
-
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        PropertyNameCaseInsensitive = true,
-    };
-
-    private static readonly TimeSpan RetryDelay = TimeSpan.FromMinutes(1);
-
-    private static readonly TimeSpan CatalogRefreshInterval = TimeSpan.FromMinutes(5);
 
     private readonly Queue<PendingSubmit> queue = new();
 
@@ -143,7 +131,7 @@ public sealed class CarrotLocationSyncService
             }
             else
             {
-                nextUploadAttemptUtc = DateTime.UtcNow + RetryDelay;
+                nextUploadAttemptUtc = DateTime.UtcNow + CrowdsourceSyncHttp.RetryDelay;
                 if (upload.Error is { } uploadError)
                 {
                     logger.Warn("[CarrotLocationSync] upload failed: {Message}", uploadError);
@@ -166,7 +154,7 @@ public sealed class CarrotLocationSyncService
         {
             acceptedLocations = catalog.Locations;
             catalogTerritory = catalog.TerritoryId;
-            nextCatalogFetchUtc = DateTime.UtcNow + CatalogRefreshInterval;
+            nextCatalogFetchUtc = DateTime.UtcNow + CrowdsourceSyncHttp.CatalogRefreshInterval;
             logger.Info(
                 "[CarrotLocationSync] catalog territory={Territory} locations={Count}",
                 catalog.TerritoryId,
@@ -174,7 +162,7 @@ public sealed class CarrotLocationSyncService
         }
         else
         {
-            nextCatalogFetchUtc = DateTime.UtcNow + RetryDelay;
+            nextCatalogFetchUtc = DateTime.UtcNow + CrowdsourceSyncHttp.RetryDelay;
             if (catalog.Error is { } catalogError)
             {
                 logger.Warn("[CarrotLocationSync] catalog failed: {Message}", catalogError);
@@ -196,7 +184,7 @@ public sealed class CarrotLocationSyncService
             }
 
             Vector3 position = carrot.GetPosition();
-            string key = PositionKey(territory, position);
+            string key = CrowdsourceSyncHttp.PositionKey(territory, position);
             if (queuedKeys.Contains(key) || submittedKeys.Contains(key))
             {
                 continue;
@@ -240,7 +228,7 @@ public sealed class CarrotLocationSyncService
                 Content = new StringContent(json, Encoding.UTF8, "application/json"),
             };
 
-            using HttpResponseMessage response = await Http.SendAsync(request).ConfigureAwait(false);
+            using HttpResponseMessage response = await CrowdsourceSyncHttp.Http.SendAsync(request).ConfigureAwait(false);
             Interlocked.Exchange(
                 ref completedUpload,
                 response.IsSuccessStatusCode
@@ -282,7 +270,7 @@ public sealed class CarrotLocationSyncService
         {
             string url = $"{ApiUrl}?territoryId={territory}";
             using HttpRequestMessage request = new(HttpMethod.Get, url);
-            using HttpResponseMessage response = await Http.SendAsync(request).ConfigureAwait(false);
+            using HttpResponseMessage response = await CrowdsourceSyncHttp.Http.SendAsync(request).ConfigureAwait(false);
             string body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             if (!response.IsSuccessStatusCode)
@@ -293,7 +281,7 @@ public sealed class CarrotLocationSyncService
                 return;
             }
 
-            CarrotCatalogResponse? parsed = JsonSerializer.Deserialize<CarrotCatalogResponse>(body, JsonOptions);
+            CarrotCatalogResponse? parsed = JsonSerializer.Deserialize<CarrotCatalogResponse>(body, CrowdsourceSyncHttp.JsonOptions);
             List<AcceptedCarrotLocation> locations = parsed?.Locations?
                 .Where(l => l.TerritoryId == territory && l.Position != null)
                 .Select(l => new AcceptedCarrotLocation(
@@ -309,15 +297,6 @@ public sealed class CarrotLocationSyncService
         {
             Interlocked.Exchange(ref completedCatalog, CatalogOutcome.Failed(territory, ex.Message));
         }
-    }
-
-    private static string PositionKey(ushort territory, Vector3 position)
-    {
-        // Match Worker near-dupe window (±0.1 yalm).
-        string x = MathF.Round(position.X, 1).ToString("F1", CultureInfo.InvariantCulture);
-        string y = MathF.Round(position.Y, 1).ToString("F1", CultureInfo.InvariantCulture);
-        string z = MathF.Round(position.Z, 1).ToString("F1", CultureInfo.InvariantCulture);
-        return $"{territory}:{x}:{y}:{z}";
     }
 
     private readonly record struct PendingSubmit(ushort TerritoryId, Vector3 Position, string Key);

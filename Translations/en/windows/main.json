@@ -34,34 +34,7 @@
     "emergency_stop_done": "[BOCCHI] Emergency Stop",
     "goal": "Goal",
     "current_step": "Current step",
-    "chests": "Pot chests",
-    "automator_states": {
-      "entry": "Starting",
-      "idle": "Idle",
-      "dead": "Dead",
-      "in_combat": "In combat",
-      "casting_treasure_sight": "Casting Treasure Sight",
-      "applying_buffs": "Applying buffs",
-      "repairing": "Repairing",
-      "choosing_activity": "Picking next activity",
-      "returning": "Returning to camp",
-      "pathfinding": "Traveling",
-      "in_fate": "In FATE",
-      "waiting_for_critical_encounter": "Waiting for CE",
-      "waiting_for_pot_fate": "Waiting for pot",
-      "in_critical_encounter": "In CE",
-      "returning_to_job": "Switching back to job",
-      "leveling_phantom_job": "Switching phantom job",
-      "farming_pot_chests": "Farming pot chests",
-      "triaging": "Raising players"
-    },
-    "farmer_phases": {
-      "waiting": "Waiting",
-      "buffing": "Buffing",
-      "gathering": "Pulling enemies",
-      "stacking": "Gathering pack",
-      "fighting": "Fighting"
-    }
+    "chests": "Pot chests"
   },
   "pot_timer": {
     "active": "Pot FATE active",

@@ -1,4 +1,4 @@
-using BOCCHI.Common;
+﻿using BOCCHI.Common;
 using BOCCHI.Common.Config;
 using BOCCHI.Common.Data;
 using BOCCHI.Common.Data.Aethernet;
@@ -67,16 +67,14 @@ public sealed class CarrotHunterService
 
     private const int FortuneCarrotUseMaxAttempts = 3;
 
-    /// <summary>Lateral nudge around ramp/wall geometry when pathing stalls far from the pad.</summary>
-    private static readonly TimeSpan StuckNudgeTimeout = TimeSpan.FromSeconds(10);
+    private readonly WalkStuckWatch farStuckWatch = new(new WalkStuckWatch.Options(
+        NudgeAfter: TimeSpan.FromSeconds(10),
+        EscalateAfter: TimeSpan.FromSeconds(18),
+        MaxEscalations: 2));
 
-    /// <summary>Re-path to the pad after a nudge if still not progressing.</summary>
-    private static readonly TimeSpan StuckRepathTimeout = TimeSpan.FromSeconds(18);
+    private readonly EmptyPadConfirm emptyPadConfirm = new();
 
-    /// <summary>Give up on a pad after this many nudge+repath cycles (interior mesh, etc.).</summary>
-    private const int MaxStuckRepaths = 2;
-
-    private const float StuckProgressThreshold = 1.5f;
+    private readonly CampReturnSession campReturn = new("CarrotHunt::Return");
 
     private const string FinishedRouteMessage = "Carrot Hunt finished the authored route.";
 
@@ -122,8 +120,6 @@ public sealed class CarrotHunterService
 
     private Task<ChainResult>? activeTeleportChain;
 
-    private Task<ChainResult>? activeReturnChain;
-
     /// <summary>After Return succeeds: stop hunt (finish) vs continue to current authored pad.</summary>
     private bool returnThenStop;
 
@@ -133,20 +129,6 @@ public sealed class CarrotHunterService
     private float approachBestDistance = float.MaxValue;
 
     private DateTime approachLastProgressUtc = DateTime.MinValue;
-
-    private int? emptyPadCandidateAuthoredId;
-
-    private DateTime emptyPadCandidateSinceUtc = DateTime.MinValue;
-
-    private int? stuckWatchAuthoredId;
-
-    private float stuckWatchBestDistance = float.MaxValue;
-
-    private DateTime stuckWatchStartedUtc = DateTime.MinValue;
-
-    private bool stuckNudgeIssued;
-
-    private int stuckRepathCount;
 
     public bool Running { get; private set; }
 
@@ -364,7 +346,7 @@ public sealed class CarrotHunterService
         ClearHop();
         returnThenStop = false;
         returnThenAethernet = false;
-        activeReturnChain = null;
+        campReturn.Detach();
 
         if (currentAuthored is not { } authored)
         {
@@ -437,7 +419,7 @@ public sealed class CarrotHunterService
     {
         if (!Running)
         {
-            activeReturnChain = null;
+            campReturn.Detach();
             return;
         }
 
@@ -447,23 +429,24 @@ public sealed class CarrotHunterService
         }
 
         IZone zone = zones.GetZone();
-        if (zone.IsInBasecamp() && activeReturnChain == null)
-        {
-            OnReturnArrived();
-            return;
-        }
+        CampReturnSession.TickResult result = campReturn.Tick(
+            zone,
+            player.Position,
+            blockedFromReturn: conditions[ConditionFlag.InCombat],
+            zones,
+            conditions,
+            gui,
+            pathfinder,
+            vnav,
+            chainManager,
+            chains);
 
-        if (activeReturnChain != null)
+        switch (result)
         {
-            if (!activeReturnChain.IsCompleted)
-            {
+            case CampReturnSession.TickResult.Arrived:
+                OnReturnArrived();
                 return;
-            }
-
-            bool ok = activeReturnChain.IsCompletedSuccessfully && zone.IsInBasecamp();
-            activeReturnChain = null;
-            if (!ok)
-            {
+            case CampReturnSession.TickResult.Failed:
                 log.Warning("Carrot hunt: Return failed — walking instead");
                 returnThenAethernet = false;
                 ClearHop();
@@ -476,32 +459,9 @@ public sealed class CarrotHunterService
 
                 Phase = CarrotHuntPhase.Pathing;
                 return;
-            }
-
-            OnReturnArrived();
-            return;
+            default:
+                return;
         }
-
-        if (conditions[ConditionFlag.InCombat])
-        {
-            // In combat: walk toward camp stand-off.
-            if (!vnav.IsRunning() && !vnav.IsPathfinding())
-            {
-                Vector3 standOff = zone.GetMainAetheryte().GetCampStandOffPosition(player.Position);
-                vnav.PathfindAndMoveCloseTo(standOff, false, AethernetNavigation.PathfindArrivalRadius);
-            }
-
-            return;
-        }
-
-        activeReturnChain = chainManager.Manage(
-            ReturnToBaseCamp.Append(
-                chains.Create("CarrotHunt::Return"),
-                zones,
-                conditions,
-                gui,
-                pathfinder,
-                vnav));
     }
 
     private void OnReturnArrived()
@@ -1008,7 +968,7 @@ public sealed class CarrotHunterService
     private void RecalculateAndAdvance(int? preferStartId = null)
     {
         ClearHop();
-        activeReturnChain = null;
+        campReturn.Detach();
         returnThenAethernet = false;
         returnThenStop = false;
         currentAuthored = null;
@@ -1598,7 +1558,7 @@ public sealed class CarrotHunterService
     private void CancelTravelForLocalCarrot()
     {
         ClearHop();
-        activeReturnChain = null;
+        campReturn.Detach();
         returnThenAethernet = false;
         returnThenStop = false;
         if (Phase is CarrotHuntPhase.ApproachingAetheryte
@@ -1624,24 +1584,10 @@ public sealed class CarrotHunterService
             && Vector3.DistanceSquared(authoredPosition, c.GetPosition()) <= trustSq);
     }
 
-    private bool ConfirmEmptyCarrotPad(int authoredId)
-    {
-        DateTime now = DateTime.UtcNow;
-        if (emptyPadCandidateAuthoredId != authoredId)
-        {
-            emptyPadCandidateAuthoredId = authoredId;
-            emptyPadCandidateSinceUtc = now;
-            return false;
-        }
+    private bool ConfirmEmptyCarrotPad(int authoredId) =>
+        emptyPadConfirm.Tick(authoredId, HuntDistances.EmptyPadConfirmDelay);
 
-        return now - emptyPadCandidateSinceUtc >= HuntDistances.EmptyPadConfirmDelay;
-    }
-
-    private void ClearEmptyPadCandidate()
-    {
-        emptyPadCandidateAuthoredId = null;
-        emptyPadCandidateSinceUtc = DateTime.MinValue;
-    }
+    private void ClearEmptyPadCandidate() => emptyPadConfirm.Clear();
 
     private Carrot? FindUnusedLiveCarrotNear(CarrotData authored, float matchRadiusSq)
     {
@@ -1901,70 +1847,40 @@ public sealed class CarrotHunterService
             return false;
         }
 
-        DateTime now = DateTime.UtcNow;
-        if (stuckWatchAuthoredId != authoredId)
+        switch (farStuckWatch.Tick(authoredId, distance))
         {
-            stuckWatchAuthoredId = authoredId;
-            stuckWatchBestDistance = distance;
-            stuckWatchStartedUtc = now;
-            stuckNudgeIssued = false;
-            stuckRepathCount = 0;
-            return false;
-        }
-
-        if (distance < stuckWatchBestDistance - StuckProgressThreshold)
-        {
-            stuckWatchBestDistance = distance;
-            stuckWatchStartedUtc = now;
-            stuckNudgeIssued = false;
-            return false;
-        }
-
-        if (!stuckNudgeIssued && now - stuckWatchStartedUtc >= StuckNudgeTimeout)
-        {
-            stuckNudgeIssued = true;
-            TryIssueStuckNudge();
-            return true;
-        }
-
-        if (stuckNudgeIssued && now - stuckWatchStartedUtc >= StuckRepathTimeout)
-        {
-            stuckRepathCount++;
-            if (stuckRepathCount > MaxStuckRepaths)
-            {
+            case WalkStuckWatch.Action.Nudge:
+                TryIssueStuckNudge();
+                return true;
+            case WalkStuckWatch.Action.GiveUp:
                 log.Information(
-                    "Carrot hunt: giving up on authored {Id} after {Count} stuck recoveries",
-                    authoredId,
-                    stuckRepathCount);
+                    "Carrot hunt: giving up on authored {Id} after stuck recoveries",
+                    authoredId);
                 SkipCurrentAuthored();
                 return true;
-            }
+            case WalkStuckWatch.Action.Repath:
+                // Wrong shelf: repathing Direct climbs the same cliff. Re-pick Return/aethernet.
+                if (!HuntDistances.IsSameFloor(player.Position, currentTargetPosition))
+                {
+                    log.Debug(
+                        "Carrot hunt: still stuck on authored {Id} (wrong floor) — re-routing via camp/aethernet",
+                        authoredId);
+                    pathfinder.Stop();
+                    vnav.Stop();
+                    BeginRouteToCurrentAuthored();
+                    return true;
+                }
 
-            stuckWatchStartedUtc = now;
-            stuckNudgeIssued = false;
-
-            // Wrong shelf: repathing Direct climbs the same cliff. Re-pick Return/aethernet.
-            if (!HuntDistances.IsSameFloor(player.Position, currentTargetPosition))
-            {
                 log.Debug(
-                    "Carrot hunt: still stuck on authored {Id} (wrong floor) — re-routing via camp/aethernet",
+                    "Carrot hunt: still stuck on authored {Id} after nudge — repathing",
                     authoredId);
                 pathfinder.Stop();
                 vnav.Stop();
-                BeginRouteToCurrentAuthored();
+                vnav.PathfindAndMoveCloseTo(currentTargetPosition, false, OpenTreasureCofferChain.PathArrivalRange);
                 return true;
-            }
-
-            log.Debug(
-                "Carrot hunt: still stuck on authored {Id} after nudge — repathing",
-                authoredId);
-            pathfinder.Stop();
-            vnav.Stop();
-            vnav.PathfindAndMoveCloseTo(currentTargetPosition, false, OpenTreasureCofferChain.PathArrivalRange);
-            return true;
+            default:
+                return false;
         }
-
-        return false;
     }
 
     private void TryIssueStuckNudge()
@@ -1979,14 +1895,7 @@ public sealed class CarrotHunterService
         vnav.PathfindAndMoveCloseTo(nudge, false, 1.5f);
     }
 
-    private void ResetFarStuckWatch()
-    {
-        stuckWatchAuthoredId = null;
-        stuckWatchBestDistance = float.MaxValue;
-        stuckWatchStartedUtc = DateTime.MinValue;
-        stuckNudgeIssued = false;
-        stuckRepathCount = 0;
-    }
+    private void ResetFarStuckWatch() => farStuckWatch.Reset();
 
     private bool MaybeDismountNear(float distance)
     {
@@ -2064,7 +1973,7 @@ public sealed class CarrotHunterService
         ResetApproachProgress();
         ResetFarStuckWatch();
         ClearHop();
-        activeReturnChain = null;
+        campReturn.Detach();
         returnThenStop = false;
         returnThenAethernet = false;
     }
@@ -2089,7 +1998,7 @@ public sealed class CarrotHunterService
     private void SoftStopMovementForPause()
     {
         chainManager.CancelWhere(name => name.StartsWith("CarrotHunt", StringComparison.Ordinal));
-        activeReturnChain = null;
+        campReturn.Detach();
         activeTeleportChain = null;
         vnav.Stop();
         pathfinder.Stop();

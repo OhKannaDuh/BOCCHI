@@ -4,7 +4,6 @@ using BOCCHI.Common.Services;
 using Dalamud.Plugin;
 using Ocelot.Lifecycle;
 using Ocelot.Services.Logger;
-using System.Globalization;
 using System.Net.Http;
 using System.Numerics;
 using System.Text;
@@ -41,17 +40,6 @@ public sealed class CofferLocationSyncService
     public const float MatchRadius = 3.5f;
 
     public const float MatchRadiusSq = MatchRadius * MatchRadius;
-
-    private static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(15) };
-
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        PropertyNameCaseInsensitive = true,
-    };
-
-    private static readonly TimeSpan RetryDelay = TimeSpan.FromMinutes(1);
-
-    private static readonly TimeSpan CatalogRefreshInterval = TimeSpan.FromMinutes(5);
 
     private readonly Queue<PendingSubmit> queue = new();
 
@@ -119,7 +107,7 @@ public sealed class CofferLocationSyncService
 
         ushort territory = zones.GetZone().TerritoryType;
         Vector3 position = new(x, y, z);
-        string key = PositionKey(territory, dataId, position);
+        string key = CrowdsourceSyncHttp.PositionKey(territory, dataId, position);
         if (queuedKeys.Contains(key) || submittedKeys.Contains(key))
         {
             return;
@@ -179,7 +167,7 @@ public sealed class CofferLocationSyncService
             }
             else
             {
-                nextUploadAttemptUtc = DateTime.UtcNow + RetryDelay;
+                nextUploadAttemptUtc = DateTime.UtcNow + CrowdsourceSyncHttp.RetryDelay;
                 if (upload.Error is { } uploadError)
                 {
                     logger.Warn("[CofferLocationSync] upload failed: {Message}", uploadError);
@@ -202,7 +190,7 @@ public sealed class CofferLocationSyncService
         {
             accepted = catalog.Locations;
             catalogTerritory = catalog.TerritoryId;
-            nextCatalogFetchUtc = DateTime.UtcNow + CatalogRefreshInterval;
+            nextCatalogFetchUtc = DateTime.UtcNow + CrowdsourceSyncHttp.CatalogRefreshInterval;
             logger.Info(
                 "[CofferLocationSync] catalog territory={Territory} candidates={Count}",
                 catalog.TerritoryId,
@@ -210,7 +198,7 @@ public sealed class CofferLocationSyncService
         }
         else
         {
-            nextCatalogFetchUtc = DateTime.UtcNow + RetryDelay;
+            nextCatalogFetchUtc = DateTime.UtcNow + CrowdsourceSyncHttp.RetryDelay;
             if (catalog.Error is { } catalogError)
             {
                 logger.Warn("[CofferLocationSync] catalog failed: {Message}", catalogError);
@@ -256,7 +244,7 @@ public sealed class CofferLocationSyncService
                 Content = new StringContent(json, Encoding.UTF8, "application/json"),
             };
 
-            using HttpResponseMessage response = await Http.SendAsync(request).ConfigureAwait(false);
+            using HttpResponseMessage response = await CrowdsourceSyncHttp.Http.SendAsync(request).ConfigureAwait(false);
             Interlocked.Exchange(
                 ref completedUpload,
                 response.IsSuccessStatusCode
@@ -299,7 +287,7 @@ public sealed class CofferLocationSyncService
         {
             string url = $"{CandidatesUrl}?territoryId={territory}";
             using HttpRequestMessage request = new(HttpMethod.Get, url);
-            using HttpResponseMessage response = await Http.SendAsync(request).ConfigureAwait(false);
+            using HttpResponseMessage response = await CrowdsourceSyncHttp.Http.SendAsync(request).ConfigureAwait(false);
             string body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             if (!response.IsSuccessStatusCode)
@@ -310,7 +298,7 @@ public sealed class CofferLocationSyncService
                 return;
             }
 
-            CatalogResponse? parsed = JsonSerializer.Deserialize<CatalogResponse>(body, JsonOptions);
+            CatalogResponse? parsed = JsonSerializer.Deserialize<CatalogResponse>(body, CrowdsourceSyncHttp.JsonOptions);
             List<CrowdsourcedCofferCandidate> locations = [];
             if (parsed?.Candidates != null)
             {
@@ -335,14 +323,6 @@ public sealed class CofferLocationSyncService
         {
             Interlocked.Exchange(ref completedCatalog, CatalogOutcome.Failed(territory, ex.Message));
         }
-    }
-
-    private static string PositionKey(ushort territory, uint dataId, Vector3 position)
-    {
-        string x = MathF.Round(position.X, 1).ToString("F1", CultureInfo.InvariantCulture);
-        string y = MathF.Round(position.Y, 1).ToString("F1", CultureInfo.InvariantCulture);
-        string z = MathF.Round(position.Z, 1).ToString("F1", CultureInfo.InvariantCulture);
-        return $"{territory}:{dataId}:{x}:{y}:{z}";
     }
 
     private readonly record struct PendingSubmit(

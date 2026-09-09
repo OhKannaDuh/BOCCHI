@@ -650,6 +650,19 @@ public class Automator
             survey.SurveyWaitDeadlineUtc = DateTime.MinValue;
         }
 
+        // Keep Illegal Mode filler hunt paused for the farm (do not ResumeNearPlayer mid-elixir).
+        ITreasureHunter hunt = hunterFactory();
+        if (hunt.Running && !hunt.Paused)
+        {
+            hunt.Pause();
+            logger.Debug("Paused treasure hunt — beginning exclusive pot chest farm");
+        }
+
+        if (SuspendedForTreasure)
+        {
+            SetSuspendedForTreasure(false);
+        }
+
         memory.TryAdd(farm);
     }
 }

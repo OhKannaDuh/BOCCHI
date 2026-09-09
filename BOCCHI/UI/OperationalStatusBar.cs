@@ -154,7 +154,7 @@ public class OperationalStatusBar
             {
                 string detail = Farmer.Suspended
                     ? translator.T($".automation.mob_farmer.yield_reasons.{Farmer.YieldReason.ToString().ToSnakeCase()}")
-                    : translator.T($".status.farmer_phases.{Farmer.Phase.ToString().ToSnakeCase()}");
+                    : translator.T($"state_machines.farmer_phase.{Farmer.Phase.ToString().ToSnakeCase()}.label");
                 if (!Farmer.Suspended && Farmer.CurrentSpotName is { } spot)
                 {
                     detail = $"{detail} · {spot}";
@@ -303,5 +303,5 @@ public class OperationalStatusBar
     }
 
     private string FormatAutomatorState(AutomatorState state) =>
-        translator.T($".status.automator_states.{state.ToString().ToSnakeCase()}");
+        translator.T($"state_machines.automator.{state.ToString().ToSnakeCase()}.label");
 }

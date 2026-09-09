@@ -34,34 +34,7 @@
     "emergency_stop_done": "[BOCCHI] 緊急停止",
     "goal": "目標",
     "current_step": "いまの手順",
-    "chests": "マジックポット宝箱",
-    "automator_states": {
-      "entry": "開始中",
-      "idle": "待機中",
-      "dead": "戦闘不能",
-      "in_combat": "戦闘中",
-      "casting_treasure_sight": "トレジャーサイト詠唱中",
-      "applying_buffs": "バフ付与中",
-      "repairing": "修理中",
-      "choosing_activity": "次の活動を選んでいます",
-      "returning": "キャンプに戻っています",
-      "pathfinding": "移動中",
-      "in_fate": "FATE中",
-      "waiting_for_critical_encounter": "CE待機中",
-      "waiting_for_pot_fate": "マジックポット待機中",
-      "in_critical_encounter": "CE中",
-      "returning_to_job": "ジョブに戻しています",
-      "leveling_phantom_job": "サポートジョブ切替中",
-      "farming_pot_chests": "マジックポット宝箱を回収中",
-      "triaging": "蘇生中"
-    },
-    "farmer_phases": {
-      "waiting": "待機中",
-      "buffing": "バフ中",
-      "gathering": "敵を引っ張っています",
-      "stacking": "パックをまとめています",
-      "fighting": "戦闘中"
-    }
+    "chests": "マジックポット宝箱"
   },
   "pot_timer": {
     "active": "マジックポットFATE進行中",

@@ -155,6 +155,15 @@ public class IllegalModeTreasureFillerService
     /// </summary>
     private void UpdateRunningFillerHunt(bool activityNow)
     {
+        // Pot FATE ending starts FarmingPotChests — leave-early yield ends then, but the hunt
+        // must stay paused for the whole farm. Otherwise ResumeNearPlayer fights Automator's
+        // SuspendedForTreasure + PotChestFarmMemory latch every tick (idle elixir / no pathing).
+        if (ShouldDeferToPotChestFarm())
+        {
+            PauseHuntForYield("pot chest farm");
+            return;
+        }
+
         if (ShouldYieldHuntForImminentPot())
         {
             PauseHuntForYield("pot");
@@ -651,6 +660,12 @@ public class IllegalModeTreasureFillerService
 
     private void EnterHuntPhase(bool fromSurvey)
     {
+        if (ShouldDeferToPotChestFarm())
+        {
+            PauseHuntForYield("pot chest farm");
+            return;
+        }
+
         // Map hunts keep Automator awake so a spawned FATE/CE can interrupt.
         // Sight hunts stay suspended until a matching pause option fires (then unsuspend).
         if (!HasTreasureSight)

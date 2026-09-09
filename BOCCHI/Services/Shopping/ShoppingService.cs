@@ -41,18 +41,26 @@ public sealed class ShoppingService(
     ILogger<ShoppingService> logger
 ) : IShoppingService, IOnUpdate
 {
-    private const string ReturnChainPrefix = "Shopping::Return";
+    /// <summary>Normal pause between auto-shop attempts after a completed run.</summary>
+    private static readonly TimeSpan DefaultBuyCooldown = TimeSpan.FromSeconds(30);
+
+    /// <summary>
+    /// When Knightshopper cannot afford the next Occult Crescent buy, do not yank Illegal Mode
+    /// back to camp every short cooldown — wait until farming can reasonably change balances.
+    /// </summary>
+    private static readonly TimeSpan InsufficientFundsCooldown = TimeSpan.FromMinutes(20);
+
+    private readonly CampReturnSession campReturn = new("Shopping::Return");
 
     private IMobFarmer Farmer => farmerFactory();
 
     private Guid? operationId;
-    private Task<ChainResult>? returnChain;
     private bool priorityClaimed;
     private bool forcedSession;
     private DateTimeOffset buyCooldownUntil = DateTimeOffset.MinValue;
 
     public bool IsActive =>
-        priorityClaimed || operationId is not null || returnChain is not null || forcedSession;
+        priorityClaimed || operationId is not null || campReturn.HasChain || forcedSession;
 
     public UpdateLimit UpdateLimit =>
         new()
@@ -122,7 +130,7 @@ public sealed class ShoppingService(
     {
         string phase = operationId is not null
             ? "Knightshopper running"
-            : returnChain is not null
+            : campReturn.HasChain
                 ? "returning to base camp"
                 : forcedSession || priorityClaimed
                     ? "preparing"
@@ -177,16 +185,9 @@ public sealed class ShoppingService(
             return;
         }
 
-        if (returnChain is not null)
+        if (campReturn.HasChain || (forcedSession && priorityClaimed && operationId is null))
         {
             TickReturn(zone);
-            return;
-        }
-
-        // Forced session already claimed priority but is waiting (e.g. combat walk-in).
-        if (forcedSession && priorityClaimed)
-        {
-            BeginReturnOrShop(zone);
             return;
         }
 
@@ -234,38 +235,11 @@ public sealed class ShoppingService(
             return;
         }
 
-        if (conditions[ConditionFlag.InCombat] || conditions[ConditionFlag.Unconscious])
-        {
-            // Return cannot cast — walk toward camp until we can.
-            EnsureWalkTowardCamp(zone);
-            return;
-        }
-
-        if (returnChain is not null)
-        {
-            return;
-        }
-
-        pathfinder.Stop();
-        vnav.Stop();
-        logger.Debug("[Shopping] Returning to base camp before Knightshopper");
-        returnChain = chainManager.Manage(
-            ReturnToBaseCamp.Append(
-                chains.Create(ReturnChainPrefix),
-                zones,
-                conditions,
-                gui,
-                pathfinder,
-                vnav));
+        TickReturn(zone);
     }
 
     private void TickReturn(IZone zone)
     {
-        if (returnChain is null)
-        {
-            return;
-        }
-
         if (ShouldDeferForActivity())
         {
             logger.Debug("[Shopping] aborted — FATE/CE activity during Return");
@@ -273,47 +247,30 @@ public sealed class ShoppingService(
             return;
         }
 
-        // Combat mid-Return: cancel chain and walk in.
-        if (conditions[ConditionFlag.InCombat] || conditions[ConditionFlag.Unconscious])
-        {
-            CancelReturnChain();
-            EnsureWalkTowardCamp(zone);
-            return;
-        }
-
-        if (!returnChain.IsCompleted)
-        {
-            return;
-        }
-
-        bool ok = returnChain.IsCompletedSuccessfully
-            && returnChain.Result.IsSuccess
-            && zone.IsInBasecamp();
-        string? error = returnChain.IsCompletedSuccessfully
-            ? returnChain.Result.ErrorMessage
-            : returnChain.Exception?.Message;
-        returnChain = null;
-
-        if (!ok)
-        {
-            logger.Debug(
-                "[Shopping] Return unfinished ({Message}) — retrying",
-                error ?? "?");
-            BeginReturnOrShop(zone);
-            return;
-        }
-
-        logger.Debug("[Shopping] Arrived at base camp");
-        TryStartKnightshopper();
-    }
-
-    private void EnsureWalkTowardCamp(IZone zone)
-    {
         ClaimPriority();
-        Vector3 standOff = zone.GetMainAetheryte().GetCampStandOffPosition(player.Position);
-        if (!vnav.IsRunning() && !vnav.IsPathfinding())
+        CampReturnSession.TickResult result = campReturn.Tick(
+            zone,
+            player.Position,
+            blockedFromReturn: conditions[ConditionFlag.InCombat] || conditions[ConditionFlag.Unconscious],
+            zones,
+            conditions,
+            gui,
+            pathfinder,
+            vnav,
+            chainManager,
+            chains);
+
+        switch (result)
         {
-            vnav.PathfindAndMoveCloseTo(standOff, false, AethernetNavigation.PathfindArrivalRadius);
+            case CampReturnSession.TickResult.Arrived:
+                logger.Debug("[Shopping] Arrived at base camp");
+                TryStartKnightshopper();
+                return;
+            case CampReturnSession.TickResult.Failed:
+                logger.Debug("[Shopping] Return unfinished — retrying");
+                return;
+            default:
+                return;
         }
     }
 
@@ -340,7 +297,7 @@ public sealed class ShoppingService(
             if (start.Result is StartResult.EmptyList or StartResult.NotReady or StartResult.NotLoggedIn
                 or StartResult.InvalidCurrency)
             {
-                buyCooldownUntil = DateTimeOffset.UtcNow + TimeSpan.FromSeconds(30);
+                buyCooldownUntil = DateTimeOffset.UtcNow + DefaultBuyCooldown;
                 AbortShopping(resumeAutomation: true, cancelKnightshopper: false);
                 return;
             }
@@ -370,7 +327,7 @@ public sealed class ShoppingService(
                 "[Shopping] Knightshopper finished: {State} — {Message}",
                 status.State,
                 status.Message);
-            FinishShopping();
+            FinishShopping(status.Message);
             return;
         }
 
@@ -382,7 +339,7 @@ public sealed class ShoppingService(
                 "[Shopping] Knightshopper op lost: {State} — {Message}",
                 status.State,
                 status.Message);
-            FinishShopping();
+            FinishShopping(status.Message);
             return;
         }
 
@@ -418,12 +375,34 @@ public sealed class ShoppingService(
         logger.Debug("[Shopping] soft-suspended other automation for shopping");
     }
 
-    private void FinishShopping()
+    private void FinishShopping(string? finishMessage = null)
     {
         AbortShopping(resumeAutomation: true, cancelKnightshopper: false);
-        buyCooldownUntil = DateTimeOffset.UtcNow + TimeSpan.FromSeconds(30);
-        logger.Debug("[Shopping] finished — cooldown 30s");
+
+        TimeSpan cooldown = LooksLikeInsufficientFunds(finishMessage)
+            ? InsufficientFundsCooldown
+            : DefaultBuyCooldown;
+        buyCooldownUntil = DateTimeOffset.UtcNow + cooldown;
+
+        if (cooldown == InsufficientFundsCooldown)
+        {
+            logger.Debug(
+                "[Shopping] finished — insufficient Occult Crescent for buy list, cooldown {Minutes}m",
+                InsufficientFundsCooldown.TotalMinutes);
+        }
+        else
+        {
+            logger.Debug("[Shopping] finished — cooldown {Seconds}s", DefaultBuyCooldown.TotalSeconds);
+        }
     }
+
+    /// <summary>
+    /// Knightshopper reports success with a message like
+    /// "Insufficient OccultCrescent for … Need N, have M" when nothing was bought.
+    /// </summary>
+    private static bool LooksLikeInsufficientFunds(string? message) =>
+        !string.IsNullOrEmpty(message)
+        && message.Contains("Insufficient", StringComparison.OrdinalIgnoreCase);
 
     private void AbortShopping(bool resumeAutomation, bool cancelKnightshopper)
     {
@@ -432,7 +411,7 @@ public sealed class ShoppingService(
         operationId = null;
         priorityClaimed = false;
         forcedSession = false;
-        CancelReturnChain();
+        campReturn.Cancel(chainManager, pathfinder, vnav);
         pathfinder.Stop();
         vnav.Stop();
 
@@ -445,17 +424,6 @@ public sealed class ShoppingService(
         {
             modeGuard.NotifyShoppingEnded();
         }
-    }
-
-    private void CancelReturnChain()
-    {
-        if (returnChain is null)
-        {
-            return;
-        }
-
-        chainManager.CancelWhere(name => name.StartsWith(ReturnChainPrefix, StringComparison.Ordinal));
-        returnChain = null;
     }
 
     private string FormatKnightshopperStatus(Guid id)

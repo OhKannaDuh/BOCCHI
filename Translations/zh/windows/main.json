@@ -34,34 +34,7 @@
     "emergency_stop_done": "[BOCCHI] 紧急停止",
     "goal": "目标",
     "current_step": "当前步骤",
-    "chests": "魔法罐宝箱",
-    "automator_states": {
-      "entry": "启动中",
-      "idle": "待机",
-      "dead": "已阵亡",
-      "in_combat": "战斗中",
-      "casting_treasure_sight": "正在使用魔寻宝",
-      "applying_buffs": "正在附加增益",
-      "repairing": "正在修理",
-      "choosing_activity": "正在挑选下一步",
-      "returning": "正在返回营地",
-      "pathfinding": "赶路中",
-      "in_fate": "危命任务中",
-      "waiting_for_critical_encounter": "等待紧急遭遇战",
-      "waiting_for_pot_fate": "等待魔法罐",
-      "in_critical_encounter": "紧急遭遇战中",
-      "returning_to_job": "正在切回职业",
-      "leveling_phantom_job": "正在切换辅助职业",
-      "farming_pot_chests": "正在收取魔法罐宝箱",
-      "triaging": "正在救人"
-    },
-    "farmer_phases": {
-      "waiting": "等待中",
-      "buffing": "上增益",
-      "gathering": "拉怪中",
-      "stacking": "聚怪中",
-      "fighting": "战斗中"
-    }
+    "chests": "魔法罐宝箱"
   },
   "pot_timer": {
     "active": "魔法罐危命任务进行中",
