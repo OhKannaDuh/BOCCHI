@@ -40,6 +40,8 @@ public sealed class PotCycleSyncService
 
     private static readonly TimeSpan FetchRetryDelay = TimeSpan.FromSeconds(20);
 
+    private static readonly TimeSpan FetchMissRetryWindow = TimeSpan.FromMinutes(3);
+
     private static readonly TimeSpan FetchRateLimitMinDelay = TimeSpan.FromMinutes(2);
 
     private static readonly TimeSpan FetchRateLimitMaxDelay = TimeSpan.FromMinutes(10);
@@ -59,6 +61,8 @@ public sealed class PotCycleSyncService
     private long lastUploadedSpawnUnix;
 
     private string? lastFetchedInstanceKey;
+
+    private DateTime fetchMissRetryUntilUtc = DateTime.MinValue;
 
     private DateTime nextUploadAttemptUtc = DateTime.MinValue;
 
@@ -197,18 +201,35 @@ public sealed class PotCycleSyncService
             return;
         }
 
-        lastFetchedInstanceKey = fetch.InstanceKey;
-        nextFetchAttemptUtc = DateTime.UtcNow;
         fetchRateLimitDelay = FetchRateLimitMinDelay;
         loggedFetchRateLimit = false;
 
         if (!fetch.Found || fetch.PotFateId == 0 || fetch.SpawnUnix <= 0)
         {
+            if (fetchMissRetryUntilUtc == DateTime.MinValue)
+            {
+                fetchMissRetryUntilUtc = DateTime.UtcNow + FetchMissRetryWindow;
+            }
+
+            if (DateTime.UtcNow >= fetchMissRetryUntilUtc)
+            {
+                lastFetchedInstanceKey = fetch.InstanceKey;
+                logger.Debug(
+                    "[PotCycleSync] fetch miss — no cycle for key {Key}… (stopped retrying)",
+                    Shorten(fetch.InstanceKey));
+                return;
+            }
+
+            nextFetchAttemptUtc = DateTime.UtcNow + FetchRetryDelay;
             logger.Debug(
-                "[PotCycleSync] fetch miss — no cycle for key {Key}…",
+                "[PotCycleSync] fetch miss — no cycle for key {Key}… retrying",
                 Shorten(fetch.InstanceKey));
             return;
         }
+
+        lastFetchedInstanceKey = fetch.InstanceKey;
+        fetchMissRetryUntilUtc = DateTime.MinValue;
+        nextFetchAttemptUtc = DateTime.UtcNow;
 
         if (fetch.ResponseTerritoryId != 0 && fetch.ResponseTerritoryId != fetch.RequestTerritoryId)
         {
@@ -416,6 +437,7 @@ public sealed class PotCycleSyncService
         instanceKey = newKey;
         fingerprintTerritory = territory;
         lastFetchedInstanceKey = null;
+        fetchMissRetryUntilUtc = DateTime.MinValue;
 
         // Do not clear the pot timer on FATE-roster churn. Local/remote anchors re-validate
         // when the next pot is seen; wiping here caused "next pot → unknown".
@@ -457,6 +479,7 @@ public sealed class PotCycleSyncService
         fingerprintFateId = 0;
         fingerprintStartEpoch = 0;
         lastFetchedInstanceKey = null;
+        fetchMissRetryUntilUtc = DateTime.MinValue;
         nextFetchAttemptUtc = DateTime.MinValue;
         fetchRateLimitDelay = FetchRateLimitMinDelay;
         loggedFetchRateLimit = false;
@@ -480,6 +503,7 @@ public sealed class PotCycleSyncService
         fingerprintFateId = 0;
         fingerprintStartEpoch = 0;
         lastFetchedInstanceKey = null;
+        fetchMissRetryUntilUtc = DateTime.MinValue;
         nextFetchAttemptUtc = DateTime.MinValue;
         fetchRateLimitDelay = FetchRateLimitMinDelay;
         loggedFetchRateLimit = false;

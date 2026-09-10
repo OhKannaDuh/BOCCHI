@@ -11,11 +11,7 @@ namespace BOCCHI.Common.Data.Zones;
 public static class DismountAssist
 {
     /// <summary>
-    ///     ConditionFlag.Mounted lags the character by a frame or two, so a flag-only test can
-    ///     report "on foot" while still mounted. Callers then skip the dismount and the interact
-    ///     behind it fails silently — no dismount, no open (#175). Ask the character itself as well
-    ///     and treat any positive signal as mounted: a redundant dismount cast is a no-op, a missed
-    ///     one costs the chest.
+    ///     Mounted flag lags a frame — also ask the character. A missed dismount fails the open (#175).
     /// </summary>
     public static unsafe bool IsMounted(ICondition conditions)
     {

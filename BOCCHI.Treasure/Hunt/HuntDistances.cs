@@ -44,6 +44,16 @@ public static class HuntDistances
         MathF.Abs(a.Y - b.Y) <= SameFloorVerticalTolerance;
 
     /// <summary>
+    ///     Shelves this far apart are a cliff, not a ramp (Suspended Masonry island vs 2037).
+    ///     <see cref="SameFloorVerticalTolerance"/> is for empty-skip / interact; this is for
+    ///     “do not idle at the edge — Return / take a shard down”.
+    /// </summary>
+    public const float ShelfSeparationYalms = 40f;
+
+    public static bool IsSeparatedShelf(Vector3 a, Vector3 b) =>
+        MathF.Abs(a.Y - b.Y) > ShelfSeparationYalms;
+
+    /// <summary>
     ///     Carrot Hunt: trust empty farther out when another live carrot proves the region
     ///     has streamed. Treasure Hunt uses <c>EmptyPadTrustDistance</c> instead.
     /// </summary>

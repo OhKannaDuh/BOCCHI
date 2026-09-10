@@ -6,10 +6,7 @@ using Ocelot.Extensions;
 namespace BOCCHI.Automator.Services.PotTreasure;
 
 /// <summary>
-///     Narrows the authored pot chest spots using compass hints.
-///     A hint is a bearing relative to where Magical Elixir was used (or where the log landed),
-///     not wherever the player is when the farm finally reads it. Applying a mid-walk or next-pad
-///     position as the origin used to send the hunt to the wrong octant and ping-pong.
+///     Compass hints are bearings from where Magical Elixir was used, not from the current feet.
 /// </summary>
 public static class PotTreasureFilter
 {

@@ -105,6 +105,11 @@ public sealed class CofferLocationSyncService
             return;
         }
 
+        if (TreasurePathing.IsUnloadAltitude(y))
+        {
+            return;
+        }
+
         ushort territory = zones.GetZone().TerritoryType;
         Vector3 position = new(x, y, z);
         string key = CrowdsourceSyncHttp.PositionKey(territory, dataId, position);
@@ -309,11 +314,17 @@ public sealed class CofferLocationSyncService
                         continue;
                     }
 
+                    Vector3 position = new(entry.Position.X, entry.Position.Y, entry.Position.Z);
+                    if (TreasurePathing.IsUnloadAltitude(position))
+                    {
+                        continue;
+                    }
+
                     locations.Add(new CrowdsourcedCofferCandidate(
                         entry.CandidateId,
                         (ushort)entry.TerritoryId,
                         (uint)entry.DataId,
-                        new Vector3(entry.Position.X, entry.Position.Y, entry.Position.Z)));
+                        position));
                 }
             }
 

@@ -86,10 +86,7 @@ public class GoalValidator
             return false;
         }
 
-        // Battle: keep the goal when we actually entered In CE, waited here, or still have
-        // EventId / CE-tagged enemies / the registration ring. Pathing-only used to keep
-        // driving to coords or staying In CE (#196). Forgetting the wait latch on Enter
-        // then requiring the inset wait disc dropped Appalling Behavior mid-fight.
+        // Keep the goal after we entered In CE / waited / still have EventId, tagged enemies, or the ring (#196).
         if (IsCommittedToCriticalEncounter(id))
         {
             return true;
@@ -109,6 +106,19 @@ public class GoalValidator
         if (potsOnly)
         {
             if (!isPot)
+            {
+                return false;
+            }
+        }
+        else if (isPot)
+        {
+            if (!fatesConfig.IsFateEnabledForIllegalMode(
+                    id.Value,
+                    isPotFate: true,
+                    automatorConfig.PreferPotFates)
+                || (!automatorConfig.ShouldDoFates
+                    && !automatorConfig.ShouldFarmPotChests
+                    && !automatorConfig.ShouldPrepositionToPots))
             {
                 return false;
             }

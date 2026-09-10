@@ -5,7 +5,14 @@
   "compatibility_date": "2026-05-03",
   "observability": {
     "enabled": true,
-    "head_sampling_rate": 1
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1
+    },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 0.01
+    }
   },
   "triggers": {
     "crons": ["*/5 * * * *"]

@@ -35,7 +35,8 @@ public static class CarrotPadCatalog
 
         foreach (AcceptedCarrotLocation location in remote)
         {
-            if (baked.Any(b => Vector3.DistanceSquared(b.Position, location.Position) <= MergeRadiusSq))
+            if (TreasurePathing.IsUnloadAltitude(location.Position)
+                || baked.Any(b => Vector3.DistanceSquared(b.Position, location.Position) <= MergeRadiusSq))
             {
                 continue;
             }

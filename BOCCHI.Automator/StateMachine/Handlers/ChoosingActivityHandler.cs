@@ -115,108 +115,17 @@ public class ChoosingActivityHandler
         TryChoosePotPreposition();
     }
 
-    private Fate? FindStartableFate()
-    {
-        IReadOnlyList<Fate> snapshot = fateRepository.Snapshot();
-        if (snapshot.Count == 0)
-        {
-            return null;
-        }
-
-        if (!PotsOnly && !automatorConfig.ShouldDoFates)
-        {
-            return null;
-        }
-
-        Fate? bestPot = null;
-        Fate? bestOther = null;
-        float bestPotScore = float.MinValue;
-        float bestOtherScore = float.MinValue;
-        DateTimeOffset now = DateTimeOffset.UtcNow;
-        PotCycleSnapshot cycle = potCycle.Snapshot;
-        bool potFarming = PotsOnly
-            || fatesConfig.IsPotFallbackGatingEnabled(
-                (uint)cycle.PredictedNextPotFateId,
-                automatorConfig.ShouldDoFates,
-                automatorConfig.PreferPotFates,
-                automatorConfig.ShouldFarmPotChests,
-                automatorConfig.ShouldPrepositionToPots);
-        IZone zone = zones.GetZone();
-
-        foreach (Fate fate in snapshot)
-        {
-            bool isPot = zone.IsPotFate(fate.Id.Value);
-            if (isPot)
-            {
-                if (!LivePotPriority.IsStartable(
-                        fate,
-                        zone,
-                        automatorConfig,
-                        fatesConfig,
-                        potsConfig,
-                        automatorContext,
-                        fieldNotes))
-                {
-                    continue;
-                }
-            }
-            else if (PotsOnly)
-            {
-                continue;
-            }
-            else if (!fatesConfig.IsFateEnabledForIllegalMode(
-                         fate.Id.Value,
-                         isPotFate: false,
-                         automatorConfig.PreferPotFates))
-            {
-                continue;
-            }
-            else if (CompletionistBlocksFate(fate.Id.Value))
-            {
-                continue;
-            }
-            else
-            {
-                TimeSpan cutoff = TimeSpan.FromMinutes(Math.Max(0, potsConfig.FateFallbackCutoffMinutes));
-                PotFallbackStartDecision decision = PotFallbackWindow.Evaluate(
-                    cycle,
-                    now,
-                    cutoff,
-                    potFarming,
-                    "FATE");
-                if (!decision.AllowStart)
-                {
-                    continue;
-                }
-            }
-
-            // Pot-only mode: accept pots even when they sit in DisabledFateIds.
-            float scoreValue = PotsOnly && isPot
-                ? Math.Max(1f, fateScorer.Score(fate).Value)
-                : fateScorer.Score(fate).Value;
-            if (scoreValue <= 0f)
-            {
-                continue;
-            }
-
-            if (isPot)
-            {
-                if (scoreValue > bestPotScore)
-                {
-                    bestPotScore = scoreValue;
-                    bestPot = fate;
-                }
-            }
-            else if (scoreValue > bestOtherScore)
-            {
-                bestOtherScore = scoreValue;
-                bestOther = fate;
-            }
-        }
-
-        // Live pots always beat other FATEs. CE vs pot is decided in Handle / FindStartable.
-        return bestPot ?? bestOther;
-    }
+    private Fate? FindStartableFate() =>
+        LivePotPriority.FindBest(
+            fateRepository.Snapshot(),
+            zones.GetZone(),
+            fateScorer,
+            potCycle,
+            automatorConfig,
+            fatesConfig,
+            potsConfig,
+            automatorContext,
+            fieldNotes);
 
     private bool TryChoosePotPreposition()
     {

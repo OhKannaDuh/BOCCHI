@@ -50,8 +50,7 @@ public class ReturningHandler
 {
     /// <summary>
     ///     CastDelay can roll up to 60s; give dismount / combat drop / Yesno time after that.
-    ///     Past this, drop the latch so Pathfinding can Teleport+Walk from the field instead of
-    ///     standing on "Returning to camp" forever (Vertigo / #178-class hangs).
+    ///     Drop the latch so Pathfinding can Teleport+Walk instead of sitting on Returning (#178).
     /// </summary>
     private static readonly TimeSpan CastAttemptBudget = TimeSpan.FromSeconds(45);
 

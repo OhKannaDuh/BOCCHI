@@ -184,6 +184,11 @@ public sealed class CarrotLocationSyncService
             }
 
             Vector3 position = carrot.GetPosition();
+            if (TreasurePathing.IsUnloadAltitude(position))
+            {
+                continue;
+            }
+
             string key = CrowdsourceSyncHttp.PositionKey(territory, position);
             if (queuedKeys.Contains(key) || submittedKeys.Contains(key))
             {
@@ -288,6 +293,7 @@ public sealed class CarrotLocationSyncService
                     l.CandidateId,
                     (ushort)l.TerritoryId,
                     new Vector3(l.Position!.X, l.Position.Y, l.Position.Z)))
+                .Where(l => !TreasurePathing.IsUnloadAltitude(l.Position))
                 .ToList()
                 ?? [];
 

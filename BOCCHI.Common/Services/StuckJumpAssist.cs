@@ -15,17 +15,7 @@ using ECommonsPlayer = ECommons.GameHelpers.Player;
 namespace BOCCHI.Common.Services;
 
 /// <summary>
-///     Hops when vnav believes it is running but the character has stopped moving.
-///     Rocks, low ledges and stair lips catch the mesh in places it thinks are walkable, and vnav
-///     keeps happily reporting "moving" while the character stands still against them — so nothing
-///     downstream notices. A jump clears nearly all of them (#185).
-///     <para>
-///     This is stuck <i>recovery</i>, not jump-aware routing: it tells the router nothing and needs
-///     no authored takeoff/landing data, so it also covers snags nobody has reported. It stays
-///     useful even if vnavmesh gains real jump links, which would only replace routing.
-///     </para>
-///     Self-contained on purpose — it watches position itself rather than hanging off a movement
-///     hook, because the treasure and carrot hunts drive vnav directly and would miss one.
+///     Jump when vnav reports moving but the character is stuck on mesh it thinks is walkable (#185).
 /// </summary>
 public sealed class StuckJumpAssist(
     IVNavmeshIpc vnav,

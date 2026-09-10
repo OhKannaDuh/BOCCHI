@@ -6,10 +6,8 @@ using BOCCHI.Common.Services;
 namespace BOCCHI.Automator.Services;
 
 /// <summary>
-///     Shared CE Preparing→Battle handoff. After #196, open-world InCombat alone is not enough
-///     (trash near a false wait ring flipped Illegal Mode into In CE). Prefer still being inside
-///     the registration area once Battle starts; EventId / CE-tagged enemies also count when those
-///     signals catch up.
+///     CE Preparing→Battle: still in the registration area (or EventId / CE-tagged enemies).
+///     Open-world InCombat alone is not enough (#196).
 /// </summary>
 internal static class CriticalEncounterBattleHandoff
 {

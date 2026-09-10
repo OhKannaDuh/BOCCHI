@@ -57,7 +57,9 @@ public class ApproachingKnowledgeCrystalHandler
         {
             pathfinder.Stop();
 
-            if (DismountAssist.TryDismount(conditions))
+            if (conditions[ConditionFlag.BetweenAreas]
+                || conditions[ConditionFlag.BetweenAreas51]
+                || DismountAssist.TryDismount(conditions))
             {
                 return null;
             }

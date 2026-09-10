@@ -2,10 +2,25 @@ import {
   CATALOG_CACHE_TTL_SECONDS,
   invalidateAcceptedCatalogCaches,
   readCatalogCache,
+  rememberCatalogPayload,
   writeCatalogCache,
 } from "./catalogCache";
-import { processPendingCarrotObservations } from "./carrotProcessor";
-import { processPendingObservations } from "./processor";
+import {
+  processCarrotObservationById,
+  processPendingCarrotObservations,
+} from "./carrotProcessor";
+import {
+  invalidatePotHitCache,
+  POT_HIT_CACHE_TTL_SECONDS,
+  readPotHitCache,
+  rememberPotHitPayload,
+  writePotHitCache,
+} from "./potCycleCache";
+import {
+  processObservationById,
+  processPendingObservations,
+} from "./processor";
+import { MIN_VALID_WORLD_Y, isUnloadAltitude } from "./worldBounds";
 
 interface CofferObservationRequest {
   territoryId: number;
@@ -58,6 +73,8 @@ const CARROT_OBJECT_BASE_ID = 2010139;
 const POT_CYCLE_MAX_AGE_SECONDS = 45 * 60;
 /** Drop pot_cycles older than this (seconds). Must exceed GET max age. */
 const POT_CYCLE_RETAIN_SECONDS = 2 * 60 * 60;
+/** Drop processed coffer/carrot rows older than this (days). Candidates keep last centroid. */
+const PROCESSED_OBSERVATION_RETAIN_DAYS = 14;
 /** Paid D1: prune in large batches until caught up (was capped for free-tier write budget). */
 const POT_CYCLE_PRUNE_BATCH = 25_000;
 const POT_CYCLE_PRUNE_MAX_ROUNDS = 20;
@@ -231,7 +248,7 @@ async function getCandidateDetail(candidateId: number, env: Env): Promise<Respon
   return jsonResponse({ candidate, members: members.results });
 }
 
-async function buildAcceptedCandidatesPayload(request: Request, env: Env): Promise<{
+async function buildAcceptedCandidatesPayload(request: Request, env: Env, compact = false): Promise<{
   schemaVersion: number;
   generatedAtUtc: string;
   candidates: Array<{
@@ -239,11 +256,11 @@ async function buildAcceptedCandidatesPayload(request: Request, env: Env): Promi
     territoryId: number;
     dataId: number;
     position: { x: number; y: number; z: number };
-    observationCount: number;
-    distinctInstallationCount: number;
-    firstObservedAtUtc: string;
-    lastObservedAtUtc: string;
-    acceptanceMethod: "automatic" | "manual" | null;
+    observationCount?: number;
+    distinctInstallationCount?: number;
+    firstObservedAtUtc?: string;
+    lastObservedAtUtc?: string;
+    acceptanceMethod?: "automatic" | "manual" | null;
   }>;
 }> {
   const url = new URL(request.url);
@@ -263,8 +280,8 @@ async function buildAcceptedCandidatesPayload(request: Request, env: Env): Promi
     throw jsonResponse({ error: "Invalid dataId." }, 400);
   }
 
-  const clauses = ["status = 'accepted'"];
-  const values: number[] = [];
+  const clauses = ["status = 'accepted'", "centroid_y >= ?"];
+  const values: number[] = [MIN_VALID_WORLD_Y];
   if (parsedTerritoryId !== null) {
     clauses.push("territory_id = ?");
     values.push(parsedTerritoryId);
@@ -274,12 +291,17 @@ async function buildAcceptedCandidatesPayload(request: Request, env: Env): Promi
     values.push(parsedDataId);
   }
 
-  const candidates = await env.DB.prepare(`
-    SELECT id, territory_id, data_id,
+  const columns = compact
+    ? `id, territory_id, data_id,
+      centroid_x, centroid_y, centroid_z`
+    : `id, territory_id, data_id,
       centroid_x, centroid_y, centroid_z,
       observation_count, distinct_installation_count,
       first_observed_at_utc, last_observed_at_utc,
-      acceptance_method
+      acceptance_method`;
+
+  const candidates = await env.DB.prepare(`
+    SELECT ${columns}
     FROM observation_candidates
     WHERE ${clauses.join(" AND ")}
     ORDER BY territory_id, data_id,
@@ -301,21 +323,32 @@ async function buildAcceptedCandidatesPayload(request: Request, env: Env): Promi
   return {
     schemaVersion: 1,
     generatedAtUtc: new Date().toISOString(),
-    candidates: candidates.results.map(candidate => ({
-      candidateId: candidate.id,
-      territoryId: candidate.territory_id,
-      dataId: candidate.data_id,
-      position: {
-        x: candidate.centroid_x,
-        y: candidate.centroid_y,
-        z: candidate.centroid_z,
-      },
-      observationCount: candidate.observation_count,
-      distinctInstallationCount: candidate.distinct_installation_count,
-      firstObservedAtUtc: candidate.first_observed_at_utc,
-      lastObservedAtUtc: candidate.last_observed_at_utc,
-      acceptanceMethod: candidate.acceptance_method,
-    })),
+    candidates: candidates.results.map(candidate => compact
+      ? {
+        candidateId: candidate.id,
+        territoryId: candidate.territory_id,
+        dataId: candidate.data_id,
+        position: {
+          x: candidate.centroid_x,
+          y: candidate.centroid_y,
+          z: candidate.centroid_z,
+        },
+      }
+      : {
+        candidateId: candidate.id,
+        territoryId: candidate.territory_id,
+        dataId: candidate.data_id,
+        position: {
+          x: candidate.centroid_x,
+          y: candidate.centroid_y,
+          z: candidate.centroid_z,
+        },
+        observationCount: candidate.observation_count,
+        distinctInstallationCount: candidate.distinct_installation_count,
+        firstObservedAtUtc: candidate.first_observed_at_utc,
+        lastObservedAtUtc: candidate.last_observed_at_utc,
+        acceptanceMethod: candidate.acceptance_method,
+      }),
   };
 }
 
@@ -337,7 +370,11 @@ async function exportAcceptedCandidates(request: Request, env: Env): Promise<Res
 }
 
 /** Public plugin catalog — accepted candidates only (no admin token). */
-async function listAcceptedCandidatesPublic(request: Request, env: Env): Promise<Response> {
+async function listAcceptedCandidatesPublic(
+  request: Request,
+  env: Env,
+  ctx: ExecutionContext,
+): Promise<Response> {
   try {
     const url = new URL(request.url);
     const cached = await readCatalogCache("coffers", url);
@@ -345,11 +382,14 @@ async function listAcceptedCandidatesPublic(request: Request, env: Env): Promise
       return cached;
     }
 
-    const payload = await buildAcceptedCandidatesPayload(request, env);
+    const payload = await buildAcceptedCandidatesPayload(request, env, true);
+    rememberCatalogPayload("coffers", url, payload);
     const response = jsonResponse(payload, 200, {
       "Cache-Control": `public, max-age=${CATALOG_CACHE_TTL_SECONDS}`,
     });
-    await writeCatalogCache("coffers", url, response);
+    ctx.waitUntil(writeCatalogCache("coffers", url, response).catch(error => {
+      console.error(error);
+    }));
     return response;
   } catch (error) {
     if (error instanceof Response) {
@@ -446,18 +486,18 @@ async function getCarrotCandidateDetail(candidateId: number, env: Env): Promise<
   return jsonResponse({ candidate, members: members.results });
 }
 
-async function buildAcceptedCarrotLocationsPayload(request: Request, env: Env): Promise<{
+async function buildAcceptedCarrotLocationsPayload(request: Request, env: Env, compact = false): Promise<{
   schemaVersion: number;
   generatedAtUtc: string;
   locations: Array<{
     candidateId: number;
     territoryId: number;
     position: { x: number; y: number; z: number };
-    observationCount: number;
-    distinctInstallationCount: number;
-    firstObservedAtUtc: string;
-    lastObservedAtUtc: string;
-    acceptanceMethod: "automatic" | "manual" | null;
+    observationCount?: number;
+    distinctInstallationCount?: number;
+    firstObservedAtUtc?: string;
+    lastObservedAtUtc?: string;
+    acceptanceMethod?: "automatic" | "manual" | null;
   }>;
 }> {
   const url = new URL(request.url);
@@ -471,19 +511,24 @@ async function buildAcceptedCarrotLocationsPayload(request: Request, env: Env): 
     throw jsonResponse({ error: "territoryId must be an Occult Crescent zone." }, 400);
   }
 
-  const clauses = ["status = 'accepted'"];
-  const values: number[] = [];
+  const clauses = ["status = 'accepted'", "centroid_y >= ?"];
+  const values: number[] = [MIN_VALID_WORLD_Y];
   if (parsedTerritoryId !== null) {
     clauses.push("territory_id = ?");
     values.push(parsedTerritoryId);
   }
 
-  const candidates = await env.DB.prepare(`
-    SELECT id, territory_id,
+  const columns = compact
+    ? `id, territory_id,
+      centroid_x, centroid_y, centroid_z`
+    : `id, territory_id,
       centroid_x, centroid_y, centroid_z,
       observation_count, distinct_installation_count,
       first_observed_at_utc, last_observed_at_utc,
-      acceptance_method
+      acceptance_method`;
+
+  const candidates = await env.DB.prepare(`
+    SELECT ${columns}
     FROM carrot_candidates
     WHERE ${clauses.join(" AND ")}
     ORDER BY territory_id, centroid_x, centroid_y, centroid_z, id
@@ -503,20 +548,30 @@ async function buildAcceptedCarrotLocationsPayload(request: Request, env: Env): 
   return {
     schemaVersion: 1,
     generatedAtUtc: new Date().toISOString(),
-    locations: candidates.results.map(candidate => ({
-      candidateId: candidate.id,
-      territoryId: candidate.territory_id,
-      position: {
-        x: candidate.centroid_x,
-        y: candidate.centroid_y,
-        z: candidate.centroid_z,
-      },
-      observationCount: candidate.observation_count,
-      distinctInstallationCount: candidate.distinct_installation_count,
-      firstObservedAtUtc: candidate.first_observed_at_utc,
-      lastObservedAtUtc: candidate.last_observed_at_utc,
-      acceptanceMethod: candidate.acceptance_method,
-    })),
+    locations: candidates.results.map(candidate => compact
+      ? {
+        candidateId: candidate.id,
+        territoryId: candidate.territory_id,
+        position: {
+          x: candidate.centroid_x,
+          y: candidate.centroid_y,
+          z: candidate.centroid_z,
+        },
+      }
+      : {
+        candidateId: candidate.id,
+        territoryId: candidate.territory_id,
+        position: {
+          x: candidate.centroid_x,
+          y: candidate.centroid_y,
+          z: candidate.centroid_z,
+        },
+        observationCount: candidate.observation_count,
+        distinctInstallationCount: candidate.distinct_installation_count,
+        firstObservedAtUtc: candidate.first_observed_at_utc,
+        lastObservedAtUtc: candidate.last_observed_at_utc,
+        acceptanceMethod: candidate.acceptance_method,
+      }),
   };
 }
 
@@ -537,7 +592,11 @@ async function exportAcceptedCarrotLocations(request: Request, env: Env): Promis
   }
 }
 
-async function listAcceptedCarrotLocationsPublic(request: Request, env: Env): Promise<Response> {
+async function listAcceptedCarrotLocationsPublic(
+  request: Request,
+  env: Env,
+  ctx: ExecutionContext,
+): Promise<Response> {
   try {
     const url = new URL(request.url);
     const cached = await readCatalogCache("carrots", url);
@@ -545,11 +604,14 @@ async function listAcceptedCarrotLocationsPublic(request: Request, env: Env): Pr
       return cached;
     }
 
-    const payload = await buildAcceptedCarrotLocationsPayload(request, env);
+    const payload = await buildAcceptedCarrotLocationsPayload(request, env, true);
+    rememberCatalogPayload("carrots", url, payload);
     const response = jsonResponse(payload, 200, {
       "Cache-Control": `public, max-age=${CATALOG_CACHE_TTL_SECONDS}`,
     });
-    await writeCatalogCache("carrots", url, response);
+    ctx.waitUntil(writeCatalogCache("carrots", url, response).catch(error => {
+      console.error(error);
+    }));
     return response;
   } catch (error) {
     if (error instanceof Response) {
@@ -713,6 +775,10 @@ function validateObservation(value: unknown): string | null {
     return "Coordinates are outside the accepted range.";
   }
 
+  if (isUnloadAltitude(observation.worldY!)) {
+    return "Coordinates are at unload / inside-floor altitude.";
+  }
+
   if (!isAcceptableString(observation.installationHash, true, 128)) {
     return "installationHash is required.";
   }
@@ -834,6 +900,10 @@ function validateCarrotLocation(value: unknown): string | null {
     return "Coordinates are outside the accepted range.";
   }
 
+  if (isUnloadAltitude(observation.worldY!)) {
+    return "Coordinates are at unload / inside-floor altitude.";
+  }
+
   if (!isAcceptableString(observation.installationHash, true, 128)) {
     return "installationHash is required.";
   }
@@ -939,7 +1009,7 @@ function validatePotCycle(value: unknown): string | null {
   return null;
 }
 
-async function submitPotCycle(request: Request, env: Env): Promise<Response> {
+async function submitPotCycle(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
   const body = await parseJsonBody(request);
   const validationError = validatePotCycle(body);
   if (validationError !== null) {
@@ -975,6 +1045,10 @@ async function submitPotCycle(request: Request, env: Env): Promise<Response> {
     return jsonResponse({ accepted: true, duplicate: true });
   }
 
+  ctx.waitUntil(invalidatePotHitCache(instanceKey).catch(error => {
+    console.error(error);
+  }));
+
   return jsonResponse({
     accepted: true,
     duplicate: false,
@@ -982,11 +1056,16 @@ async function submitPotCycle(request: Request, env: Env): Promise<Response> {
   }, 201);
 }
 
-async function getPotCycle(request: Request, env: Env): Promise<Response> {
+async function getPotCycle(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
   const url = new URL(request.url);
   const instanceKey = url.searchParams.get("instanceKey")?.trim() ?? "";
   if (!INSTANCE_KEY_PATTERN.test(instanceKey)) {
     return jsonResponse({ found: false, error: "instanceKey must be a 64-character hex SHA-256 digest." }, 400);
+  }
+
+  const cached = await readPotHitCache(instanceKey);
+  if (cached !== undefined) {
+    return cached;
   }
 
   const minSpawnUnix = Math.floor(Date.now() / 1000) - POT_CYCLE_MAX_AGE_SECONDS;
@@ -1010,7 +1089,7 @@ async function getPotCycle(request: Request, env: Env): Promise<Response> {
     return jsonResponse({ found: false });
   }
 
-  return jsonResponse({
+  const payload = {
     found: true,
     instanceKey: row.instance_key,
     territoryId: row.territory_id,
@@ -1018,14 +1097,25 @@ async function getPotCycle(request: Request, env: Env): Promise<Response> {
     potFateId: row.pot_fate_id,
     spawnAtUnix: row.spawn_at_unix,
     observedAtUtc: row.observed_at_utc,
+  };
+  rememberPotHitPayload(instanceKey, payload);
+  const response = jsonResponse(payload, 200, {
+    "Cache-Control": `public, max-age=${POT_HIT_CACHE_TTL_SECONDS}`,
   });
+  ctx.waitUntil(writePotHitCache(instanceKey, response).catch(error => {
+    console.error(error);
+  }));
+  return response;
 }
 
-async function submitCarrotLocation(request: Request, env: Env): Promise<Response> {
+async function submitCarrotLocation(
+  request: Request,
+  env: Env,
+): Promise<{ response: Response; observationId: number | null }> {
   const body = await parseJsonBody(request);
   const validationError = validateCarrotLocation(body);
   if (validationError !== null) {
-    return jsonResponse({ accepted: false, error: validationError }, 400);
+    return { response: jsonResponse({ accepted: false, error: validationError }, 400), observationId: null };
   }
 
   const observation = body as CarrotLocationRequest;
@@ -1063,25 +1153,35 @@ async function submitCarrotLocation(request: Request, env: Env): Promise<Respons
   ).run();
 
   if (!result.success) {
-    return jsonResponse({ accepted: false, error: "Database insert failed." }, 500);
+    return {
+      response: jsonResponse({ accepted: false, error: "Database insert failed." }, 500),
+      observationId: null,
+    };
   }
 
   if (result.meta.changes === 0) {
-    return jsonResponse({ accepted: true, duplicate: true });
+    return { response: jsonResponse({ accepted: true, duplicate: true }), observationId: null };
   }
 
-  return jsonResponse({
-    accepted: true,
-    duplicate: false,
-    observationId: result.meta.last_row_id,
-  }, 201);
+  const observationId = result.meta.last_row_id ?? null;
+  return {
+    response: jsonResponse({
+      accepted: true,
+      duplicate: false,
+      observationId,
+    }, 201),
+    observationId,
+  };
 }
 
-async function submitObservation(request: Request, env: Env): Promise<Response> {
+async function submitObservation(
+  request: Request,
+  env: Env,
+): Promise<{ response: Response; observationId: number | null }> {
   const body = await parseJsonBody(request);
   const validationError = validateObservation(body);
   if (validationError !== null) {
-    return jsonResponse({ accepted: false, error: validationError }, 400);
+    return { response: jsonResponse({ accepted: false, error: validationError }, 400), observationId: null };
   }
 
   const observation = body as CofferObservationRequest;
@@ -1123,18 +1223,25 @@ async function submitObservation(request: Request, env: Env): Promise<Response> 
   ).run();
 
   if (!result.success) {
-    return jsonResponse({ accepted: false, error: "Database insert failed." }, 500);
+    return {
+      response: jsonResponse({ accepted: false, error: "Database insert failed." }, 500),
+      observationId: null,
+    };
   }
 
   if (result.meta.changes === 0) {
-    return jsonResponse({ accepted: true, duplicate: true });
+    return { response: jsonResponse({ accepted: true, duplicate: true }), observationId: null };
   }
 
-  return jsonResponse({
-    accepted: true,
-    duplicate: false,
-    observationId: result.meta.last_row_id,
-  }, 201);
+  const observationId = result.meta.last_row_id ?? null;
+  return {
+    response: jsonResponse({
+      accepted: true,
+      duplicate: false,
+      observationId,
+    }, 201),
+    observationId,
+  };
 }
 
 export default {
@@ -1147,7 +1254,7 @@ export default {
 
     if (request.method === "GET" && url.pathname === "/api/v1/candidates") {
       try {
-        return await listAcceptedCandidatesPublic(request, env);
+        return await listAcceptedCandidatesPublic(request, env, ctx);
       } catch (error) {
         if (error instanceof Response) {
           return error;
@@ -1160,7 +1267,7 @@ export default {
 
     if (request.method === "GET" && url.pathname === "/api/v1/carrot-locations") {
       try {
-        return await listAcceptedCarrotLocationsPublic(request, env);
+        return await listAcceptedCarrotLocationsPublic(request, env, ctx);
       } catch (error) {
         if (error instanceof Response) {
           return error;
@@ -1244,15 +1351,19 @@ export default {
           return rateLimitResponse;
         }
 
-        const response = await submitObservation(request, env);
-        // Cluster / auto-accept promptly so the public catalog does not wait on cron alone.
-        ctx.waitUntil(processPendingObservations(env).then(async result => {
-          console.log("Observation processor (post-submit)", result);
-          if (result.assigned > 0) {
-            await invalidateAcceptedCatalogCaches();
-          }
-        }));
-        return response;
+        const submitted = await submitObservation(request, env);
+        if (submitted.observationId !== null) {
+          ctx.waitUntil(processObservationById(env, submitted.observationId).then(async result => {
+            console.log("Observation processor (post-submit)", result);
+            if (result.newlyAccepted > 0) {
+              await invalidateAcceptedCatalogCaches();
+            }
+          }).catch(error => {
+            console.error(error);
+          }));
+        }
+
+        return submitted.response;
       } catch (error) {
         if (error instanceof Response) {
           return error;
@@ -1270,14 +1381,19 @@ export default {
           return rateLimitResponse;
         }
 
-        const response = await submitCarrotLocation(request, env);
-        ctx.waitUntil(processPendingCarrotObservations(env).then(async result => {
-          console.log("Carrot processor (post-submit)", result);
-          if (result.assigned > 0) {
-            await invalidateAcceptedCatalogCaches();
-          }
-        }));
-        return response;
+        const submitted = await submitCarrotLocation(request, env);
+        if (submitted.observationId !== null) {
+          ctx.waitUntil(processCarrotObservationById(env, submitted.observationId).then(async result => {
+            console.log("Carrot processor (post-submit)", result);
+            if (result.newlyAccepted > 0) {
+              await invalidateAcceptedCatalogCaches();
+            }
+          }).catch(error => {
+            console.error(error);
+          }));
+        }
+
+        return submitted.response;
       } catch (error) {
         if (error instanceof Response) {
           return error;
@@ -1295,7 +1411,7 @@ export default {
           return rateLimitResponse;
         }
 
-        return await submitPotCycle(request, env);
+        return await submitPotCycle(request, env, ctx);
       } catch (error) {
         if (error instanceof Response) {
           return error;
@@ -1313,7 +1429,7 @@ export default {
           return rateLimitResponse;
         }
 
-        return await getPotCycle(request, env);
+        return await getPotCycle(request, env, ctx);
       } catch (error) {
         if (error instanceof Response) {
           return error;
@@ -1332,14 +1448,51 @@ export default {
     console.log("Observation processor completed", cofferResult);
     const carrotResult = await processPendingCarrotObservations(env);
     console.log("Carrot processor completed", carrotResult);
-    if (cofferResult.assigned > 0 || carrotResult.assigned > 0) {
+    const rejectedUnload = await rejectUnloadAltitudeCandidates(env);
+    console.log("Unload-altitude candidate reject completed", rejectedUnload);
+    if (cofferResult.newlyAccepted > 0
+      || carrotResult.newlyAccepted > 0
+      || rejectedUnload.coffers > 0
+      || rejectedUnload.carrots > 0) {
       await invalidateAcceptedCatalogCaches();
     }
 
-    const pruned = await pruneStalePotCycles(env);
-    console.log("Pot cycle prune completed", pruned);
+    const prunedPots = await pruneStalePotCycles(env);
+    console.log("Pot cycle prune completed", prunedPots);
+    const prunedObservations = await pruneProcessedObservations(env);
+    console.log("Processed observation prune completed", prunedObservations);
   },
 } satisfies ExportedHandler<Env>;
+
+/** Drop accepted pads whose centroid is unload / inside-floor junk (hamlet basement is ~−162). */
+async function rejectUnloadAltitudeCandidates(
+  env: Env,
+): Promise<{ coffers: number; carrots: number }> {
+  const coffers = await env.DB.prepare(`
+    UPDATE observation_candidates
+    SET status = 'rejected',
+      review_note = 'Unload / inside-floor altitude (centroid_y < -250).',
+      reviewed_at_utc = CURRENT_TIMESTAMP,
+      updated_at_utc = CURRENT_TIMESTAMP
+    WHERE status = 'accepted'
+      AND centroid_y < ?
+  `).bind(MIN_VALID_WORLD_Y).run();
+
+  const carrots = await env.DB.prepare(`
+    UPDATE carrot_candidates
+    SET status = 'rejected',
+      review_note = 'Unload / inside-floor altitude (centroid_y < -250).',
+      reviewed_at_utc = CURRENT_TIMESTAMP,
+      updated_at_utc = CURRENT_TIMESTAMP
+    WHERE status = 'accepted'
+      AND centroid_y < ?
+  `).bind(MIN_VALID_WORLD_Y).run();
+
+  return {
+    coffers: coffers.meta.changes ?? 0,
+    carrots: carrots.meta.changes ?? 0,
+  };
+}
 
 /** Paid D1: delete stale pot_cycles in large rounds until caught up. */
 async function pruneStalePotCycles(env: Env): Promise<{ deleted: number; rounds: number }> {
@@ -1367,4 +1520,57 @@ async function pruneStalePotCycles(env: Env): Promise<{ deleted: number; rounds:
   }
 
   return { deleted, rounds };
+}
+
+/** Drop clustered coffer/carrot rows (and their member links) older than the retain window. */
+async function pruneProcessedObservations(
+  env: Env,
+): Promise<{ coffers: number; carrots: number }> {
+  const coffers = await pruneProcessedTable(
+    env,
+    "observation_candidate_members",
+    "observations",
+  );
+  const carrots = await pruneProcessedTable(
+    env,
+    "carrot_candidate_members",
+    "carrot_observations",
+  );
+  return { coffers, carrots };
+}
+
+async function pruneProcessedTable(
+  env: Env,
+  membersTable: "observation_candidate_members" | "carrot_candidate_members",
+  observationsTable: "observations" | "carrot_observations",
+): Promise<number> {
+  let deleted = 0;
+  const staleIds = `
+    SELECT id
+    FROM ${observationsTable}
+    WHERE processed = 1
+      AND received_at_utc < datetime('now', '-${PROCESSED_OBSERVATION_RETAIN_DAYS} days')
+    ORDER BY id
+    LIMIT ?
+  `;
+  for (let round = 0; round < POT_CYCLE_PRUNE_MAX_ROUNDS; round++) {
+    const results = await env.DB.batch([
+      env.DB.prepare(`
+        DELETE FROM ${membersTable}
+        WHERE observation_id IN (${staleIds})
+      `).bind(POT_CYCLE_PRUNE_BATCH),
+      env.DB.prepare(`
+        DELETE FROM ${observationsTable}
+        WHERE id IN (${staleIds})
+      `).bind(POT_CYCLE_PRUNE_BATCH),
+    ]);
+
+    const changes = results[1].meta.changes ?? 0;
+    deleted += changes;
+    if (changes < POT_CYCLE_PRUNE_BATCH) {
+      break;
+    }
+  }
+
+  return deleted;
 }

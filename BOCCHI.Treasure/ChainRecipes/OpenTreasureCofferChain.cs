@@ -83,7 +83,7 @@ public class OpenTreasureCofferChain
             return false;
         }
 
-        // Include opened/looted — excluding them made the chain path forever after a successful open (#166).
+        // Include opened/looted so the chain does not path forever after a successful open (#166).
         IGameObject? nearby = FindMatchingTreasureNear(target, searchRadius: 6f);
         if (nearby != null)
         {
@@ -104,8 +104,6 @@ public class OpenTreasureCofferChain
                 float dist2d = player.Position.Distance2D(nearby.Position);
                 if (dist2d > PreferredOpenDistance)
                 {
-                    // Keep walking — early stop + Interact fails "Too far away" on some pads
-                    // (SH 1821). EnsurePathing uses the live position this close (no mesh-snap loop).
                     EnsurePathing(nearby.Position, pathState);
                     if (dist2d > MaxOpenAttemptDistance)
                     {
@@ -117,11 +115,9 @@ public class OpenTreasureCofferChain
                     StopNav();
                 }
 
-                // Stay mounted when possible (forced dismount in high-knowledge areas got people killed, #175).
+                // Stay mounted when possible — forced dismount in high-knowledge packs got people killed (#175).
 
-                // Pot reveals open on a cast, unlike ordinary coffers which resolve instantly.
-                // Re-issuing Interact every 200ms restarts that cast, so it never completes and the
-                // farm loops on a chest it is standing on. Let a cast in flight finish.
+                // Pot reveals open on a cast; re-issuing Interact every 200ms restarts it.
                 if (player.IsCasting()
                     || conditions[ConditionFlag.Casting]
                     || conditions[ConditionFlag.Casting87])

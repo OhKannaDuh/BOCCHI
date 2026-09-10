@@ -7,6 +7,12 @@ namespace BOCCHI.Treasure.Services;
 /// <summary>Normalize coffer positions that the game exposes with bogus altitudes.</summary>
 public static class TreasurePathing
 {
+    /// <summary>
+    ///     Below this Y is unload / inside-floor junk (−500 to −980), not hamlet basement (~−162).
+    ///     Keep in sync with coffer-api <c>worldBounds.ts</c> <c>MIN_VALID_WORLD_Y</c>.
+    /// </summary>
+    public const float UnloadAltitudeMax = -250f;
+
     /// <summary>Horizontal slack when snapping an authored pad onto the navmesh.</summary>
     private const float SnapExtentXZ = 8f;
 
@@ -19,10 +25,14 @@ public static class TreasurePathing
     /// <summary>Reject a snap that changed floors — stacked geometry (island over hamlet).</summary>
     private const float MaxSnapDeltaY = 25f;
 
-    /// <summary>Rewrite Y ≈ -500 reveal altitudes. Do not snap authored pads to the player's Y.</summary>
+    public static bool IsUnloadAltitude(float y) => y < UnloadAltitudeMax;
+
+    public static bool IsUnloadAltitude(Vector3 position) => IsUnloadAltitude(position.Y);
+
+    /// <summary>Rewrite unload / Y ≈ -500 reveal altitudes. Do not snap authored pads to the player's Y.</summary>
     public static Vector3 PathablePosition(Vector3 position, float playerY)
     {
-        if (MathF.Abs(position.Y + 500f) < 0.5f)
+        if (IsUnloadAltitude(position.Y) || MathF.Abs(position.Y + 500f) < 0.5f)
         {
             return position with { Y = playerY };
         }

@@ -1,4 +1,4 @@
-# Local wrangler / npm
-cloudflare/coffer-api/node_modules/
-cloudflare/coffer-api/.wrangler/
-cloudflare/coffer-api/dist/
+# Local wrangler / npm (paths are relative to this file)
+node_modules/
+.wrangler/
+dist/

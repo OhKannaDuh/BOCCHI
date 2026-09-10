@@ -8,6 +8,11 @@ BOCCHI*/obj
 BOCCHI*/bin
 .cursor/
 
+# Worker local state (gitignore inside coffer-api uses these names; keep a root copy too)
+cloudflare/coffer-api/.wrangler/
+cloudflare/coffer-api/node_modules/
+cloudflare/coffer-api/dist/
+
 # Legacy monolith code superseded by BOCCHI.* projects on rewrite
 /BOCCHI/Modules/
 /BOCCHI/Chains/

@@ -74,10 +74,8 @@ public class AutoRotationController(
     public void EnableForCriticalEncounter() => EnableActivity(CombatActivity.CriticalEncounter);
 
     /// <summary>
-    ///     Fight back while pot chest farming. The AI deliberately owns movement here: the farm does
-    ///     not path during combat, so there is nothing to fight over — and the magic pot trails the
-    ///     player, so letting the AI dodge takes the pot out of AoE with us. The pot can be
-    ///     destroyed and the run lost with it, which is the real reason this matters (#188).
+    ///     Fight back while pot chest farming. The farm does not path in combat; the AI dodges
+    ///     so the trailing pot stays out of AoE (#188).
     /// </summary>
     public void EnableForSelfDefence() => EnableActivity(CombatActivity.Fate);
 
@@ -87,9 +85,7 @@ public class AutoRotationController(
     /// </summary>
     public void DisableAi()
     {
-        // Keep AI on only while In FATE / In CE owns the character (travel suspended).
-        // A leftover CE EventId alone used to block Disable — Cursed Concern tagged travellers
-        // and left RSR/BMR fighting trash while mounted (#200).
+        // Keep AI on while In FATE / In CE (travel suspended). EventId alone must not (#200).
         if (!CombatSuppressedByActivity
             && memory.TryRemember<SuspendTravelForActivityMemory>(out SuspendTravelForActivityMemory _)
             && (criticalEncounters.IsInCriticalEncounter() || fates.IsInFate()))

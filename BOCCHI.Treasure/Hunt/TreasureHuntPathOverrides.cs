@@ -56,6 +56,8 @@ public static class TreasureHuntPathOverrides
         ],
         // Suspended Masonry lower pad — map ~8.6, 35.8; vnav cuts off the island edge (#173).
         // Keep the near island via only — (-700,160,800) is off-mesh (~100y west) and pathfind fails.
+        // Do not use this via when leaving for 2037 (Y~86): it stays on the island. Cliff
+        // hops drop the departure via and Return when the walk idles at the edge.
         [(ZoneId.NorthHorn, 2058)] =
         [
             new(-640f, 160.1f, 780f),

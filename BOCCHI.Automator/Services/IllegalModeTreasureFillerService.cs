@@ -25,6 +25,7 @@ public class IllegalModeTreasureFillerService
     ISupportJobFactory supportJobs,
     IZoneProvider zones,
     IPotCycleTracker potCycle,
+    IFateRepository fates,
     IIllegalModeStartableActivityProbe startableActivities,
     AutomatorConfig automatorConfig,
     FatesConfig fatesConfig,
@@ -225,8 +226,8 @@ public class IllegalModeTreasureFillerService
     }
 
     /// <summary>
-    ///     True when Pot timing says leave for the next (or live) pot — same window as
-    ///     "Leave for pots this many minutes early" / wait-near-pots.
+    ///     True when leave-early / a live pot should pause auto treasure hunt.
+    ///     Live pots come from the FATE list, not only the shared timer.
     /// </summary>
     private bool ShouldYieldHuntForImminentPot()
     {
@@ -235,17 +236,37 @@ public class IllegalModeTreasureFillerService
             return false;
         }
 
+        if (!FarmsPotChests && !automatorConfig.ShouldPrepositionToPots)
+        {
+            return false;
+        }
+
+        IZone zone = zones.GetZone();
+        foreach (Fate fate in fates.Snapshot())
+        {
+            if (!zone.IsPotFate(fate.Id.Value)
+                || !fatesConfig.IsFateEnabledForIllegalMode(
+                    fate.Id.Value,
+                    isPotFate: true,
+                    automatorConfig.PreferPotFates)
+                || potsConfig.ShouldSkipLivePot(fate.TimeRemainingSeconds))
+            {
+                continue;
+            }
+
+            return true;
+        }
+
         PotCycleSnapshot cycle = potCycle.Snapshot;
         uint potId = cycle.CurrentActivePotFateId != 0
             ? (uint)cycle.CurrentActivePotFateId
             : (uint)cycle.PredictedNextPotFateId;
 
-        if (!fatesConfig.IsPotFallbackGatingEnabled(
+        if (potId == 0
+            || !fatesConfig.IsFateEnabledForIllegalMode(
                 potId,
-                automatorConfig.ShouldDoFates,
-                automatorConfig.PreferPotFates,
-                automatorConfig.ShouldFarmPotChests,
-                automatorConfig.ShouldPrepositionToPots))
+                isPotFate: true,
+                automatorConfig.PreferPotFates))
         {
             return false;
         }

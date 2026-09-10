@@ -83,6 +83,12 @@ public class TreasureHunterService
     /// <summary>Skip an unreachable hunt via after this long with no progress.</summary>
     private static readonly TimeSpan StuckViaTimeout = TimeSpan.FromSeconds(10);
 
+    /// <summary>
+    ///     Only abandon a via this close. Farther away usually means Hide stopped vnav, not that
+    ///     the via itself is unreachable.
+    /// </summary>
+    private const float StuckViaSkipRadius = 12f;
+
     /// <summary>Minimum distance improvement toward the destination that counts as progress.</summary>
     private const float StuckProgressThreshold = 1.5f;
 
@@ -122,6 +128,8 @@ public class TreasureHunterService
     private readonly HashSet<uint> checkedNodeIds = [];
     /// <summary>Stuck / geometry skips — never reclaim via Nearby divert (#173).</summary>
     private readonly HashSet<uint> stuckSkippedNodeIds = [];
+    /// <summary>Already tried Return/shard to drop to this pad’s shelf (re-apply after replan).</summary>
+    private readonly HashSet<uint> cliffReroutedNodeIds = [];
     private readonly HashSet<uint> lastCompletedRunNodeIds = [];
 
     private readonly Stopwatch stopwatch = new();
@@ -651,6 +659,7 @@ public class TreasureHunterService
         authoredNodeOrder.Clear();
         checkedNodeIds.Clear();
         stuckSkippedNodeIds.Clear();
+        cliffReroutedNodeIds.Clear();
         ClearEmptyPadCandidate();
         ClearWalkLiveBind();
         ClearNavigateClosingLatch();
@@ -890,9 +899,19 @@ public class TreasureHunterService
         switch (padStuckWatch.Tick(step.NodeId, distance, pathfinding: vnav.IsPathfinding()))
         {
             case WalkStuckWatch.Action.Nudge:
+                if (TryRerouteSeparatedShelf(step.NodeId))
+                {
+                    return true;
+                }
+
                 TryIssueStuckNudge(step);
                 return true;
             case WalkStuckWatch.Action.GiveUp:
+                if (TryRerouteSeparatedShelf(step.NodeId))
+                {
+                    return true;
+                }
+
                 log.Warning(
                     "Treasure hunt appears stuck reaching coffer {NodeId}; excluding it and recalculating the route",
                     step.NodeId);
@@ -1010,6 +1029,13 @@ public class TreasureHunterService
     private bool TrySkipStuckVia(uint nodeId, float distance)
     {
         DateTime now = DateTime.UtcNow;
+        // Pathfinding / Hide-hold is not "stuck on the via".
+        if (vnav.IsPathfinding() || now < holdNavigateUntilUtc)
+        {
+            viaStuckStartedUtc = now;
+            return false;
+        }
+
         if (viaStuckIndex != walkViaIndex)
         {
             viaStuckIndex = walkViaIndex;
@@ -1030,6 +1056,17 @@ public class TreasureHunterService
             return false;
         }
 
+        // Still far from the via: do not abandon a descent stop. Drop via Return instead.
+        if (distance > StuckViaSkipRadius)
+        {
+            if (TryRerouteSeparatedShelf(nodeId))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         log.Warning(
             "Treasure hunt: skipping stuck via {ViaIndex} toward node {NodeId} (dist {Dist:F1})",
             walkViaIndex,
@@ -1039,6 +1076,59 @@ public class TreasureHunterService
         ResetViaStuckWatch();
         vnav.Stop();
         pathfinder.Stop();
+        return true;
+    }
+
+    /// <summary>True when the current walk is already a camp/shard approach into this pad.</summary>
+    private bool CurrentApproachIsCampEntry()
+    {
+        if (StepIndex <= 0)
+        {
+            return false;
+        }
+
+        return steps[StepIndex - 1].Type is HuntPathfinderStepType.ReturnToBaseCamp
+            or HuntPathfinderStepType.TeleportToAethernet
+            or HuntPathfinderStepType.WalkToAethernet;
+    }
+
+    /// <summary>
+    ///     High island vs lower pad: walking the 2D line idles at the cliff. Return and take a
+    ///     shard down (same idea as carrot hunt’s wrong-shelf hop).
+    /// </summary>
+    private bool TryRerouteSeparatedShelf(uint nodeId)
+    {
+        if (pathPlanner == null || planningRoute || CurrentApproachIsCampEntry())
+        {
+            return false;
+        }
+
+        if (!TryGetLayout(nodeId, out TreasureLayoutDatum layout)
+            || !HuntDistances.IsSeparatedShelf(player.Position, layout.Position))
+        {
+            return false;
+        }
+
+        bool inCamp = zones.GetZone().IsInBasecamp();
+        List<HuntPathfinderStep> entry = pathPlanner.BuildEntryLeg(nodeId, alreadyInCamp: inCamp);
+        if (entry.Count == 0
+            || (entry.Count == 1 && entry[0].Type == HuntPathfinderStepType.WalkToNode))
+        {
+            return false;
+        }
+
+        cliffReroutedNodeIds.Add(nodeId);
+        steps.RemoveAt(StepIndex);
+        steps.InsertRange(StepIndex, entry);
+        walkViaStepIndex = -1;
+        walkViaIndex = 0;
+        walkVias.Clear();
+        ResetViaStuckWatch();
+        ResetStuckWatch();
+        SoftStopMovement();
+        log.Debug(
+            "Treasure hunt: {NodeId} is on another shelf — Returning / shard to drop down",
+            nodeId);
         return true;
     }
 
@@ -1649,6 +1739,15 @@ public class TreasureHunterService
         }
 
         EnsureWalkVias(step);
+
+        if (cliffReroutedNodeIds.Contains(step.NodeId)
+            && HuntDistances.IsSeparatedShelf(player.Position, layoutDestination)
+            && TryRerouteSeparatedShelf(step.NodeId))
+        {
+            return false;
+        }
+
+        SkipPassedWalkVias(layoutDestination);
         if (walkViaIndex < walkVias.Count)
         {
             Vector3 via = walkVias[walkViaIndex];
@@ -2437,7 +2536,8 @@ public class TreasureHunterService
                               && treasureData.Any(d => d.Matches(layout.Id, layout.Position));
             bool onCrowd = hasCrowdsourced
                            && liveSpots.Any(c =>
-                               Vector3.DistanceSquared(c.Position, layout.Position)
+                               !TreasurePathing.IsUnloadAltitude(c.Position)
+                               && Vector3.DistanceSquared(c.Position, layout.Position)
                                <= CofferLocationSyncService.MatchRadiusSq);
             if (!onAuthored && !onCrowd)
             {
@@ -2522,11 +2622,6 @@ public class TreasureHunterService
             {
                 Transform* transform = instance->GetTransformImpl();
                 Vector3 position = transform->Translation;
-                if (position.Y <= -10f && !hasPositionData && !hasCrowdsourced)
-                {
-                    continue;
-                }
-
                 uint treasureRowId = Unsafe.Read<uint>((byte*)instance + 0x30);
                 uint sgbId = data.GetExcelSheet<TreasureSheet>().GetRow(treasureRowId).SGB.RowId;
                 if (!TreasureCoffer.IsBronzeOrSilverSgb(sgbId))
@@ -2537,10 +2632,26 @@ public class TreasureHunterService
                 TreasureData? authored = hasPositionData
                     ? treasureData.FirstOrDefault(d => d.Matches(treasureRowId, position))
                     : null;
+
+                if (TreasurePathing.IsUnloadAltitude(position))
+                {
+                    if (authored?.Position is not { } bakedUnload)
+                    {
+                        continue;
+                    }
+
+                    position = bakedUnload;
+                }
+                else if (position.Y <= -10f && !hasPositionData && !hasCrowdsourced)
+                {
+                    continue;
+                }
+
                 bool matchAuthored = authored != null;
                 bool matchCrowd = hasCrowdsourced
                     && liveSpots.Any(c =>
-                        Vector3.DistanceSquared(c.Position, position) <= CofferLocationSyncService.MatchRadiusSq);
+                        !TreasurePathing.IsUnloadAltitude(c.Position)
+                        && Vector3.DistanceSquared(c.Position, position) <= CofferLocationSyncService.MatchRadiusSq);
 
                 // Union: baked map and/or shared catalog. Neither → take every bronze/silver layout pad.
                 if ((hasPositionData || hasCrowdsourced) && !matchAuthored && !matchCrowd)
@@ -2628,6 +2739,11 @@ public class TreasureHunterService
         int added = 0;
         foreach (CrowdsourcedCofferCandidate spot in liveSpots)
         {
+            if (TreasurePathing.IsUnloadAltitude(spot.Position))
+            {
+                continue;
+            }
+
             if (layoutTreasure.Any(t =>
                     Vector3.DistanceSquared(t.Position, spot.Position) <= CofferLocationSyncService.MatchRadiusSq))
             {
@@ -2861,7 +2977,13 @@ public class TreasureHunterService
 
         previousNodeId ??= LastCheckedNodeId;
 
-        if (previousNodeId is uint prevId
+        bool destOnOtherShelf = TryGetLayout(step.NodeId, out TreasureLayoutDatum destLayout)
+            && previousNodeId is uint prevForShelf
+            && TryGetLayout(prevForShelf, out TreasureLayoutDatum prevLayout)
+            && HuntDistances.IsSeparatedShelf(prevLayout.Position, destLayout.Position);
+
+        if (!destOnOtherShelf
+            && previousNodeId is uint prevId
             && TreasureHuntPathOverrides.TryGetDeparture(zoneId, prevId, out IReadOnlyList<Vector3> departure))
         {
             walkVias.AddRange(departure);
@@ -2872,12 +2994,9 @@ public class TreasureHunterService
             walkVias.AddRange(approach);
         }
 
-        // Skip vias we are already on (e.g. resumed mid-route next to the safe spot).
-        while (walkViaIndex < walkVias.Count
-               && player.Position.Distance2D(walkVias[walkViaIndex]) <= 3f)
-        {
-            walkViaIndex++;
-        }
+        SkipPassedWalkVias(TryGetLayout(step.NodeId, out TreasureLayoutDatum skipLayout)
+            ? skipLayout.Position
+            : player.Position);
 
         if (walkVias.Count > 0)
         {
@@ -2886,6 +3005,34 @@ public class TreasureHunterService
                 walkVias.Count,
                 step.NodeId,
                 walkViaIndex);
+        }
+    }
+
+    /// <summary>
+    ///     Skip vias we are already on, and skip the rest when already on the pad’s floor
+    ///     closer to the coffer than to the via (don’t backtrack up the island).
+    /// </summary>
+    private void SkipPassedWalkVias(Vector3 destination)
+    {
+        while (walkViaIndex < walkVias.Count)
+        {
+            Vector3 via = walkVias[walkViaIndex];
+            if (player.Position.Distance2D(via) <= 3f)
+            {
+                walkViaIndex++;
+                ResetViaStuckWatch();
+                continue;
+            }
+
+            if (HuntDistances.IsSameFloor(player.Position, destination)
+                && player.Position.Distance2D(destination) <= player.Position.Distance2D(via))
+            {
+                walkViaIndex = walkVias.Count;
+                ResetViaStuckWatch();
+                return;
+            }
+
+            return;
         }
     }
 
@@ -2994,6 +3141,7 @@ public class TreasureHunterService
         tickTreasures.Clear();
         pathPlanner = null;
         stuckSkippedNodeIds.Clear();
+        cliffReroutedNodeIds.Clear();
         pandoraAutoOpen.Release();
 
         if (wasStandalone || wasIllegalFiller || wasMobFarmer)

@@ -80,8 +80,7 @@ public class TriagingHandler
             return StatePriority.Never;
         }
 
-        // Pending + InCombat used to score Never, so ReturningStateMemory (VeryHigh) owned the
-        // UI and blocked Pathfinding Teleport until the Return timeout — triage never started.
+        // Score Always while pending so Return (VeryHigh) cannot own the UI until triage starts.
         return StatePriority.Always;
     }
 

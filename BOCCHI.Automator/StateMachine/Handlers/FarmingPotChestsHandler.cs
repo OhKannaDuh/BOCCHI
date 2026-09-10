@@ -797,9 +797,8 @@ public class FarmingPotChestsHandler
     }
 
     /// <summary>
-    ///     Stuck means vnav cannot get us there. Long routes may move away from the goal, so only
-    ///     <see cref="PathfindingState.Moving"/> counts as a real path — a Pathfinding/idle loop is
-    ///     the off-mesh retry from #176/#194.
+    ///     Stuck means vnav cannot get us there. Only Moving counts as a real path —
+    ///     Pathfinding/idle looping is the off-mesh retry (#176/#194).
     /// </summary>
     private bool IsApproachStuck(Vector3 target, float distance)
     {
@@ -814,16 +813,18 @@ public class FarmingPotChestsHandler
             return false;
         }
 
-        // While the route planner owns travel, vnav is legitimately idle between teleport steps —
-        // reading that as "no route" would skip the candidate mid-hop.
+        if (ninjaHideRequired)
+        {
+            approachIdleSince = DateTimeOffset.MinValue;
+            return false;
+        }
+
         if (travelPlanTask != null || travelSteps != null)
         {
             approachIdleSince = DateTimeOffset.MinValue;
             return false;
         }
 
-        // Only Moving means vnav actually has a route. Pathfinding+idle looping is the off-mesh
-        // case: EnsurePathing re-issues every 750ms, which used to reset the idle timer forever (#194).
         if (pathfinder.GetState() == PathfindingState.Moving)
         {
             approachIdleSince = DateTimeOffset.MinValue;
@@ -1135,9 +1136,7 @@ public class FarmingPotChestsHandler
 
         float distance = player.Position.Distance2D(pathable);
 
-        // OpenTreasureCofferChain can already interact inside MaxOpenAttemptDistance. Keep issuing
-        // PathfindAndMoveTo here and vnav often parks just outside InteractDistance — no Open chain,
-        // endless "Queueing move-to" (#nyanoha pot chest).
+        // Already in open range — do not re-queue a walk that parks just outside interact.
         if (distance <= OpenTreasureCofferChain.MaxOpenAttemptDistance)
         {
             if (!pathfinder.IsIdle())
@@ -1185,18 +1184,11 @@ public class FarmingPotChestsHandler
             pathfinder.PathfindAndMoveTo(new(pathable));
         }
 
-        // Remount only for longer walks — not while already on top of a reveal.
+        // Remount only for longer walks — not while already on top of a reveal,
+        // and never while Hide is required / still up (mount cancels Hide).
         if (allowRemount && distance > 15f)
         {
-            IZone zone = zones.GetZone();
-            MountWait.TryCastIfNeeded(
-                conditions,
-                objects,
-                pathable,
-                movement.ShouldAutoMount,
-                movement.PreferredMountId,
-                zone.IsInBasecamp(),
-                zone);
+            MaybeMount(pathable);
         }
 
         return true;
@@ -1374,6 +1366,37 @@ public class FarmingPotChestsHandler
         IGameObject? chest = FindChestNear(position);
         return chest != null && !OpenTreasureCofferChain.IsOpenedOrLooted(chest) ? chest : null;
     }
+
+    private void MaybeMount(Vector3 destination)
+    {
+        if (ninjaHideRequired)
+        {
+            return;
+        }
+
+        if (ninjaHide.IsStealthed
+            && !ninjaHide.TryEndStealthForTravel(StillThreatenedForRemount))
+        {
+            return;
+        }
+
+        IZone zone = zones.GetZone();
+        MountWait.TryCastIfNeeded(
+            conditions,
+            objects,
+            destination,
+            movement.ShouldAutoMount,
+            movement.PreferredMountId,
+            zone.IsInBasecamp(),
+            zone);
+    }
+
+    private bool StillThreatenedForRemount() =>
+        ninjaHideRouteGate.ShouldKeepStealthForThreats(
+            objects,
+            player.Position,
+            treasureConfig.KnowledgeHideOffset,
+            treasureConfig.KnowledgeThreatExitDistance);
 
     /// <returns>False while still preparing Hide (caller should wait via EnsurePathing returning true).</returns>
     private bool ApplyNinjaHideGate(Vector3? approachingDestination = null)

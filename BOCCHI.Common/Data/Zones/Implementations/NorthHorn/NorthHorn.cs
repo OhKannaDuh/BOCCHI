@@ -273,7 +273,8 @@ public class NorthHorn
                 2073, [
                     new(new(-113.4943f, 5.0879984f, -74.15943f), 99),
                     new(new(-960f, 48f, -425.8f), 99),
-                    new(new(-834f, 18.913685f, -587.4f), 99),
+                    // Map ~4.8, 10.1 (was ~4.8, 9.7 / <-834, -587.4>; Eureka Linker ~4.7, 9.7)
+                    new(new(-834f, 18.913685f, -569f), 99),
                     new(new(-853.493f, 58f, -323.8983f), 99),
                     new(new(-586.3f, 47.81013f, -715.2f), 99),
                     new(new(71.10001f, 81.074875f, 942.3f), 99),
@@ -306,6 +307,8 @@ public class NorthHorn
                     // Map ~16.8, 22.3 — old Y≈3–6 points were off-mesh and stuck the farm (#176).
                     new(new(-184f, 53.15f, 91f), 99),
                     new(new(-172.6f, 53.15f, 103.2f), 99),
+                    // Map ~5.9, 35.2 — high island (Linker ~4.6, 36.3 is a different pad, already in reroll).
+                    new(new(-779f, 160f, 686f), 99),
                 ]
             }
         };
@@ -325,6 +328,8 @@ public class NorthHorn
         new(new(-585f, 160f, 842f), 99),
         new(new(-656.9f, 23.036425f, -799.3f), 99),
         new(new(-839.9977f, 160f, 740f), 99),
+        // Map ~5.9, 35.2 — high-island 2nd-chance pad (Linker listed the neighbor at ~4.6, 36.3).
+        new(new(-779f, 160f, 686f), 99),
         new(new(-487.8f, 48.000015f, -953.2f), 99),
         new(new(-603f, 32f, -869f), 99),
         new(new(-637.2283f, 32f, -950.4841f), 99),
