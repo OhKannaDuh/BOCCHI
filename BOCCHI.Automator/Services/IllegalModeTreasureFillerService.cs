@@ -44,6 +44,17 @@ public class IllegalModeTreasureFillerService
     private bool loggedSightUnavailable;
 
     /// <summary>
+    ///     Longest a FATE / CE / pot yield waits for the hunt to finish the coffer it is standing at.
+    ///     Covers the open chain's interact + cast without letting a wedged pad block yields forever.
+    /// </summary>
+    private static readonly TimeSpan FinishingCofferYieldHold = TimeSpan.FromSeconds(20);
+
+    /// <summary>Pad the finishing-coffer hold belongs to; the cap is per pad so flicker cannot re-arm it.</summary>
+    private uint? finishingCofferHoldNodeId;
+
+    private DateTime finishingCofferHoldSinceUtc = DateTime.MinValue;
+
+    /// <summary>
     ///     Last primary Goal that was a pot FATE. Survives Goal forget so post-activity hunt
     ///     can defer to Magical Elixir / pot chests even when Automator missed the same-frame latch
     ///     (e.g. after manually stopping the filler hunt).
@@ -176,6 +187,11 @@ public class IllegalModeTreasureFillerService
             return;
         }
 
+        if (ShouldHoldYieldForFinishingCoffer())
+        {
+            return;
+        }
+
         if (ShouldYieldHuntForImminentPot())
         {
             PauseHuntForYield("pot");
@@ -294,6 +310,40 @@ public class IllegalModeTreasureFillerService
             potFarmingEnabled: true);
     }
 
+    /// <summary>
+    ///     Hunt is opening (or parked next to) the live coffer of the current pad — let it finish
+    ///     before yielding to a FATE / CE / pot, else we leave with the chest unopened. Capped by
+    ///     <see cref="FinishingCofferYieldHold" />; triage and pot chest farm still pause at once.
+    /// </summary>
+    private bool ShouldHoldYieldForFinishingCoffer()
+    {
+        if (!hunter.IsFinishingCoffer)
+        {
+            return false;
+        }
+
+        // Keyed by pad: a one-tick radar miss or radius wobble must not restart the countdown.
+        uint? nodeId = hunter.GetCurrentStep()?.NodeId;
+        DateTime now = DateTime.UtcNow;
+        if (finishingCofferHoldNodeId != nodeId)
+        {
+            finishingCofferHoldNodeId = nodeId;
+            finishingCofferHoldSinceUtc = now;
+        }
+
+        if (now - finishingCofferHoldSinceUtc >= FinishingCofferYieldHold)
+        {
+            return false;
+        }
+
+        if (EzThrottler.Throttle("IllegalModeMapHuntHoldCoffer", 5000))
+        {
+            logger.Debug("Illegal Mode: holding treasure hunt yield — finishing coffer");
+        }
+
+        return true;
+    }
+
     private bool TryPauseForStartableYield()
     {
         if (memory.TryRemember<NavigationInterruptedMemory>(out NavigationInterruptedMemory _)
@@ -316,6 +366,8 @@ public class IllegalModeTreasureFillerService
     {
         if (!hunter.Paused)
         {
+            // Yield happened — the pad gets a fresh finishing hold after resume.
+            finishingCofferHoldNodeId = null;
             hunter.Pause();
             logger.Debug("Illegal Mode: paused treasure hunt for {Reason}", reason);
         }

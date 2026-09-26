@@ -101,6 +101,27 @@ public class TreasureHunterService
     /// </summary>
     private const float StuckEmptySkipRadius = 15f;
 
+    /// <summary>
+    ///     Mesh / chest collision can park 3–5y out; still interactable. Used after a stuck nudge
+    ///     or once the player has stalled this close (see <see cref="CloseStallOpenDelay" />).
+    /// </summary>
+    private const float StuckOpenSlack = 3.5f;
+
+    /// <summary>
+    ///     Standing still inside the stuck-open band this long counts as parked — open from here
+    ///     instead of waiting ~12s for the stuck nudge (FATE yields used to win that race).
+    /// </summary>
+    private static readonly TimeSpan CloseStallOpenDelay = TimeSpan.FromSeconds(2);
+
+    /// <summary>Movement below this (2D) while parked near the coffer still counts as stalled.</summary>
+    private const float CloseStallMoveTolerance = 0.5f;
+
+    /// <summary>
+    ///     Live unopened coffer this close (2D, same floor) means the pad is about to be opened —
+    ///     <see cref="IsFinishingCoffer" /> asks Illegal Mode to hold its FATE/CE yield.
+    /// </summary>
+    private const float FinishingCofferRadius = 12f;
+
     private readonly WalkStuckWatch padStuckWatch = new(new WalkStuckWatch.Options(
         NudgeAfter: TimeSpan.FromSeconds(12),
         EscalateAfter: TimeSpan.FromSeconds(30),
@@ -194,6 +215,11 @@ public class TreasureHunterService
 
     /// <summary>Skip coffer repath until this time (stuck nudge must be allowed to start).</summary>
     private DateTime holdNavigateUntilUtc = DateTime.MinValue;
+
+    /// <summary>Where the player last settled inside the stuck-open band of the current coffer.</summary>
+    private Vector3? closeStallAnchor;
+
+    private DateTime closeStallSinceUtc = DateTime.MinValue;
 
     /// <summary>
     ///     Live coffer XZ for the current WalkToNode. Sticky so a one-tick miss in the object
@@ -538,6 +564,35 @@ public class TreasureHunterService
         && !Paused
         && config.SkipUnsafeTreasureWindows
         && IsUnsafeTreasureWindow();
+
+    /// <inheritdoc />
+    public bool IsFinishingCoffer
+    {
+        get
+        {
+            if (!Running || Paused)
+            {
+                return false;
+            }
+
+            if (activeChain is { IsCompleted: false })
+            {
+                return true;
+            }
+
+            if (GetCurrentStep() is not { Type: HuntPathfinderStepType.WalkToNode } step
+                || !TryGetLayout(step.NodeId, out TreasureLayoutDatum layout))
+            {
+                return false;
+            }
+
+            IGameObject? live = FindTreasureForLayout(layout.Position, step.NodeId);
+            return live != null
+                   && !OpenTreasureCofferChain.IsOpenedOrLooted(live)
+                   && player.Position.Distance2D(live.Position) <= FinishingCofferRadius
+                   && IsSameFloor(live.Position);
+        }
+    }
 
     public int StepIndex { get; private set; }
 
@@ -1011,12 +1066,39 @@ public class TreasureHunterService
         stuckSkippedNodeIds.Add(step.NodeId);
         LastCheckedNodeId = step.NodeId;
         emptyPadConfirm.Clear();
-        padStuckWatch.Reset();
+        ResetStuckWatch();
         FinishCurrentPad();
         return true;
     }
 
-    private void ResetStuckWatch() => padStuckWatch.Reset();
+    private void ResetStuckWatch()
+    {
+        padStuckWatch.Reset();
+        closeStallAnchor = null;
+    }
+
+    /// <summary>
+    ///     True once the player has sat inside the stuck-open band without moving for
+    ///     <see cref="CloseStallOpenDelay" /> — vnav parked against collision short of 3.5y.
+    /// </summary>
+    private bool IsStalledNearCoffer(float dist2d)
+    {
+        if (dist2d > OpenTreasureCofferChain.PreferredOpenDistance + StuckOpenSlack)
+        {
+            closeStallAnchor = null;
+            return false;
+        }
+
+        Vector3 here = player.Position;
+        if (closeStallAnchor is not { } anchor || anchor.Distance2D(here) > CloseStallMoveTolerance)
+        {
+            closeStallAnchor = here;
+            closeStallSinceUtc = DateTime.UtcNow;
+            return false;
+        }
+
+        return DateTime.UtcNow - closeStallSinceUtc >= CloseStallOpenDelay;
+    }
 
     private void ResetViaStuckWatch()
     {
@@ -1937,13 +2019,14 @@ public class TreasureHunterService
             return false;
         }
 
-        // Match the open chain: mesh often parks just outside 2y. After a stuck nudge,
-        // chest / prop collision can leave you 3–5y out — still interactable.
-        const float StuckOpenSlack = 3.5f;
-        float openSlack = padStuckWatch.NudgeIssued
+        // Match the open chain: mesh often parks just outside 2y. After a stuck nudge, or once
+        // parked still near the chest, collision can leave you 3–5y out — still interactable.
+        bool widenOpen = IsStalledNearCoffer(dist2d) || padStuckWatch.NudgeIssued;
+        float openSlack = widenOpen
             ? StuckOpenSlack
             : OpenTreasureCofferChain.OpenAttemptSlack;
-        if (dist2d > OpenTreasureCofferChain.PreferredOpenDistance + openSlack
+        float maxOpenDistance = OpenTreasureCofferChain.PreferredOpenDistance + openSlack;
+        if (dist2d > maxOpenDistance
             || !IsSameFloor(destination))
         {
             return false;
@@ -1967,7 +2050,8 @@ public class TreasureHunterService
         ninjaHide.EndStealthForInteract(keepNinja);
         activeChain = chainManager.Manage(
             chains.Create($"TreasureHunt::Open({step.NodeId})")
-                .Then<OpenTreasureCofferChain, TreasureOpenTarget>(present.Position)
+                .Then<OpenTreasureCofferChain, TreasureOpenTarget>(
+                    new TreasureOpenTarget(present.Position, MaxInteractDistance: maxOpenDistance))
         );
 
         return false;

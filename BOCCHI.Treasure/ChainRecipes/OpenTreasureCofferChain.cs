@@ -21,8 +21,15 @@ using CsObjectKind = FFXIVClientStructs.FFXIV.Client.Game.Object.ObjectKind;
 
 namespace BOCCHI.Treasure.ChainRecipes;
 
-/// <summary>Where to open a coffer; optional BaseId filter avoids overlapping non-pot chests.</summary>
-public readonly record struct TreasureOpenTarget(Vector3 Position, IReadOnlyList<uint>? PreferredBaseIds = null)
+/// <summary>
+///     Where to open a coffer; optional BaseId filter avoids overlapping non-pot chests.
+///     <paramref name="MaxInteractDistance" /> widens the interact gate when the caller already
+///     knows collision parks the player farther out (defaults to <see cref="OpenTreasureCofferChain.MaxOpenAttemptDistance" />).
+/// </summary>
+public readonly record struct TreasureOpenTarget(
+    Vector3 Position,
+    IReadOnlyList<uint>? PreferredBaseIds = null,
+    float? MaxInteractDistance = null)
 {
     public static implicit operator TreasureOpenTarget(Vector3 position) => new(position);
 }
@@ -105,7 +112,7 @@ public class OpenTreasureCofferChain
                 if (dist2d > PreferredOpenDistance)
                 {
                     EnsurePathing(nearby.Position, pathState);
-                    if (dist2d > MaxOpenAttemptDistance)
+                    if (dist2d > (target.MaxInteractDistance ?? MaxOpenAttemptDistance))
                     {
                         return false;
                     }

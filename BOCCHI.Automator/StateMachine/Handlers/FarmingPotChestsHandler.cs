@@ -1286,11 +1286,16 @@ public class FarmingPotChestsHandler
         }
 
         Vector3 position = PathableTreasurePosition(chest.Position);
-        // Prefer reveal BaseIds — pot reveals are EventObj, not ObjectKind.Treasure.
+        // Prefer reveal BaseIds — pot reveals are EventObj, not ObjectKind.Treasure. Always
+        // include the chest we picked: an unknown-id coffer accepted on a pot spot would
+        // otherwise never match and time out every 45s until the farm ends.
+        uint[] openBaseIds = PotTreasureIds.RevealCofferBaseIds.Contains(chest.BaseId)
+            ? PotTreasureIds.RevealCofferBaseIds
+            : [..PotTreasureIds.RevealCofferBaseIds, chest.BaseId];
         activeChain = chainManager.Manage(
             chains.Create("PotChestFarm::Open")
                 .Then<OpenTreasureCofferChain, TreasureOpenTarget>(
-                    new TreasureOpenTarget(position, PotTreasureIds.RevealCofferBaseIds))
+                    new TreasureOpenTarget(position, openBaseIds))
         );
     }
 

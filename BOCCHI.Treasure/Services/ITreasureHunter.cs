@@ -16,6 +16,12 @@ public interface ITreasureHunter
     /// </summary>
     bool WaitingForSafeWindow { get; }
 
+    /// <summary>
+    ///     Hunt is running and either opening a coffer or standing next to the live, unopened
+    ///     coffer of the current pad. Opportunistic yields (FATE / CE / pot) should wait briefly.
+    /// </summary>
+    bool IsFinishingCoffer { get; }
+
     int StepIndex { get; }
 
     int StepCount { get; }
