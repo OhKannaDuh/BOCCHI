@@ -1,5 +1,6 @@
 using System.Reflection;
 using BOCCHI.Common.Config.Fields;
+using BOCCHI.Common.Ipc.GatherBuddy;
 using BOCCHI.Common.Ipc.Knightshopper;
 using BOCCHI.Common.UI;
 using Dalamud.Bindings.ImGui;
@@ -21,13 +22,18 @@ public sealed class PluginDependencyStatusRenderer(
     IBossModIpc bossMod,
     ILifestreamIpc lifestream,
     IKnightshopperIpc knightshopper,
+    IGatherBuddyIpc gatherBuddy,
     IRotationSolverRebornIpc rsr,
-    AutomatorConfig automator
+    AutomatorConfig automator,
+    ShoppingConfig shopping
 ) : IFieldRenderer<PluginDependencyStatusAttribute>
 {
     private const string StatusKey = "config.dependencies.fields.status";
 
     private static readonly CombatAutorotationDisplay CombatDisplay = new();
+
+    /// <summary>Upstream manifest name first, then the BOCCHI-bld fork's.</summary>
+    private static readonly string[] GatherBuddyInternalNames = ["GatherBuddyReborn", "GatherBuddyReborn-bld"];
 
     public bool Render(object target, PropertyInfo prop, PluginDependencyStatusAttribute attr, Type owner, ITranslator translator)
     {
@@ -44,7 +50,13 @@ public sealed class PluginDependencyStatusRenderer(
         ImGui.Spacing();
         BocchiUi.MutedWrapped(T(translator, "shopping_intro"));
         ImGui.Spacing();
-        Draw("Knightshopper", "Knightshopper", translator, (_, t) => IpcStatus(knightshopper.IsAvailable, t));
+        DrawRow("GatherBuddy Reborn", GatherBuddyStatus(translator), translator, !shopping.UsesKnightshopper);
+        Draw(
+            "Knightshopper",
+            "Knightshopper",
+            translator,
+            (_, t) => IpcStatus(knightshopper.IsAvailable, t),
+            shopping.UsesKnightshopper);
 
         ImGui.Spacing();
         BocchiUi.SectionTitle(T(translator, "optional"));
@@ -149,7 +161,16 @@ public sealed class PluginDependencyStatusRenderer(
         Func<string, ITranslator, (string Label, bool Ok, bool Pending)>? ipc = null,
         bool inUse = false)
     {
-        var (label, ok, pending) = ResolveStatus(internalName, translator, ipc);
+        DrawRow(displayName, ResolveStatus(internalName, translator, ipc), translator, inUse);
+    }
+
+    private static void DrawRow(
+        string displayName,
+        (string Label, bool Ok, bool Pending) status,
+        ITranslator translator,
+        bool inUse)
+    {
+        var (label, ok, pending) = status;
         if (inUse && ok)
         {
             label = $"{label} · {T(translator, "in_use")}";
@@ -191,6 +212,29 @@ public sealed class PluginDependencyStatusRenderer(
         }
 
         return (label, ok, pending);
+    }
+
+    /// <summary>
+    ///     GBR ships under more than one InternalName, and a loaded build can still predate the
+    ///     vendor-list IPC — so IPC reachability decides Ready, not the plugin being loaded.
+    /// </summary>
+    private (string Label, bool Ok, bool Pending) GatherBuddyStatus(ITranslator translator)
+    {
+        if (gatherBuddy.IsAvailable)
+        {
+            return (T(translator, "ready"), true, false);
+        }
+
+        if (GatherBuddyInternalNames.Any(pluginStatus.IsLoaded))
+        {
+            return gatherBuddy.Version > 0
+                ? (T(translator, "outdated"), false, true)
+                : (T(translator, "not_working"), false, false);
+        }
+
+        return plugin.InstalledPlugins.Any(p => GatherBuddyInternalNames.Contains(p.InternalName))
+            ? (T(translator, "not_enabled"), false, false)
+            : (T(translator, "not_installed"), false, false);
     }
 
     private static BocchiUi.StatusChipKind StatusKind(bool ok, bool pending) =>

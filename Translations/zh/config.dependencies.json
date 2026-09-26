@@ -3,10 +3,10 @@
   "fields": {
     "status": {
       "label": "状态",
-      "intro": "赶路插件必须就绪。战斗只需「常规 → 战斗」中所选的插件就绪即可。自动购物需要 Knightshopper。",
+      "intro": "赶路插件必须就绪。战斗只需「常规 → 战斗」中所选的插件就绪即可。自动购物需要「购物」中所选的后端（GatherBuddy Reborn 或 Knightshopper）。",
       "required": "赶路",
       "shopping": "购物",
-      "shopping_intro": "自动购物在银/金达到阈值时，若不在大本营则先 Return，再启动 Knightshopper 的 Occult Crescent 清单。物品在 Knightshopper 中配置。",
+      "shopping_intro": "自动购物在银/金达到阈值时，若不在大本营则先 Return，再运行所选后端。GatherBuddy Reborn：在其 Vendors 窗口配置清单。Knightshopper：在 Knightshopper 中配置清单。",
       "optional": "战斗",
       "optional_intro": "Wrath Combo 还需要 BossMod。",
       "optional_intro_bmr": "Wrath Combo 还需要 BossMod 或 BossMod Reborn。",
@@ -17,6 +17,7 @@
       "ready": "就绪",
       "map_loading": "地图仍在加载",
       "not_working": "无法使用",
+      "outdated": "需要更新",
       "not_enabled": "未启用",
       "not_installed": "未安装"
     }

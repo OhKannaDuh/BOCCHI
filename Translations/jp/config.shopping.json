@@ -1,13 +1,14 @@
 {
   "label": "買い物",
-  "tooltip": "銀貨または金貨がしきい値に達したら他の自動化を一時停止し、必要なら拠点へリターンしてから Knightshopper のオカルトクレセント買い物リストを開始します。Knightshopper が必要です（依存関係を参照）。FATE/CE中は開始しません。",
+  "tooltip": "銀貨または金貨がしきい値に達したら他の自動化を一時停止し、必要なら拠点へリターンしてから選択したバックエンドで購入します：GatherBuddy Reborn のベンダーリスト（既定）または Knightshopper のオカルトクレセントリスト。依存関係を参照。FATE/CE中は開始しません。",
   "sections": {
-    "auto": "自動買い物"
+    "auto": "自動買い物",
+    "backend": "バックエンド"
   },
   "fields": {
     "enable_auto_shop": {
       "label": "自動買い物を有効化",
-      "tooltip": "オン：銀貨または金貨がしきい値に達し、FATE/CE中でなければ、他の自動化を一時停止し、フィールドにいれば拠点へリターンしてから Knightshopper のオカルトクレセント買い物リストを開始します。品目は Knightshopper で設定します。トレジャーハントやモブファーム待機中は中断できますが、プル中・戦闘中はしません。Knightshopper が無い／未準備なら何もしません。\nオフ：自動買い物しません。"
+      "tooltip": "オン：銀貨または金貨がしきい値に達し、FATE/CE中でなければ、他の自動化を一時停止し、フィールドにいれば拠点へリターンしてから選択したバックエンドの購入を開始します。トレジャーハントやモブファーム待機中は中断できますが、プル中・戦闘中はしません。バックエンドが無い／未準備、または（GatherBuddy Reborn）リストに買うものが残っていなければ何もしません。\nオフ：自動買い物しません。"
     },
     "silver_threshold": {
       "label": "銀のしきい値",
@@ -16,6 +17,17 @@
     "gold_threshold": {
       "label": "金のしきい値",
       "tooltip": "南ホーンは金貨、北ホーンは金オボルがこの値に達したら買い物を開始。FATE/CE中、およびモブファームのプル中・戦闘中は開始しません。0＝金では開始しない。"
+    },
+    "backend": {
+      "label": "買い物バックエンド",
+      "tooltip": "GatherBuddy Reborn：下で指定した名前のベンダー購入リストを購入します（GatherBuddy Reborn の Vendors ウィンドウ、オカルトクレセント通貨タブで設定）。各品目が目標数に達するまで購入します。\nKnightshopper：Knightshopper のオカルトクレセントリストを開始します（品目は Knightshopper で設定）。"
+    },
+    "gather_buddy_list_name": {
+      "label": "GatherBuddy Reborn リスト",
+      "tooltip": "GatherBuddy Reborn のベンダー購入リスト名。完全一致が必要です（大文字小文字は区別しません）。既定は「新月岛」なので、GatherBuddy Reborn の Vendors ウィンドウで同名のリストを作成してください（またはドロップダウンから選択）。空欄なら GatherBuddy Reborn で現在アクティブなリストを使います。一致するリストが無いと自動買い物は行いません。",
+      "tooltip_disabled": "GatherBuddy Reborn バックエンドでのみ使用します。",
+      "hint": "空欄＝アクティブなリスト",
+      "no_lists": "GatherBuddy Reborn のリストがありません"
     }
   }
 }

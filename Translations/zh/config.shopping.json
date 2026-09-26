@@ -1,13 +1,14 @@
 {
   "label": "购物",
-  "tooltip": "银币或金币达到阈值时，暂停其他自动化；若不在大本营则先 Return，再启动 Knightshopper 的 Occult Crescent 购物清单。需要 Knightshopper（见依赖项）。FATE/CE 进行中不会开始。",
+  "tooltip": "银币或金币达到阈值时，暂停其他自动化；若不在大本营则先 Return，再通过所选后端购买：GatherBuddy Reborn 商店清单（默认）或 Knightshopper 的 Occult Crescent 清单。见依赖项。FATE/CE 进行中不会开始。",
   "sections": {
-    "auto": "自动购物"
+    "auto": "自动购物",
+    "backend": "购物后端"
   },
   "fields": {
     "enable_auto_shop": {
       "label": "启用自动购物",
-      "tooltip": "开：银币或金币达到阈值且不在 FATE/CE 中时，暂停其他自动化；若在野外则先 Return 回大本营，再启动 Knightshopper 的 Occult Crescent 购物清单。物品在 Knightshopper 中配置。可打断寻宝和刷怪待机；不会打断拉怪/战斗中。若未安装或未就绪 Knightshopper 则不操作。\n关：不自动购物。"
+      "tooltip": "开：银币或金币达到阈值且不在 FATE/CE 中时，暂停其他自动化；若在野外则先 Return 回大本营，再启动所选后端的购买。可打断寻宝和刷怪待机；不会打断拉怪/战斗中。后端未安装或未就绪、或（GatherBuddy Reborn）清单已无可买物品时不操作。\n关：不自动购物。"
     },
     "silver_threshold": {
       "label": "银币阈值",
@@ -16,6 +17,17 @@
     "gold_threshold": {
       "label": "金币阈值",
       "tooltip": "南角金币、北角金奥博达到该值时开始购物。FATE/CE 进行中、刷怪拉怪/战斗中不会开始。0 = 不因金币开始。"
+    },
+    "backend": {
+      "label": "购物后端",
+      "tooltip": "GatherBuddy Reborn：购买下方指定名称的商店清单（在 GatherBuddy Reborn 的 Vendors 窗口「新月岛」货币页中配置），每个物品买到目标数量为止。\nKnightshopper：启动 Knightshopper 的 Occult Crescent 清单（物品在 Knightshopper 中配置）。"
+    },
+    "gather_buddy_list_name": {
+      "label": "GatherBuddy Reborn 清单",
+      "tooltip": "GatherBuddy Reborn 中商店购买清单的名称，必须完全一致（不区分大小写）。默认为「新月岛」，请在 GatherBuddy Reborn 的 Vendors 窗口中创建同名清单（或从下拉框选择已有清单）。留空则使用 GatherBuddy Reborn 当前激活的清单。找不到对应清单时不会自动购物。",
+      "tooltip_disabled": "仅在使用 GatherBuddy Reborn 后端时生效。",
+      "hint": "留空 = 当前激活清单",
+      "no_lists": "未找到 GatherBuddy Reborn 清单"
     }
   }
 }

@@ -88,6 +88,7 @@ public unsafe class DebugCommand
             case "shopping":
             case "knightshopper":
             case "ks":
+            case "gbr":
                 DebugShopping(context.Args.Length > 1 ? context.Args[1] : null);
                 break;
             default:
@@ -98,7 +99,8 @@ public unsafe class DebugCommand
     }
 
     /// <summary>
-    ///     Return to base camp if needed, then start Knightshopper’s Occult Crescent list
+    ///     Return to base camp if needed, then start the configured shopping backend
+    ///     (GatherBuddy Reborn vendor list or Knightshopper’s Occult Crescent list)
     ///     (no currency threshold; works with auto-shop off).
     ///     <c>/bocchi debug shop</c> · <c>shop status</c> · <c>shop cancel</c>
     /// </summary>
@@ -110,7 +112,7 @@ public unsafe class DebugCommand
             BocchiChat.Print(
                 chat,
                 uiConfig,
-                "Usage: /bocchi debug shop [status|cancel] — Return to base camp, then Knightshopper Occult Crescent list.");
+                "Usage: /bocchi debug shop [status|cancel] — Return to base camp, then run the configured shopping backend (GatherBuddy Reborn / Knightshopper).");
             return;
         }
 
@@ -129,7 +131,7 @@ public unsafe class DebugCommand
             }
 
             shopping.ForceStop();
-            BocchiChat.Print(chat, uiConfig, "Shopping cancelled (Return / Knightshopper stopped).");
+            BocchiChat.Print(chat, uiConfig, "Shopping cancelled (Return / purchase run stopped).");
             return;
         }
 

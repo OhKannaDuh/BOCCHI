@@ -1,13 +1,14 @@
 {
   "label": "쇼핑",
-  "tooltip": "은화 또는 금화가 임계값에 도달하면 다른 자동화를 잠시 멈추고, 필요하면 본진으로 리턴한 뒤 Knightshopper의 Occult Crescent 쇼핑 목록을 시작합니다. Knightshopper가 필요합니다(의존성 참조). FATE/CE 중에는 시작하지 않습니다.",
+  "tooltip": "은화 또는 금화가 임계값에 도달하면 다른 자동화를 잠시 멈추고, 필요하면 본진으로 리턴한 뒤 선택한 백엔드로 구매합니다: GatherBuddy Reborn 상점 목록(기본) 또는 Knightshopper의 Occult Crescent 목록. 의존성 참조. FATE/CE 중에는 시작하지 않습니다.",
   "sections": {
-    "auto": "자동 쇼핑"
+    "auto": "자동 쇼핑",
+    "backend": "백엔드"
   },
   "fields": {
     "enable_auto_shop": {
       "label": "자동 쇼핑 사용",
-      "tooltip": "켜기: 은화나 금화가 임계값에 도달했고 FATE/CE 중이 아니면, 다른 자동화를 잠시 멈추고 필드에 있으면 본진으로 리턴한 뒤 Knightshopper의 Occult Crescent 쇼핑 목록을 시작합니다. 품목은 Knightshopper에서 설정합니다. 보물찾기나 몹 파머 대기 중에는 중단할 수 있지만, 풀/전투 중에는 하지 않습니다. Knightshopper가 없거나 준비되지 않으면 아무 것도 하지 않습니다.\n끄기: 자동 쇼핑하지 않습니다."
+      "tooltip": "켜기: 은화나 금화가 임계값에 도달했고 FATE/CE 중이 아니면, 다른 자동화를 잠시 멈추고 필드에 있으면 본진으로 리턴한 뒤 선택한 백엔드의 구매를 시작합니다. 보물찾기나 몹 파머 대기 중에는 중단할 수 있지만, 풀/전투 중에는 하지 않습니다. 백엔드가 없거나 준비되지 않았거나, (GatherBuddy Reborn) 목록에 더 살 것이 없으면 아무 것도 하지 않습니다.\n끄기: 자동 쇼핑하지 않습니다."
     },
     "silver_threshold": {
       "label": "은 임계값",
@@ -16,6 +17,17 @@
     "gold_threshold": {
       "label": "금 임계값",
       "tooltip": "남뿔은 금화·북뿔은 금 오볼이 이 값에 도달하면 쇼핑을 시작합니다. FATE/CE 중, 몹 파머 풀/전투 중에는 시작하지 않습니다. 0 = 금으로는 시작하지 않음."
+    },
+    "backend": {
+      "label": "쇼핑 백엔드",
+      "tooltip": "GatherBuddy Reborn: 아래에 지정한 이름의 상점 구매 목록을 구매합니다(GatherBuddy Reborn의 Vendors 창, Occult Crescent 화폐 탭에서 설정). 각 품목이 목표 수량에 도달할 때까지 구매합니다.\nKnightshopper: Knightshopper의 Occult Crescent 목록을 시작합니다(품목은 Knightshopper에서 설정)."
+    },
+    "gather_buddy_list_name": {
+      "label": "GatherBuddy Reborn 목록",
+      "tooltip": "GatherBuddy Reborn 상점 구매 목록 이름으로, 정확히 일치해야 합니다(대소문자 구분 안 함). 기본값은 「新月岛」이므로 GatherBuddy Reborn의 Vendors 창에서 같은 이름의 목록을 만드세요(또는 드롭다운에서 선택). 비워 두면 GatherBuddy Reborn에서 현재 활성화된 목록을 사용합니다. 일치하는 목록이 없으면 자동 쇼핑을 하지 않습니다.",
+      "tooltip_disabled": "GatherBuddy Reborn 백엔드에서만 사용됩니다.",
+      "hint": "비우면 = 활성 목록",
+      "no_lists": "GatherBuddy Reborn 목록이 없습니다"
     }
   }
 }

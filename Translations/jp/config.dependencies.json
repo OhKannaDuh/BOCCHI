@@ -3,10 +3,10 @@
   "fields": {
     "status": {
       "label": "状態",
-      "intro": "移動用プラグインは準備完了である必要があります。戦闘は「一般 → 戦闘」で選んだものだけ準備完了なら十分です。自動買い物には Knightshopper が必要です。",
+      "intro": "移動用プラグインは準備完了である必要があります。戦闘は「一般 → 戦闘」で選んだものだけ準備完了なら十分です。自動買い物には「買い物」で選んだバックエンド（GatherBuddy Reborn または Knightshopper）が必要です。",
       "required": "移動",
       "shopping": "買い物",
-      "shopping_intro": "自動買い物は銀／金のしきい値で、必要なら拠点へリターンしてから Knightshopper のオカルトクレセントリストを開始します。品目は Knightshopper で設定します。",
+      "shopping_intro": "自動買い物は銀／金のしきい値で、必要なら拠点へリターンしてから選択したバックエンドを実行します。GatherBuddy Reborn：Vendors ウィンドウでリストを設定。Knightshopper：Knightshopper でリストを設定。",
       "optional": "戦闘",
       "optional_intro": "Wrath Combo には BossMod も必要です。",
       "optional_intro_bmr": "Wrath Combo には BossMod または BossMod Reborn も必要です。",
@@ -17,6 +17,7 @@
       "ready": "準備完了",
       "map_loading": "マップ読み込み中",
       "not_working": "動作していません",
+      "outdated": "更新が必要",
       "not_enabled": "無効",
       "not_installed": "未インストール"
     }

@@ -10,6 +10,7 @@ using BOCCHI.Common.Data.Zones.Graph.Factory;
 using BOCCHI.Common.Data.Zones.Implementations.NorthHorn;
 using BOCCHI.Common.Data.Zones.Implementations.SouthHorn;
 using BOCCHI.Common.Ipc.EurekaLinker;
+using BOCCHI.Common.Ipc.GatherBuddy;
 using BOCCHI.Common.Ipc.Knightshopper;
 using BOCCHI.Common.Services;
 using BOCCHI.Common.Steps;
@@ -21,6 +22,7 @@ using BOCCHI.Services;
 using BOCCHI.Services.Changelog;
 using BOCCHI.Services.Repair;
 using BOCCHI.Services.Shopping;
+using BOCCHI.Services.Shopping.Backends;
 using BOCCHI.Trackers;
 using BOCCHI.Treasure;
 using BOCCHI.UI;
@@ -93,6 +95,9 @@ public sealed class Plugin(IDalamudPluginInterface plugin, IPluginLog logger) : 
         services.AddSingleton<CombatAutorotationFilter>();
         services.AddSingleton<AutoRepairMethodDisplay>();
         services.AddSingleton<NoOpFilter<AutoRepairMethod>>();
+        services.AddSingleton<ShoppingBackendKindDisplay>();
+        services.AddSingleton<NoOpFilter<ShoppingBackendKind>>();
+        services.AddSingleton<IFieldRenderer<GatherBuddyListSelectAttribute>, GatherBuddyListSelectRenderer>();
         services.AddSingleton<IFieldRenderer<TriageRaiseJobAttribute>, TriageRaiseJobRenderer>();
         services.AddSingleton<IFieldRenderer<BossModPresetOptionsAttribute>, BossModPresetOptionsRenderer>();
         services.AddSingleton<IFieldRenderer<WrathOccultOptionBlacklistAttribute>, WrathOccultOptionBlacklistRenderer>();
@@ -142,6 +147,10 @@ public sealed class Plugin(IDalamudPluginInterface plugin, IPluginLog logger) : 
         services.AddSingleton<AethernetTeleportChain>();
         services.AddSingleton<IKnightshopperIpc, KnightshopperIpc>();
         services.AddSingleton<IEurekaLinkerIpc, EurekaLinkerIpc>();
+        services.AddSingleton<IGatherBuddyIpc, GatherBuddyIpc>();
+        services.AddSingleton<IShoppingBackend, GatherBuddyShoppingBackend>();
+        services.AddSingleton<IShoppingBackend, KnightshopperShoppingBackend>();
+        services.AddSingleton<ShoppingBackendSelector>();
         services.AddSingleton<ShoppingService>();
         services.AddSingleton<IShoppingService>(sp => sp.GetRequiredService<ShoppingService>());
         services.AddSingleton<Func<IShoppingService>>(sp => () => sp.GetRequiredService<IShoppingService>());
@@ -306,6 +315,11 @@ public sealed class Plugin(IDalamudPluginInterface plugin, IPluginLog logger) : 
     {
         shopping.SilverThreshold = Math.Clamp(shopping.SilverThreshold, 0, 9999);
         shopping.GoldThreshold = Math.Clamp(shopping.GoldThreshold, 0, 9999);
+        shopping.GatherBuddyListName = shopping.GatherBuddyListName?.Trim() ?? ShoppingConfig.DefaultGatherBuddyListName;
+        if (!Enum.IsDefined(shopping.Backend))
+        {
+            shopping.Backend = ShoppingBackendKind.GatherBuddyReborn;
+        }
     }
 
 }

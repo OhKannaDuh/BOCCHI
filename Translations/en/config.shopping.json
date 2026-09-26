@@ -1,13 +1,14 @@
 {
   "label": "Shopping",
-  "tooltip": "When silver or gold hits a threshold, pause other automation, Return to base camp if needed, then let Knightshopper buy your Occult Crescent list. Needs Knightshopper (see Dependencies). Never starts during a FATE or CE.",
+  "tooltip": "When silver or gold hits a threshold, pause other automation, Return to base camp if needed, then buy through the selected backend: a GatherBuddy Reborn vendor list (default) or Knightshopper’s Occult Crescent list. See Dependencies. Never starts during a FATE or CE.",
   "sections": {
-    "auto": "Auto-shop"
+    "auto": "Auto-shop",
+    "backend": "Backend"
   },
   "fields": {
     "enable_auto_shop": {
       "label": "Enable auto-shop",
-      "tooltip": "On: when silver or gold is at its threshold (and you are not in a FATE or CE), pause other automation, Return to base camp if you are out in the field, then start Knightshopper’s Occult Crescent shopping list. Configure items in Knightshopper. Can interrupt treasure hunting and idle Mob Farmer waits; not mid-pull or mid-fight. Does nothing if Knightshopper is missing or not ready.\nOff: never auto-shop."
+      "tooltip": "On: when silver or gold is at its threshold (and you are not in a FATE or CE), pause other automation, Return to base camp if you are out in the field, then start the selected backend’s purchase run. Can interrupt treasure hunting and idle Mob Farmer waits; not mid-pull or mid-fight. Does nothing if the backend is missing or not ready, or (GatherBuddy Reborn) the list has nothing left to buy.\nOff: never auto-shop."
     },
     "silver_threshold": {
       "label": "Silver threshold",
@@ -16,6 +17,17 @@
     "gold_threshold": {
       "label": "Gold threshold",
       "tooltip": "Start shopping when gold pieces (South Horn) or gold obols (North Horn) reach this. Never during a FATE or CE, or mid Mob Farmer pull/fight. 0 = never start from gold."
+    },
+    "backend": {
+      "label": "Shopping backend",
+      "tooltip": "GatherBuddy Reborn: buys the vendor list named below (configure it in GatherBuddy Reborn’s Vendors window, 新月岛 / Occult Crescent currency tab). Buys until each item reaches its target amount.\nKnightshopper: starts Knightshopper’s Occult Crescent list (items configured in Knightshopper)."
+    },
+    "gather_buddy_list_name": {
+      "label": "GatherBuddy Reborn list",
+      "tooltip": "Name of the vendor buy list in GatherBuddy Reborn — must match exactly (case-insensitive). Default: 新月岛, so create a list with that name in GatherBuddy Reborn’s Vendors window (or pick one from the dropdown). Leave empty to use whichever list is currently active in GatherBuddy Reborn. If no list matches, auto-shop does nothing.",
+      "tooltip_disabled": "Only used with the GatherBuddy Reborn backend.",
+      "hint": "Empty = active list",
+      "no_lists": "No GatherBuddy Reborn lists found"
     }
   }
 }

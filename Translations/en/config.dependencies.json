@@ -3,10 +3,10 @@
   "fields": {
     "status": {
       "label": "Status",
-      "intro": "Travel plugins must be ready. For combat, only what you picked under General → Combat rotation needs to be ready. Auto-shop needs Knightshopper.",
+      "intro": "Travel plugins must be ready. For combat, only what you picked under General → Combat rotation needs to be ready. Auto-shop needs the backend picked under Shopping (GatherBuddy Reborn or Knightshopper).",
       "required": "Travel",
       "shopping": "Shopping",
-      "shopping_intro": "Auto-shop Returns to base camp if needed, then starts Knightshopper’s Occult Crescent list when your silver/gold threshold is hit. Configure the list in Knightshopper.",
+      "shopping_intro": "Auto-shop Returns to base camp if needed, then runs the selected backend when your silver/gold threshold is hit. GatherBuddy Reborn: configure the list in its Vendors window. Knightshopper: configure the list in Knightshopper.",
       "optional": "Combat",
       "optional_intro": "Wrath Combo also needs BossMod.",
       "optional_intro_bmr": "Wrath Combo also needs BossMod or BossMod Reborn.",
@@ -17,6 +17,7 @@
       "ready": "Ready",
       "map_loading": "Map still loading — wait until Status shows Ready",
       "not_working": "Not working",
+      "outdated": "Update required",
       "not_enabled": "Not enabled",
       "not_installed": "Not installed"
     }
