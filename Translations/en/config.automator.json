@@ -121,6 +121,10 @@
       "label": "Auto-accept raise",
       "tooltip": "While dead, accept a raise from another player. The return-to-camp prompt is never accepted."
     },
+    "auto_accept_raise_delay_seconds": {
+      "label": "Raise accept delay (seconds)",
+      "tooltip": "Seconds to wait after the raise prompt appears before accepting it. 0 = accept at once. Accepts early if the offer is about to expire."
+    },
     "should_cast_treasure_sight": {
       "label": "Cast Treasure Sight at camp",
       "tooltip": "On: at camp, cast Treasure Sight on the Interval below when Auto treasure hunt is off.\nOff: do not cast Sight at camp on a timer.",

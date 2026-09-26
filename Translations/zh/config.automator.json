@@ -121,6 +121,10 @@
       "label": "自动接受复活",
       "tooltip": "阵亡时自动接受其他玩家的复活。不会接受“返回据点”的提示。"
     },
+    "auto_accept_raise_delay_seconds": {
+      "label": "接受复活等待秒数",
+      "tooltip": "复活提示弹出后，等待多少秒再接受。0＝立即接受。复活即将超时时会提前接受。"
+    },
     "should_cast_treasure_sight": {
       "label": "在营地使用魔寻宝",
       "tooltip": "开启：关闭自动寻宝时，按下方间隔在营地施放魔寻宝。\n关闭：不在营地按计时施放。",

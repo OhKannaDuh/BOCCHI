@@ -12,9 +12,14 @@ namespace BOCCHI.Automator.Services;
 /// </summary>
 public static unsafe class RaisePrompt
 {
-    public static bool TryAccept(out string caster)
+    /// <summary>
+    ///     AgentRevive has a pending raise. Only reads the agent, so it stays stable while the
+    ///     prompt's text node catches up; use it to time the offer, not to decide to press Yes.
+    /// </summary>
+    public static bool TryGetPending(out string caster, out int timeLeft)
     {
         caster = string.Empty;
+        timeLeft = 0;
         AgentRevive* agent = AgentRevive.Instance();
         if (agent == null || agent->ResurrectingPlayerId == 0 || agent->ResurrectionTimeLeft <= 0)
         {
@@ -22,7 +27,13 @@ public static unsafe class RaisePrompt
         }
 
         caster = agent->ResurrectingPlayerName.ToString().Trim();
-        if (caster.Length == 0 || !AddonHelpers.TryGetSelectYesno(out AddonSelectYesno* yesno))
+        timeLeft = agent->ResurrectionTimeLeft;
+        return caster.Length > 0;
+    }
+
+    public static bool TryAccept(out string caster)
+    {
+        if (!TryGetPending(out caster, out _) || !AddonHelpers.TryGetSelectYesno(out AddonSelectYesno* yesno))
         {
             return false;
         }

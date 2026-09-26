@@ -104,6 +104,14 @@ public class AutomatorConfig : IAutoConfig
     public bool AutoAcceptRaise { get; set; } = true;
 
     /// <summary>
+    ///     Seconds to wait after the raise prompt appears before accepting it. 0 = accept at once.
+    ///     Accepts early anyway if the offer is about to expire. Order 11 + name keeps it directly
+    ///     under Auto-accept raise.
+    /// </summary>
+    [IntRange(0, 30, Order = 11, Indent = 1, Requires = nameof(AutoAcceptRaise), Section = "triage")]
+    public int AutoAcceptRaiseDelaySeconds { get; set; } = 0;
+
+    /// <summary>
     ///     After FATE/CE: if raisable corpses are nearby, raise with the selected phantom job then continue.
     ///     No bodies → no swap / no wait; Illegal Mode continues as usual.
     /// </summary>
