@@ -117,6 +117,10 @@
       "chemist": "辅助炼金术士",
       "white_mage": "辅助白魔法师"
     },
+    "auto_accept_raise": {
+      "label": "自动接受复活",
+      "tooltip": "阵亡时自动接受其他玩家的复活。不会接受“返回据点”的提示。"
+    },
     "should_cast_treasure_sight": {
       "label": "在营地使用魔寻宝",
       "tooltip": "开启：关闭自动寻宝时，按下方间隔在营地施放魔寻宝。\n关闭：不在营地按计时施放。",

@@ -1,4 +1,5 @@
 ﻿using BOCCHI.Automator.Data;
+using BOCCHI.Automator.Services;
 using BOCCHI.Common.Data.StateMemory;
 using BOCCHI.Common.Services;
 using Dalamud.Game.ClientState.Conditions;
@@ -17,7 +18,8 @@ public class InCombatHandler
     IFateContext fateContext,
     ICriticalEncounterContext criticalEncounterContext,
     IPathfinder pathfinder,
-    IAutomatorMemory memory
+    IAutomatorMemory memory,
+    AutoRotationController autoRotation
 ) : ScoreStateHandler<AutomatorState, StatePriority>(AutomatorState.InCombat)
 {
     public override StatePriority GetScore()
@@ -32,8 +34,8 @@ public class InCombatHandler
             return StatePriority.Never;
         }
 
-        // Pot chest farming also scores High, and this handler only dismounts and stops the
-        // pathfinder — so winning the tie just interrupts the farm on every combat flicker.
+        // Pot chest farming also scores High and runs its own self-defence — winning the tie
+        // just interrupts the farm on every combat flicker.
         if (memory.TryRemember<PotChestFarmMemory>(out PotChestFarmMemory _)
             || memory.TryRemember<PendingPotChestFarmMemory>(out PendingPotChestFarmMemory _))
         {
@@ -49,6 +51,20 @@ public class InCombatHandler
         return conditions[ConditionFlag.InCombat] ? StatePriority.High : StatePriority.Never;
     }
 
+    public override void Enter()
+    {
+        base.Enter();
+        // Open-world trash, or a fight BOCCHI lost track of (raised after the goal expired,
+        // mode restarted mid-CE). Nothing else arms combat here, so without this we stand idle.
+        autoRotation.EnableForSelfDefence();
+    }
+
+    public override void Exit(AutomatorState next)
+    {
+        autoRotation.DisableAi();
+        base.Exit(next);
+    }
+
     public override void Handle()
     {
         if (objects.LocalPlayer is null)
@@ -57,7 +73,6 @@ public class InCombatHandler
         }
 
         // Open-world trash only — FATE/CE combat is InFate / InCriticalEncounter.
-        // Targeting stays with the player / BossMod; we only dismount here.
 
         if (conditions[ConditionFlag.Mounted])
         {

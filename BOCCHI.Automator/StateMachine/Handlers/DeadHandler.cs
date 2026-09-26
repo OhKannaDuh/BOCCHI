@@ -1,9 +1,12 @@
 ﻿using BOCCHI.Automator.Data;
 using BOCCHI.Automator.Services;
+using BOCCHI.Common.Config;
 using BOCCHI.Common.Data.StateMemory;
 using BOCCHI.Common.Services;
 using Dalamud.Game.ClientState.Conditions;
+using ECommons.Throttlers;
 using Ocelot.Chain;
+using Ocelot.Services.Logger;
 using Ocelot.Services.Pathfinding;
 using Ocelot.Services.PlayerState;
 using Ocelot.States.Score;
@@ -16,7 +19,9 @@ public class DeadHandler
     IAutomatorMemory memory,
     IPathfinder pathfinder,
     IChainManager chains,
-    AutoRotationController autoRotation
+    AutoRotationController autoRotation,
+    AutomatorConfig config,
+    ILogger<DeadHandler> logger
 ) : ScoreStateHandler<AutomatorState, StatePriority>(AutomatorState.Dead)
 {
     public override StatePriority GetScore() =>
@@ -43,5 +48,14 @@ public class DeadHandler
 
     public override void Handle()
     {
+        if (!config.AutoAcceptRaise || !EzThrottler.Throttle("Dead::AcceptRaise", 1000))
+        {
+            return;
+        }
+
+        if (RaisePrompt.TryAccept(out string caster))
+        {
+            logger.Info("Accepted raise from {Caster}", caster);
+        }
     }
 }

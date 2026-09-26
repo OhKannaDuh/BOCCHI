@@ -95,6 +95,15 @@ public class AutomatorConfig : IAutoConfig
     public bool PhantomJobsLevelingMode { get; set; } = false;
 
     /// <summary>
+    ///     While dead, accept a raise from another player. The return-to-camp death prompt is never
+    ///     accepted — only the raise prompt that names the player casting it.
+    ///     Shares Order 11 with Triage Mode; the name tie-break keeps it above Triage Mode and its
+    ///     indented raise-job option.
+    /// </summary>
+    [Checkbox(Order = 11, Section = "triage")]
+    public bool AutoAcceptRaise { get; set; } = true;
+
+    /// <summary>
     ///     After FATE/CE: if raisable corpses are nearby, raise with the selected phantom job then continue.
     ///     No bodies → no swap / no wait; Illegal Mode continues as usual.
     /// </summary>
