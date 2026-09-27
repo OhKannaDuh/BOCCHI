@@ -19,7 +19,21 @@
       "not_working": "動作していません",
       "outdated": "更新が必要",
       "not_enabled": "無効",
-      "not_installed": "未インストール"
+      "not_installed": "未インストール",
+      "add_repo": "リポジトリを追加",
+      "add_repo_tooltip": "{url} をカスタムプラグインリポジトリに追加します。",
+      "install": "プラグインをインストール",
+      "installing": "インストール中…",
+      "install_tooltip": "{plugin} をプラグインリポジトリからインストールします（未追加のリポジトリは自動で追加されます）。",
+      "open_installer": "インストーラーを開く",
+      "repo_added": "{plugin} のリポジトリを追加しました。",
+      "repo_exists": "{plugin} のリポジトリは既に追加されています。",
+      "repo_failed": "{plugin} のリポジトリを追加できませんでした。詳細は /xllog を確認してください。",
+      "installed": "{plugin} をインストールしました。",
+      "already_installed": "{plugin} は既にインストールされています。",
+      "install_failed": "{plugin} をインストールできませんでした。プラグインインストーラーまたは /xllog で詳細を確認してください。",
+      "leftover_removed": "{plugin} の残存ファイルを削除してインストールしました。",
+      "leftover_in_use": "{plugin} をインストールできません：残存ファイル「{path}」が使用中です。ゲームを終了するかフォルダーを削除してから再試行してください。"
     }
   }
 }

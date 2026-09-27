@@ -19,7 +19,21 @@
       "not_working": "无法使用",
       "outdated": "需要更新",
       "not_enabled": "未启用",
-      "not_installed": "未安装"
+      "not_installed": "未安装",
+      "add_repo": "添加仓库",
+      "add_repo_tooltip": "将 {url} 添加到自定义插件仓库。",
+      "install": "安装插件",
+      "installing": "安装中…",
+      "install_tooltip": "从插件仓库安装 {plugin}（仓库未添加时会自动添加）。",
+      "open_installer": "打开安装器",
+      "repo_added": "已添加 {plugin} 的插件仓库。",
+      "repo_exists": "{plugin} 的插件仓库已添加。",
+      "repo_failed": "无法添加 {plugin} 的插件仓库，详情见 /xllog。",
+      "installed": "已安装 {plugin}。",
+      "already_installed": "{plugin} 已安装。",
+      "install_failed": "无法安装 {plugin}，请在插件安装器或 /xllog 中查看详情。",
+      "leftover_removed": "已清理 {plugin} 的残留文件并完成安装。",
+      "leftover_in_use": "无法安装 {plugin}：残留文件「{path}」正被占用。请关闭游戏或删除该文件夹后重试。"
     }
   }
 }

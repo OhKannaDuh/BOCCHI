@@ -19,7 +19,21 @@
       "not_working": "Not working",
       "outdated": "Update required",
       "not_enabled": "Not enabled",
-      "not_installed": "Not installed"
+      "not_installed": "Not installed",
+      "add_repo": "Add repository",
+      "add_repo_tooltip": "Add {url} to Custom Plugin Repositories.",
+      "install": "Install plugin",
+      "installing": "Installing…",
+      "install_tooltip": "Install {plugin} from its plugin repository (the repository is added if missing).",
+      "open_installer": "Open installer",
+      "repo_added": "Added the {plugin} repository.",
+      "repo_exists": "The {plugin} repository is already added.",
+      "repo_failed": "Could not add the {plugin} repository. See /xllog for details.",
+      "installed": "Installed {plugin}.",
+      "already_installed": "{plugin} is already installed.",
+      "install_failed": "Could not install {plugin}. Check the plugin installer or /xllog for details.",
+      "leftover_removed": "Removed leftover {plugin} files and installed the plugin.",
+      "leftover_in_use": "Could not install {plugin}: leftover files at '{path}' are in use. Close the game or delete that folder, then try again."
     }
   }
 }

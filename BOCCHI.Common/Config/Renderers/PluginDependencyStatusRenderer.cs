@@ -2,8 +2,11 @@ using System.Reflection;
 using BOCCHI.Common.Config.Fields;
 using BOCCHI.Common.Ipc.GatherBuddy;
 using BOCCHI.Common.Ipc.Knightshopper;
+using BOCCHI.Common.Services.PluginInstall;
 using BOCCHI.Common.UI;
 using Dalamud.Bindings.ImGui;
+using Dalamud.Interface;
+using Dalamud.Interface.Components;
 using Dalamud.Plugin;
 using Ocelot.Config.Renderers;
 using Ocelot.Ipc.BossMod;
@@ -25,15 +28,13 @@ public sealed class PluginDependencyStatusRenderer(
     IGatherBuddyIpc gatherBuddy,
     IRotationSolverRebornIpc rsr,
     AutomatorConfig automator,
-    ShoppingConfig shopping
+    ShoppingConfig shopping,
+    DependencyPluginInstaller installer
 ) : IFieldRenderer<PluginDependencyStatusAttribute>
 {
     private const string StatusKey = "config.dependencies.fields.status";
 
     private static readonly CombatAutorotationDisplay CombatDisplay = new();
-
-    /// <summary>Upstream manifest name first, then the BOCCHI-bld fork's.</summary>
-    private static readonly string[] GatherBuddyInternalNames = ["GatherBuddyReborn", "GatherBuddyReborn-bld"];
 
     public bool Render(object target, PropertyInfo prop, PluginDependencyStatusAttribute attr, Type owner, ITranslator translator)
     {
@@ -42,18 +43,23 @@ public sealed class PluginDependencyStatusRenderer(
 
         BocchiUi.SectionTitle(T(translator, "required"));
         ImGui.Spacing();
-        Draw("Travel (vnavmesh)", "vnavmesh", translator, VnavStatus);
-        Draw("Lifestream", "Lifestream", translator, (_, t) => IpcStatus(lifestream.IsAvailable, t));
+        Draw("Travel (vnavmesh)", DependencyPlugins.VNavmesh, translator, VnavStatus);
+        Draw("Lifestream", DependencyPlugins.Lifestream, translator, (_, t) => IpcStatus(lifestream.IsAvailable, t));
 
         ImGui.Spacing();
         BocchiUi.SectionTitle(T(translator, "shopping"));
         ImGui.Spacing();
         BocchiUi.MutedWrapped(T(translator, "shopping_intro"));
         ImGui.Spacing();
-        DrawRow("GatherBuddy Reborn", GatherBuddyStatus(translator), translator, !shopping.UsesKnightshopper);
+        DrawRow(
+            "GatherBuddy Reborn",
+            GatherBuddyStatus(translator),
+            translator,
+            !shopping.UsesKnightshopper,
+            DependencyPlugins.GatherBuddyReborn);
         Draw(
             "Knightshopper",
-            "Knightshopper",
+            DependencyPlugins.Knightshopper,
             translator,
             (_, t) => IpcStatus(knightshopper.IsAvailable, t),
             shopping.UsesKnightshopper);
@@ -69,21 +75,21 @@ public sealed class PluginDependencyStatusRenderer(
         BocchiUi.MutedWrapped(OptionalIntro(translator));
         ImGui.Spacing();
 
-        Draw("Wrath Combo", "WrathCombo", translator, inUse: InUse("WrathCombo"));
+        Draw("Wrath Combo", DependencyPlugins.WrathCombo, translator, inUse: InUse("WrathCombo"));
         if (ShouldShowOptional(CombatPluginPresence.RotationSolver, InUse(CombatPluginPresence.RotationSolver)))
         {
             Draw(
                 "Rotation Solver Reborn",
-                CombatPluginPresence.RotationSolver,
+                DependencyPlugins.RotationSolverReborn,
                 translator,
                 RsrIpcIfReachable,
                 InUse(CombatPluginPresence.RotationSolver));
         }
 
-        Draw("BossMod", "BossMod", translator, BossModIpcIfLoaded, InUse("BossMod"));
+        Draw("BossMod", DependencyPlugins.BossMod, translator, BossModIpcIfLoaded, InUse("BossMod"));
         if (ShouldShowOptional("BossModReborn", InUse("BossModReborn")))
         {
-            Draw("BossMod Reborn", "BossModReborn", translator, BossModIpcIfLoaded, InUse("BossModReborn"));
+            Draw("BossMod Reborn", DependencyPlugins.BossModReborn, translator, BossModIpcIfLoaded, InUse("BossModReborn"));
         }
 
         return false;
@@ -156,19 +162,20 @@ public sealed class PluginDependencyStatusRenderer(
 
     private void Draw(
         string displayName,
-        string internalName,
+        DependencyPlugin dependency,
         ITranslator translator,
         Func<string, ITranslator, (string Label, bool Ok, bool Pending)>? ipc = null,
         bool inUse = false)
     {
-        DrawRow(displayName, ResolveStatus(internalName, translator, ipc), translator, inUse);
+        DrawRow(displayName, ResolveStatus(dependency.InstallName, translator, ipc), translator, inUse, dependency);
     }
 
-    private static void DrawRow(
+    private void DrawRow(
         string displayName,
         (string Label, bool Ok, bool Pending) status,
         ITranslator translator,
-        bool inUse)
+        bool inUse,
+        DependencyPlugin dependency)
     {
         var (label, ok, pending) = status;
         if (inUse && ok)
@@ -179,6 +186,70 @@ public sealed class PluginDependencyStatusRenderer(
         ImGui.TextUnformatted(displayName);
         ImGui.SameLine(280f);
         BocchiUi.DrawStatusChip(label, StatusKind(ok, pending));
+
+        if (!ok)
+        {
+            DrawActions(dependency, translator);
+        }
+    }
+
+    /// <summary>
+    ///     Missing plugin: add its repository and/or install it. Installed but disabled: open the
+    ///     installer. A loaded plugin that is still not ready (outdated IPC, map loading) gets nothing.
+    /// </summary>
+    private void DrawActions(DependencyPlugin dependency, ITranslator translator)
+    {
+        if (dependency.InternalNames.Any(pluginStatus.IsLoaded)
+            || (dependency.InstallName == CombatPluginPresence.RotationSolver && rsr.IsAvailable))
+        {
+            return;
+        }
+
+        ImGui.PushID($"dependency_{dependency.InstallName}");
+        if (dependency.InternalNames.Any(pluginStatus.IsInstalled))
+        {
+            ImGui.SameLine();
+            if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Plug, T(translator, "open_installer")))
+            {
+                installer.OpenInstaller(dependency);
+            }
+
+            ImGui.PopID();
+            return;
+        }
+
+        bool busy = installer.IsInstalling(dependency);
+        ImGui.BeginDisabled(busy);
+        if (!installer.IsRepositoryAdded(dependency))
+        {
+            ImGui.SameLine();
+            if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Plus, T(translator, "add_repo")))
+            {
+                installer.AddRepository(dependency, translator);
+            }
+
+            Tooltip(translator.T($"{StatusKey}.add_repo_tooltip", ("url", dependency.PrimaryRepositoryUrl)));
+        }
+
+        ImGui.SameLine();
+        if (ImGuiComponents.IconButtonWithText(
+                FontAwesomeIcon.Download,
+                T(translator, busy ? "installing" : "install")))
+        {
+            installer.Install(dependency, translator);
+        }
+
+        ImGui.EndDisabled();
+        Tooltip(translator.T($"{StatusKey}.install_tooltip", ("plugin", dependency.DisplayName)));
+        ImGui.PopID();
+    }
+
+    private static void Tooltip(string text)
+    {
+        if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
+        {
+            ImGui.SetTooltip(text);
+        }
     }
 
     private (string Label, bool Ok, bool Pending) ResolveStatus(
@@ -225,14 +296,15 @@ public sealed class PluginDependencyStatusRenderer(
             return (T(translator, "ready"), true, false);
         }
 
-        if (GatherBuddyInternalNames.Any(pluginStatus.IsLoaded))
+        IReadOnlyList<string> names = DependencyPlugins.GatherBuddyReborn.InternalNames;
+        if (names.Any(pluginStatus.IsLoaded))
         {
             return gatherBuddy.Version > 0
                 ? (T(translator, "outdated"), false, true)
                 : (T(translator, "not_working"), false, false);
         }
 
-        return plugin.InstalledPlugins.Any(p => GatherBuddyInternalNames.Contains(p.InternalName))
+        return plugin.InstalledPlugins.Any(p => names.Contains(p.InternalName))
             ? (T(translator, "not_enabled"), false, false)
             : (T(translator, "not_installed"), false, false);
     }
