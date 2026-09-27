@@ -1,6 +1,6 @@
 {
   "label": "買い物",
-  "tooltip": "銀貨または金貨がしきい値に達したら他の自動化を一時停止し、必要なら拠点へリターンしてから選択したバックエンドで購入します：GatherBuddy Reborn のベンダーリスト（既定）または Knightshopper のオカルトクレセントリスト。依存関係を参照。FATE/CE中は開始しません。",
+  "tooltip": "銀貨または金貨がしきい値に達したら他の自動化を一時停止し、必要なら拠点へリターンしてから選択したバックエンドで購入します：Knightshopper のオカルトクレセントリスト（既定）または GatherBuddy Reborn のベンダーリスト。依存関係を参照。FATE/CE中は開始しません。",
   "sections": {
     "auto": "自動買い物",
     "backend": "バックエンド"
@@ -24,7 +24,7 @@
     },
     "gather_buddy_list_name": {
       "label": "GatherBuddy Reborn リスト",
-      "tooltip": "GatherBuddy Reborn のベンダー購入リスト名。完全一致が必要です（大文字小文字は区別しません）。既定は「新月岛」なので、GatherBuddy Reborn の Vendors ウィンドウで同名のリストを作成してください（またはドロップダウンから選択）。空欄なら GatherBuddy Reborn で現在アクティブなリストを使います。一致するリストが無いと自動買い物は行いません。",
+      "tooltip": "GatherBuddy Reborn のベンダー購入リスト名。完全一致が必要です（大文字小文字は区別しません）。GatherBuddy Reborn の Vendors ウィンドウでリストを作成するか、ドロップダウンから選択してください。空欄（既定）なら GatherBuddy Reborn で現在アクティブなリストを使います。一致するリストが無いと自動買い物は行いません。",
       "tooltip_disabled": "GatherBuddy Reborn バックエンドでのみ使用します。",
       "hint": "空欄＝アクティブなリスト",
       "no_lists": "GatherBuddy Reborn のリストがありません"

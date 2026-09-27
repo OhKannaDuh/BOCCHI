@@ -320,7 +320,7 @@ public sealed class Plugin(IDalamudPluginInterface plugin, IPluginLog logger) : 
         shopping.GatherBuddyListName = shopping.GatherBuddyListName?.Trim() ?? ShoppingConfig.DefaultGatherBuddyListName;
         if (!Enum.IsDefined(shopping.Backend))
         {
-            shopping.Backend = ShoppingBackendKind.GatherBuddyReborn;
+            shopping.Backend = ShoppingBackendKind.Knightshopper;
         }
     }
 

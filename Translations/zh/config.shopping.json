@@ -1,6 +1,6 @@
 {
   "label": "购物",
-  "tooltip": "银币或金币达到阈值时，暂停其他自动化；若不在大本营则先 Return，再通过所选后端购买：GatherBuddy Reborn 商店清单（默认）或 Knightshopper 的 Occult Crescent 清单。见依赖项。FATE/CE 进行中不会开始。",
+  "tooltip": "银币或金币达到阈值时，暂停其他自动化；若不在大本营则先 Return，再通过所选后端购买：Knightshopper 的 Occult Crescent 清单（默认）或 GatherBuddy Reborn 商店清单。见依赖项。FATE/CE 进行中不会开始。",
   "sections": {
     "auto": "自动购物",
     "backend": "购物后端"
@@ -24,7 +24,7 @@
     },
     "gather_buddy_list_name": {
       "label": "GatherBuddy Reborn 清单",
-      "tooltip": "GatherBuddy Reborn 中商店购买清单的名称，必须完全一致（不区分大小写）。默认为「新月岛」，请在 GatherBuddy Reborn 的 Vendors 窗口中创建同名清单（或从下拉框选择已有清单）。留空则使用 GatherBuddy Reborn 当前激活的清单。找不到对应清单时不会自动购物。",
+      "tooltip": "GatherBuddy Reborn 中商店购买清单的名称，必须完全一致（不区分大小写）。请在 GatherBuddy Reborn 的 Vendors 窗口中创建清单，或从下拉框选择已有清单。留空（默认）则使用 GatherBuddy Reborn 当前激活的清单。找不到对应清单时不会自动购物。",
       "tooltip_disabled": "仅在使用 GatherBuddy Reborn 后端时生效。",
       "hint": "留空 = 当前激活清单",
       "no_lists": "未找到 GatherBuddy Reborn 清单"

@@ -1,6 +1,6 @@
 {
   "label": "Shopping",
-  "tooltip": "When silver or gold hits a threshold, pause other automation, Return to base camp if needed, then buy through the selected backend: a GatherBuddy Reborn vendor list (default) or Knightshopper’s Occult Crescent list. See Dependencies. Never starts during a FATE or CE.",
+  "tooltip": "When silver or gold hits a threshold, pause other automation, Return to base camp if needed, then buy through the selected backend: Knightshopper’s Occult Crescent list (default) or a GatherBuddy Reborn vendor list. See Dependencies. Never starts during a FATE or CE.",
   "sections": {
     "auto": "Auto-shop",
     "backend": "Backend"
@@ -24,7 +24,7 @@
     },
     "gather_buddy_list_name": {
       "label": "GatherBuddy Reborn list",
-      "tooltip": "Name of the vendor buy list in GatherBuddy Reborn — must match exactly (case-insensitive). Default: 新月岛, so create a list with that name in GatherBuddy Reborn’s Vendors window (or pick one from the dropdown). Leave empty to use whichever list is currently active in GatherBuddy Reborn. If no list matches, auto-shop does nothing.",
+      "tooltip": "Name of the vendor buy list in GatherBuddy Reborn — must match exactly (case-insensitive). Create the list in GatherBuddy Reborn’s Vendors window, or pick one from the dropdown. Leave empty (default) to use whichever list is currently active in GatherBuddy Reborn. If no list matches, auto-shop does nothing.",
       "tooltip_disabled": "Only used with the GatherBuddy Reborn backend.",
       "hint": "Empty = active list",
       "no_lists": "No GatherBuddy Reborn lists found"

@@ -9,7 +9,7 @@ namespace BOCCHI.Common.Config;
 [ConfigGroup("shopping", GroupOrder = 25)]
 public class ShoppingConfig : IAutoConfig
 {
-    public const string DefaultGatherBuddyListName = "新月岛";
+    public const string DefaultGatherBuddyListName = "";
 
     [Checkbox(Order = 0, Section = "auto")]
     public bool EnableAutoShop { get; set; } = false;
@@ -23,7 +23,7 @@ public class ShoppingConfig : IAutoConfig
     public int GoldThreshold { get; set; } = 0;
 
     [EnumSelectDisplay<ShoppingBackendKind, ShoppingBackendKindDisplay>(Order = 3, Section = "backend")]
-    public ShoppingBackendKind Backend { get; set; } = ShoppingBackendKind.GatherBuddyReborn;
+    public ShoppingBackendKind Backend { get; set; } = ShoppingBackendKind.Knightshopper;
 
     /// <summary>GBR Vendors-tab buy list to run (case-insensitive). Empty = GBR's active list.</summary>
     [GatherBuddyListSelect(Order = 4, Section = "backend", DisabledWhen = nameof(UsesKnightshopper))]
