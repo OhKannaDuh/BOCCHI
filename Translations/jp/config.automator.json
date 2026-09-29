@@ -40,9 +40,35 @@
     },
     "disabled_wrath_occult_options": {
       "label": "BOCCHI が使用できるサポートジョブのアクション（Wrath Combo）",
-      "tooltip": "チェックを外したアクションは、BOCCHI が Wrath のクレセントアイル設定を引き継ぐ際にオフのままになります（例：狂戦士の「レイジ」はギミックを受けて倒れる原因になることがあります）。\n変更は次回イリーガルモードまたはモブファーム開始時に反映されます。\nアクションにカーソルを合わせると Wrath のオプション名を表示します。",
+      "tooltip": "チェックを外したアクションは、BOCCHI が Wrath のクレセントアイル設定を引き継ぐ際にオフのままになります（例：サポートバーサーカーの「レイジ」はギミックを受けて倒れる原因になることがあります）。\n変更は次回イリーガルモードまたはモブファーム開始時に反映されます。\nアクションにカーソルを合わせると Wrath のオプション名を表示します。",
       "empty": "Wrath Combo が読み込まれていないか、このバージョンの Wrath はサポートジョブのオプション一覧に対応していません。",
-      "built_in": "BOCCHI は常にこの項目をオフにします。"
+      "built_in": "BOCCHI は常にこの項目をオフにします。",
+      "jobs": {
+        "freelancer": "サポートすっぴん",
+        "knight": "サポートナイト",
+        "berserker": "サポートバーサーカー",
+        "monk": "サポートモンク",
+        "ranger": "サポート狩人",
+        "samurai": "サポート侍",
+        "bard": "サポート吟遊詩人",
+        "geomancer": "サポート風水士",
+        "time_mage": "サポート時魔道士",
+        "cannoneer": "サポート砲撃士",
+        "chemist": "サポート薬師",
+        "oracle": "サポート予言士",
+        "thief": "サポートシーフ",
+        "mystic_knight": "サポート魔法剣士",
+        "gladiator": "サポート剣闘士",
+        "dancer": "サポート踊り子",
+        "ninja": "サポート忍者",
+        "white_mage": "サポート白魔道士",
+        "black_mage": "サポート黒魔道士",
+        "dragoon": "サポート竜騎士",
+        "summoner": "サポート召喚士",
+        "blue_mage": "サポート青魔道士",
+        "red_mage": "サポート赤魔道士",
+        "necromancer": "サポートネクロマンサー"
+      }
     },
     "update_boss_mod_presets_automatically": {
       "label": "プリセットを自動更新",

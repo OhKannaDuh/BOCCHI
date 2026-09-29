@@ -19,13 +19,19 @@ namespace BOCCHI.Common.Config.Renderers;
 /// <summary>
 ///     Per phantom job, a checkbox for each Wrath option (checked = BOCCHI may use it). Option
 ///     names come from Wrath, so the list stays in sync with whatever Wrath version is loaded.
+///     Job and action names follow the plugin language, not the client language.
 /// </summary>
-public sealed partial class WrathOccultOptionBlacklistRenderer(IWrathOccultOptionCatalog catalog, IDataManager data)
+public sealed partial class WrathOccultOptionBlacklistRenderer(
+    IWrathOccultOptionCatalog catalog,
+    IDataManager data,
+    ITranslationRepository translations)
     : IFieldRenderer<WrathOccultOptionBlacklistAttribute>
 {
     private static readonly TimeSpan RetryInterval = TimeSpan.FromSeconds(5);
 
     private IReadOnlyList<JobOptions> jobs = [];
+
+    private string? jobsLanguage;
 
     private DateTime nextLoadAttempt = DateTime.MinValue;
 
@@ -56,6 +62,7 @@ public sealed partial class WrathOccultOptionBlacklistRenderer(IWrathOccultOptio
         }
 
         string builtInReason = translator.T(fieldKey.Replace(".label", ".built_in", StringComparison.Ordinal));
+        string jobsKey = fieldKey.Replace(".label", ".jobs", StringComparison.Ordinal);
         bool changed = false;
         BocchiUi.PushFieldStyle();
         try
@@ -63,7 +70,9 @@ public sealed partial class WrathOccultOptionBlacklistRenderer(IWrathOccultOptio
             foreach (JobOptions job in loaded)
             {
                 int blocked = job.Options.Count(o => disabled.Contains(o.Name));
-                string header = blocked > 0 ? $"{job.JobName} ({blocked})" : job.JobName;
+                string jobKey = $"{jobsKey}.{JobKey(job.JobId)}";
+                string jobName = translator.Has(jobKey) ? translator.T(jobKey) : job.JobName;
+                string header = blocked > 0 ? $"{jobName} ({blocked})" : jobName;
                 if (!ImGui.TreeNode($"{header}###wrath_occult_{job.JobId}"))
                 {
                     continue;
@@ -121,24 +130,35 @@ public sealed partial class WrathOccultOptionBlacklistRenderer(IWrathOccultOptio
         return changed;
     }
 
-    /// <summary>Loaded once Wrath answers; retried every few seconds while it is missing.</summary>
+    /// <summary>
+    ///     Loaded once Wrath answers; retried every few seconds while it is missing. Reloaded when
+    ///     the plugin language changes, since action labels depend on it.
+    /// </summary>
     private IReadOnlyList<JobOptions> GetJobs()
     {
+        string language = translations.CurrentLanguage;
+        if (language != jobsLanguage)
+        {
+            jobs = [];
+            jobsLanguage = language;
+            nextLoadAttempt = DateTime.MinValue;
+        }
+
         if (jobs.Count > 0 || DateTime.UtcNow < nextLoadAttempt)
         {
             return jobs;
         }
 
         nextLoadAttempt = DateTime.UtcNow + RetryInterval;
-        jobs = LoadJobs();
+        jobs = LoadJobs(language);
         return jobs;
     }
 
-    private List<JobOptions> LoadJobs()
+    private List<JobOptions> LoadJobs(string language)
     {
         ExcelSheet<MKDSupportJob> jobSheet = data.GetExcelSheet<MKDSupportJob>();
-        ExcelSheet<LuminaAction> actions = data.GetExcelSheet<LuminaAction>();
         ExcelSheet<LuminaAction> actionsEn = data.GetExcelSheet<LuminaAction>(ClientLanguage.English);
+        ExcelSheet<LuminaAction> actions = ActionSheetFor(language, actionsEn);
 
         List<JobOptions> result = [];
         foreach (SupportJobId id in Enum.GetValues<SupportJobId>())
@@ -160,7 +180,40 @@ public sealed partial class WrathOccultOptionBlacklistRenderer(IWrathOccultOptio
         return result;
     }
 
-    /// <summary>Normalized English action name → client-language name, for this job's actions.</summary>
+    /// <summary>
+    ///     Action names in the plugin language when the game data has it (English / Japanese);
+    ///     otherwise the client language. zh / ko are only in their own clients' data.
+    /// </summary>
+    private ExcelSheet<LuminaAction> ActionSheetFor(string language, ExcelSheet<LuminaAction> actionsEn)
+    {
+        ClientLanguage? wanted = language switch
+        {
+            "en" => ClientLanguage.English,
+            "jp" => ClientLanguage.Japanese,
+            _ => null,
+        };
+
+        if (wanted == null || wanted == data.Language)
+        {
+            return data.GetExcelSheet<LuminaAction>();
+        }
+
+        if (wanted == ClientLanguage.English)
+        {
+            return actionsEn;
+        }
+
+        try
+        {
+            return data.GetExcelSheet<LuminaAction>(wanted);
+        }
+        catch (Exception)
+        {
+            return data.GetExcelSheet<LuminaAction>();
+        }
+    }
+
+    /// <summary>Normalized English action name → display-language name, for this job's actions.</summary>
     private static Dictionary<string, string> LocalizedActionNames(
         MKDSupportJob row,
         ExcelSheet<LuminaAction> actions,
@@ -203,6 +256,35 @@ public sealed partial class WrathOccultOptionBlacklistRenderer(IWrathOccultOptio
             ? $"{action} ({string.Join(' ', parts.Skip(3).Select(SplitCamelCase))})"
             : action;
     }
+
+    private static string JobKey(uint jobId) => (SupportJobId)jobId switch
+    {
+        SupportJobId.PhantomFreelancer => "freelancer",
+        SupportJobId.PhantomKnight => "knight",
+        SupportJobId.PhantomBerserker => "berserker",
+        SupportJobId.PhantomMonk => "monk",
+        SupportJobId.PhantomRanger => "ranger",
+        SupportJobId.PhantomSamurai => "samurai",
+        SupportJobId.PhantomBard => "bard",
+        SupportJobId.PhantomGeomancer => "geomancer",
+        SupportJobId.PhantomTime => "time_mage",
+        SupportJobId.PhantomCannoneer => "cannoneer",
+        SupportJobId.PhantomChemist => "chemist",
+        SupportJobId.PhantomOracle => "oracle",
+        SupportJobId.PhantomThief => "thief",
+        SupportJobId.PhantomMysticKnight => "mystic_knight",
+        SupportJobId.PhantomGladiator => "gladiator",
+        SupportJobId.PhantomDancer => "dancer",
+        SupportJobId.PhantomNinja => "ninja",
+        SupportJobId.PhantomWhiteMage => "white_mage",
+        SupportJobId.PhantomBlackMage => "black_mage",
+        SupportJobId.PhantomDragoon => "dragoon",
+        SupportJobId.PhantomSummoner => "summoner",
+        SupportJobId.PhantomBlueMage => "blue_mage",
+        SupportJobId.PhantomRedMage => "red_mage",
+        SupportJobId.PhantomNecromancer => "necromancer",
+        _ => jobId.ToString(),
+    };
 
     private static string SplitCamelCase(string value) => CamelCaseBoundary().Replace(value, " ");
 
