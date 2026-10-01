@@ -66,6 +66,8 @@ public class FarmingPotChestsHandler
 
     private const float CandidateProbeRadius = 5f;
 
+    private static readonly TimeSpan OffMeshWalkTimeout = TimeSpan.FromSeconds(10);
+
     private static readonly TimeSpan ChestSpawnWait = TimeSpan.FromSeconds(45);
 
     private static readonly TimeSpan BuffWaitTimeout = TimeSpan.FromSeconds(25);
@@ -115,6 +117,10 @@ public class FarmingPotChestsHandler
     private Queue<IPathStep>? travelSteps;
 
     private Vector3? approachTarget;
+
+    private Vector3? offMeshTarget;
+
+    private DateTimeOffset offMeshSince = DateTimeOffset.MinValue;
 
     private DateTimeOffset approachSince = DateTimeOffset.MinValue;
 
@@ -411,9 +417,8 @@ public class FarmingPotChestsHandler
         }
 
         float distance = player.Position.Distance2D(reveal.Position);
-        // MaxOpenAttemptDistance (not InteractDistance): vnav often parks in the 2–3.5y band
-        // and never reaches the tighter interact gate — open chain can still succeed there.
-        if (distance > OpenTreasureCofferChain.MaxOpenAttemptDistance)
+        // The open chain finishes the approach itself, including the straight-line stretch onto off-mesh coffers.
+        if (distance > OpenTreasureCofferChain.OffMeshFinishRange)
         {
             if (!EnsurePathing(reveal.Position, allowRemount: false))
             {
@@ -660,6 +665,12 @@ public class FarmingPotChestsHandler
             return;
         }
 
+        if (TryWalkOffMeshGap(target))
+        {
+            farm.SettledAtUtc = DateTimeOffset.MinValue;
+            return;
+        }
+
         ResetApproachWatch();
         pathfinder.Stop();
         if (farm.SettledAtUtc == DateTimeOffset.MinValue)
@@ -693,6 +704,37 @@ public class FarmingPotChestsHandler
         }
 
         SkipCurrentCandidate(farm);
+    }
+
+    // Authored pads in a navmesh hole snap several yalms onto the mesh; walk the rest straight so the probe and reveal reach.
+    private bool TryWalkOffMeshGap(Vector3 target)
+    {
+        float distance = player.Position.Distance2D(target);
+        if (distance <= CandidateProbeRadius || distance > OpenTreasureCofferChain.OffMeshFinishRange)
+        {
+            offMeshTarget = null;
+            return false;
+        }
+
+        if (offMeshTarget is not { } current || current.Distance2D(target) > 1f)
+        {
+            offMeshTarget = target;
+            offMeshSince = DateTimeOffset.UtcNow;
+            logger.Debug("Pot treasure: pad {Pos:F0} is {Dist:F1}y off the navmesh — walking the last stretch", target, distance);
+        }
+
+        if (DateTimeOffset.UtcNow - offMeshSince > OffMeshWalkTimeout)
+        {
+            return false;
+        }
+
+        if (!vnav.IsRunning() && EzThrottler.Throttle("PotChestFarm::OffMesh", 1500))
+        {
+            pathfinder.Stop();
+            vnav.FollowPath([player.Position, TreasurePathing.PathablePosition(target, player.Position.Y)], false);
+        }
+
+        return true;
     }
 
     private void SkipCurrentCandidate(PotChestFarmMemory farm)
@@ -782,10 +824,8 @@ public class FarmingPotChestsHandler
             }
 
             // 2D — reveal Y ≈ -500 made 3D distance ~500y and blocked open forever (#170).
-            // Match OpenTreasureCofferChain's open-attempt range so we do not keep pathing in the
-            // 2–3.5y band where vnav often parks and never starts PotChestFarm::Open.
             float distance = player.Position.Distance2D(reveal.Position);
-            if (distance > OpenTreasureCofferChain.MaxOpenAttemptDistance)
+            if (distance > OpenTreasureCofferChain.OffMeshFinishRange)
             {
                 if (IsApproachStuck(reveal.Position, distance))
                 {
@@ -975,7 +1015,7 @@ public class FarmingPotChestsHandler
 
         farm.WaitingForSpawnSince = DateTimeOffset.MinValue;
 
-        if (distance > OpenTreasureCofferChain.MaxOpenAttemptDistance)
+        if (distance > OpenTreasureCofferChain.OffMeshFinishRange)
         {
             if (IsApproachStuck(pathable, distance))
             {
@@ -1164,7 +1204,7 @@ public class FarmingPotChestsHandler
             return;
         }
 
-        Vector3 position = PathableTreasurePosition(chest.Position);
+        Vector3 position = TreasurePathing.PathablePosition(chest.Position, player.Position.Y);
         // Prefer reveal BaseIds — pot reveals are EventObj, not ObjectKind.Treasure.
         activeChain = chainManager.Manage(
             chains.Create("PotChestFarm::Open")

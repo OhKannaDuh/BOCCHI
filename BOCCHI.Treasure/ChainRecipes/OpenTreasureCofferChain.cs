@@ -45,6 +45,8 @@ public class OpenTreasureCofferChain
 
     public const float InteractDistance = PreferredOpenDistance;
 
+    public const float OffMeshFinishRange = 12f;
+
     public override string Name => "Open Treasure Coffer";
 
     protected override IChain Compose(IChain chain, TreasureOpenTarget target)
@@ -166,6 +168,17 @@ public class OpenTreasureCofferChain
 
         if (cooling)
         {
+            return;
+        }
+
+        // vnav parks at the mesh edge when the coffer sits in a navmesh hole — finish in a straight line.
+        if (!drifted
+            && !vnav.IsRunning()
+            && !vnav.IsPathfinding()
+            && player.Position.Distance2D(destination) <= OffMeshFinishRange)
+        {
+            pathState.LastIssuedUtc = DateTime.UtcNow;
+            vnav.FollowPath([player.Position, TreasurePathing.PathablePosition(destination, player.Position.Y)], false);
             return;
         }
 
