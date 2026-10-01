@@ -9,3 +9,6 @@
 
 ### Illegal Mode
 - No longer waits for pot chests after skipping a pot FATE it never joined
+
+### Dependencies
+- Missing plugins can be installed straight from the Dependencies page: add the repository and install in one click, or open the installer for ones that are installed but turned off

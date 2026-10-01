@@ -84,6 +84,7 @@ public sealed class Plugin(IDalamudPluginInterface plugin, IPluginLog logger) : 
         services.AddSingleton<IFieldRenderer<DisabledCriticalEncounterIdsAttribute>, DisabledCriticalEncounterIdsRenderer>();
         services.AddSingleton<IFieldRenderer<MountSelectAttribute>, MountSelectRenderer>();
         services.AddSingleton<IFieldRenderer<PluginDependencyStatusAttribute>, PluginDependencyStatusRenderer>();
+        services.AddSingleton<DependencyPluginInstaller>();
         services.AddSingleton<IFieldRenderer<LogsViewerAttribute>, LogsViewerRenderer>();
         services.AddSingleton<IMp3SoundPlayer, Mp3SoundPlayer>();
         services.AddSingleton<IFieldRenderer<Mp3SoundSelectAttribute>, Mp3SoundSelectRenderer>();

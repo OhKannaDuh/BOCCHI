@@ -18,7 +18,18 @@
       "map_loading": "マップ読み込み中",
       "not_working": "動作していません",
       "not_enabled": "無効",
-      "not_installed": "未インストール"
+      "not_installed": "未インストール",
+      "add_repo": "リポジトリを追加",
+      "add_repo_tooltip": "{url} をカスタムプラグインリポジトリに追加します。",
+      "install": "プラグインをインストール",
+      "installing": "インストール中…",
+      "install_tooltip": "{plugin} をプラグインリポジトリからインストールします。",
+      "open_installer": "インストーラーを開く",
+      "repo_added": "{plugin} のリポジトリを追加しました。",
+      "repo_exists": "{plugin} のリポジトリは既に追加されています。",
+      "repo_failed": "{plugin} のリポジトリを追加できませんでした。詳細は /xllog を確認してください。",
+      "installed": "{plugin} をインストールしました。",
+      "install_failed": "{plugin} をインストールできませんでした。プラグインインストーラーまたは /xllog を確認してください。"
     }
   }
 }

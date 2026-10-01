@@ -18,7 +18,18 @@
       "map_loading": "Map still loading — wait until Status shows Ready",
       "not_working": "Not working",
       "not_enabled": "Not enabled",
-      "not_installed": "Not installed"
+      "not_installed": "Not installed",
+      "add_repo": "Add repository",
+      "add_repo_tooltip": "Add {url} to Custom Plugin Repositories.",
+      "install": "Install plugin",
+      "installing": "Installing…",
+      "install_tooltip": "Install {plugin} from its plugin repository.",
+      "open_installer": "Open installer",
+      "repo_added": "Added the {plugin} repository.",
+      "repo_exists": "The {plugin} repository is already added.",
+      "repo_failed": "Could not add the {plugin} repository. See /xllog for details.",
+      "installed": "Installed {plugin}.",
+      "install_failed": "Could not install {plugin}. Check the plugin installer or /xllog for details."
     }
   }
 }
