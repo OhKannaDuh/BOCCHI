@@ -12,5 +12,8 @@ public interface IBuffRunner
 
     void Start();
 
+    /// <summary>Like <see cref="Start"/>, but walks into the buff circle from a nearby crystal.</summary>
+    void StartWalkIn();
+
     void Stop();
 }

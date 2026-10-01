@@ -74,6 +74,12 @@ public class MobScanner
             .Where(o => player.Position.Distance2D(o.Position) <= config.MaxEuclideanDistance)
             .Where(o =>
             {
+                // Anything already attacking us must be fought, whatever the mob/level filters say.
+                if (o.IsTargetingPlayer(localPlayer))
+                {
+                    return true;
+                }
+
                 BattleChara* battleChara = (BattleChara*)o.Address;
                 // Level 0 = foray info unavailable; don't filter those out.
                 byte level = battleChara->ForayInfo.Level;

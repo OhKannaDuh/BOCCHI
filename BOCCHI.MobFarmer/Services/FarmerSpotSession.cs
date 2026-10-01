@@ -51,6 +51,15 @@ public sealed class FarmerSpotSession(MobFarmerConfig config, IPlayer player, IO
 
     public void MarkArrived() => NeedsApproach = false;
 
+    /// <summary>After a yield (crystal buffs, pots, hunt) took us away, walk back before farming again.</summary>
+    public void RequireApproachIfAway()
+    {
+        if (Origin != Vector3.Zero && player.Position.Distance2D(Origin) > 8f)
+        {
+            NeedsApproach = true;
+        }
+    }
+
     /// <summary>Returns true when the session moved to a different spot.</summary>
     public bool TickClaimed(IMobScanner scanner)
     {

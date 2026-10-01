@@ -393,7 +393,11 @@ public class Automator
         {
             if (!validator.Validate(goal.Goal))
             {
-                if (goal.Goal.GoalType is FateGoal fateGoal)
+                // Only if we actually took part — a pot FATE dropped en route (progress skip) has no
+                // Cache Me to wait for, and idling for it parks us among high-level mobs.
+                if (goal.Goal.GoalType is FateGoal fateGoal
+                    && memory.TryRemember<CommittedFateMemory>(out CommittedFateMemory committed)
+                    && committed.IsFor(fateGoal.id))
                 {
                     TryStartPotChestFarm(fateGoal.id);
                 }

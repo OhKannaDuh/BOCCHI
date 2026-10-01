@@ -3,6 +3,7 @@ using BOCCHI.Common.Config;
 using BOCCHI.Common.Data.Zones;
 using BOCCHI.Common.Services;
 using BOCCHI.MobFarmer.Data;
+using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Plugin.Services;
 using Ocelot.Extensions;
 using Ocelot.Lifecycle;
@@ -24,6 +25,7 @@ public class MobFarmerService
     IPlayer player,
     IZoneProvider zones,
     IChatGui chat,
+    ICondition conditions,
     UIConfig uiConfig,
     ITranslator<MainWindow> translator,
     IAutomationModeGuard modeGuard,
@@ -62,6 +64,12 @@ public class MobFarmerService
         get
         {
             if (!Running || Suspended)
+            {
+                return false;
+            }
+
+            // Never yield mid-pull — the yielded mode doesn't fight, so we'd stand there and get hit.
+            if (scanner.InCombat.Any() || conditions[ConditionFlag.InCombat])
             {
                 return false;
             }
@@ -137,6 +145,7 @@ public class MobFarmerService
             return;
         }
 
+        spots.RequireApproachIfAway();
         combat.Prepare();
     }
 
