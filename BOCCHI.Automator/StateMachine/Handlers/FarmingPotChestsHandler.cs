@@ -1286,8 +1286,17 @@ public class FarmingPotChestsHandler
 
         if (reveal == null)
         {
-            if (FindRevealNear(origin) != null
-                && EzThrottler.Throttle("PotChestFarm::RevealNotTargetable", 2000))
+            // Reveals often stay untargetable until you are in interact range; a stuck approach 5–12y out
+            // would otherwise wait on "nothing to open" until Cache Me ran out. The open chain checks targetable.
+            IGameObject? untargetable = FindRevealNear(origin);
+            if (untargetable != null
+                && player.Position.Distance2D(untargetable.Position) <= OpenTreasureCofferChain.OffMeshFinishRange
+                && !OpenTreasureCofferChain.IsOpenedOrLooted(untargetable))
+            {
+                return untargetable;
+            }
+
+            if (untargetable != null && EzThrottler.Throttle("PotChestFarm::RevealNotTargetable", 2000))
             {
                 logger.Debug("Pot treasure: coffer on an authored spot is not targetable yet — waiting");
             }
