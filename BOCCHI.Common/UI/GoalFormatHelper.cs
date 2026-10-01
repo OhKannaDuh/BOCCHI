@@ -20,6 +20,9 @@ public static class GoalFormatHelper
             CriticalEncounterGoal(var id) => string.Format(
                 translator.T(".goals.critical_encounter"),
                 CriticalEncounterName(data, id.Value)),
+            ForkedTowerGoal(var id) => string.Format(
+                translator.T(".goals.forked_tower"),
+                CriticalEncounterName(data, id.Value)),
             var _ => goal.Describe()
         };
     }

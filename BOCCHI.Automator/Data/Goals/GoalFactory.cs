@@ -17,4 +17,10 @@ public class GoalFactory : IGoalFactory
         {
             GoalType = new CriticalEncounterGoal(id)
         };
+
+    public IGoal ForkedTower(CriticalEncounterId id) =>
+        new Goal
+        {
+            GoalType = new ForkedTowerGoal(id)
+        };
 }

@@ -38,6 +38,9 @@
   "waiting_for_pot_fate": {
     "label": "マジックポット待機中"
   },
+  "waiting_for_forked_tower": {
+    "label": "フォークタワー待機中"
+  },
   "in_critical_encounter": {
     "label": "CE中"
   },

@@ -13,6 +13,9 @@ public interface IZone
 
     ushort ForkedTowerEventId { get; }
 
+    /// <summary>Centre of the Forked Tower entry pad (Blood platform / Magic aetherial node); null when the zone has no tower.</summary>
+    Vector3? ForkedTowerEntrance { get; }
+
     bool IsOccultCrescentZone();
 
     bool IsInBasecamp();

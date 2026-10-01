@@ -29,6 +29,7 @@ public class GoalValidator
     IAutomatorMemory memory,
     IFieldNoteTracker fieldNotes,
     IStartableCriticalEncounterFinder startableCriticalEncounters,
+    IForkedTowerRegistration forkedTower,
     ICondition conditions,
     IObjectTable objects,
     ILogger<GoalValidator> logger
@@ -40,6 +41,7 @@ public class GoalValidator
         {
             CriticalEncounterGoal(var id) => ValidateCriticalEncounter(id),
             FateGoal(var id) => ValidateFate(id),
+            ForkedTowerGoal(var id) => ValidateForkedTower(id),
             var _ => throw new ArgumentOutOfRangeException(nameof(GoalType))
         };
     }
@@ -66,6 +68,12 @@ public class GoalValidator
 
         if (ce.IsPreparing())
         {
+            if (!IsCommittedToCriticalEncounter(id) && IsLeavingForForkedTower())
+            {
+                logger.Debug("Invalidating CE {CeId} (still pathing) — Forked Tower registration is open", id.Value);
+                return false;
+            }
+
             if (!IsCommittedToCriticalEncounter(id)
                 && automatorConfig.PreferPotFates
                 && TryFindLiveAllowedPot(out Fate _))
@@ -132,6 +140,12 @@ public class GoalValidator
 
         if (isPot && IsValidPotPreposition(id))
         {
+            if (IsLeavingForForkedTower())
+            {
+                logger.Debug("Invalidating pot preposition {FateId} — Forked Tower registration is open", id.Value);
+                return false;
+            }
+
             if (!potsOnly
                 && startableCriticalEncounters.FindStartable() is { } prepositionCe
                 && ShouldLeaveFateTravelForCe(prepositionCe))
@@ -175,6 +189,12 @@ public class GoalValidator
                     live.TimeRemainingSeconds / 60.0);
                 return false;
             }
+        }
+
+        if (!IsEngagedWithFate(id) && IsLeavingForForkedTower())
+        {
+            logger.Debug("Invalidating FATE {FateId} (still pathing) — Forked Tower registration is open", id.Value);
+            return false;
         }
 
         if (isPot)
@@ -254,6 +274,47 @@ public class GoalValidator
             "FATE");
         return decision.AllowStart;
     }
+
+    private bool ValidateForkedTower(CriticalEncounterId id)
+    {
+        if (!forkedTower.IsEnabled || zones.GetZone().IsInForkedTower())
+        {
+            return false;
+        }
+
+        if (criticalEncounterRepository.TryGetForkedTower() is not { } tower
+            || tower.Id != id
+            || !forkedTower.CanStillEnter(tower))
+        {
+            return false;
+        }
+
+        if (tower.IsPreparing())
+        {
+            return true;
+        }
+
+        if (!tower.IsActive()
+            || !memory.TryRemember<WaitingForForkedTowerMemory>(out WaitingForForkedTowerMemory wait)
+            || !wait.IsFor(id))
+        {
+            return false;
+        }
+
+        // The teleport lands a moment after Battle starts; give it time before going back to farming.
+        wait.BattleSeenAt ??= DateTimeOffset.UtcNow;
+        if (DateTimeOffset.UtcNow - wait.BattleSeenAt.Value < ForkedTowerTeleportGrace)
+        {
+            return true;
+        }
+
+        logger.Info("Forked Tower {Id} started without teleporting us in — resuming", id.Value);
+        return false;
+    }
+
+    private static readonly TimeSpan ForkedTowerTeleportGrace = TimeSpan.FromSeconds(20);
+
+    private bool IsLeavingForForkedTower() => forkedTower.FindRegistrable() != null;
 
     private bool ShouldLeaveFateTravelForCe(CriticalEncounter ce)
     {

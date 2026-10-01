@@ -30,6 +30,7 @@ public class ChoosingActivityHandler
     IZoneProvider zones,
     IFieldNoteTracker fieldNotes,
     IStartableCriticalEncounterFinder startableCriticalEncounters,
+    IForkedTowerRegistration forkedTower,
     ILogger<ChoosingActivityHandler> logger
 ) : ScoreStateHandler<AutomatorState, StatePriority>(AutomatorState.ChoosingActivity)
 {
@@ -77,7 +78,8 @@ public class ChoosingActivityHandler
         }
 
         bool hasCriticalEncounter = !PotsOnly && startableCriticalEncounters.FindStartable() != null;
-        if (!hasCriticalEncounter
+        if (forkedTower.FindRegistrable() == null
+            && !hasCriticalEncounter
             && FindStartableFate() == null
             && !CanPrepositionToPot(out _))
         {
@@ -89,6 +91,13 @@ public class ChoosingActivityHandler
 
     public override void Handle()
     {
+        if (forkedTower.FindRegistrable() is { } tower)
+        {
+            memory.TryAdd(new GoalMemory(goalFactory.ForkedTower(tower.Id)));
+            logger.Info("Chose Forked Tower {Id} ({Name}) — registration open", tower.Id.Value, tower.Name);
+            return;
+        }
+
         if (!PotsOnly)
         {
             CriticalEncounter? criticalEncounter = startableCriticalEncounters.FindStartable();

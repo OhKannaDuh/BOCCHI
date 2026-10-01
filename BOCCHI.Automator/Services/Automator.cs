@@ -45,6 +45,7 @@ public class Automator
     IChatGui chat,
     PotsConfig potsConfig,
     AutomatorConfig automatorConfig,
+    ForkedTowerConfig forkedTowerConfig,
     UIConfig uiConfig,
     AutoRotationController autoRotation,
     IAutomationModeGuard modeGuard,
@@ -330,6 +331,12 @@ public class Automator
             return;
         }
 
+        if (forkedTowerConfig.AutoRegisterInIllegalMode && context.IsIllegalMode && zones.GetZone().IsInForkedTower())
+        {
+            DisableDueToEnteringForkedTower();
+            return;
+        }
+
         if (SuspendedForShopping)
         {
             return;
@@ -383,6 +390,7 @@ public class Automator
                 {
                     FateGoal(var id) => $"FATE {id.Value}",
                     CriticalEncounterGoal(var id) => $"CE {id.Value}",
+                    ForkedTowerGoal(var id) => $"Forked Tower {id.Value}",
                     _ => goal.Goal.Describe(),
                 };
                 logger.Debug(
@@ -394,6 +402,7 @@ public class Automator
             }
             else if (!memory.TryRemember<GoalPathStepMemory>(out GoalPathStepMemory _)
                      && !memory.TryRemember<WaitingForCriticalEncounterMemory>(out WaitingForCriticalEncounterMemory _)
+                     && !memory.TryRemember<WaitingForForkedTowerMemory>(out WaitingForForkedTowerMemory _)
                      && !memory.TryRemember<WaitingForPotFateMemory>(out WaitingForPotFateMemory _)
                      && !memory.TryRemember<SuspendTravelForActivityMemory>(out SuspendTravelForActivityMemory _)
                      && !memory.TryRemember<CommittedCriticalEncounterMemory>(out CommittedCriticalEncounterMemory _)
@@ -436,6 +445,16 @@ public class Automator
 
         context.SetRunMode(AutomatorRunMode.Off);
         BocchiChat.Print(chat, uiConfig, translator.T(offMessage));
+        ApplyRunModeSideEffects(turningOn: false);
+    }
+
+    // BossMod takes over inside the tower; Illegal Mode would only fight it.
+    private void DisableDueToEnteringForkedTower()
+    {
+        logger.Info("Entered the Forked Tower — turning off Illegal Mode");
+
+        context.SetRunMode(AutomatorRunMode.Off);
+        BocchiChat.Print(chat, uiConfig, translator.T(".automation.automator.illegal_mode_off_forked_tower"));
         ApplyRunModeSideEffects(turningOn: false);
     }
 

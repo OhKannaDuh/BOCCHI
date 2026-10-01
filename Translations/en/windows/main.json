@@ -56,7 +56,8 @@
   },
   "goals": {
     "fate": "FATE: {0}",
-    "critical_encounter": "Critical Encounter: {0}"
+    "critical_encounter": "Critical Encounter: {0}",
+    "forked_tower": "Registering: {0}"
   },
   "trackers": {
     "experience": {
@@ -139,6 +140,9 @@
       "illegal_mode_on": "[BOCCHI] Illegal Mode On",
       "illegal_mode_off": "[BOCCHI] Illegal Mode Off",
       "illegal_mode_off_left_zone": "[BOCCHI] Left Occult Crescent — Illegal Mode Off",
+      "illegal_mode_off_forked_tower": "[BOCCHI] Entered the Forked Tower — Illegal Mode Off",
+      "forked_tower_offer_ciphers": "[BOCCHI] On the Forked Tower pad — offer Sanguine Ciphers at a cipher reliquary to register. Stay on the pad until you are teleported.",
+      "forked_tower_on_pad": "[BOCCHI] On the Forked Tower pad — stay here until you are teleported.",
       "pathfinding_refreshed": "[BOCCHI] Route replanned",
       "pathfinding_refreshed_no_goal": "[BOCCHI] Route cleared (nothing to go to right now)",
       "path_routing_failed": "[BOCCHI] Couldn't plan a route to that FATE/CE. Skipping it briefly — toggle Illegal Mode or Rebuild path map if it keeps happening.",

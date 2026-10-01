@@ -15,4 +15,7 @@ public class ForkedTowerConfig : IAutoConfig
 
     [FloatRange(20f, 300f, Order = 2, Section = "helpers")]
     public float TrapDrawRange { get; set; } = 150f;
+
+    [Checkbox(Order = 3, Section = "illegal_mode")]
+    public bool AutoRegisterInIllegalMode { get; set; } = false;
 }

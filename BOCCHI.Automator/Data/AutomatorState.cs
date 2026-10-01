@@ -19,7 +19,8 @@ public enum AutomatorState
     ReturningToJob,
     LevelingPhantomJob,
     FarmingPotChests,
-    Triaging
+    Triaging,
+    WaitingForForkedTower
 }
 
 public enum StatePriority

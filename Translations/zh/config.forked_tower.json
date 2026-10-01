@@ -2,7 +2,8 @@
   "label": "两歧塔",
   "tooltip": "新月岛南部两歧塔的辅助。北部支持稍后加入。",
   "sections": {
-    "helpers": "辅助"
+    "helpers": "辅助",
+    "illegal_mode": "违规模式"
   },
   "fields": {
     "draw_potential_trap_positions": {
@@ -15,6 +16,10 @@
     },
     "trap_draw_range": {
       "label": "仅显示该距离内的陷阱（米）"
+    },
+    "auto_register_in_illegal_mode": {
+      "label": "报名开放时前往两歧塔",
+      "tooltip": "违规模式运行中且两歧塔开放报名时，放弃当前行程，前往入口平台并站在上面等待传送。进入塔内后自动关闭违规模式。力之塔（南部）：仍需你自己在传送魔纹启动灯处献上「魔纹启动凭证：力之塔」，BOCCHI 只会提醒。"
     }
   }
 }

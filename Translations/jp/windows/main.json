@@ -56,7 +56,8 @@
   },
   "goals": {
     "fate": "FATE: {0}",
-    "critical_encounter": "クリティカルエンカウント: {0}"
+    "critical_encounter": "クリティカルエンカウント: {0}",
+    "forked_tower": "受付: {0}"
   },
   "trackers": {
     "experience": {
@@ -139,6 +140,9 @@
       "illegal_mode_on": "[BOCCHI] 不正モード オン",
       "illegal_mode_off": "[BOCCHI] 不正モード オフ",
       "illegal_mode_off_left_zone": "[BOCCHI] オカルトクレセントを離れたため不正モード オフ",
+      "illegal_mode_off_forked_tower": "[BOCCHI] フォークタワーに入場 — 不正モード オフ",
+      "forked_tower_offer_ciphers": "[BOCCHI] フォークタワーの入場地点に到着 — 近くの装置で受付用アイテム（Sanguine Cipher）を奉納して受付してください。転送されるまで地点から離れないでください。",
+      "forked_tower_on_pad": "[BOCCHI] フォークタワーの入場地点に到着 — 転送されるまで地点から離れないでください。",
       "pathfinding_refreshed": "[BOCCHI] ルートを作り直しました",
       "pathfinding_refreshed_no_goal": "[BOCCHI] ルートを解除しました（いま行く先がありません）",
       "path_routing_failed": "[BOCCHI] そのFATE/CEへのルートを計画できませんでした。しばらくスキップします — 繰り返す場合は不正モードを切り替えるか「経路マップを再構築」してください。",

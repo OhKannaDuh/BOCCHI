@@ -82,4 +82,7 @@ public static class PhantomBuffs
 public static class PlayerStatuses
 {
     public const ushort Raise = 148;
+
+    /// <summary>Granted after offering Sanguine Ciphers at the Forked Tower: Blood reliquary.</summary>
+    public const ushort ForkedTowerRightOfEntry = 4474;
 }

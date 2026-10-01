@@ -2,7 +2,8 @@
   "label": "フォークタワー",
   "tooltip": "南征編フォークタワー向けの補助。北征編対応は後日。",
   "sections": {
-    "helpers": "補助"
+    "helpers": "補助",
+    "illegal_mode": "不正モード"
   },
   "fields": {
     "draw_potential_trap_positions": {
@@ -15,6 +16,10 @@
     },
     "trap_draw_range": {
       "label": "この距離以内のトラップだけ表示（ヤルム）"
+    },
+    "auto_register_in_illegal_mode": {
+      "label": "受付開始でフォークタワーへ向かう",
+      "tooltip": "不正モード中にフォークタワーの受付が始まったら、今の移動をやめて入場地点へ向かい、転送されるまでその上で待機します。塔に入ると不正モードはオフになります。ブラッド（南征編）：受付用アイテム（Sanguine Cipher）の奉納は自分で行ってください（BOCCHI は案内のみ）。"
     }
   }
 }

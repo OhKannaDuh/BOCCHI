@@ -347,7 +347,23 @@ public class PathCalculator
         {
             CriticalEncounterGoal(var id) => GetActivityNode(id.Value, graph, NodeType.CriticalEncounter),
             FateGoal(var id) => GetActivityNode(id.Value, graph, NodeType.NormalFate, NodeType.PotFate),
+            ForkedTowerGoal => GetForkedTowerNode(),
             var _ => throw new ArgumentOutOfRangeException()
+        };
+    }
+
+    // The tower pad is not an authored activity, so it has no graph node — route to it like any position.
+    private Node GetForkedTowerNode()
+    {
+        if (zones.GetZone().ForkedTowerEntrance is not { } entrance)
+        {
+            throw new InvalidOperationException("Zone has no Forked Tower entrance");
+        }
+
+        return new Node
+        {
+            Type = NodeType.CriticalEncounter,
+            Position = entrance,
         };
     }
 

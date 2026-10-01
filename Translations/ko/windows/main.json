@@ -56,7 +56,8 @@
   },
   "goals": {
     "fate": "돌발: {0}",
-    "critical_encounter": "비상 조우: {0}"
+    "critical_encounter": "비상 조우: {0}",
+    "forked_tower": "등록: {0}"
   },
   "trackers": {
     "experience": {
@@ -139,6 +140,9 @@
       "illegal_mode_on": "[BOCCHI] 자동 모드 켜짐",
       "illegal_mode_off": "[BOCCHI] 자동 모드 꺼짐",
       "illegal_mode_off_left_zone": "[BOCCHI] 초승달 섬를 떠나 자동 모드 꺼짐",
+      "illegal_mode_off_forked_tower": "[BOCCHI] 포크 타워 입장 — 자동 모드 꺼짐",
+      "forked_tower_offer_ciphers": "[BOCCHI] 포크 타워 발판 도착 — 근처 장치에서 등록용 아이템(Sanguine Cipher)을 봉헌해 등록하세요. 전송될 때까지 발판을 벗어나지 마세요.",
+      "forked_tower_on_pad": "[BOCCHI] 포크 타워 발판 도착 — 전송될 때까지 발판을 벗어나지 마세요.",
       "pathfinding_refreshed": "[BOCCHI] 경로를 다시 짰습니다",
       "pathfinding_refreshed_no_goal": "[BOCCHI] 경로를 지웠습니다 (지금 갈 곳이 없음)",
       "path_routing_failed": "[BOCCHI] 해당 FATE/CE로 가는 경로를 짤 수 없습니다. 잠시 건너뜁니다 — 계속되면 자동 모드를 전환하거나 「경로 맵 다시 만들기」를 누르세요.",

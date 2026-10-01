@@ -9,6 +9,7 @@ internal static class IllegalModeActivityWork
     public static bool HasPrimaryActivity(IAutomatorMemory memory) =>
         memory.TryRemember<GoalMemory>(out GoalMemory _)
         || memory.TryRemember<WaitingForCriticalEncounterMemory>(out WaitingForCriticalEncounterMemory _)
+        || memory.TryRemember<WaitingForForkedTowerMemory>(out WaitingForForkedTowerMemory _)
         || memory.TryRemember<WaitingForPotFateMemory>(out WaitingForPotFateMemory _)
         || memory.TryRemember<GoalPathStepMemory>(out GoalPathStepMemory _)
         || memory.TryRemember<SuspendTravelForActivityMemory>(out SuspendTravelForActivityMemory _)
@@ -95,6 +96,7 @@ internal static class IllegalModeActivityWork
     {
         memory.Forget<GoalPathStepMemory>();
         memory.Forget<WaitingForCriticalEncounterMemory>();
+        memory.Forget<WaitingForForkedTowerMemory>();
         memory.Forget<WaitingForPotFateMemory>();
         memory.Forget<SuspendTravelForActivityMemory>();
         memory.Forget<CommittedCriticalEncounterMemory>();
