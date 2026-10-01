@@ -417,7 +417,7 @@ public class FarmingPotChestsHandler
         }
 
         float distance = player.Position.Distance2D(reveal.Position);
-        // The open chain finishes the approach itself, including the straight-line stretch onto off-mesh coffers.
+        // 12y, not 3.5: the open chain walks onto off-mesh coffers itself; vnav alone parks short of them.
         if (distance > OpenTreasureCofferChain.OffMeshFinishRange)
         {
             if (!EnsurePathing(reveal.Position, allowRemount: false))
@@ -706,7 +706,6 @@ public class FarmingPotChestsHandler
         SkipCurrentCandidate(farm);
     }
 
-    // Authored pads in a navmesh hole snap several yalms onto the mesh; walk the rest straight so the probe and reveal reach.
     private bool TryWalkOffMeshGap(Vector3 target)
     {
         float distance = player.Position.Distance2D(target);
@@ -1286,8 +1285,7 @@ public class FarmingPotChestsHandler
 
         if (reveal == null)
         {
-            // Reveals often stay untargetable until you are in interact range; a stuck approach 5–12y out
-            // would otherwise wait on "nothing to open" until Cache Me ran out. The open chain checks targetable.
+            // Reveals stay untargetable until in interact range — filtering on it left us idle 7y out until Cache Me expired.
             IGameObject? untargetable = FindRevealNear(origin);
             if (untargetable != null
                 && player.Position.Distance2D(untargetable.Position) <= OpenTreasureCofferChain.OffMeshFinishRange

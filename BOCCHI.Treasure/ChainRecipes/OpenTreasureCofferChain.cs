@@ -171,7 +171,7 @@ public class OpenTreasureCofferChain
             return;
         }
 
-        // vnav parks at the mesh edge when the coffer sits in a navmesh hole — finish in a straight line.
+        // vnav parks at the mesh edge for coffers in a navmesh hole; only a straight line gets in range.
         if (!drifted
             && !vnav.IsRunning()
             && !vnav.IsPathfinding()

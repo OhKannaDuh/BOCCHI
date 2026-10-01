@@ -2062,7 +2062,18 @@ public class TreasureHunterService
         {
             lastNavigateTarget = moveTarget;
             lastNavigateIssuedUtc = DateTime.UtcNow;
-            vnav.PathfindAndMoveCloseTo(moveTarget, false, moveArrival);
+
+            // Straight line keeps vnav running into unlinked ledges so StuckJumpAssist can jump (SH 1842).
+            if (!drifted
+                && IsSameFloor(destination)
+                && player.Position.Distance2D(destination) <= OpenTreasureCofferChain.OffMeshFinishRange)
+            {
+                vnav.FollowPath([player.Position, TreasurePathing.PathablePosition(destination, player.Position.Y)], false);
+            }
+            else
+            {
+                vnav.PathfindAndMoveCloseTo(moveTarget, false, moveArrival);
+            }
         }
 
         MaybeMount(moveTarget);

@@ -17,3 +17,4 @@
 - Phantom job names in the Wrath Combo action list now follow the plugin language instead of the game client language
 - Pot chests that sit off the navmesh can be reached and opened again: BOCCHI walks the last few yalms in a straight line instead of stopping short
 - A revealed pot chest is opened even when BOCCHI got stuck a few yalms away, instead of waiting there until the buff runs out
+- Treasure Hunt jumps up onto ledge coffers again (e.g. the Wanderer's Haven west coast) instead of giving up on them
