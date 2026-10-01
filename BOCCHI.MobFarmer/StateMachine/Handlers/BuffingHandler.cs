@@ -79,7 +79,6 @@ public class BuffingHandler
             return null;
         }
 
-        // Advance only on *Done flags — never on a Try* returning Gathering while still pending.
         if (!quickstepDone)
         {
             TryQuickstep();
@@ -98,7 +97,6 @@ public class BuffingHandler
             }
         }
 
-        // Counterstance last so Fleetfooted covers pull start, not buff idle.
         if (!counterstanceDone)
         {
             TryCounterstance();
@@ -137,8 +135,6 @@ public class BuffingHandler
             return;
         }
 
-        // Only treat Quicker Step as success after we issued a cast this pull — an existing
-        // crystal / prior-pull buff must not skip the every-pull Quickstep attempt.
         if (quickstepIssued)
         {
             if (HasQuickstepBuff() || DateTimeOffset.UtcNow - (stepWaitStartedUtc ?? DateTimeOffset.UtcNow) >= StepGiveUp)
@@ -156,14 +152,12 @@ public class BuffingHandler
             return;
         }
 
-        // Already on CD from a recent cast — nothing to do this pull.
         if (Actions.PhantomActionII.GetRecastTime() > 0f)
         {
             FinishQuickstep();
             return;
         }
 
-        // Job just swapped — briefly wait for CanCast before giving up.
         stepWaitStartedUtc ??= DateTimeOffset.UtcNow;
         if (DateTimeOffset.UtcNow - stepWaitStartedUtc.Value >= StepGiveUp)
         {
@@ -179,7 +173,6 @@ public class BuffingHandler
 
     private void TryGeomancerBuffs()
     {
-        // Respite shares a short CD with Quickstep — wait below; do not gate on current Recast here.
         bool wantBell = config.ApplyBattleBell && BattleBell.GetRecastTime() <= config.MaximumBattleBellWaitTime;
         bool wantRespite = config.ApplyRingingRespite
                            && supportJobs.Create(SupportJobId.PhantomGeomancer).Level
@@ -229,7 +222,6 @@ public class BuffingHandler
         if (!respiteDone)
         {
             float respiteCd = RingingRespite.GetRecastTime();
-            // Shared CD with Quickstep: wait within Max wait, skip if longer.
             if (respiteCd > config.MaximumBattleBellWaitTime)
             {
                 respiteDone = true;
@@ -239,7 +231,6 @@ public class BuffingHandler
 
             if (respiteIssued)
             {
-                // Cast went out — GCD/shared CD ticking (or buff) is enough to finish.
                 if (respiteCd > 0f
                     || HasRingingRespite()
                     || DateTimeOffset.UtcNow - (stepWaitStartedUtc ?? DateTimeOffset.UtcNow) >= StepGiveUp)

@@ -22,9 +22,6 @@ using Ocelot.Services.PlayerState;
 
 namespace BOCCHI.Services;
 
-/// <summary>
-///     Yields Mob Farmer to pots, Treasure Sight, Treasure Hunt, or knowledge-crystal buffs, then resumes.
-/// </summary>
 public sealed class MobFarmerYieldService
 (
     IMobFarmer farmer,
@@ -66,10 +63,8 @@ public sealed class MobFarmerYieldService
 
     private bool startedBuffs;
 
-    /// <summary>Set once the buff run is underway; before that the yield is still travelling to a crystal.</summary>
     private bool buffRunBegun;
 
-    /// <summary>A buff that can't be applied keeps ShouldRefreshAny true — don't Return-loop on it.</summary>
     private DateTimeOffset nextBuffAt = DateTimeOffset.MinValue;
 
     private readonly CampReturnSession campReturn = new("MobFarmer::BuffReturn");
@@ -78,7 +73,6 @@ public sealed class MobFarmerYieldService
 
     private Task<ChainResult>? sightChain;
 
-    /// <summary>Phantom job to restore after Sight when the chain fails before its restore step.</summary>
     private SupportJobId? pendingSightRestoreJob;
 
     private TimeSpan HuntIntervalMinutes =>
@@ -100,7 +94,6 @@ public sealed class MobFarmerYieldService
         {
             sawRunning = true;
             nextHuntAt = DateTimeOffset.UtcNow + HuntIntervalMinutes;
-            // Cast Sight as soon as yield is allowed — do not wait a full interval first.
             nextSightAt = DateTimeOffset.MinValue;
         }
 
@@ -143,7 +136,6 @@ public sealed class MobFarmerYieldService
             && buffs.ShouldRefreshAny()
             && !buffRunner.IsRunning)
         {
-            // Farm spots are rarely at a crystal — Return to camp first, then walk into the circle.
             farmer.SetSuspended(true, FarmerYieldReason.CrystalBuffs);
             startedBuffs = true;
             buffRunBegun = false;
@@ -213,8 +205,6 @@ public sealed class MobFarmerYieldService
                 break;
 
             case FarmerYieldReason.Shopping:
-                // Shopping may have interrupted a crystal-buff yield — clear the latch so we
-                // do not think buffs are still in progress after NotifyShoppingEnded (#203).
                 if (startedBuffs)
                 {
                     startedBuffs = false;
@@ -285,7 +275,6 @@ public sealed class MobFarmerYieldService
         startedBuffs = false;
         buffRunBegun = false;
         nextBuffAt = DateTimeOffset.UtcNow + TimeSpan.FromMinutes(5);
-        // Resuming walks back to the farm spot (see FarmerSpotSession.RequireApproachIfAway).
         if (farmer.Suspended && farmer.YieldReason == FarmerYieldReason.CrystalBuffs)
         {
             farmer.SetSuspended(false);
@@ -372,9 +361,6 @@ public sealed class MobFarmerYieldService
             pendingSightRestoreJob = current.Id;
         }
 
-        // Do not gate on fill % or an existing Sight reading — this yield is how Mob Farmer
-        // refreshes counts (and the first cast of a session). Timed Treasure Hunt still uses
-        // TreasureHuntFillGate.
         sightChain = chainManager.Manage(
             chains.Create("MobFarmer::TreasureSight")
                 .Then<HuntTreasureSightChain>());

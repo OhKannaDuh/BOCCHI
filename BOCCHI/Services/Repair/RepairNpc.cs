@@ -7,15 +7,10 @@ using Ocelot.Extensions;
 
 namespace BOCCHI.Services.Repair;
 
-/// <summary>
-///     Artisan / AutoDuty mender detection: Event NPCs whose ENpcData includes repair (720915).
-/// </summary>
 internal static class RepairNpc
 {
-    /// <summary>ENpcData row for the Repair interaction (same id Artisan and AutoDuty use).</summary>
     public const uint RepairEventId = 720915;
 
-    /// <summary>Wide enough to reach the Occult Crescent camp mender from the aetheryte pad.</summary>
     public const float SearchRadius = 50f;
 
     public const float InteractRadius = 3.5f;
@@ -65,7 +60,6 @@ internal static class RepairNpc
 
     private static int IndexOfRepair(ENpcBase sheet)
     {
-        // ENpcData is a fixed list of menu / interaction rows on the NPC.
         for (int i = 0; i < sheet.ENpcData.Count; i++)
         {
             if (sheet.ENpcData[i].RowId == RepairEventId)

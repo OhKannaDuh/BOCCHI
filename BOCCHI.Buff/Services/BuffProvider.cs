@@ -43,7 +43,6 @@ public class BuffProvider
             return true;
         }
 
-        // Inquiring Mind alone (no per-buff toggles): keep every unlocked crystal buff up.
         return CanUseInquiringMind()
                && GetInquiringMindTargets().Any(b =>
                    player.GetRemainingMinutes(b.StatusId) <= (uint)config.ReapplyThreshold);
@@ -79,10 +78,6 @@ public class BuffProvider
         return targets.All(b => player.GetRemainingMinutes(b.StatusId) >= InquiringMindFreshMinutes);
     }
 
-    /// <summary>
-    ///     Buffs Inquiring Mind will grant: selected toggles the player can receive, or all
-    ///     unlocked crystal buffs when IM is on and no toggles are selected.
-    /// </summary>
     private IEnumerable<BuffData> GetInquiringMindTargets()
     {
         if (!CanUseInquiringMind())
@@ -96,7 +91,6 @@ public class BuffProvider
             return selected;
         }
 
-        // IM-only: maintain every crystal buff the player has unlocked.
         return GetBuffs().Where(CanRefreshBuff);
     }
 

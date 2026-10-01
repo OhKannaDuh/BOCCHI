@@ -4,7 +4,6 @@ public interface IAutomatorContext
 {
     AutomatorRunMode RunMode { get; }
 
-    /// <summary>True when Illegal Mode, Completionist, or Pots &amp; Treasure is driving the automator pipeline.</summary>
     bool Enabled { get; }
 
     bool IsIllegalMode { get; }
@@ -13,13 +12,10 @@ public interface IAutomatorContext
 
     bool IsCompletionist { get; }
 
-    /// <summary>Toggle Illegal Mode on/off. Turns off other automator run modes if active.</summary>
     void Toggle();
 
-    /// <summary>Toggle dedicated Pots &amp; Treasure mode.</summary>
     void TogglePotsAndTreasure();
 
-    /// <summary>Toggle Completionist Mode (note-filtered Illegal pipeline).</summary>
     void ToggleCompletionist();
 
     void SetRunMode(AutomatorRunMode mode);

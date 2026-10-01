@@ -30,7 +30,6 @@ public class CastingTreasureSightHandler
 
     public override StatePriority GetScore()
     {
-        // Sticky while swapping to Freelancer / casting Sight.
         if (memory.TryRemember<CastingTreasureSightMemory>(out CastingTreasureSightMemory _))
         {
             return StatePriority.Critical;
@@ -52,7 +51,6 @@ public class CastingTreasureSightHandler
             return StatePriority.Never;
         }
 
-        // Post-activity survey latch owns Sight while auto-hunt is enabled.
         if (automatorConfig.EnableAutomaticTreasureHuntDuringIllegalMode
             && memory.TryRemember<AutomaticTreasureSurveyMemory>(out AutomaticTreasureSurveyMemory survey)
             && survey.PendingSurvey
@@ -66,7 +64,6 @@ public class CastingTreasureSightHandler
             return StatePriority.Never;
         }
 
-        // Below ChoosingActivity (Low) so a startable CE/FATE still wins; above Idle (Lowest).
         return StatePriority.VeryLow;
     }
 
@@ -74,8 +71,6 @@ public class CastingTreasureSightHandler
     {
         base.Enter();
 
-        // Only remember a non-Freelancer job — re-entering while already Freelancer must not
-        // overwrite a real previous job with Freelancer (TryAdd) or leave nothing to restore.
         if (supportJobs.TryGetCurrent(out SupportJob current)
             && current.Id != SupportJobId.PhantomFreelancer)
         {
@@ -121,7 +116,6 @@ public class CastingTreasureSightHandler
                     memory.TryAdd(survey);
                 }
 
-                // Post-activity latch or idle camp Sight while auto-hunt waits for CE/FATE.
                 if (survey.PendingSurvey
                     || automatorConfig.EnableAutomaticTreasureHuntDuringIllegalMode)
                 {
@@ -130,16 +124,10 @@ public class CastingTreasureSightHandler
                     survey.MinAcceptedRevision = tracker.SurveyRevision;
                     survey.SurveyWaitDeadlineUtc = DateTime.UtcNow + TimeSpan.FromSeconds(8);
                 }
-
-                // Job restore is ReturningToJobHandler (must beat Pathfinding priority).
             }
         }
     }
 
-    /// <summary>
-    ///     Idle camp Sight on the configured interval — auto-hunt while waiting, or the camp
-    ///     Sight toggle when auto-hunt is off.
-    /// </summary>
     private bool CanCastIdleCampSight()
     {
         bool autoHunt = automatorConfig.EnableAutomaticTreasureHuntDuringIllegalMode;

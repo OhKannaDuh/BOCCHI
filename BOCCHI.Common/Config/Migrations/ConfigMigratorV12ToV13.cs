@@ -2,7 +2,6 @@ using Newtonsoft.Json.Linq;
 
 namespace BOCCHI.Common.Config.Migrations;
 
-/// <summary>Move Carrot Hunt toggles out of TreasureConfig into CarrotConfig.</summary>
 public class ConfigMigratorV12ToV13 : IMigrator
 {
     public int FromVersion => 12;

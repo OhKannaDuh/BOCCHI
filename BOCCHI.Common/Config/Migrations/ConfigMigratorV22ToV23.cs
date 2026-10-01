@@ -2,12 +2,6 @@ using Newtonsoft.Json.Linq;
 
 namespace BOCCHI.Common.Config.Migrations;
 
-/// <summary>
-///     Move the travel settings every module reads out of AutomatorConfig into their own Movement
-///     group. They are not Illegal Mode options — Treasure Hunt, Carrot Hunt and Mob Farmer all
-///     honour them — and living under Automator made them undiscoverable.
-///     Illegal-Mode-only travel settings stay where they are.
-/// </summary>
 public class ConfigMigratorV22ToV23 : IMigrator
 {
     public int FromVersion => 22;
@@ -42,8 +36,6 @@ public class ConfigMigratorV22ToV23 : IMigrator
             automator.Remove(key);
         }
 
-        // Auto treasure hunt is read only by Illegal Mode, so it moves the other way: off the
-        // Treasure page and onto Automator, beside the Treasure Sight options it works with.
         if (result["TreasureConfig"] is JObject treasure)
         {
             const string autoHunt = "EnableAutomaticTreasureHuntDuringIllegalMode";

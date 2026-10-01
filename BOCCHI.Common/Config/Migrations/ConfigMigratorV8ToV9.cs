@@ -2,7 +2,6 @@ using Newtonsoft.Json.Linq;
 
 namespace BOCCHI.Common.Config.Migrations;
 
-/// <summary>Move Preposition to pots onto Illegal Mode (AutomatorConfig).</summary>
 public class ConfigMigratorV8ToV9 : IMigrator
 {
     public int FromVersion => 8;

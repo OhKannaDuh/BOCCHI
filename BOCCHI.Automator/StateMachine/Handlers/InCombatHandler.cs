@@ -40,7 +40,6 @@ public class InCombatHandler
             return StatePriority.Never;
         }
 
-        // Don't abandon Fate/CE transit to fight random trash on the road.
         if (memory.TryRemember<GoalPathStepMemory>(out GoalPathStepMemory _))
         {
             return StatePriority.Never;
@@ -55,9 +54,6 @@ public class InCombatHandler
         {
             return;
         }
-
-        // Open-world trash only — FATE/CE combat is InFate / InCriticalEncounter.
-        // Targeting stays with the player / BossMod; we only dismount here.
 
         if (conditions[ConditionFlag.Mounted])
         {

@@ -13,9 +13,6 @@ using System.Text.Json.Serialization;
 
 namespace BOCCHI.Treasure.Services;
 
-/// <summary>
-///     Fetches accepted Magic Pot chest pads and anonymously uploads opens when Share maps is on.
-/// </summary>
 public sealed class PotChestLocationSyncService
 (
     TreasureConfig config,
@@ -57,7 +54,6 @@ public sealed class PotChestLocationSyncService
             Limit = 1000
         };
 
-    /// <summary>Kick a refresh before planning a pot farm (non-blocking if already recent).</summary>
     public void EnsureFreshForFarm()
     {
         if (!config.EnableSharedMaps || !zones.GetZone().IsOccultCrescentZone())
@@ -68,7 +64,6 @@ public sealed class PotChestLocationSyncService
         StartCatalogRefresh(zones.GetZone().TerritoryType, force: true);
     }
 
-    /// <summary>Primary pot pads for a FATE — baked with accepted corrections / extras.</summary>
     public IReadOnlyList<PotChestData> GetPrimaryPads(IZone zone, int fateId)
     {
         if (!zone.GetPotChestData().TryGetValue(fateId, out List<PotChestData>? baked))
@@ -79,11 +74,9 @@ public sealed class PotChestLocationSyncService
         return MergePool(zone, fateId, isReroll: false, baked);
     }
 
-    /// <summary>Second-chance pads — baked with accepted corrections / extras.</summary>
     public IReadOnlyList<PotChestData> GetRerollPads(IZone zone)
     {
         List<PotChestData> baked = zone.GetRerollPotChestData();
-        // Reroll rows are shared across pot FATEs; filter remotes with isReroll and any fate id.
         return MergeRerollPool(zone, baked);
     }
 
@@ -166,7 +159,6 @@ public sealed class PotChestLocationSyncService
             return baked;
         }
 
-        // Reroll pads are zone-wide; accept any fate id marked isReroll (dedupe by position in Merge).
         List<AcceptedPotChestLocation> remotes = accepted.Where(a => a.IsReroll).ToList();
         return remotes.Count == 0 ? baked.ToList() : PotChestPadCatalog.Merge(baked, remotes);
     }

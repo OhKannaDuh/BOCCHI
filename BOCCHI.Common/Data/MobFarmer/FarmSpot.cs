@@ -3,7 +3,6 @@ using Newtonsoft.Json;
 
 namespace BOCCHI.Common.Data.MobFarmer;
 
-/// <summary>A named gather origin (and optional stack/stop point) for Mob Farmer.</summary>
 [Serializable]
 public class FarmSpot
 {
@@ -27,7 +26,6 @@ public class FarmSpot
 
     public float StackZ { get; set; }
 
-    /// <summary>0 = use the global minimum-enemies-before-fighting setting.</summary>
     public int MinimumMobsToStartFight { get; set; }
 
     [JsonIgnore]

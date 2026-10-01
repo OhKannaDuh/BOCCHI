@@ -7,10 +7,6 @@ using Serilog.Events;
 
 namespace BOCCHI.Services.Logging;
 
-/// <summary>
-///     Forwards to Dalamud logging and mirrors every write into <see cref="IBocchiLogBuffer"/>.
-///     Forces Debug minimum so Debug lines reach Dalamud without the user changing log level.
-/// </summary>
 public sealed class CapturingPluginLog : IPluginLog
 {
     private static readonly Regex NamedHole = new(@"\{[^{}]+\}", RegexOptions.Compiled);
@@ -24,7 +20,6 @@ public sealed class CapturingPluginLog : IPluginLog
         this.inner = inner;
         this.buffer = buffer;
 
-        // Capture() always buffers Debug; also lower Dalamud's gate so /xllog and Serilog see them.
         if (inner.MinimumLogLevel > LogEventLevel.Debug)
         {
             inner.MinimumLogLevel = LogEventLevel.Debug;

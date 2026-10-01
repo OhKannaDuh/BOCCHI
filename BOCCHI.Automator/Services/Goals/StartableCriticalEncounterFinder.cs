@@ -44,8 +44,6 @@ public class StartableCriticalEncounterFinder
         RouteUnreachableGoalMemory? unreachable = IllegalModeActivityWork.TakeActiveUnreachable(memory);
         FateId? excludeFate = unreachable?.Goal.GoalType is FateGoal(var skipped) ? skipped : null;
 
-        // Prefer pot FATEs: a live pot we would actually start outranks a CE.
-        // Skip / allowlist / unreachable / completionist still apply — a skipped pot must not block CEs.
         if (automatorConfig.PreferPotFates
             && LivePotPriority.FindStartable(
                 fateRepository,
@@ -60,7 +58,6 @@ public class StartableCriticalEncounterFinder
             return null;
         }
 
-        // Include Warmup so Choosing does not stall on a visible CE.
         foreach (CriticalEncounter ce in criticalEncounterRepository.SnapshotWithoutForkedTower())
         {
             if (!ce.IsPreparing() || !criticalEncountersConfig.IsCriticalEncounterEnabled(ce.Id.Value))

@@ -58,7 +58,6 @@ public class ApplyingBuffsHandler
             return StatePriority.Never;
         }
 
-        // Starting on Freelancer is valid (#211). Restore the phantom job you started on.
         return StatePriority.MediumHigh;
     }
 
@@ -96,7 +95,6 @@ public class ApplyingBuffsHandler
     public override void Exit(AutomatorState next)
     {
         base.Exit(next);
-        // Buff SM finished or we were pre-empted — drop the latch so Choosing/Pathfinding can run.
         if (next != AutomatorState.ApplyingBuffs)
         {
             ClearBuffLatch();
@@ -112,7 +110,6 @@ public class ApplyingBuffsHandler
 
         stateMachine.Update();
 
-        // Manual BuffRunner aborts on NoCrystalsFound; Illegal Mode must clear the latch too.
         if (stateMachine.State == BuffState.NoCrystalsFound)
         {
             logger.Warning("Illegal Mode buff run aborted — no knowledge crystals nearby");

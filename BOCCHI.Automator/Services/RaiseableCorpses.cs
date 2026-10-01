@@ -6,7 +6,6 @@ using Ocelot.Extensions;
 
 namespace BOCCHI.Automator.Services;
 
-/// <summary>Nearby dead players who still need a Revive (no Raise pending).</summary>
 internal static class RaiseableCorpses
 {
     public const float CastRangeYalms = 28f;

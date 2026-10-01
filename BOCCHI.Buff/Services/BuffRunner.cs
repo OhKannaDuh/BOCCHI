@@ -68,7 +68,6 @@ public class BuffRunner
         memory.TryAdd<ApplyingBuffsMemory>();
         if (manual)
         {
-            // Manual runs cast in place; without this the approach handler walks into the circle.
             memory.TryAdd<ManualBuffRunMemory>();
         }
 

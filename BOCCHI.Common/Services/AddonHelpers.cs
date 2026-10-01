@@ -4,7 +4,6 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace BOCCHI.Common.Services;
 
-/// <summary>Thin ECommons wrappers for addons we poll often.</summary>
 public static unsafe class AddonHelpers
 {
     public static bool IsShopExchangeOpen() =>

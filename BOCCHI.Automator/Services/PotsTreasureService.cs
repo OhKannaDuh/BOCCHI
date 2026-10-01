@@ -17,10 +17,6 @@ using Ocelot.Windows;
 
 namespace BOCCHI.Automator.Services;
 
-/// <summary>
-/// Dedicated pots + treasure mode: pot FATEs and chests, then treasure hunt
-/// until the configured pot lead before the next pot spawn; preposition and repeat.
-/// </summary>
 public class PotsTreasureService
 (
     IAutomator automator,
@@ -52,7 +48,6 @@ public class PotsTreasureService
 
     private bool huntWasRunning;
 
-    /// <summary>Live pot FATE id we already handed to the automator this pot window.</summary>
     private uint ensuredPotFateId;
 
     public bool Running => context.IsPotsAndTreasure;
@@ -98,7 +93,6 @@ public class PotsTreasureService
 
         modeGuard.EnsureExclusive(AutomationMode.PotsAndTreasure);
 
-        // Fresh hunt session for this mode (location-resume still applies if coffers remain).
         if (hunter.Running)
         {
             hunter.Toggle();
@@ -280,8 +274,6 @@ public class PotsTreasureService
             logger.Debug("Pots & Treasure: paused hunt for pot window");
         }
 
-        // Hunt filler freezes the automator; when a pot pops we must hand it a FATE goal
-        // (ChoosingActivity alone can stay blocked by interrupt latches / empty score paths).
         if (leavingHunt)
         {
             memory.Forget<NavigationInterruptedMemory>();
@@ -357,7 +349,6 @@ public class PotsTreasureService
         {
             hunter.Resume();
             huntWasRunning = true;
-            // Rebuild the walk from the current authored step after pot vnav ownership.
             hunter.RecalculateRoute();
             logger.Debug("Pots & Treasure: resumed treasure hunt where it left off");
         }

@@ -1,6 +1,5 @@
 namespace BOCCHI.Treasure.Hunt;
 
-/// <summary>Debounce empty-pad confirmation so a one-frame miss does not skip a live pad.</summary>
 public sealed class EmptyPadConfirm
 {
     private long? candidateKey;

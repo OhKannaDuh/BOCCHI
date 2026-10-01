@@ -2,7 +2,6 @@ using Newtonsoft.Json.Linq;
 
 namespace BOCCHI.Common.Config.Migrations;
 
-/// <summary>Fold TrackerConfig into UIConfig (single UI settings page).</summary>
 public class ConfigMigratorV18ToV19 : IMigrator
 {
     public int FromVersion => 18;

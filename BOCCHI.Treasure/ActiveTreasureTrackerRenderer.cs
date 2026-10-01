@@ -6,7 +6,6 @@ using Ocelot.Windows;
 
 namespace BOCCHI.Treasure;
 
-/// <summary>Active bronze / silver fill in the main Trackers panel.</summary>
 public class ActiveTreasureTrackerRenderer
 (
     ITreasureTracker tracker,
@@ -17,7 +16,6 @@ public class ActiveTreasureTrackerRenderer
 {
     public MainWindowSection Section => MainWindowSection.Trackers;
 
-    // After experience (0) and currency (10).
     public uint Order => 20;
 
     public void Render() =>

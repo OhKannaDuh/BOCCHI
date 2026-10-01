@@ -13,7 +13,6 @@ public class GraphFactory : IGraphFactory
     public async Task<ZoneGraph> BuildAsync(GraphConfig config, IZone zone)
     {
 #if DEBUG
-        // Replace previous rebuild's samples — avoid unbounded accumulation across cold builds.
         GraphConfig.DebugPathLines.Clear();
 #endif
         ZoneGraph graph = new();

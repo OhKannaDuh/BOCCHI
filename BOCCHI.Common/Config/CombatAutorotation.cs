@@ -2,7 +2,6 @@ using Ocelot.Config.Renderers.Enum;
 
 namespace BOCCHI.Common.Config;
 
-/// <summary>Illegal Mode combat automation choice.</summary>
 public enum CombatAutorotation
 {
     None = 0,

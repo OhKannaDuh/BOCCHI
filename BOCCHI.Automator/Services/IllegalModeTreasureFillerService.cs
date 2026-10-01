@@ -14,7 +14,6 @@ using Ocelot.Services.Logger;
 
 namespace BOCCHI.Automator.Services;
 
-/// <summary>Illegal Mode post-activity treasure filler.</summary>
 public class IllegalModeTreasureFillerService
 (
     IAutomator automator,
@@ -34,7 +33,6 @@ public class IllegalModeTreasureFillerService
     ILogger<IllegalModeTreasureFillerService> logger
 ) : IOnUpdate
 {
-    // TriageLatchService Order 10 runs before this (Order 0) on the update pass.
     public int Order => 0;
 
     private bool hadPrimaryActivity;
@@ -43,24 +41,16 @@ public class IllegalModeTreasureFillerService
 
     private bool loggedSightUnavailable;
 
-    /// <summary>
-    ///     Last primary Goal that was a pot FATE. Survives Goal forget so post-activity hunt
-    ///     can defer to Magical Elixir / pot chests even when Automator missed the same-frame latch
-    ///     (e.g. after manually stopping the filler hunt).
-    /// </summary>
     private FateId? potFatePrimary;
 
     private bool HasTreasureSight => SupportJobTreasureSight.CanCast(supportJobs);
 
-    /// <summary>Map hunt always yields to FATEs; Sight hunt only when the FATE option is on.</summary>
     private bool YieldsHuntToFate =>
         !HasTreasureSight || automatorConfig.PauseAutoTreasureHuntForFate;
 
-    /// <summary>Map hunt always yields to CEs; Sight hunt only when the CE option is on.</summary>
     private bool YieldsHuntToCriticalEncounter =>
         !HasTreasureSight || automatorConfig.PauseAutoTreasureHuntForCriticalEncounter;
 
-    /// <summary>True when the hunt can pause for at least one activity type.</summary>
     private bool YieldsHuntToAnyActivity => YieldsHuntToFate || YieldsHuntToCriticalEncounter;
 
     public void Update()
@@ -132,7 +122,6 @@ public class IllegalModeTreasureFillerService
 
         if (survey.PendingSurvey)
         {
-            // CastingTreasureSightHandler casts at camp; ReturningHandler gets us there.
             return;
         }
 
@@ -148,12 +137,6 @@ public class IllegalModeTreasureFillerService
         }
     }
 
-    /// <summary>
-    ///     When yielding is enabled (map hunt, or Sight hunt with FATE/CE pause options), pause for
-    ///     a matching active or startable activity so Illegal Mode can take it, then resume afterward.
-    ///     Pot leave-early (#204) yields when "Pause auto treasure hunt for pots" is on — even if
-    ///     Pause-for-FATE is off — so the hunt does not ignore predicted pot spawns.
-    /// </summary>
     private void UpdateRunningFillerHunt(bool activityNow)
     {
         if (TriageSession.IsActive(memory))
@@ -162,14 +145,10 @@ public class IllegalModeTreasureFillerService
             return;
         }
 
-        // Stop after return: do not start or resume hunt while paused at the shard.
         if (memory.TryRemember<NavigationInterruptedMemory>(out NavigationInterruptedMemory _))
         {
             return;
         }
-        // Pot FATE ending starts FarmingPotChests — leave-early yield ends then, but the hunt
-        // must stay paused for the whole farm. Otherwise ResumeNearPlayer fights Automator's
-        // SuspendedForTreasure + PotChestFarmMemory latch every tick (idle elixir / no pathing).
         if (ShouldDeferToPotChestFarm())
         {
             PauseHuntForYield("pot chest farm");
@@ -191,7 +170,6 @@ public class IllegalModeTreasureFillerService
 
         if (!YieldsHuntToAnyActivity)
         {
-            // Sight hunt with both pause options off — still resume after a pot leave-early pause.
             if (hunter.Paused)
             {
                 EnterHuntPhase(fromSurvey: false);
@@ -208,7 +186,6 @@ public class IllegalModeTreasureFillerService
                 return;
             }
 
-            // Triage / buffs / camp Sight block the Automator SM — still check startable CE/FATE.
             if (TryPauseForStartableYield())
             {
                 return;
@@ -216,7 +193,6 @@ public class IllegalModeTreasureFillerService
 
             if (hunter.Paused)
             {
-                // Triage / buffs / Sight after a yielded FATE/CE — stay paused and unsuspended.
                 automator.SetSuspendedForTreasure(false);
             }
 
@@ -231,15 +207,10 @@ public class IllegalModeTreasureFillerService
         bool startableMatch = HasStartableYieldTarget(out string kind);
         if (hunter.Paused && !startableMatch)
         {
-            // Activity cancelled / nothing matching left — keep filling the map.
             EnterHuntPhase(fromSurvey: false);
         }
     }
 
-    /// <summary>
-    ///     True when leave-early / a live pot should pause auto treasure hunt.
-    ///     Live pots come from the FATE list, not only the shared timer.
-    /// </summary>
     private bool ShouldYieldHuntForImminentPot()
     {
         if (!automatorConfig.PauseAutoTreasureHuntForPots)
@@ -341,10 +312,6 @@ public class IllegalModeTreasureFillerService
         return false;
     }
 
-    /// <summary>
-    ///     Map hunt pauses for any filler-blocking work. Sight hunt only pauses for FATE/CE that
-    ///     match the enabled options (plus follow-on triage/buffs while already paused).
-    /// </summary>
     private bool ShouldPauseForCurrentActivity()
     {
         if (!HasTreasureSight)
@@ -409,14 +376,11 @@ public class IllegalModeTreasureFillerService
             return;
         }
 
-        // TriageLatchService owns raise latch; wait until it finishes before Sight / map hunt.
         if (TriageSession.IsActive(memory))
         {
             return;
         }
 
-        // Pot chests + Magical Elixir beat Sight survey / map resume — even if a survey was
-        // already latched, or Automator missed CreateSmart this frame after a manual hunt stop.
         if (TryDeferForPotChestFarm(survey))
         {
             return;
@@ -427,7 +391,6 @@ public class IllegalModeTreasureFillerService
             return;
         }
 
-        // Same map-hunt session was paused for this FATE/CE — continue remaining pads.
         if (hunter.ManagedByIllegalModeFiller && hunter.Running && hunter.Paused)
         {
             logger.Info("Illegal Mode: resuming map treasure hunt after FATE/CE");
@@ -456,9 +419,6 @@ public class IllegalModeTreasureFillerService
     private bool FarmsPotChests =>
         automatorConfig.ShouldFarmPotChests || context.IsPotsAndTreasure;
 
-    /// <summary>
-    ///     Prefer pot chest / elixir wait over post-activity Sight or map hunt.
-    /// </summary>
     private bool TryDeferForPotChestFarm(AutomaticTreasureSurveyMemory survey)
     {
         if (!FarmsPotChests)
@@ -477,8 +437,6 @@ public class IllegalModeTreasureFillerService
                 return false;
             }
 
-            // Automator.Update runs first and normally CreateSmarts; if it did not (stop / suspend
-            // race), arm Pending so the next Automator tick starts WaitingForBuff → elixir.
             if (!memory.TryRemember<PendingPotChestFarmMemory>(out PendingPotChestFarmMemory _)
                 && !memory.TryRemember<PotChestFarmMemory>(out PotChestFarmMemory _))
             {
@@ -525,7 +483,6 @@ public class IllegalModeTreasureFillerService
             survey.WaitingForSurveyResult = false;
             survey.SurveyWaitDeadlineUtc = DateTime.MinValue;
             survey.PendingMapHunt = true;
-            // Hunt owns travel/Return — drop any Automator Return already queued after the FATE/CE.
             memory.Forget<ReturningStateMemory>();
             LogSightUnavailableOnce();
             logger.Debug("Illegal Mode: latched map treasure hunt without Treasure Sight ({Reason})", reason);
@@ -582,7 +539,6 @@ public class IllegalModeTreasureFillerService
             return;
         }
 
-        // Prefer a live FATE/CE before burning a full map pass.
         if (startableActivities.HasStartableFateOrCriticalEncounter())
         {
             return;
@@ -598,7 +554,6 @@ public class IllegalModeTreasureFillerService
             return;
         }
 
-        // No Sight → no live fill counts. Always run the built-in map; thresholds only apply after a survey.
         survey.PendingMapHunt = false;
         EnterHuntPhase(fromSurvey: false);
     }
@@ -661,7 +616,6 @@ public class IllegalModeTreasureFillerService
 
     private void OnFillerHuntEnded(AutomaticTreasureSurveyMemory survey)
     {
-        // After a route, wait for the next activity before surveying / hunting again.
         survey.PendingSurvey = false;
         survey.WaitingForSurveyResult = false;
         survey.PendingMapHunt = false;
@@ -713,8 +667,6 @@ public class IllegalModeTreasureFillerService
             return;
         }
 
-        // Map hunts keep Automator awake so a spawned FATE/CE can interrupt.
-        // Sight hunts stay suspended until a matching pause option fires (then unsuspend).
         if (!HasTreasureSight)
         {
             automator.SetSuspendedForTreasure(false);
@@ -729,7 +681,6 @@ public class IllegalModeTreasureFillerService
         {
             if (!fromSurvey)
             {
-                // Keep retrying the map hunt once navmesh is ready.
                 if (memory.TryRemember(out AutomaticTreasureSurveyMemory survey))
                 {
                     survey.PendingMapHunt = true;
@@ -761,8 +712,6 @@ public class IllegalModeTreasureFillerService
 
         if (hunter.Paused)
         {
-            // After a distant FATE/CE/pot, continue from nearby remaining pads instead of walking
-            // back to where the route was paused (includes pot leave-early with Sight pause-FATE off).
             hunter.ResumeNearPlayer();
             hadFillerHunt = true;
             logger.Debug("Illegal Mode: resumed automatic treasure hunt");

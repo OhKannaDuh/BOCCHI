@@ -5,10 +5,6 @@ using Lumina.Excel.Sheets;
 
 namespace BOCCHI.Common.Data.OccultCrescent;
 
-/// <summary>
-///     Occult Crescent currency and cipher item ids from <see cref="MKDData"/>.
-///     Fallbacks are the 7.3x row ids so inventory reads still work before excel init.
-/// </summary>
 public static class OccultCurrencies
 {
     public static uint SilverPieceItemId { get; private set; } = 45043;
@@ -19,10 +15,8 @@ public static class OccultCurrencies
 
     public static uint GoldObolItemId { get; private set; } = 51976;
 
-    /// <summary>South Horn — Sanguine Cipher.</summary>
     public static uint SouthHornCipherItemId { get; private set; } = 47739;
 
-    /// <summary>North Horn — Arcane Amulet.</summary>
     public static uint NorthHornCipherItemId { get; private set; } = 51977;
 
     public static void Initialize(IDataManager data)

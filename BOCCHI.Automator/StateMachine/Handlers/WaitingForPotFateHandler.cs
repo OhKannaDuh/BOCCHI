@@ -50,7 +50,6 @@ public class WaitingForPotFateHandler
             return StatePriority.Never;
         }
 
-        // FATE is up — drop wait so Automator rebuilds a path into the live circle.
         if (fates.HasFate(fateGoal.id))
         {
             return StatePriority.Never;

@@ -7,10 +7,6 @@ using XIVFate = Lumina.Excel.Sheets.Fate;
 
 namespace BOCCHI.Common.UI;
 
-/// <summary>
-///     Local pot FATE countdown(s) from <see cref="IPotCycleTracker"/>.
-///     South Horn and North Horn are tracked separately and stay visible after you leave the zone.
-/// </summary>
 public static class PotTimerUi
 {
     public static void Draw(
@@ -39,7 +35,6 @@ public static class PotTimerUi
         }
     }
 
-    /// <summary>One-line status text for all known zone cycles, or null when nothing to show.</summary>
     public static string? FormatCompact(
         IPotCycleTracker potCycle,
         IDataManager data,

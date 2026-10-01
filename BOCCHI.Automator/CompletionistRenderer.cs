@@ -55,7 +55,6 @@ public class CompletionistRenderer
 
         ImGui.Spacing();
 
-        // About stays collapsed by default so the checklist is the first thing you see.
         ImGui.PushStyleColor(ImGuiCol.Text, BocchiUi.Header);
         bool aboutOpen = ImGui.CollapsingHeader(
             translator.T(".completionist.about"),
@@ -151,7 +150,6 @@ public class CompletionistRenderer
 
         if (clicked)
         {
-            // Click = map flag only. Ctrl+click = flag + cost-routed travel to authored coords.
             bool travel = ImGui.GetIO().KeyCtrl;
             GoToSurvey(entry, noteName, travel);
         }
@@ -173,7 +171,6 @@ public class CompletionistRenderer
             return;
         }
 
-        // Pause automator travel so Illegal/Completionist replan doesn't fight survey pathing.
         if (automator.IsActive)
         {
             memory.Forget<GoalMemory>();

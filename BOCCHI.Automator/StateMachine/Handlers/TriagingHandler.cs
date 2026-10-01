@@ -22,9 +22,6 @@ using ActionCastScope = Ocelot.Actions.ActionCastScope;
 
 namespace BOCCHI.Automator.StateMachine.Handlers;
 
-/// <summary>
-///     After FATE/CE with nearby dead players: Chemist or White Mage raise → restore job → continue.
-/// </summary>
 public class TriagingHandler
 (
     IAutomatorContext context,
@@ -80,7 +77,6 @@ public class TriagingHandler
             return StatePriority.Never;
         }
 
-        // Score Always while pending so Return (VeryHigh) cannot own the UI until triage starts.
         return StatePriority.Always;
     }
 

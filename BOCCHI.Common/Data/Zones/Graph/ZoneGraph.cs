@@ -43,10 +43,6 @@ public class ZoneGraph
         return JsonSerializer.Deserialize<ZoneGraph>(json, options);
     }
 
-    /// <summary>
-    ///     True when the cached graph has the camp/teleport/activity wiring Automator needs.
-    ///     Corrupt or half-written early caches fail this and should be rebuilt.
-    /// </summary>
     public bool IsUsableForRouting()
     {
         if (Nodes.Count == 0 || Edges.Count == 0)
@@ -82,13 +78,9 @@ public class ZoneGraph
         return activities.All(activity => GetInboundTeleport(activity) != null);
     }
 
-    /// <summary>How many FATE/CE nodes have a usable inbound aetheryte walk.</summary>
     public int CountRoutableActivities() =>
         GetActivityNodes().Count(activity => GetInboundTeleport(activity) != null);
 
-    /// <summary>
-    ///     Drop baked CE combat sizes. Registration size comes from live LGB, not the path map.
-    /// </summary>
     public void ClearCriticalEncounterCombatRadii()
     {
         foreach (Node node in GetActivityNodes())
@@ -103,10 +95,6 @@ public class ZoneGraph
         }
     }
 
-    /// <summary>
-    ///     True when every authored FATE/CE for the zone exists in the graph with an inbound teleport.
-    ///     Catches stale caches that are "usable" but missing newer activities.
-    /// </summary>
     public bool CoversZoneActivities(IZone zone)
     {
         if (!IsUsableForRouting())
@@ -161,7 +149,6 @@ public class ZoneGraph
             throw new InvalidOperationException("Both nodes must exist before adding an edge.");
         }
 
-        // Unreachable walks report PositiveInfinity — omit from the graph.
         if (!float.IsFinite(cost))
         {
             return;
@@ -225,15 +212,9 @@ public class ZoneGraph
         return true;
     }
 
-    /// <summary>Validation view — every inbound teleport, regardless of unlock state.</summary>
     public Node? GetInboundTeleport(Node goal) =>
         GetInboundTeleports(goal).FirstOrDefault().Teleport;
 
-    /// <summary>Routing view — the best inbound shard the player has unlocked.</summary>
-    public Node? GetUsableInboundTeleport(Node goal) =>
-        GetUsableInboundTeleports(goal).FirstOrDefault().Teleport;
-
-    /// <summary>Routing view — only shards the player has unlocked.</summary>
     public IReadOnlyList<(Node Teleport, float Cost)> GetUsableInboundTeleports(Node goal)
     {
         IReadOnlyList<(Node Teleport, float Cost)> wired = GetInboundTeleports(goal)
@@ -244,19 +225,15 @@ public class ZoneGraph
             return wired;
         }
 
-        // Pot chest search (and other live destinations) feed a synthetic Node with no graph
-        // edges — estimate inbound cost by 2D so Return / aethernet can still beat a cross-map walk.
         return EstimateUsableInboundTeleports(goal.Position);
     }
 
-    /// <summary>Nearest unlocked shards to an arbitrary point, ordered by 2D walk estimate.</summary>
     public IReadOnlyList<(Node Teleport, float Cost)> EstimateUsableInboundTeleports(Vector3 goalPosition) =>
         GetUsableTeleportNodes()
             .Select(tp => (Teleport: tp, Cost: tp.Position.Distance2D(goalPosition)))
             .OrderBy(entry => entry.Cost)
             .ToList();
 
-    /// <summary>All teleport→activity walk edges, preferred shard first, then by walk cost.</summary>
     public IReadOnlyList<(Node Teleport, float Cost)> GetInboundTeleports(Node goal)
     {
         uint? preferredId = goal.Metadata is ActivityNodeMetadata { PreferredAethernetId: { } id } ? id : null;
@@ -301,17 +278,6 @@ public class ZoneGraph
     public IEnumerable<Node> GetTeleportNodes() =>
         GetNodesByTypes(NodeType.BaseCampAetheryte, NodeType.AethernetShard);
 
-    /// <summary>
-    ///     Teleports the player can actually use right now.
-    ///     <para>
-    ///     Deliberately separate from <see cref="GetTeleportNodes"/>: that one feeds graph
-    ///     <i>validation</i>, which asks whether the cached file is intact. Hiding locked shards
-    ///     from validation would make a low-unlock character's graph look corrupt and rebuild it on
-    ///     every check. Unlock state belongs to routing, not to the data.
-    ///     </para>
-    ///     Filtered on query rather than at build time for the same reason in reverse — the graph is
-    ///     cached to disk, so baking unlock state in would leave a shard missing after it is earned.
-    /// </summary>
     public IEnumerable<Node> GetUsableTeleportNodes() => GetTeleportNodes().Where(IsTeleportUsable);
 
     private static bool IsTeleportUsable(Node node) =>
@@ -329,7 +295,6 @@ public class ZoneGraph
 
     public async Task ConnectToBaseCamp(List<Node> nodes, GraphConfig config)
     {
-        // Cover Lost Citadel CEs (On the Hunt ~685y from return pad); 512 skipped those edges.
         const float MaxEuclideanDistance2D = 750f;
 
         Node? returnNode = GetBaseCampReturnPositionNode();
@@ -358,7 +323,6 @@ public class ZoneGraph
 
         foreach (Node node in nodes)
         {
-            // Prefer authored aethernet when present; fall back if that shard cannot walk to the activity.
             List<Node> candidateTeleports = teleports;
             if (node.Metadata is ActivityNodeMetadata { PreferredAethernetId: { } preferredId })
             {
@@ -381,7 +345,6 @@ public class ZoneGraph
                 scored = await ScoreAllTeleportWalks(NearestTeleports(teleports, node, takeAll: false), node, config);
             }
 
-            // Keep several inbound edges so same-shard departures can hop to another pad (#172).
             foreach ((Node teleport, float inboundCost, float outboundCost) in scored)
             {
                 if (!float.IsPositiveInfinity(inboundCost))

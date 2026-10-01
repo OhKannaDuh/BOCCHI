@@ -10,55 +10,30 @@ public static class NavigationConstants
 {
     public const float MaxDirectWalkDistance = 80f;
 
-    /// <summary>
-    ///     Yalm-equivalent cost of casting Return. Every route planner shares these two so a hop is
-    ///     priced the same whether the treasure hunt, the carrot hunt or graph traversal is asking.
-    /// </summary>
     public const float ReturnCost = 40f;
 
-    /// <summary>
-    ///     Yalm-equivalent cost of one aethernet hop. A hop's teleport chain takes roughly 2.5s,
-    ///     which is about 50 yalms of mounted travel — graph traversal previously priced it at 10
-    ///     and so reached for teleports on hops it could comfortably walk.
-    /// </summary>
     public const float AethernetHopCost = 50f;
 
-    /// <summary>Player is considered at base camp within this distance of the aetheryte.</summary>
     public const float CampRadius = 80f;
 
-    /// <summary>Stop this close to FATE/CE center so we enter the engagement circle.</summary>
     public const float EventApproachMinRadius = 0f;
 
     public const float EventApproachMaxRadius = 5f;
 
-    /// <summary>Angular jitter (degrees) for FATE stand-off so clients don't stack on one ray.</summary>
     public const float EventApproachJitter = 50f;
 
-    /// <summary>PathCalculator treats this as "arrived at event" — must be ≥ max approach.</summary>
     public const float EventArrivalRadius = 5f;
 
-    /// <summary>
-    ///     Yield FATE travel to BossMod AI once this close to a FATE enemy (yalms past hitbox).
-    ///     Registration is the rim of a large circle — too far for AutoTarget / StayCloseToTarget.
-    /// </summary>
     public const float FateAiHandoffRange = 25f;
 
-    /// <summary>No FATE enemies up yet: yield once this close to the live FATE centre.</summary>
     public const float FateAiHandoffFromCenter = 25f;
 
-    /// <summary>
-    ///     Extra yalms past the FATE radius before a committed In FATE is treated as left.
-    /// </summary>
     public const float FateCommittedLeaveYalms = 40f;
 
-    /// <param name="nearestTargetPastHitbox">
-    ///     Distance past hitbox to the nearest FATE enemy, or <see cref="float.MaxValue"/> if none.
-    /// </param>
     public static bool IsWithinFateAiHandoff(float distanceToCenter, float nearestTargetPastHitbox) =>
         nearestTargetPastHitbox <= FateAiHandoffRange
         || distanceToCenter <= FateAiHandoffFromCenter;
 
-    /// <summary>Near the FATE circle or a FATE mob after CurrentFate dropped — not a walk-away.</summary>
     public static bool IsWithinFateCommitment(
         float distanceToCenter,
         float fateRadius,
@@ -69,45 +44,24 @@ public static class NavigationConstants
                || distanceToCenter <= leash;
     }
 
-    /// <summary>
-    ///     Added to LGB CE combat radius for debug green.
-    ///     Red debug = padded − this (the in-game blue registration edge).
-    /// </summary>
     public const float CriticalEncounterRadiusPadding = 7f;
 
-    /// <summary>Yellow debug ring inset from padded CE radius (green − this).</summary>
     public const float CriticalEncounterYellowInset = 2f;
 
-    /// <summary>Square CEs: cyan stand (path target) as a fraction of red half-extent.</summary>
     public const float CriticalEncounterSquareStandRatio = 0.7f;
 
-    /// <summary>Circle CEs: cyan stand ring (path target while waiting), as a fraction of red.</summary>
     public const float CriticalEncounterCircleStandRatio = 0.45f;
 
-    /// <summary>Debug green pad beyond red for square CEs (same idea as circle pad).</summary>
     public const float CriticalEncounterSquareRadiusPadding = 7f;
 
-    /// <summary>
-    ///     Inset from the blue registration edge. Waiting / arrival on the rim does not place you
-    ///     into the instance (Tiny Terror, A Beast Unleashed).
-    /// </summary>
     public const float CriticalEncounterWaitInset = 8f;
 
-    /// <summary>Circle travel stand-off around the cyan ring — closer to centre than the rim.</summary>
     public const float CriticalEncounterApproachMinRatio = 0.25f;
 
-    /// <summary>Circle travel stand-off outer (≤ stand ratio).</summary>
     public const float CriticalEncounterApproachMaxRatio = 0.4f;
 
-    /// <summary>Square CEs: max Chebyshev stand-off from center as a fraction of half-extent.</summary>
     public const float CriticalEncounterSquareApproachMaxRatio = 0.25f;
 
-    /// <summary>
-    ///     Registration size/centre still come from LGB. Shape prefers the zone CE table when we
-    ///     have a row — LGB <c>TriggerBoxShape</c> can disagree with the blue ring (e.g. Lost on
-    ///     the Wind is a circle). Authored squares (A Beast Unleashed, Cursed Resurgence, Dark
-    ///     Artistry, The Black Regiment) stay square.
-    /// </summary>
     public static ActivityAreaShape ResolveCriticalEncounterShape(ActivityData? authored, bool lgbIsSquare) =>
         authored is not null
             ? authored.AreaShape
@@ -121,15 +75,12 @@ public static class NavigationConstants
         return ResolveCriticalEncounterShape(authored, lgbIsSquare);
     }
 
-    /// <summary>Random stand-off ring while waiting for a predicted pot FATE.</summary>
     public const float PotPrepositionMinRadius = 12f;
 
     public const float PotPrepositionMaxRadius = 32f;
 
-    /// <summary>Euclidean distance above which long pathfinds should mount first.</summary>
     public const float MountMinDistance = 20f;
 
-    /// <summary>Red debug / combat radius from padded <c>ce.Radius</c>.</summary>
     public static float CriticalEncounterRedRadius(
         float paddedRadius,
         ActivityAreaShape shape = ActivityAreaShape.Circle)
@@ -140,11 +91,9 @@ public static class NavigationConstants
         return MathF.Max(0f, paddedRadius - pad);
     }
 
-    /// <summary>Yellow debug radius from padded <c>ce.Radius</c>.</summary>
     public static float CriticalEncounterYellowRadius(float paddedRadius) =>
         MathF.Max(0f, paddedRadius - CriticalEncounterYellowInset);
 
-    /// <summary>Cyan debug / preferred stand size (inside red).</summary>
     public static float CriticalEncounterStandRadius(float combatRadius, ActivityAreaShape shape)
     {
         if (combatRadius <= 0f)
@@ -158,7 +107,6 @@ public static class NavigationConstants
         return combatRadius * ratio;
     }
 
-    /// <summary>Padded outer (green) size from LGB combat radius.</summary>
     public static float CriticalEncounterPaddedRadius(float combatRadius, ActivityAreaShape shape)
     {
         float pad = shape == ActivityAreaShape.Square
@@ -167,11 +115,6 @@ public static class NavigationConstants
         return combatRadius + pad;
     }
 
-    /// <summary>
-    ///     True when <paramref name="point"/> is inside the CE wait area — the blue registration
-    ///     ring/box, inset by <see cref="CriticalEncounterWaitInset"/> so travel does not stop on
-    ///     the rim. <paramref name="combatRadius"/> is the LGB size (circle radius or square half-extent).
-    /// </summary>
     public static bool IsInsideCriticalEncounterWaitArea(
         Vector3 center,
         float combatRadius,
@@ -192,10 +135,6 @@ public static class NavigationConstants
         return IsInsideCriticalEncounterArea(center, wait, shape, point);
     }
 
-    /// <summary>
-    ///     True inside the full registration edge (red debug), with no wait inset.
-    ///     Use after arrival so waiting is not yanked back from the stand ring toward the rim.
-    /// </summary>
     public static bool IsInsideCriticalEncounterRegistrationArea(
         Vector3 center,
         float combatRadius,
@@ -230,11 +169,6 @@ public static class NavigationApproach
         return destination.GetApproachPosition(from, range, NavigationConstants.EventApproachJitter);
     }
 
-    /// <summary>Random point inside the combat area so travel lands on the blue registration zone.</summary>
-    /// <param name="standRadius">
-    ///     Standable radius when tighter than <paramref name="combatRadius"/>; 0 to use the
-    ///     registration rim. The rim can extend past the ground you can actually stand on.
-    /// </param>
     public static Vector3 GetCriticalEncounterApproachPosition(
         Vector3 center,
         float combatRadius,
@@ -249,7 +183,6 @@ public static class NavigationApproach
         float red = MathF.Max(1f, standRadius > 0f ? standRadius : combatRadius);
         if (shape == ActivityAreaShape.Square)
         {
-            // Squares (e.g. A Beast Unleashed): scatter inside the blue box — not one approach ray.
             float maxFromCenter = MathF.Min(
                 red * NavigationConstants.CriticalEncounterSquareApproachMaxRatio,
                 NavigationConstants.EventApproachMaxRadius);
@@ -270,7 +203,6 @@ public static class NavigationApproach
             max = min;
         }
 
-        // Scatter on the disc. An inbound ray from the aethernet often lands on a ramp outside the ring.
         float dist = min + rng.NextSingle() * (max - min);
         float angle = rng.NextSingle() * MathF.PI * 2f;
         return center + new Vector3(MathF.Cos(angle) * dist, 0f, MathF.Sin(angle) * dist);
@@ -294,9 +226,6 @@ public static class NavigationApproach
         return GetEventPosition(goal.Position, from);
     }
 
-    /// <summary>
-    ///     World / non-Illegal PathTo: use CE inner stand-off when the destination is a known CE.
-    /// </summary>
     public static bool TryResolveCriticalEncounterApproach(
         IZone zone,
         CriticalEncounterGeometry? geometry,

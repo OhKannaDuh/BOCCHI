@@ -36,7 +36,6 @@ public class MobScanner
 
     public unsafe void Update()
     {
-        // Occult Crescent only (the farmer panel still previews counts while stopped).
         if (!zones.GetZone().IsOccultCrescentZone())
         {
             ClearScan();
@@ -88,7 +87,6 @@ public class MobScanner
                     return false;
                 }
 
-                // Selected OC NameIds count even when not flagged hostile yet (common in caves).
                 if (MobData.IsSelected(o.NameId, config.Mobs))
                 {
                     return true;

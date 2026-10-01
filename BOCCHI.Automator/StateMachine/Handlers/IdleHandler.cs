@@ -42,8 +42,6 @@ public class IdleHandler(
     {
         base.Enter();
         PathStepSoftStop.Cancel(chains);
-        // Survey / World PathTo use ActivityGoto chains — don't kill them on idle handoff.
-        // Map-hunt filler keeps Automator Idle so FATE/CE can interrupt; don't Stop() its vnav.
         if (!IsNavigationInterrupted() && !IsIllegalModeMapHuntFillerActive())
         {
             StopMovement();
@@ -65,8 +63,6 @@ public class IdleHandler(
             memory.Forget<IdleStateMemory>();
         }
 
-        // Map-hunt filler keeps Automator Idle so FATE/CE can interrupt. Leaving Idle
-        // (Returning / Pathfinding flicker) must not Path.Stop the hunt's walk.
         if (!IsNavigationInterrupted() && !IsIllegalModeMapHuntFillerActive())
         {
             StopMovement();
@@ -80,7 +76,6 @@ public class IdleHandler(
             return;
         }
 
-        // Stay Idle (so a FATE/CE can still score) but do not park / Stop() while the hunt leaves camp.
         if (IsIllegalModeMapHuntFillerActive())
         {
             return;
@@ -102,7 +97,6 @@ public class IdleHandler(
             return;
         }
 
-        // Inside cyan (idle band or closer / magenta) — stop; do not path into the crystal.
         if (zone.IsWithinIdleWait(player.Position))
         {
             idle.ApproachCandidateIndex = 0;
@@ -115,8 +109,6 @@ public class IdleHandler(
             return;
         }
 
-        // Path to spots spread between magenta (Lifestream) and cyan (idle outer).
-        // Shuffle once per idle session so clients don't all take the nearest tile first.
         if (idle.WaitCandidates is not { Count: > 0 })
         {
             List<Vector3> built = zone.GetIdleWaitCandidates(player.Position).ToList();
@@ -166,10 +158,6 @@ public class IdleHandler(
     private bool IsNavigationInterrupted() =>
         memory.TryRemember<NavigationInterruptedMemory>(out NavigationInterruptedMemory _);
 
-    /// <summary>
-    ///     Map hunts (no Treasure Sight) keep Automator awake. While that hunt is moving, Idle must
-    ///     not Stop() vnav — that re-queues the same camp→coffer path every tick.
-    /// </summary>
     private bool IsIllegalModeMapHuntFillerActive() =>
         hunter.ManagedByIllegalModeFiller && hunter.Running && !hunter.Paused;
 

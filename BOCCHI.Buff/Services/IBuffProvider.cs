@@ -13,11 +13,9 @@ public interface IBuffProvider
 
     bool CanUseInquiringMind();
 
-    /// <summary>Selected buffs Inquiring Mind can grant that still need a refresh.</summary>
     IEnumerable<BuffData> GetInquiringMindTargetsNeedingRefresh(IPlayerCharacter player, uint maxFreshMinutes);
 
     bool NeedsInquiringMind(IPlayerCharacter player, uint maxFreshMinutes);
 
-    /// <summary>True when every Inquiring Mind target for this run is freshly applied.</summary>
     bool AreInquiringMindTargetsFresh(IPlayerCharacter player);
 }

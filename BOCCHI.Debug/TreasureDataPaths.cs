@@ -1,6 +1,5 @@
 namespace BOCCHI.Debug;
 
-/// <summary>Shared path helpers for debug export panels that write into BOCCHI.Treasure/Data.</summary>
 public static class TreasureDataPaths
 {
     public static string? FindRepoTreasureDataRoot(string? start)
@@ -20,10 +19,6 @@ public static class TreasureDataPaths
         return null;
     }
 
-    /// <summary>
-    /// Writes the same payload under the plugin <c>Data/{zone}/</c> folder and, when found,
-    /// the repo <c>BOCCHI.Treasure/Data/{zone}/</c> folder.
-    /// </summary>
     public static List<string> WriteZoneDataFile(
         string? pluginDir,
         string zoneFolder,

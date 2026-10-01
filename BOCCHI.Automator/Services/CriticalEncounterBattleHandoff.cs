@@ -5,10 +5,6 @@ using BOCCHI.Common.Services;
 
 namespace BOCCHI.Automator.Services;
 
-/// <summary>
-///     CE Preparing→Battle: still in the registration area (or EventId / CE-tagged enemies).
-///     Open-world InCombat alone is not enough (#196).
-/// </summary>
 internal static class CriticalEncounterBattleHandoff
 {
     public static bool IsReady(
@@ -22,8 +18,6 @@ internal static class CriticalEncounterBattleHandoff
             return true;
         }
 
-        // Already waiting for this CE, battle started, still inside the registration edge —
-        // EventId / enemy tags can lag for seconds after Warmup→Battle.
         if (!encounter.IsActive())
         {
             return false;

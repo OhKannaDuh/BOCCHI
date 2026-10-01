@@ -22,7 +22,6 @@ public static class JObjectExtensions
         public int IntOr(string path, int fallback) => self.SelectToken(path)?.Value<int>() ?? fallback;
     }
 
-    /// <summary>Copy a property from <paramref name="source"/> onto <paramref name="target"/> when present.</summary>
     public static void MoveIfPresent(JObject source, JObject target, string key)
     {
         if (source[key] is JToken value)

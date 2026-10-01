@@ -16,10 +16,6 @@ using ECommonsPlayer = ECommons.GameHelpers.Player;
 
 namespace BOCCHI.Treasure.Services;
 
-/// <summary>
-///     Real Ninja Hide (2245 / status 614) + optional gearset swap for dangerous coffer approaches.
-///     Optional Phantom Thief Occult Sprint while stealthed.
-/// </summary>
 public sealed class NinjaHideAssist(
     IPlayer player,
     ICondition conditions,
@@ -49,12 +45,8 @@ public sealed class NinjaHideAssist(
     public bool IsMounted =>
         conditions[ConditionFlag.Mounted] || conditions[ConditionFlag.Mounting];
 
-    /// <summary>
-    ///     Prepare stealth for a dangerous walk. Returns false while still equipping / dismounting / casting.
-    /// </summary>
     public bool EnsureReady(int ninjaGearsetNumber)
     {
-        // Hide / gearset mid-fight fails and fights with combat movement.
         if (conditions[ConditionFlag.InCombat])
         {
             return false;
@@ -72,7 +64,6 @@ public sealed class NinjaHideAssist(
             return false;
         }
 
-        // Dismount jump/landing — Hide fails with "while jumping".
         if (ECommonsPlayer.IsJumping || DismountAssist.TryDismount(conditions))
         {
             return false;
@@ -87,9 +78,6 @@ public sealed class NinjaHideAssist(
         return false;
     }
 
-    /// <summary>
-    ///     Best-effort: Phantom Thief + Occult Sprint while Hide is up. Never blocks walking.
-    /// </summary>
     public void TryOccultSprintWhileHidden()
     {
         if (!IsStealthed
@@ -116,7 +104,6 @@ public sealed class NinjaHideAssist(
         OccultSprint.Cast();
     }
 
-    /// <summary>Swap back to the job/gearset used before the Ninja Hide flow, if we changed it.</summary>
     public void RestorePreviousGearsetIfNeeded()
     {
         RestorePreviousSupportJobIfNeeded();
@@ -139,14 +126,6 @@ public sealed class NinjaHideAssist(
         }
     }
 
-    /// <summary>
-    ///     Before coffer / carrot interact: always drop Phantom Thief (Occult Sprint).
-    ///     Gearset restore is skipped while threats remain — swapping off Ninja cancels Hide and
-    ///     pulls nearby high-Knowledge mobs before Hide can be cast again.
-    /// </summary>
-    /// <param name="keepNinjaWhileThreatened">
-    ///     True when a knowledge threat is still in range (see route gate remount check).
-    /// </param>
     public void EndStealthForInteract(bool keepNinjaWhileThreatened = false)
     {
         RestorePreviousSupportJobIfNeeded();
@@ -158,7 +137,6 @@ public sealed class NinjaHideAssist(
         RestorePreviousGearsetIfNeeded();
     }
 
-    /// <summary>Restore phantom job remembered before Occult Sprint Thief swap.</summary>
     public void RestorePreviousSupportJobIfNeeded()
     {
         if (supportJobBeforeThief is not { } restoreId)
@@ -227,13 +205,6 @@ public sealed class NinjaHideAssist(
         return supportJobs.TryGetCurrent(out SupportJob current) && current.Id == id;
     }
 
-    /// <summary>
-    ///     Drops Hide when travel no longer needs stealth (Hide toggles off).
-    ///     Returns true when not stealthed and safe to mount.
-    /// </summary>
-    /// <param name="stillThreatened">
-    ///     When true, keep Hide up (pack nearby) — do not burn Hide cooldown to remount.
-    /// </param>
     public bool TryEndStealthForTravel(Func<bool>? stillThreatened = null)
     {
         if (!IsStealthed)
@@ -368,15 +339,10 @@ public sealed class NinjaHideAssist(
             return false;
         }
 
-        // Equip is async — caller polls active gearset / job.
         return false;
     }
 }
 
-/// <summary>
-///     Enter/exit Hide requirement with clear-debounce so pack threats do not burn Hide cooldown
-///     between nearby high-Knowledge mobs.
-/// </summary>
 public sealed class NinjaHideRouteGate
 {
     public static readonly TimeSpan ClearDebounce = TimeSpan.FromSeconds(2.5);

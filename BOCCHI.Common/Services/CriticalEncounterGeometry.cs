@@ -12,25 +12,13 @@ using ExcelDynamicEvent = Lumina.Excel.Sheets.DynamicEvent;
 
 namespace BOCCHI.Common.Services;
 
-/// <summary>Centre and size of a Critical Encounter's registration area, read from level geometry.</summary>
 public readonly record struct CriticalEncounterArea(Vector3 Center, float Radius, bool IsSquare);
 
-/// <summary>
-///     Resolves a Critical Encounter's real registration area from the zone's level geometry.
-///     <para>
-///     Occult CE <c>DynamicEvent.MapMarker.Radius</c> is 0 even while registration is open.
-///     <c>DynamicEvent.LGBMapRange</c> is the InstanceId of a MapRange volume — the shape the
-///     blue ring is drawn from — but live copies of that field are often still 0, so we also
-///     read the Excel row and, if needed, pick the MapRange whose centre is nearest the event
-///     marker.
-///     </para>
-/// </summary>
 public sealed class CriticalEncounterGeometry(
     IDataManager data,
     IClientState clientState,
     ILogger<CriticalEncounterGeometry> logger)
 {
-    /// <summary>Layer files besides the level stem (e.g. oc1f1.lgb) that can hold MapRange volumes.</summary>
     private static readonly string[] ExtraLayerFiles =
         ["planevent", "planmap", "planner", "planlive", "planobject", "bg"];
 
@@ -40,7 +28,6 @@ public sealed class CriticalEncounterGeometry(
 
     private ushort cachedTerritory;
 
-    /// <param name="detail">Why lookup succeeded or failed — for <c>/bocchi debug ce</c>.</param>
     public unsafe CriticalEncounterArea? TryGet(ushort dynamicEventId, out string detail)
     {
         if (cachedTerritory != (ushort)clientState.TerritoryType)
@@ -158,17 +145,8 @@ public sealed class CriticalEncounterGeometry(
         return null;
     }
 
-    /// <summary>
-    ///     How far from authored staging to search for a replacement MapRange when the ID match is
-    ///     an elevated / oversized volume (Eternal Watch).
-    /// </summary>
     private const float AlternateMapRangeSearchRadius = 80f;
 
-    /// <summary>
-    ///     Resolve the MapRange BOCCHI should wait in: prefer the event's LGB id, but when that
-    ///     volume fails sanitization (huge elevated Eternal Watch MapRange), pick a ground-sized
-    ///     MapRange near authored staging instead of the generic 40y fallback alone.
-    /// </summary>
     public CriticalEncounterArea? TryResolveForAuthored(
         ushort dynamicEventId,
         Vector3 authoredStaging,
@@ -329,7 +307,6 @@ public sealed class CriticalEncounterGeometry(
         bool square = range.ParentData.TriggerBoxShape == TriggerBoxShape.TriggerBoxShapeBox
                       || range.ParentData.TriggerBoxShape == TriggerBoxShape.TriggerBoxShapeBoard;
 
-        // Box scale is a half-extent per axis; sphere/cylinder use the horizontal scale as radius.
         float radius = MathF.Max(scale.X, scale.Z);
         return new CriticalEncounterArea(center, radius, square);
     }

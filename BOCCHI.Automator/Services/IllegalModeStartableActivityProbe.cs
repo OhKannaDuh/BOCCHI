@@ -7,9 +7,6 @@ using BOCCHI.Common.Services;
 
 namespace BOCCHI.Automator.Services;
 
-/// <summary>
-///     Whether Illegal Mode would pick a live CE or FATE right now (not pot preposition).
-/// </summary>
 public interface IIllegalModeStartableActivityProbe
 {
     bool HasStartableFateOrCriticalEncounter();

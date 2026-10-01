@@ -27,7 +27,6 @@ public sealed class FieldNoteTracker(IDataManager data, IUnlockState unlockState
         }
         catch
         {
-            // Unlock state may be unavailable outside the game world.
             return false;
         }
     }
@@ -39,7 +38,6 @@ public sealed class FieldNoteTracker(IDataManager data, IUnlockState unlockState
             return true;
         }
 
-        // Unused Notes item still counts (record unlock happens on use).
         return entry.Note is { } note && GetInventoryCount((uint)note) > 0;
     }
 

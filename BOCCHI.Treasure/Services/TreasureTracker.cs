@@ -19,10 +19,8 @@ namespace BOCCHI.Treasure.Services;
 
 public class TreasureTracker : ITreasureTracker, IOnUpdate, IDisposable
 {
-    /// <summary>WideText / chat: “You sense the presence of X silver … and Y bronze …”.</summary>
     private const uint ActiveChestLogMessageId = 10965;
 
-    /// <summary>WideText / chat: “There appear to be no treasure coffers in the area...”</summary>
     private const uint NoActiveChestsLogMessageId = 10966;
 
     private readonly IAddonLifecycle addonLifecycle;
@@ -71,7 +69,6 @@ public class TreasureTracker : ITreasureTracker, IOnUpdate, IDisposable
         this.hunter = hunter;
         this.carrotHunter = carrotHunter;
         addonLifecycle.RegisterListener(AddonEvent.PostDraw, "_WideText", OnWideTextPostDraw);
-        // Chat is more reliable than scraping _WideText (empty first frames / cooldown misses).
         chat.LogMessage += OnChatLogMessage;
     }
 
@@ -83,7 +80,6 @@ public class TreasureTracker : ITreasureTracker, IOnUpdate, IDisposable
 
     public void Update()
     {
-        // Occult Crescent only — drop live coffers and Sight fill when you leave.
         if (!zones.GetZone().IsOccultCrescentZone())
         {
             if (treasures.Count > 0)
@@ -112,8 +108,6 @@ public class TreasureTracker : ITreasureTracker, IOnUpdate, IDisposable
             .GroupBy(o => o.GameObjectId)
             .ToDictionary(g => g.Key, g => g.First());
 
-        // Open transition first — IsValid() is false once opened, so dropping those before
-        // CheckOpened left Active bronze/silver stuck after Sight.
         foreach (TreasureCoffer treasure in treasures)
         {
             if (!treasure.CheckOpened())
@@ -184,7 +178,6 @@ public class TreasureTracker : ITreasureTracker, IOnUpdate, IDisposable
 
     public int SilverChests { get; private set; }
 
-    /// <summary>Increments on each successful Treasure Sight count parse.</summary>
     public int SurveyRevision { get; private set; }
 
     private void OnChatLogMessage(ILogMessage message)
@@ -205,7 +198,6 @@ public class TreasureTracker : ITreasureTracker, IOnUpdate, IDisposable
             return;
         }
 
-        // Excel order: silver then bronze (matches WideText group 1 / 2).
         if (!message.TryGetIntParameter(0, out int silver)
             || !message.TryGetIntParameter(1, out int bronze))
         {
@@ -228,7 +220,6 @@ public class TreasureTracker : ITreasureTracker, IOnUpdate, IDisposable
             return;
         }
 
-        // Only throttle successful parses — burning CD on empty/wrong banners missed Sight.
         if (DateTime.Now - lastParseWideText < parseWideTextCooldown)
         {
             return;
@@ -276,7 +267,6 @@ public class TreasureTracker : ITreasureTracker, IOnUpdate, IDisposable
         silver = Math.Clamp(silver, 0, 8);
         bronze = Math.Clamp(bronze, 0, 30);
 
-        // Same banner can hit both chat + WideText — ignore duplicate within a moment.
         if (CountInitialised
             && SilverChests == silver
             && BronzeChests == bronze

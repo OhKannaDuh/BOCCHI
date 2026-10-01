@@ -10,10 +10,6 @@ using Ocelot.Services.Logger;
 
 namespace BOCCHI.Automator.Services;
 
-/// <summary>
-///     After FATE/CE: latch Triage only when a raisable corpse is already nearby.
-///     No bodies → normal Return continues.
-/// </summary>
 public sealed class TriageLatchService
 (
     IAutomator automator,
@@ -26,7 +22,6 @@ public sealed class TriageLatchService
     ILogger<TriageLatchService> logger
 ) : IOnUpdate
 {
-    // Before IllegalModeTreasureFillerService so Sight waits for PendingTriage.
     public int Order => 10;
 
     private bool hadActivity;

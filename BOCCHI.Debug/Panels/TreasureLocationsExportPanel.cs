@@ -15,7 +15,6 @@ using System.Text.Json.Serialization;
 
 namespace BOCCHI.Debug.Panels;
 
-/// <summary>Exports bronze/silver layout pads to <c>treasure_locations.json</c>.</summary>
 public sealed class TreasureLocationsExportPanel
 (
     IZoneProvider zones,
@@ -28,7 +27,6 @@ public sealed class TreasureLocationsExportPanel
 {
     private const string Filename = "treasure_locations.json";
 
-    /// <summary>Export filename — not treasure_route.json (overwriting that dropped South Horn to NN).</summary>
     private const string RouteFilename = "treasure_route.suggested.json";
 
     private static readonly JsonSerializerOptions WriteJson = new()

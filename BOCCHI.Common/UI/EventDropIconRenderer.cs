@@ -12,7 +12,6 @@ using System.Numerics;
 
 namespace BOCCHI.Common.UI;
 
-/// <summary>Renders South Horn demiatma / note / soul-shard icons under FATE/CE rows.</summary>
 public class EventDropIconRenderer(
     IDataManager data,
     ITextureProvider textures,

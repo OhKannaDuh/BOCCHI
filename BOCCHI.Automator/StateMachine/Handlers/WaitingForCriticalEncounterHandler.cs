@@ -19,7 +19,6 @@ using Ocelot.States.Score;
 
 namespace BOCCHI.Automator.StateMachine.Handlers;
 
-/// <summary>Hold at a CE until Battle, then hand off to <see cref="InCriticalEncounterHandler"/>.</summary>
 public class WaitingForCriticalEncounterHandler
 (
     IAutomatorMemory memory,
@@ -45,7 +44,6 @@ public class WaitingForCriticalEncounterHandler
 
         if (ce.IsActive())
         {
-            // Hand off when participation is detected (EventId may lag).
             if (ShouldHandOffToInCritical(ce))
             {
                 return StatePriority.Never;
@@ -96,14 +94,12 @@ public class WaitingForCriticalEncounterHandler
             return StatePriority.Never;
         }
 
-        // Beat Pathfinding (High) once inside the red registration ring.
         return StatePriority.VeryHigh;
     }
 
     public override void Enter()
     {
         base.Enter();
-        // Forget GoalPathStepMemory before cancel (avoid soft-pause).
         memory.Forget<GoalPathStepMemory>();
         PathStepSoftStop.Stop(manager, pathfinder, vnav);
 
@@ -136,7 +132,6 @@ public class WaitingForCriticalEncounterHandler
             return;
         }
 
-        // Enter already soft-stopped PathStep chains; only keep vnav quiet while holding.
         pathfinder.Stop();
         vnav.Stop();
 

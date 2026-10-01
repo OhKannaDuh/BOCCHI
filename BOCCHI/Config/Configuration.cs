@@ -9,7 +9,6 @@ public class Configuration : IConfiguration
 
     [ConfigHidden] public int Version { get; set; } = CurrentVersion;
 
-    /// <summary>Plugin assembly version last acknowledged via the What’s new popup (not config schema).</summary>
     [ConfigHidden] public string LastSeenPluginVersion { get; set; } = "";
 
     public UIConfig UIConfig { get; set; } = new();

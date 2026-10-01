@@ -2,7 +2,6 @@ using Newtonsoft.Json.Linq;
 
 namespace BOCCHI.Common.Config.Migrations;
 
-/// <summary>Schema bump only — HuntReturnCost already removed in v10→v11.</summary>
 public class ConfigMigratorV11ToV12 : IMigrator
 {
     public int FromVersion => 11;

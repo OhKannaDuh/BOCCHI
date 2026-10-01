@@ -49,7 +49,6 @@ public class OperationalStatusBar
 
     private IMobFarmer Farmer => farmer ??= farmerFactory();
 
-    /// <summary>Set when a status chip is clicked; MainRenderer opens that section once.</summary>
     public MainWindowSection? ExpandSectionRequest { get; private set; }
 
     public void ConsumeExpandRequest() => ExpandSectionRequest = null;
@@ -61,8 +60,6 @@ public class OperationalStatusBar
     public bool PotsTreasureActive => PotsTreasure.Running;
 
     public bool MobFarmerActive => Farmer.Running;
-
-    public bool TreasureHuntActive => hunter.Running;
 
     public bool StandaloneTreasureHuntActive => hunter.Running && !hunter.ManagedByPotsTreasure;
 
@@ -203,7 +200,6 @@ public class OperationalStatusBar
             BocchiUi.DrawStatusChip(potChip, BocchiUi.StatusChipKind.Muted);
         }
 
-        // Ready path-map stays quiet — only show while loading/building.
         if (ZoneGraphStatusUi.TryFormat(
                 zones.GetZone(),
                 translator,

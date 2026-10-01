@@ -13,7 +13,6 @@ public interface IZoneProvider
 
 public class ZoneProvider(IClientState client, IEnumerable<IZone> zones) : IZoneProvider
 {
-    /// <summary>Reuse a single NullZone outside Occult Crescent — GetZone is called several times per frame.</summary>
     private static readonly NullZone None = new();
 
     private readonly Dictionary<ushort, IZone> zoneMap = zones.ToDictionary(z => z.TerritoryType);

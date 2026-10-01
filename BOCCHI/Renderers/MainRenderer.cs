@@ -109,7 +109,6 @@ public class MainRenderer
             else
             {
                 openedWhileActive.Remove(section);
-                // World (and idle modes): start collapsed for new installs.
                 ImGui.SetNextItemOpen(false, ImGuiCond.FirstUseEver);
             }
 

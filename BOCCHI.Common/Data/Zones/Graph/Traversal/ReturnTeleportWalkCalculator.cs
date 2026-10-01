@@ -20,7 +20,6 @@ public class ReturnTeleportWalkCalculator : IGraphCandidateCalculator
         Node? baseCampAetheryte = graph.GetBaseCampAetheryteNode();
         Node? returnNode = graph.GetBaseCampReturnPositionNode();
 
-        // Already at / near camp (return pad or aetheryte) — never offer Return again.
         if (baseCampAetheryte != null && start.Distance2D(baseCampAetheryte.Position) <= NavigationConstants.CampRadius)
         {
             return Task.FromResult<TraversalCandidate?>(null);
@@ -51,14 +50,12 @@ public class ReturnTeleportWalkCalculator : IGraphCandidateCalculator
         Node inbound = inbounds[0].Teleport;
         float walkToGoalFromInbound = inbounds[0].Cost;
 
-        // Return already lands at base camp — no aethernet hop.
         if (inbound.Type == NodeType.BaseCampAetheryte)
         {
             return Task.FromResult<TraversalCandidate?>(new(
                 NavigationConstants.ReturnCost + toBaseCampNodeEdge.Cost + walkToGoalFromInbound,
                 [
                     PathStep.Return(),
-                    // Destination is already offset via GetEventPosition — don't also give vnav a 20y arrival.
                     PathStep.Pathfind(
                         NavigationApproach.ResolveActivityApproach(goal, returnNode.Position),
                         NavigationConstants.EventArrivalRadius)

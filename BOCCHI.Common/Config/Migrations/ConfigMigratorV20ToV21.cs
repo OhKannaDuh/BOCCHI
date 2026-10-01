@@ -2,7 +2,6 @@ using Newtonsoft.Json.Linq;
 
 namespace BOCCHI.Common.Config.Migrations;
 
-/// <summary>Replace ToggleAiProvider with CombatAutorotation.</summary>
 public class ConfigMigratorV20ToV21 : IMigrator
 {
     public int FromVersion => 20;

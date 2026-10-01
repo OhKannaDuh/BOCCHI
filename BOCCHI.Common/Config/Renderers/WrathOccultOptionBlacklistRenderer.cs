@@ -16,10 +16,6 @@ using LuminaAction = Lumina.Excel.Sheets.Action;
 
 namespace BOCCHI.Common.Config.Renderers;
 
-/// <summary>
-///     Per phantom job, a checkbox for each Wrath option (checked = BOCCHI may use it). Option
-///     names come from Wrath, so the list stays in sync with whatever Wrath version is loaded.
-/// </summary>
 public sealed partial class WrathOccultOptionBlacklistRenderer(IWrathOccultOptionCatalog catalog, IDataManager data)
     : IFieldRenderer<WrathOccultOptionBlacklistAttribute>
 {
@@ -121,7 +117,6 @@ public sealed partial class WrathOccultOptionBlacklistRenderer(IWrathOccultOptio
         return changed;
     }
 
-    /// <summary>Loaded once Wrath answers; retried every few seconds while it is missing.</summary>
     private IReadOnlyList<JobOptions> GetJobs()
     {
         if (jobs.Count > 0 || DateTime.UtcNow < nextLoadAttempt)
@@ -160,7 +155,6 @@ public sealed partial class WrathOccultOptionBlacklistRenderer(IWrathOccultOptio
         return result;
     }
 
-    /// <summary>Normalized English action name → client-language name, for this job's actions.</summary>
     private static Dictionary<string, string> LocalizedActionNames(
         MKDSupportJob row,
         ExcelSheet<LuminaAction> actions,
@@ -183,10 +177,6 @@ public sealed partial class WrathOccultOptionBlacklistRenderer(IWrathOccultOptio
         return map;
     }
 
-    /// <summary>
-    ///     <c>Phantom_Berserker_Rage</c> → the client's name for Rage. Sub-options
-    ///     (<c>Phantom_TimeMage_OccultSlowga_Wait</c>) keep their suffix: "Occult Slowga (Wait)".
-    /// </summary>
     private static string OptionLabel(string optionName, Dictionary<string, string> actionNames)
     {
         string[] parts = optionName.Split('_');

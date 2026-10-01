@@ -39,8 +39,6 @@ public class InFateHandler
             return StatePriority.Never;
         }
 
-        // Stay In FATE while still in the fight if EventId drops (dodge / step out of the ring).
-        // Walking away drops combat so travel can resume.
         if (memory.TryRemember<CommittedFateMemory>(out CommittedFateMemory committed)
             && committed.IsFor(fateGoal.id)
             && fates.HasFate(fateGoal.id)
@@ -54,17 +52,11 @@ public class InFateHandler
             return StatePriority.Never;
         }
 
-        // Already handed off once — stay In FATE while EventId matches even if AI dodges
-        // outside the 25y handoff ring (otherwise travel stays suspended and Pathfinding
-        // cannot walk back in; manual re-entry also never re-scores In FATE).
         if (memory.TryRemember<SuspendTravelForActivityMemory>(out SuspendTravelForActivityMemory _))
         {
             return StatePriority.VeryHigh;
         }
 
-        // First entry: AI cannot pick up a FATE from the registration rim. Stay in
-        // Pathfinding until close enough for AutoTarget / StayCloseToTarget.
-        // Combat None walks to mobs from here (no handoff gate).
         if (config.CombatAutorotation.UsesCombatAutomation()
             && !context.IsInCombatWith(fateGoal.id)
             && objects.LocalPlayer is { } player

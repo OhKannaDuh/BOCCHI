@@ -6,10 +6,6 @@ public static class ImGuiSectionHelper
 {
     public const float DefaultListHeight = 200f;
 
-    /// <summary>
-    ///     Child height is content-sized up to <paramref name="maxHeight"/> (avoids empty padding for short lists).
-    ///     Prefer this overload for main-window and config lists.
-    /// </summary>
     public static BoundedListScope BoundedList(
         string id,
         int itemCount,
@@ -18,7 +14,6 @@ public static class ImGuiSectionHelper
     {
         if (itemCount <= 0)
         {
-            // Still open a minimal child so callers can keep a uniform Dispose path.
             float min = ImGui.GetTextLineHeightWithSpacing() + ImGui.GetStyle().WindowPadding.Y * 2f;
             return new BoundedListScope(id, min);
         }
@@ -31,7 +26,6 @@ public static class ImGuiSectionHelper
         return new BoundedListScope(id, height);
     }
 
-    /// <summary>Fixed-height child. Prefer the itemCount overload when the list length is known.</summary>
     public static BoundedListScope BoundedList(string id, float maxHeight = DefaultListHeight) => new(id, maxHeight);
 
     public readonly struct BoundedListScope : IDisposable

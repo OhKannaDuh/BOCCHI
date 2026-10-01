@@ -34,6 +34,5 @@ public interface ICarrotHunter
 
     void Resume();
 
-    /// <summary>Manual Fortune Carrot use (for stuck / intervene).</summary>
     bool UseFortuneCarrot();
 }

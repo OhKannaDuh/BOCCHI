@@ -80,7 +80,6 @@ public class PotsTreasureRenderer
         }
 
         ImGui.Spacing();
-        // Short blurb only when idle — status bar covers live phase while running.
         if (!PotsTreasure.Running)
         {
             BocchiUi.DrawIntro(translator.T(".automation.pots_treasure.description"));
@@ -111,7 +110,6 @@ public class PotsTreasureRenderer
             }
         }
 
-        // Compact hunt status while this mode owns the treasure hunter.
         if (hunter.ManagedByPotsTreasure && (hunter.Running || hunter.Elapsed > TimeSpan.Zero))
         {
             ImGui.Spacing();

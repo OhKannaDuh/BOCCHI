@@ -14,9 +14,6 @@ using ECommonsPlayer = ECommons.GameHelpers.Player;
 
 namespace BOCCHI.Common.Services;
 
-/// <summary>
-///     Jump when vnav reports moving but the character is stuck on mesh it thinks is walkable (#185).
-/// </summary>
 public sealed class StuckJumpAssist(
     IVNavmeshIpc vnav,
     IPlayer player,
@@ -26,19 +23,14 @@ public sealed class StuckJumpAssist(
     ILogger<StuckJumpAssist> logger
 ) : IOnUpdate
 {
-    /// <summary>Leave time to land and for vnav to make real progress before hopping again.</summary>
     private const int RetryThrottleMs = 2000;
 
-    /// <summary>Horizontal movement that counts as progress. Generous — a snag moves you nowhere.</summary>
     private const float ProgressThreshold = 1f;
 
-    /// <summary>Jumps at one snag before stopping pathfind so callers can repath or skip.</summary>
     private const int MaxJumpsAtSnag = 5;
 
-    /// <summary>How long to refuse more hops near a give-up spot (avoids jump→repath→jump loops).</summary>
     private static readonly TimeSpan GiveUpCooldown = TimeSpan.FromSeconds(30);
 
-    /// <summary>Still “the same snag” if we have not walked this far from the give-up point.</summary>
     private const float GiveUpRadius = 5f;
 
     private Vector3 lastPosition;
@@ -69,8 +61,6 @@ public sealed class StuckJumpAssist(
             return;
         }
 
-        // Casting is the one thing a jump would actively break, and the rest mean the character is
-        // not under our control anyway — standing still then is expected, not stuck.
         if (conditions[ConditionFlag.Casting]
             || conditions[ConditionFlag.Casting87]
             || conditions[ConditionFlag.BetweenAreas]
@@ -90,8 +80,6 @@ public sealed class StuckJumpAssist(
             return;
         }
 
-        // 2D: falling is vertical-only and cannot be helped by jumping, so it must not read as
-        // progress — and a snag against geometry stops horizontal movement specifically.
         if (movedAtUtc == DateTime.MinValue || position.Distance2D(lastPosition) > ProgressThreshold)
         {
             lastPosition = position;
@@ -134,7 +122,6 @@ public sealed class StuckJumpAssist(
             MaxJumpsAtSnag);
         Actions.Jump.Cast();
 
-        // Give the hop a chance to land before judging progress again.
         movedAtUtc = DateTime.UtcNow;
     }
 }

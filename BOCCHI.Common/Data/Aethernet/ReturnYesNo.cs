@@ -6,9 +6,6 @@ using Lumina.Excel.Sheets;
 
 namespace BOCCHI.Common.Data.Aethernet;
 
-/// <summary>
-///     Auto-accept Return/Demi-Return SelectYesno only. Other prompts (party invites, etc.) are left alone.
-/// </summary>
 public static class ReturnYesNo
 {
     private const uint PartyInviteAddonTextRow = 120;
@@ -40,7 +37,6 @@ public static class ReturnYesNo
             return false;
         }
 
-        // Prefer localized Addon sheet match; fall back to AtkValues[7] + English-ish heuristics.
         if (templatesLoaded && returnTemplate.Length > 0 && MatchesLocalizedPrompt(prompt, returnTemplate))
         {
             return true;
@@ -51,7 +47,6 @@ public static class ReturnYesNo
             return false;
         }
 
-        // Master TeleporterModule fingerprint — only accept with prompt that looks like Return.
         if (addon->AtkValuesCount > 7
             && addon->AtkValues[7].Type == AtkValueType.Int
             && addon->AtkValues[7].Int == -1
@@ -96,7 +91,6 @@ public static class ReturnYesNo
 
     private static bool LooksLikeReturnPrompt(string prompt)
     {
-        // Last-resort heuristic when Addon sheet text isn't loaded yet.
         string n = NormalizePrompt(prompt);
         return n.Contains("return", StringComparison.OrdinalIgnoreCase)
                || n.Contains("帰還", StringComparison.Ordinal)

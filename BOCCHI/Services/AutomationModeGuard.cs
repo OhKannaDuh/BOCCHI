@@ -46,7 +46,6 @@ public class AutomationModeGuard
 
     private bool stopping;
 
-    /// <summary>Treasure / carrot hunt was running when shopping took vnav — resume after, not a hunt already paused for FATE/pots.</summary>
     private bool treasurePausedForShopping;
 
     private bool carrotPausedForShopping;
@@ -68,8 +67,6 @@ public class AutomationModeGuard
             else if (mode == AutomationMode.TreasureHunt
                 && (Automator.IsIllegalMode || Automator.IsCompletionist))
             {
-                // Auto hunt: soft-pause Illegal Mode and resume when the hunt ends. Manual hunt with
-                // auto off: only one primary mode — turn Illegal Mode off instead of running both.
                 if (automatorConfig.EnableAutomaticTreasureHuntDuringIllegalMode)
                 {
                     Automator.SetSuspendedForTreasure(true);
@@ -127,7 +124,6 @@ public class AutomationModeGuard
                 Farmer.Toggle();
             }
 
-            // Shopping needs exclusive pathing: pause treasure / carrot (resume after).
             if (mode == AutomationMode.Shopping)
             {
                 if (Hunter.Running && !Hunter.Paused)
@@ -171,7 +167,6 @@ public class AutomationModeGuard
             return;
         }
 
-        // Resume Illegal Mode / Completionist — Pots & Treasure manages its own suspension.
         if ((Automator.IsIllegalMode || Automator.IsCompletionist) && Automator.SuspendedForTreasure)
         {
             Automator.SetSuspendedForTreasure(false);
@@ -229,7 +224,6 @@ public class AutomationModeGuard
             treasurePausedForShopping = false;
             carrotPausedForShopping = false;
 
-            // Shopping owns vnav independently of Illegal Mode — stop it first or pathing continues.
             shoppingFactory().ForceStop();
             if (Automator.SuspendedForShopping)
             {
@@ -311,9 +305,6 @@ public class AutomationModeGuard
         }
     }
 
-    /// <summary>
-    ///     Manual / Mob Farmer hunts — not the Illegal Mode filler or Pots &amp; Treasure pipeline.
-    /// </summary>
     private void StopStandaloneTreasureHunt()
     {
         if (!Hunter.Running || Hunter.ManagedByIllegalModeFiller || Hunter.ManagedByPotsTreasure)

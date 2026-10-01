@@ -16,9 +16,6 @@ using Ocelot.Services.PlayerState;
 
 namespace BOCCHI.Services.Repair;
 
-/// <summary>
-///     Artisan / AutoDuty flow: path to a nearby mender, open Repair via SelectIconString, Repair All.
-/// </summary>
 public class NpcRepairStep
 (
     IChainFactory chains,

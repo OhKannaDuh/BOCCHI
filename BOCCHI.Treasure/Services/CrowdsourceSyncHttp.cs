@@ -5,7 +5,6 @@ using System.Text.Json;
 
 namespace BOCCHI.Treasure.Services;
 
-/// <summary>Shared HTTP / timing / position-key helpers for coffer, carrot, and pot-chest crowdsource sync.</summary>
 internal static class CrowdsourceSyncHttp
 {
     public static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(15) };
@@ -19,7 +18,6 @@ internal static class CrowdsourceSyncHttp
 
     public static readonly TimeSpan CatalogRefreshInterval = TimeSpan.FromMinutes(5);
 
-    /// <summary>Worker near-dupe window (±0.1 yalm), rounded invariant.</summary>
     public static string FormatCoord(float value) =>
         MathF.Round(value, 1).ToString("F1", CultureInfo.InvariantCulture);
 

@@ -4,7 +4,6 @@ using Ocelot.Windows;
 
 namespace BOCCHI.Common.UI;
 
-/// <summary>Compact path-map status so players can see why Illegal Mode may be waiting.</summary>
 public static class ZoneGraphStatusUi
 {
     public static bool TryFormat(

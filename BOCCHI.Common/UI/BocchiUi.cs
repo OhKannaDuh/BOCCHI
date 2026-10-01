@@ -3,7 +3,6 @@ using System.Numerics;
 
 namespace BOCCHI.Common.UI;
 
-/// <summary>Shared ImGui chrome: panels, chips, headers, progress.</summary>
 public static class BocchiUi
 {
     public enum StatusChipKind
@@ -13,7 +12,6 @@ public static class BocchiUi
         Muted,
     }
 
-    // Text / accents on dark panel backgrounds (keep high luminance).
     public static readonly Vector4 Header = new(0.90f, 0.78f, 0.42f, 1f);
     public static readonly Vector4 Muted = new(0.72f, 0.72f, 0.74f, 1f);
     public static readonly Vector4 Warn = new(0.98f, 0.82f, 0.42f, 1f);
@@ -23,7 +21,6 @@ public static class BocchiUi
     private static readonly Vector4 PanelBg = new(0.10f, 0.10f, 0.12f, 0.55f);
     private static readonly Vector4 PanelBorder = new(0.40f, 0.40f, 0.45f, 0.55f);
 
-    // Chip fills stay dark; text stays light (never bright-on-bright).
     private static readonly Vector4 ChipOkBg = new(0.14f, 0.32f, 0.20f, 0.95f);
     private static readonly Vector4 ChipWarnBg = new(0.38f, 0.28f, 0.08f, 0.95f);
     private static readonly Vector4 ChipMutedBg = new(0.20f, 0.20f, 0.23f, 0.95f);
@@ -31,7 +28,6 @@ public static class BocchiUi
     private static readonly Vector4 ChipWarnFg = new(1.00f, 0.92f, 0.68f, 1f);
     private static readonly Vector4 ChipMutedFg = new(0.88f, 0.88f, 0.90f, 1f);
 
-    // Progress fills are darker; labels sit beside the bar, never on the fill.
     private static readonly Vector4 BarGood = new(0.22f, 0.58f, 0.34f, 1f);
     private static readonly Vector4 BarWarn = new(0.58f, 0.44f, 0.14f, 1f);
     private static readonly Vector4 BarEmpty = new(0.22f, 0.22f, 0.25f, 1f);
@@ -185,9 +181,6 @@ public static class BocchiUi
         return clicked;
     }
 
-    /// <summary>
-    /// Progress fill with label beside the bar (never overlay text on the fill).
-    /// </summary>
     public static void DrawPercentBar(float fraction, float width, string overlay)
     {
         float clamped = Math.Clamp(fraction, 0f, 1f);
@@ -209,7 +202,6 @@ public static class BocchiUi
         }
     }
 
-    /// <summary>Slightly rounder frames for config field widgets.</summary>
     public static void PushFieldStyle()
     {
         ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, FieldFrameRounding);

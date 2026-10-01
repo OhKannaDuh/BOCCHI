@@ -69,7 +69,6 @@ public static class MobPickerHelper
             return false;
         }
 
-        // Content-sized up to listHeight (FATE/CE-style — no empty padding for short filters).
         using ImGuiSectionHelper.BoundedListScope list =
             ImGuiSectionHelper.BoundedList(listId, selectableMobs.Count, listHeight);
         if (!list.IsOpen)

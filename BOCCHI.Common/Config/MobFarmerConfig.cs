@@ -82,10 +82,6 @@ public class MobFarmerConfig : IAutoConfig
     [FloatRange(0f, 30f, Order = 23, Section = "buffs")]
     public float MaximumBattleBellWaitTime { get; set; } = 10f;
 
-    /// <summary>
-    ///     Skip Quickstep when the crystal Quicker Step buff still has at least this many minutes.
-    ///     0 = recast every pull.
-    /// </summary>
     [IntRange(0, 30, Order = 24, Section = "buffs")]
     public int QuickstepSkipIfRemainingMinutes { get; set; } = 0;
 

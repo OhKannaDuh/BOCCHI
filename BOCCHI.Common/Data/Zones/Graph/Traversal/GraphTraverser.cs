@@ -20,8 +20,6 @@ public class GraphTraverser(ZoneGraph graph, IPathfinder pathfinder, ILogger log
     {
         List<TraversalCandidate> candidates = new();
 
-        // Calculators with a cheap lower bound run last, and are skipped when they cannot beat
-        // a candidate already found.
         List<(IGraphCandidateCalculator Calculator, float Bound)> deferred = [];
 
         foreach(IGraphCandidateCalculator calculator in calculators)

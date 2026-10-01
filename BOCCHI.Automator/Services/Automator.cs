@@ -54,7 +54,6 @@ public class Automator
     ILogger<Automator> logger
 ) : IAutomator, IOnUpdate, IOnStop
 {
-    // Before IllegalModeTreasureFillerService (0) so pot-chest farm latches first.
     public int Order => 5;
 
     private IStateMachine<AutomatorState>? stateMachine;
@@ -100,7 +99,6 @@ public class Automator
             return;
         }
 
-        // Keep GoalMemory; Treasure Hunt owns vnav while suspended.
         IllegalModeActivityWork.ForgetTravelLatches(memory);
         SoftStopPathfinding();
         autoRotation.DisableAi();
@@ -124,15 +122,11 @@ public class Automator
             return;
         }
 
-        // Drop in-flight buff approach — crystal pathing at camp fought the antiquarian (#203).
         memory.Forget<ApplyingBuffsMemory>();
         memory.Forget<ManualBuffRunMemory>();
         memory.Forget<InquiringMindAttemptedMemory>();
         memory.Forget<BuffSupportJobMemory>();
 
-        // Keep GoalMemory and FATE/CE commitment — only drop the active path steps so
-        // shopping owns vnav. Forgetting SuspendTravel / Committed* mid-CE used to make
-        // GoalValidator drop the encounter as "still pathing" on resume.
         memory.Forget<GoalPathStepMemory>();
         SoftStopPathfinding();
         autoRotation.DisableAi();
@@ -225,15 +219,6 @@ public class Automator
         EnsurePotChestFarmForBuff();
     }
 
-    /// <summary>
-    ///     Cache Me If You Can being up means there are chests to open, so that — not goal
-    ///     bookkeeping — is what starts the farm. Latching off the goal transition alone raced the
-    ///     treasure filler: whichever ran first in the frame either started the farm or latched a
-    ///     Sight survey, and the survey path Returns at High priority and picks a new FATE.
-    ///     Runs every tick; cheap, and a no-op once a farm is latched or the buff is gone.
-    ///     The buff does not say which pot it came from — see
-    ///     <see cref="ResolvePotFateForActiveBuff"/>.
-    /// </summary>
     private void EnsurePotChestFarmForBuff()
     {
         if (memory.TryRemember<PotChestFarmMemory>(out PotChestFarmMemory _)
@@ -273,7 +258,6 @@ public class Automator
         IllegalModeActivityWork.ForgetTravelLatches(memory, includePotChests: true);
         SoftStopPathfinding();
 
-        // GoalMemory kept — Update() will rebuild GoalPathStepMemory from here.
         if (!memory.TryRemember<GoalMemory>(out GoalMemory _))
         {
             BocchiChat.Print(chat, uiConfig, translator.T(".automation.automator.pathfinding_refreshed_no_goal"));
@@ -301,10 +285,8 @@ public class Automator
             IllegalModeActivityWork.ForgetTravelLatches(memory, includePotChests: true);
             SoftStopPathfinding();
             memory.Forget<GoalPathStepMemory>();
-            // GoalMemory kept — Update() replans once the path map is ready.
         }
 
-        // Kick load immediately so the UI shows Loading/Building instead of waiting for a FATE pick.
         _ = zone.GetGraph().ContinueWith(
             task =>
             {
@@ -342,7 +324,6 @@ public class Automator
             return;
         }
 
-        // Zone lock even while suspended for treasure — leaving OC must fully turn the mode off.
         if (!zones.GetZone().IsOccultCrescentZone())
         {
             DisableDueToLeavingOccultCrescent();
@@ -354,9 +335,6 @@ public class Automator
             return;
         }
 
-        // Treasure hunt soft-suspend must not block pot-chest latch: when the pot FATE ends (or
-        // Cache Me is up), TryStartPending / EnsurePotChestFarm never ran and chests waited until
-        // the hunt fully stopped (Godfrey).
         if (SuspendedForTreasure)
         {
             TryStartPendingPotChestFarm();
@@ -378,7 +356,6 @@ public class Automator
 
         autoRotation.Tick();
 
-        // Mid-route cancel (vnav stop / emergency) — don't replan until mode is toggled.
         if (memory.TryRemember<NavigationInterruptedMemory>(out NavigationInterruptedMemory _))
         {
             StateMachine.Update();
@@ -511,13 +488,11 @@ public class Automator
             return;
         }
 
-        // Still mid-FATE (e.g. HasFate flicker) — wait until the pot is actually gone.
         if (fates.HasFate(fateId))
         {
             if (!memory.TryRemember<PendingPotChestFarmMemory>(out PendingPotChestFarmMemory _))
             {
                 memory.TryAdd(new PendingPotChestFarmMemory(fateId));
-                // Stop next-goal travel immediately so we don't Return/TP before chests.
                 IllegalModeActivityWork.ForgetTravelLatches(memory);
                 SoftStopPathfinding();
                 logger.Debug("Pot FATE {FateId} still active — deferring chest farm", fateId.Value);
@@ -528,8 +503,6 @@ public class Automator
 
         memory.Forget<PendingPotChestFarmMemory>();
 
-        // Magical Elixir + compass hints whenever we have pot chest data (SH authored groups, NH binned).
-        // WaitingForBuff waits for Cache Me; leftover elixir alone must not start a blind sweep.
         potChests.EnsureFreshForFarm();
         ActivityData? potFate = zone.GetPotFateData().FirstOrDefault(f => f.Id == fateId.Value);
         IReadOnlyList<PotChestData> primaryPads = potChests.GetPrimaryPads(zone, fateId.Value);
@@ -540,7 +513,6 @@ public class Automator
             return;
         }
 
-        // Blind authored sweep only when the buff is already present (no WaitingForBuff phase).
         if (objects.LocalPlayer?.StatusList.Has(PotTreasureIds.TreasureBuffStatusId) != true)
         {
             logger.Debug(
@@ -578,10 +550,6 @@ public class Automator
         BeginExclusivePotChestFarm(PotChestFarmMemory.CreateBlind(fateId, positions));
     }
 
-    /// <summary>
-    ///     Cache Me does not name the pot it came from. Nearest FATE centre is wrong after a
-    ///     manual elixir — you are often standing on a distant chest, closer to the other pot.
-    /// </summary>
     private ActivityData? ResolvePotFateForActiveBuff(IZone zone, Vector3 playerPos)
     {
         List<ActivityData> pots = zone.GetPotFateData();
@@ -638,10 +606,6 @@ public class Automator
             .FirstOrDefault();
     }
 
-    /// <summary>
-    /// Drop next-goal / Return travel so FarmingPotChests can open reveals.
-    /// Otherwise Choosing during Pending + Pathfinding (High) preempts the farm.
-    /// </summary>
     private void BeginExclusivePotChestFarm(PotChestFarmMemory farm)
     {
         memory.Forget<GoalMemory>();
@@ -649,7 +613,6 @@ public class Automator
         memory.Forget<ReturningStateMemory>();
         SoftStopPathfinding();
 
-        // Drop post-activity Sight / map latch so Return-to-camp cannot beat Magical Elixir.
         if (memory.TryRemember(out AutomaticTreasureSurveyMemory survey))
         {
             survey.PendingSurvey = false;
@@ -658,7 +621,6 @@ public class Automator
             survey.SurveyWaitDeadlineUtc = DateTime.MinValue;
         }
 
-        // Keep Illegal Mode filler hunt paused for the farm (do not ResumeNearPlayer mid-elixir).
         ITreasureHunter hunt = hunterFactory();
         if (hunt.Running && !hunt.Paused)
         {

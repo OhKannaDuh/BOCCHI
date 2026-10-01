@@ -68,37 +68,20 @@ public class TreasureHunterService
     CofferLocationSyncService cofferLocations
 ) : ITreasureHunter, IOnUpdate, IOnStop
 {
-    /// <summary>Start open attempts once this close to the coffer (yalms).</summary>
     private const float CofferOpenAttemptRadius = 75f;
 
-    /// <summary>
-    ///     After FATE/CE, if the paused resume pad is farther than this, replan from the player
-    ///     instead of walking back across the zone.
-    /// </summary>
     private const float ResumeNearPlayerMinDistance = 150f;
 
-    /// <summary>How long to wait for WideText after casting Treasure Sight.</summary>
     private static readonly TimeSpan SightCountWait = TimeSpan.FromSeconds(8);
 
-    /// <summary>Skip an unreachable hunt via after this long with no progress.</summary>
     private static readonly TimeSpan StuckViaTimeout = TimeSpan.FromSeconds(10);
 
-    /// <summary>
-    ///     Only abandon a via this close. Farther away usually means Hide stopped vnav, not that
-    ///     the via itself is unreachable.
-    /// </summary>
     private const float StuckViaSkipRadius = 12f;
 
-    /// <summary>Minimum distance improvement toward the destination that counts as progress.</summary>
     private const float StuckProgressThreshold = 1.5f;
 
-    /// <summary>Below this distance, walk-stuck recovery does not run (open / empty-skip owns it).</summary>
     private const float StuckDetectionMinDistance = OpenTreasureCofferChain.PreferredOpenDistance;
 
-    /// <summary>
-    ///     After a stuck nudge, skip an empty pad this close instead of pathing back into the
-    ///     same wall (1805 loop: neighbour coffer on radar blocked the normal empty-skip).
-    /// </summary>
     private const float StuckEmptySkipRadius = 15f;
 
     private readonly WalkStuckWatch padStuckWatch = new(new WalkStuckWatch.Options(
@@ -110,25 +93,17 @@ public class TreasureHunterService
 
     private readonly CampReturnSession campReturn = new("TreasureHunt::Return");
 
-    /// <summary>
-    ///     Do not re-issue the same vnav dest until this elapses. Covers both the
-    ///     pathfind-done / follow-not-started gap and follow dying against geometry.
-    /// </summary>
     private static readonly TimeSpan SameDestRepathCooldown = TimeSpan.FromSeconds(2.5);
 
     private readonly List<TreasureLayoutDatum> layoutTreasure = [];
 
-    /// <summary>Id index over <see cref="layoutTreasure"/>; rebuilt in <see cref="RebuildLayoutIndex"/>.</summary>
     private readonly Dictionary<uint, TreasureLayoutDatum> layoutById = [];
 
-    /// <summary>Treasure objects for the current tick (see <see cref="RefreshTickTreasures"/>).</summary>
     private readonly List<IGameObject> tickTreasures = [];
 
     private readonly List<HuntPathfinderStep> steps = [];
     private readonly HashSet<uint> checkedNodeIds = [];
-    /// <summary>Stuck / geometry skips — never reclaim via Nearby divert (#173).</summary>
     private readonly HashSet<uint> stuckSkippedNodeIds = [];
-    /// <summary>Already tried Return/shard to drop to this pad’s shelf (re-apply after replan).</summary>
     private readonly HashSet<uint> cliffReroutedNodeIds = [];
     private readonly HashSet<uint> lastCompletedRunNodeIds = [];
 
@@ -143,41 +118,26 @@ public class TreasureHunterService
     private DateTime sightCastUtc = DateTime.MinValue;
     private int locationsSinceLastSight;
 
-    /// <summary>
-    ///     Skip session-start Sight when Illegal Mode (or idle camp) just surveyed — a second
-    ///     cast back-to-back usually hits cooldown and adds nothing.
-    /// </summary>
     private static readonly TimeSpan FreshSightReuseWindow = TimeSpan.FromSeconds(45);
     private HashSet<uint> excludedNodeIdsForNextRun = [];
     private int? maxLevelOverrideForNextRun;
 
-    /// <summary>Force this pad as TSP start on the next plan (Nearby divert / reclaim).</summary>
     private uint? pendingPreferStartNode;
 
-    /// <summary>
-    ///     Next plan ignores LastCheckedNodeId so the tour starts at the nearest remaining pad
-    ///     (Illegal Mode map hunt after a distant FATE/CE).
-    /// </summary>
     private bool pendingRepathNearPlayer;
 
-    /// <summary>South Horn session start: prepend Return before first walk (cleared after first plan).</summary>
     private bool pendingSessionCampReturn;
 
-    /// <summary>South Horn segment rotation: enter the authored route here on the first plan.</summary>
     private uint? pendingEntryNodeId;
 
-    /// <summary>Node → authored segment id (for divert while the planner is null).</summary>
     private readonly Dictionary<uint, string> authoredNodeSegments = [];
 
-    /// <summary>Node → authored order index (peel-off must not jump ahead of the route).</summary>
     private readonly Dictionary<uint, int> authoredNodeOrder = [];
 
-    /// <summary>Hide required until pack threats stay clear (debounced).</summary>
     private bool ninjaHideRequired;
 
     private readonly NinjaHideRouteGate ninjaHideRouteGate = new();
 
-    /// <summary>Via-points for the current WalkToNode (departure of previous + approach of current).</summary>
     private readonly List<Vector3> walkVias = [];
 
     private int walkViaIndex;
@@ -186,27 +146,16 @@ public class TreasureHunterService
     private float viaStuckBestDistance = float.MaxValue;
     private DateTime viaStuckStartedUtc = DateTime.MinValue;
 
-    /// <summary>Last snapped target issued to vnav (repath when it drifts).</summary>
     private Vector3? lastNavigateTarget;
 
-    /// <summary>When that target was issued — do not re-queue the same dest until the cooldown elapses.</summary>
     private DateTime lastNavigateIssuedUtc = DateTime.MinValue;
 
-    /// <summary>Skip coffer repath until this time (stuck nudge must be allowed to start).</summary>
     private DateTime holdNavigateUntilUtc = DateTime.MinValue;
 
-    /// <summary>
-    ///     Live coffer XZ for the current WalkToNode. Sticky so a one-tick miss in the object
-    ///     table cannot flip pathing back to the authored pad and tug-of-war with the chest.
-    /// </summary>
     private uint? walkLiveBindNodeId;
 
     private Vector3? walkLiveBindPosition;
 
-    /// <summary>
-    ///     Once we leave the mesh snap to close on the real pad/coffer, do not fall back to the
-    ///     snap — that repaths every tick when the live object sits several yalms off-mesh.
-    /// </summary>
     private bool navigateClosingOnDestination;
 
     private Vector3? navigateClosingForDestination;
@@ -220,7 +169,6 @@ public class TreasureHunterService
             return;
         }
 
-        // Zone lock even while paused — leaving OC must fully stop (no resume on return).
         if (!zones.GetZone().IsOccultCrescentZone())
         {
             StopDueToLeavingOccultCrescent();
@@ -276,7 +224,6 @@ public class TreasureHunterService
 
         if (activeChain is { IsCompleted: false })
         {
-            // Interact often drops Hide; stay stealthed while the open chain runs near threats.
             MaintainNinjaHideDuringInteract();
             if (EzThrottler.Throttle("TreasureHunt::IdleOpenChain", 5000))
             {
@@ -324,7 +271,6 @@ public class TreasureHunterService
                         authored.Exists(d => d.Position.HasValue),
                         liveSpots.Count > 0))
                 {
-                    // Divert latch — pad may have been checked empty while still live.
                     checkedNodeIds.Remove(preferLatch);
                     validNodes.Insert(0, preferLatch);
                 }
@@ -353,8 +299,6 @@ public class TreasureHunterService
             uint? entryNodeId = pendingEntryNodeId;
             pendingEntryNodeId = null;
 
-            // After a distant FATE/CE: ignore authored continue-after + segment peel so we start
-            // at the nearest remaining pad to the player instead of walking back across the map.
             bool repathNearPlayer = pendingRepathNearPlayer;
             pendingRepathNearPlayer = false;
             uint? continueAfter = repathNearPlayer ? null : LastCheckedNodeId;
@@ -382,8 +326,6 @@ public class TreasureHunterService
                 bool alreadyInCamp = zones.GetZone().IsInBasecamp();
                 if (steps.Count > 0 && steps[0].Type == HuntPathfinderStepType.WalkToNode)
                 {
-                    // Session start: aethernet (and Return when not already in camp) instead of a
-                    // cross-map walk from base to the first pad.
                     uint firstNode = steps[0].NodeId;
                     steps.RemoveAt(0);
                     steps.InsertRange(0, pathPlanner.BuildEntryLeg(firstNode, alreadyInCamp));
@@ -402,7 +344,6 @@ public class TreasureHunterService
 
             pathPlanner = null;
             StepIndex = 0;
-            // Arm session-start Sight once, after Return/TP is planned — skip if survey is still fresh.
             if (!sessionStartSightArmed)
             {
                 bool canSight = config.CastTreasureSightDuringHunt
@@ -464,7 +405,6 @@ public class TreasureHunterService
             return;
         }
 
-        // Observe completed teleport/return chains before clearing (else the hop restarts).
         if (TryAdvanceCurrentStep())
         {
             HuntPathfinderStep completed = steps[StepIndex];
@@ -496,7 +436,6 @@ public class TreasureHunterService
         }
     }
 
-    /// <summary>Next step is Return/TP (segment exit) — must survive pad completion.</summary>
     private bool NextStepIsTravelHop()
     {
         int next = StepIndex + 1;
@@ -506,9 +445,6 @@ public class TreasureHunterService
                    or HuntPathfinderStepType.WalkToAethernet;
     }
 
-    /// <summary>
-    ///     Pad done. Advance onto the following Return / aethernet hop if there is one, else replan.
-    /// </summary>
     private void FinishCurrentPad()
     {
         walkViaStepIndex = -1;
@@ -532,7 +468,6 @@ public class TreasureHunterService
 
     public bool Paused { get; private set; }
 
-    /// <inheritdoc />
     public bool WaitingForSafeWindow =>
         Running
         && !Paused
@@ -604,7 +539,6 @@ public class TreasureHunterService
             return false;
         }
 
-        // Also called from Pots & Treasure outside our own Update tick.
         RefreshTickTreasures();
 
         TreasureHuntPathfinder? planner = CreatePathPlanner();
@@ -626,7 +560,6 @@ public class TreasureHunterService
         waitingForSightCounts = false;
         sightCastUtc = DateTime.MinValue;
         ClearEmptyPadCandidate();
-        // Preserve Every-N Sight counter across replans.
         pathPlanner = planner;
         planningRoute = true;
 
@@ -690,8 +623,6 @@ public class TreasureHunterService
                 config.LastSouthHornStartSegment = startSegment;
                 configSaver.Save();
                 pendingEntryNodeId = pathPlanner.TryGetSegmentFirstNode(startSegment);
-                // Always plan camp→aethernet entry for the first pad (Return only when not already
-                // in camp). Skipping this while in camp caused a ~1000y walk across the map.
                 pendingSessionCampReturn = true;
             }
 
@@ -707,7 +638,6 @@ public class TreasureHunterService
         pandoraAutoOpen.Hold();
     }
 
-    /// <summary>Rotate South Horn start segment; unknown id → first segment.</summary>
     private static string? NextRotationSegment(IReadOnlyList<string> segmentIds, string? lastStartSegment)
     {
         if (segmentIds.Count == 0)
@@ -875,7 +805,6 @@ public class TreasureHunterService
         return true;
     }
 
-    /// <summary>Stop movement/chains without clearing the planned route.</summary>
     private void SoftStopMovement()
     {
         chainManager.CancelWhere(name => name.StartsWith("TreasureHunt", StringComparison.Ordinal));
@@ -929,7 +858,6 @@ public class TreasureHunterService
     {
         ZoneId zoneId = zones.GetZone().ZoneId;
 
-        // Lateral nudge into NE sinking packs pulls / breaks Hide (Discord: far NE ~34x 3–4y).
         if (TreasureHuntPathOverrides.IsDensePackApproach(zoneId, step.NodeId))
         {
             log.Debug(
@@ -972,30 +900,19 @@ public class TreasureHunterService
         ClearNavigateClosingLatch();
         lastNavigateTarget = nudge;
         lastNavigateIssuedUtc = DateTime.UtcNow;
-        // TryNavigateToward would overwrite this on the next tick if we don't hold.
         holdNavigateUntilUtc = DateTime.UtcNow + TimeSpan.FromSeconds(3);
         vnav.PathfindAndMoveCloseTo(nudge, false, 1.5f);
     }
 
-    /// <summary>
-    ///     Hide / dense-pack cannot use a lateral nudge — stop grinding the wall and skip the pad
-    ///     sooner instead of waiting the full escalate window with vnav still running.
-    /// </summary>
     private void PauseStuckApproachWithoutNudge()
     {
         pathfinder.Stop();
         vnav.Stop();
         ClearNavigateClosingLatch();
-        // Hold repath long enough to cover CapEscalateAfter so we do not immediately walk back in.
         holdNavigateUntilUtc = DateTime.UtcNow + TimeSpan.FromSeconds(10);
         padStuckWatch.CapEscalateAfter(TimeSpan.FromSeconds(8));
     }
 
-    /// <summary>
-    ///     Stuck on a pad with no live coffer — skip it. Neighbour chests on radar used to
-    ///     pin us here: empty-skip required a streamed neighbour near <em>this</em> pad,
-    ///     divert required one in layout range, and neither fired so we re-queued forever.
-    /// </summary>
     private bool TrySkipEmptyAfterStuckNudge(HuntPathfinderStep step, Vector3 layoutDestination, float dist2d)
     {
         if (!padStuckWatch.NudgeIssued || !IsSameFloor(layoutDestination) || dist2d > StuckEmptySkipRadius)
@@ -1025,11 +942,9 @@ public class TreasureHunterService
         viaStuckStartedUtc = DateTime.MinValue;
     }
 
-    /// <summary>Skip the current via when vnav cannot make progress (off-mesh / blocked).</summary>
     private bool TrySkipStuckVia(uint nodeId, float distance)
     {
         DateTime now = DateTime.UtcNow;
-        // Pathfinding / Hide-hold is not "stuck on the via".
         if (vnav.IsPathfinding() || now < holdNavigateUntilUtc)
         {
             viaStuckStartedUtc = now;
@@ -1056,7 +971,6 @@ public class TreasureHunterService
             return false;
         }
 
-        // Still far from the via: do not abandon a descent stop. Drop via Return instead.
         if (distance > StuckViaSkipRadius)
         {
             if (TryRerouteSeparatedShelf(nodeId))
@@ -1079,7 +993,6 @@ public class TreasureHunterService
         return true;
     }
 
-    /// <summary>True when the current walk is already a camp/shard approach into this pad.</summary>
     private bool CurrentApproachIsCampEntry()
     {
         if (StepIndex <= 0)
@@ -1092,10 +1005,6 @@ public class TreasureHunterService
             or HuntPathfinderStepType.WalkToAethernet;
     }
 
-    /// <summary>
-    ///     High island vs lower pad: walking the 2D line idles at the cliff. Return and take a
-    ///     shard down (same idea as carrot hunt’s wrong-shelf hop).
-    /// </summary>
     private bool TryRerouteSeparatedShelf(uint nodeId)
     {
         if (pathPlanner == null || planningRoute || CurrentApproachIsCampEntry())
@@ -1132,9 +1041,6 @@ public class TreasureHunterService
         return true;
     }
 
-    /// <summary>
-    /// All remaining layout pads for live Nearby coffers, closest first (exclusive pad match).
-    /// </summary>
     private List<uint> FindAllLiveNearbyPreferNodes(IReadOnlyList<uint> validNodes)
     {
         if (validNodes.Count == 0)
@@ -1203,7 +1109,6 @@ public class TreasureHunterService
         return !config.HuntSilverChestsOnly || type == CofferType.Silver;
     }
 
-    /// <summary>True when an unopened bronze/silver hunt coffer is still near the player.</summary>
     private bool HasUnopenedLiveHuntCofferNearPlayer(float range)
     {
         foreach (TreasureCoffer coffer in tracker.Treasures)
@@ -1222,7 +1127,6 @@ public class TreasureHunterService
         return false;
     }
 
-    /// <summary>Nearest unclaimed pad; peel uses LayoutProximityRadius, not MatchRadius.</summary>
     private uint? FindNearestUnclaimedLayoutNode(
         Vector3 livePosition,
         HashSet<uint> validNodes,
@@ -1257,7 +1161,6 @@ public class TreasureHunterService
         return bestId;
     }
 
-    /// <summary>Divert mid-route when a nearer live coffer remains (including Return / aethernet).</summary>
     private bool TryReprioritizeNearbyLiveCoffer()
     {
         if (planningRoute || pathPlanner != null || activeChain != null)
@@ -1290,14 +1193,12 @@ public class TreasureHunterService
             currentDist = float.MaxValue;
         }
 
-        // Already at/near the pad — don't U-turn to another coffer mid-open.
         if (current.Type == HuntPathfinderStepType.WalkToNode
             && currentDist <= HuntDistances.NearbyLiveDivertMinCurrentDistance)
         {
             return false;
         }
 
-        // Throttle before the pad scan — divert at most every 1.5s.
         if (!EzThrottler.Throttle("TreasureHuntReprioritize", 1500))
         {
             return false;
@@ -1307,12 +1208,9 @@ public class TreasureHunterService
         List<uint> remaining = GetValidNodesForNextPlan();
         if (TryGetCurrentSegment(remaining, null) is string segment)
         {
-            // Divert only within the current segment; no segment → exclude.
             candidates.RemoveWhere(id =>
                 authoredNodeSegments.GetValueOrDefault(id) != segment);
 
-            // Stay on authored order, but reclaim a pad that was empty-skipped while the
-            // coffer was still loading — GetDivertCandidateNodes already re-adds those.
             if (TryGetAuthoredFrontier(remaining, segment) is uint frontier)
             {
                 candidates.RemoveWhere(id =>
@@ -1353,7 +1251,6 @@ public class TreasureHunterService
 
         if (currentIsLiveNearby)
         {
-            // Already walking to a live Nearby — only peel if another is clearly closer.
             if (nearbyDist + 5f >= currentDist)
             {
                 return false;
@@ -1362,13 +1259,11 @@ public class TreasureHunterService
         else if (current.Type == HuntPathfinderStepType.WalkToNode
                  && currentDist <= HuntDistances.EmptyPadSkipRadius)
         {
-            // Near pad: wait for stream/empty-skip; don't peel (false empty U-turns).
             return false;
         }
         else if (nearbyDist + HuntDistances.NearbyLiveDivertClearAdvantage >= currentDist
                  && currentDist <= HuntDistances.NearbyLiveDivertRange)
         {
-            // Current goal is also "near" but empty/wrong pad — still require a clear win.
             return false;
         }
 
@@ -1378,7 +1273,6 @@ public class TreasureHunterService
             return false;
         }
 
-        // False empty-skip may have checked this pad while the coffer is still live.
         checkedNodeIds.Remove(nearbyId);
         pendingPreferStartNode = nearbyId;
 
@@ -1399,7 +1293,6 @@ public class TreasureHunterService
         return false;
     }
 
-    /// <summary>True when the walk goal still has an unopened live coffer within divert range of the player.</summary>
     private bool IsWalkGoalLiveNearby(uint nodeId)
     {
         if (!TryGetLayout(nodeId, out TreasureLayoutDatum layout))
@@ -1416,10 +1309,6 @@ public class TreasureHunterService
         return player.Position.Distance2D(present.Position) <= HuntDistances.NearbyLiveDivertRange;
     }
 
-    /// <summary>
-    /// Remaining route pads plus other matching layout pads (including already-checked),
-    /// so a live Nearby coffer can map to its real pad after a false empty skip.
-    /// </summary>
     private HashSet<uint> GetDivertCandidateNodes(HuntPathfinderStep current)
     {
         HashSet<uint> ids = GetValidNodesForNextPlan().ToHashSet();
@@ -1490,7 +1379,6 @@ public class TreasureHunterService
             return false;
         }
 
-        // Don't interrupt return / teleport mid-step.
         HuntPathfinderStep? step = GetCurrentStep();
         if (step is { Type: HuntPathfinderStepType.ReturnToBaseCamp or HuntPathfinderStepType.TeleportToAethernet })
         {
@@ -1508,8 +1396,6 @@ public class TreasureHunterService
             return false;
         }
 
-        // Defer while fighting or job-swap gates are closed — starting the chain early
-        // only burns a 15s WaitUntil step (Dismount / ToFreelancer / RestoreJob).
         if (conditions[ConditionFlag.InCombat] || PhantomJobChangeGate.IsBlocked(conditions))
         {
             return false;
@@ -1541,7 +1427,6 @@ public class TreasureHunterService
         return true;
     }
 
-    /// <returns>True when the caller should skip the rest of this tick.</returns>
     private bool TryFinishSightAndMaybeAbort()
     {
         if (!waitingForSightCounts)
@@ -1588,7 +1473,6 @@ public class TreasureHunterService
             tracker.SilverChests,
             trimmed);
 
-        // Sight only changes the route when it actually trimmed pads.
         if (trimmed > 0)
         {
             RecalculateRoute();
@@ -1597,11 +1481,6 @@ public class TreasureHunterService
         return true;
     }
 
-    /// <summary>
-    /// After Sight, drop remaining layout nodes already empty and within walk-up range
-    /// so we do not detour onto pads the object table already proves vacant.
-    /// Distant empties are still walked to, then skipped by the normal empty-pad check.
-    /// </summary>
     private int TrimNearbyEmptyNodesAfterSight()
     {
         int trimmed = 0;
@@ -1612,7 +1491,6 @@ public class TreasureHunterService
                 continue;
             }
 
-            // Trim only nearby same-floor empties after Sight.
             if (FindTreasureForLayout(spot.Position, nodeId) != null
                 || player.Position.Distance2D(spot.Position) > config.EmptyPadTrustDistance
                 || !IsSameFloor(spot.Position))
@@ -1658,10 +1536,6 @@ public class TreasureHunterService
     private bool ShouldAbortForNoChests() =>
         TrackerReportsNoWantedChests() && HasRemainingCofferSteps();
 
-    /// <summary>
-    ///     Sight counts (and opens that decrement them) can hit 0 while the authored route still
-    ///     has empty pads — stop instead of walking the rest of the map.
-    /// </summary>
     private bool TryAbortIfTrackerEmpty()
     {
         if (waitingForSightCounts || pendingStartSight)
@@ -1732,7 +1606,6 @@ public class TreasureHunterService
             walkLiveBindNodeId = step.NodeId;
         }
 
-        // Opened/looted (incl. VBM) — skip before vias.
         if (TryCompleteOpenedLayoutCoffer(layoutDestination, step.NodeId))
         {
             return true;
@@ -1799,8 +1672,6 @@ public class TreasureHunterService
                 "Treasure hunt: could not open coffer {NodeId} — skipping and recalculating",
                 step.NodeId);
             checkedNodeIds.Add(step.NodeId);
-            // Divert reclaims false empty-skips from checkedNodeIds; keep open failures
-            // sticky like stuck pads so we do not loop on the same live coffer (SH 1821).
             stuckSkippedNodeIds.Add(step.NodeId);
             LastCheckedNodeId = step.NodeId;
             ResetStuckWatch();
@@ -1821,8 +1692,6 @@ public class TreasureHunterService
 
         if (present == null && walkLiveBindPosition == null)
         {
-            // Outside the trust slider — keep walking. Inside it (or when a neighbour coffer
-            // proves the region streamed), empty-skip may run (#168).
             bool stillApproaching = IsStillApproachingOutsideTrust(dist2d)
                                     && !RegionProvesStream(layoutDestination);
             if (stillApproaching)
@@ -1830,7 +1699,6 @@ public class TreasureHunterService
                 ClearEmptyPadCandidate();
             }
 
-            // Empty-skip first: a live coffer elsewhere on radar must not pin us to an empty pad (#168).
             if (!stillApproaching
                 && CanTrustEmptyPad(layoutDestination)
                 && ConfirmEmptyPad(step.NodeId))
@@ -1856,7 +1724,6 @@ public class TreasureHunterService
                 return false;
             }
 
-            // Still see a hunt coffer on radar — peel to it when it matches this layout area.
             if (HasUnopenedLiveHuntCofferNearPlayer(HuntDistances.NearbyLiveDivertRange))
             {
                 IGameObject? loose = FindUnopenedTreasureNear(
@@ -1893,8 +1760,6 @@ public class TreasureHunterService
         }
         else if (present == null)
         {
-            // Bound a live coffer earlier this pad — keep walking to it through brief radar gaps.
-            // After a nudge with still no radar, the bind is stale: skip like an empty pad.
             if (TrySkipEmptyAfterStuckNudge(step, layoutDestination, dist2d))
             {
                 return false;
@@ -1910,7 +1775,6 @@ public class TreasureHunterService
 
         ClearEmptyPadCandidate();
 
-        // Opened / looted (including VBM AutoOpen) — do not keep pathing at a dead coffer.
         if (OpenTreasureCofferChain.IsOpenedOrLooted(present))
         {
             vnav.Stop();
@@ -1937,8 +1801,6 @@ public class TreasureHunterService
             return false;
         }
 
-        // Match the open chain: mesh often parks just outside 2y. After a stuck nudge,
-        // chest / prop collision can leave you 3–5y out — still interactable.
         const float StuckOpenSlack = 3.5f;
         float openSlack = padStuckWatch.NudgeIssued
             ? StuckOpenSlack
@@ -1956,8 +1818,6 @@ public class TreasureHunterService
         }
 
         ResetStuckWatch();
-        // Stay on Ninja + keep Hide requirement while threatened — gearset swap drops Hide and
-        // nearby high-Knowledge mobs aggro before re-Hide.
         bool keepNinja = StillThreatenedForRemount();
         if (!keepNinja)
         {
@@ -1973,7 +1833,6 @@ public class TreasureHunterService
         return false;
     }
 
-    /// <summary>Layout pad already has an opened/looted coffer — count it done and stop nav.</summary>
     private bool TryCompleteOpenedLayoutCoffer(Vector3 layoutDestination, uint nodeId)
     {
         IGameObject? present = FindTreasureForLayout(layoutDestination, nodeId);
@@ -1991,7 +1850,6 @@ public class TreasureHunterService
     {
         StepDistance = 0f;
 
-        // Unconscious: cannot Return or walk — wait for raise / mode pause.
         if (conditions[ConditionFlag.Unconscious])
         {
             return false;
@@ -2032,7 +1890,6 @@ public class TreasureHunterService
         Vector3 destination = aethernet.GetCampStandOffPosition(player.Position);
         StepDistance = player.Position.Distance2D(crystal);
 
-        // Prefer Lifestream-ready (magenta) over raw crystal distance — stand-off may sit on the pad.
         if (zones.GetZone().IsWithinLifestreamRange(player.Position)
             || player.Position.Distance2D(destination) <= AethernetNavigation.PathfindArrivalRadius + AethernetNavigation.PathfindArrivalSlack)
         {
@@ -2083,7 +1940,6 @@ public class TreasureHunterService
 
     private void MaybeMount(Vector3 destination)
     {
-        // Sight prep / WideText wait — remounting here fights DismountAssist every tick.
         if (waitingForSightCounts)
         {
             return;
@@ -2100,7 +1956,6 @@ public class TreasureHunterService
             return;
         }
 
-        // Shared skip (between-areas / aetheryte still targeted) — avoids post-TP "Invalid target."
         MountWait.TryCastIfNeeded(
             conditions,
             objects,
@@ -2110,8 +1965,6 @@ public class TreasureHunterService
             inBaseCamp: false);
     }
 
-    /// <summary>Path/mount only after Hide is ready when required.</summary>
-    /// <returns>False while still preparing Hide (caller should wait).</returns>
     private bool TryNavigateToward(
         Vector3 destination,
         float startPathBeyond,
@@ -2125,7 +1978,6 @@ public class TreasureHunterService
 
         if (DateTime.UtcNow < holdNavigateUntilUtc)
         {
-            // Remount here cancels the stuck nudge before it can start.
             return true;
         }
 
@@ -2155,7 +2007,6 @@ public class TreasureHunterService
         const float SnapArrivalSlack = 2f;
         bool snapOffset = destination.Distance2D(pathTarget) > SnapArrivalSlack;
 
-        // New goal — drop the "closing on raw destination" latch from the previous pad/coffer.
         if (navigateClosingForDestination is not { } closingFor
             || closingFor.Distance2D(destination) > SnapArrivalSlack)
         {
@@ -2176,8 +2027,6 @@ public class TreasureHunterService
             }
         }
 
-        // Interact only needs PreferredOpenDistance; demanding PathArrivalRange (1y) walks into
-        // chest / prop collision ("invisible wall") while vnav still claims a path.
         float moveArrival = MathF.Max(arrivalRadius, startPathBeyond);
 
         // Same stand-off slack as aetheryte approach: without it, vnav completes at ~moveArrival
@@ -2193,7 +2042,6 @@ public class TreasureHunterService
         bool drifted = lastNavigateTarget is not { } last
                        || last.Distance2D(moveTarget) > RepathDrift;
 
-        // Parked on the issued move point — do not PathfindAndMove again every tick.
         if (needPath
             && !drifted
             && player.Position.Distance2D(moveTarget) <= moveArrival + ArrivalSlack)
@@ -2224,10 +2072,6 @@ public class TreasureHunterService
     private bool IsSameFloor(Vector3 destination) =>
         HuntDistances.IsSameFloor(player.Position, destination);
 
-    /// <summary>
-    ///     When enabled and a knowledge threat is in range: gearset → dismount → Hide; remount once the threat is clear.
-    ///     Returns false while still preparing (caller should wait).
-    /// </summary>
     private bool ApplyNinjaHideGate()
     {
         if (!config.UseNinjaHideOnDangerousRoutes)
@@ -2244,7 +2088,6 @@ public class TreasureHunterService
             return true;
         }
 
-        // Stop nav while preparing Hide; combat waits in EnsureReady.
         if (conditions[ConditionFlag.InCombat])
         {
             return true;
@@ -2252,7 +2095,6 @@ public class TreasureHunterService
 
         if (ninjaHide.EnsureReady(config.NinjaGearsetNumber))
         {
-            // Best-effort speed buff — never blocks walking.
             if (config.UseOccultSprintWhileHidden)
             {
                 ninjaHide.TryOccultSprintWhileHidden();
@@ -2324,22 +2166,15 @@ public class TreasureHunterService
         ninjaHideRouteGate.Reset();
     }
 
-    /// <summary>
-    ///     True while still walking in from outside <see cref="TreasureConfig.EmptyPadTrustDistance"/>.
-    ///     Inside that radius the empty-pad slider applies even if vnav is still running.
-    /// </summary>
     private bool IsStillApproachingOutsideTrust(float dist2d) =>
         dist2d > config.EmptyPadTrustDistance;
 
-    /// <summary>Another coffer streamed nearby — region is loaded enough for early empty-skip.</summary>
     private bool RegionProvesStream(Vector3 layoutDestination) =>
         player.Position.Distance2D(layoutDestination) <= HuntDistances.EmptyPadEarlySkipRadius
         && CountTreasuresNear(layoutDestination, HuntDistances.EmptyPadEarlySkipRadius) > 0;
 
-    /// <summary>True when the player is close enough to trust that this pad has no live coffer.</summary>
     private bool CanTrustEmptyPad(Vector3 layoutDestination)
     {
-        // Surface above a basement pad is "close" in 2D but not actually at the coffer.
         if (!IsSameFloor(layoutDestination))
         {
             return false;
@@ -2352,12 +2187,10 @@ public class TreasureHunterService
             return true;
         }
 
-        // Further out, only skip if a neighbour coffer proves this region has streamed.
         return dist <= HuntDistances.EmptyPadEarlySkipRadius
                && CountTreasuresNear(layoutDestination, HuntDistances.EmptyPadEarlySkipRadius) > 0;
     }
 
-    /// <summary>Treasure objects currently streamed within <paramref name="radius"/> of a point.</summary>
     private int CountTreasuresNear(Vector3 origin, float radius)
     {
         int count = 0;
@@ -2396,7 +2229,6 @@ public class TreasureHunterService
         holdNavigateUntilUtc = DateTime.MinValue;
     }
 
-    /// <summary>Rebuild <see cref="tickTreasures"/> once per tick for pad matching.</summary>
     private void RefreshTickTreasures()
     {
         tickTreasures.Clear();
@@ -2419,12 +2251,8 @@ public class TreasureHunterService
             radius,
             static o => !OpenTreasureCofferChain.IsOpenedOrLooted(o));
 
-    /// <summary>
-    /// Live coffer owned by this layout node (not a neighbor pad in the next segment).
-    /// </summary>
     private IGameObject? FindTreasureForLayout(Vector3 layoutDestination, uint nodeId)
     {
-        // Prefer unopened — an opened ghost on the pad must not hide a live silver neighbor match.
         IGameObject? close = FindUnopenedTreasureNear(layoutDestination, HuntDistances.LayoutProximityRadius)
                              ?? FindTreasureNear(layoutDestination, HuntDistances.LayoutProximityRadius);
         if (close != null && LiveCofferBelongsToLayout(close, nodeId, layoutDestination))
@@ -2442,7 +2270,6 @@ public class TreasureHunterService
         return drifted;
     }
 
-    /// <summary>Pad owns coffer within LayoutProximityRadius; else nearest layout wins.</summary>
     private bool LiveCofferBelongsToLayout(IGameObject live, uint nodeId, Vector3 layoutDestination)
     {
         float toThisPad = layoutDestination.Distance2D(live.Position);
@@ -2521,7 +2348,6 @@ public class TreasureHunterService
             .ToList();
     }
 
-    /// <summary>Authored (level-gated) or crowdsourced pad — union so both catalogs help the hunt.</summary>
     private static bool IsHuntPadAllowed(
         TreasureLayoutDatum layout,
         List<TreasureData> treasureData,
@@ -2547,7 +2373,6 @@ public class TreasureHunterService
 
         if (!TreasureData.TryResolveLevel(layout.Id, layout.Position, treasureData, out int padLevel))
         {
-            // Shared-only pad with no baked level — only when user left the cap at 50 (no limit).
             return maxLevel >= 50;
         }
 
@@ -2579,7 +2404,6 @@ public class TreasureHunterService
             .ToList();
     }
 
-    /// <summary>True when a live opened/looted coffer sits on this layout node (skip when resuming).</summary>
     private bool IsLayoutCofferOpened(uint nodeId)
     {
         if (!TryGetLayout(nodeId, out TreasureLayoutDatum layout))
@@ -2653,14 +2477,11 @@ public class TreasureHunterService
                         !TreasurePathing.IsUnloadAltitude(c.Position)
                         && Vector3.DistanceSquared(c.Position, position) <= CofferLocationSyncService.MatchRadiusSq);
 
-                // Union: baked map and/or shared catalog. Neither → take every bronze/silver layout pad.
                 if ((hasPositionData || hasCrowdsourced) && !matchAuthored && !matchCrowd)
                 {
                     continue;
                 }
 
-                // Layout transform Y is often bogus (reveal altitude / inside floor). Prefer baked coords;
-                // accepted crowd for the same dataId can replace a wrong bake after merge.
                 if (authored?.Position is { } bakedPosition)
                 {
                     position = bakedPosition;
@@ -2703,11 +2524,9 @@ public class TreasureHunterService
         }
     }
 
-    /// <summary>Layout pad for a node id, or false when the snapshot no longer has it.</summary>
     private bool TryGetLayout(uint nodeId, out TreasureLayoutDatum layout) =>
         layoutById.TryGetValue(nodeId, out layout);
 
-    /// <summary>Fill baked pads missing from the active layout snapshot.</summary>
     private void MergeBakedTreasurePads(List<TreasureData> treasureData)
     {
         HashSet<uint> present = layoutTreasure.Select(t => t.Id).ToHashSet();
@@ -2719,7 +2538,6 @@ public class TreasureHunterService
                 continue;
             }
 
-            // Model unknown until layout loads — treat as bronze so silver-only skips them.
             layoutTreasure.Add(new((uint)pad.Id, baked, TreasureCoffer.BronzeSgbId));
             added++;
         }
@@ -2730,10 +2548,6 @@ public class TreasureHunterService
         }
     }
 
-    /// <summary>
-    ///     Same coffer dataId in the accepted catalog, far from the bake → snap to crowd centroid
-    ///     (keeps layout id for path overrides). Near matches leave the bake alone.
-    /// </summary>
     private void ApplyCrowdsourcedCofferCorrections(IReadOnlyList<CrowdsourcedCofferCandidate> liveSpots)
     {
         if (liveSpots.Count == 0)
@@ -2761,7 +2575,6 @@ public class TreasureHunterService
         }
     }
 
-    /// <summary>Fill shared-catalog pads missing from the layout snapshot (by position).</summary>
     private void MergeCrowdsourcedTreasurePads(IReadOnlyList<CrowdsourcedCofferCandidate> liveSpots)
     {
         if (liveSpots.Count == 0)
@@ -2820,9 +2633,6 @@ public class TreasureHunterService
             authoredNodeSegments.Count);
     }
 
-    /// <summary>
-    ///     Segment this plan is working. Null when the zone has no authored route.
-    /// </summary>
     private string? TryGetCurrentSegment(IReadOnlyList<uint> remaining, uint? entryNodeId)
     {
         if (authoredNodeSegments.Count == 0)
@@ -2835,7 +2645,6 @@ public class TreasureHunterService
             return entrySegment;
         }
 
-        // Mid-route: segment of the next WalkToNode (skip travel hops).
         for (int i = Math.Max(StepIndex, 0); i < steps.Count; i++)
         {
             if (steps[i].Type == HuntPathfinderStepType.WalkToNode
@@ -2850,7 +2659,6 @@ public class TreasureHunterService
             : null;
     }
 
-    /// <summary>Resume pad after LastCheckedNodeId (wrap); avoids the wrong segment near camp.</summary>
     private uint? TryGetResumeNode(IReadOnlyList<uint> remaining)
     {
         int after = LastCheckedNodeId is uint last && authoredNodeOrder.TryGetValue(last, out int lastOrder)
@@ -2885,16 +2693,12 @@ public class TreasureHunterService
         return next ?? earliest;
     }
 
-    /// <summary>
-    /// First remaining pad in authored order inside the segment — peel must not jump past this.
-    /// </summary>
     private uint? TryGetAuthoredFrontier(IEnumerable<uint> remaining, string segmentId)
     {
         uint? best = null;
         int bestOrder = int.MaxValue;
         foreach (uint id in remaining)
         {
-            // Fail closed: no segment → not frontier (matches divert filter).
             if (authoredNodeSegments.GetValueOrDefault(id) != segmentId)
             {
                 continue;
@@ -2927,7 +2731,6 @@ public class TreasureHunterService
             return nearbyPrefix;
         }
 
-        // Strict: only the next remaining pad — never re-prefix passed (checked) lives.
         return nearbyPrefix.Where(id => id == frontier).ToList();
     }
 
@@ -2938,9 +2741,6 @@ public class TreasureHunterService
             return false;
         }
 
-        // IsInBasecamp is a generous radius (CampRadius), so the hunt can finish "at camp" while the
-        // player is most of that distance away — which reads as "it played the sound but never
-        // returned me". Say which check declined, so that case is distinguishable from the others.
         if (zones.GetZone().IsInBasecamp())
         {
             log.Debug(
@@ -2958,11 +2758,6 @@ public class TreasureHunterService
         return true;
     }
 
-    /// <summary>
-    ///     Queue Return before ending the session. The last coffer often replans to an empty route
-    ///     while still in combat — ending immediately skipped the walk-to-camp fallback and left
-    ///     Return uncastable.
-    /// </summary>
     private bool TryQueueReturnAfterHunt(string reason)
     {
         if (!ShouldReturnAfterHunt())
@@ -2994,7 +2789,6 @@ public class TreasureHunterService
 
         ZoneId zoneId = zones.GetZone().ZoneId;
 
-        // Departure vias from the previous pad (LastCheckedNodeId after replan).
         uint? previousNodeId = null;
         for (int i = StepIndex - 1; i >= 0; i--)
         {
@@ -3041,10 +2835,6 @@ public class TreasureHunterService
         }
     }
 
-    /// <summary>
-    ///     Skip vias we are already on, and skip the rest when already on the pad’s floor
-    ///     closer to the coffer than to the via (don’t backtrack up the island).
-    /// </summary>
     private void SkipPassedWalkVias(Vector3 destination)
     {
         while (walkViaIndex < walkVias.Count)

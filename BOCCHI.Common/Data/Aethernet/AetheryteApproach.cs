@@ -33,7 +33,6 @@ public static class AetheryteApproach
                 .Then(_ => StepResult.Failure("No local player."), $"{chainName}::NoPlayer");
         }
 
-        // Position may have changed since compose.
         return chains.Create(chainName)
             .Then(_ =>
                 {
@@ -48,7 +47,6 @@ public static class AetheryteApproach
                         return StepResult.Failure("No local player.");
                     }
 
-                    // Use distance to the cyan ring, not Lifestream IPC alone.
                     if (zone.IsWithinLifestreamRange(current.Position))
                     {
                         return StepResult.Success();
@@ -88,8 +86,6 @@ public static class AetheryteApproach
                                 Vector3 retryTarget = nearest.GetCampStandOffPosition(p.Position);
                                 MaybeMountToward(zone, objects, conditions, movement, retryTarget);
 
-                                // Re-issue only if idle and still meaningfully short — not every tick
-                                // when already parked on the stand-off tile (vnav Idle + same poly).
                                 if (pathfinder.GetState() == PathfindingState.Idle
                                     && p.Position.Distance2D(retryTarget) > AethernetNavigation.PathfindArrivalRadius)
                                 {
@@ -147,18 +143,9 @@ public static class AetheryteApproach
         });
     }
 
-    /// <summary>
-    ///     Ready to open Lifestream: must be inside the magenta body ring.
-    ///     Distance is authoritative — Lifestream IPC can be non-zero while still outside cyan.
-    /// </summary>
     public static bool IsReadyForLifestream(IZone zone, ILifestreamIpc _, Vector3 position) =>
         zone.IsWithinLifestreamRange(position);
 
-    /// <summary>
-    ///     True when we have arrived at / are standing on this shard.
-    ///     Wider than Lifestream interact range — post-TP landings and menu-open range
-    ///     are often 4–10y from the crystal; a 3.5y check caused re-TP loops to the same id.
-    /// </summary>
     public static bool IsAlreadyAtAetheryte(AethernetData? aetheryte, Vector3 position)
     {
         if (aetheryte == null)
@@ -176,7 +163,6 @@ public static class AetheryteApproach
         return position.Distance2D(interact) <= arrivedRadius;
     }
 
-    /// <summary>Nearest authored aetheryte matches <paramref name="placeNameId"/> and we're close to it.</summary>
     public static bool IsAtPlaceName(IZone zone, uint placeNameId, Vector3 position)
     {
         if (IsAlreadyAtAetheryte(zone.FindAetheryte(placeNameId), position))

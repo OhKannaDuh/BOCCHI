@@ -14,9 +14,6 @@ namespace BOCCHI.Common.Data.Aethernet;
 
 public static class AethernetTeleport
 {
-    /// <summary>
-    ///     Clear leftover Lifestream work so the next hop can start. Chain cancel alone does not Abort.
-    /// </summary>
     public static void AbortIfBusy(ILifestreamIpc lifestream)
     {
         if (lifestream.IsBusy())
@@ -86,7 +83,6 @@ public static class AethernetTeleport
                         return StepResult.Failure("No local player.");
                     }
 
-                    // Arrived during approach (or TP landed) — don't open Lifestream again.
                     if (AetheryteApproach.IsAtPlaceName(zones.GetZone(), placeNameId, player.Position))
                     {
                         if (lifestream.IsBusy())
@@ -107,7 +103,6 @@ public static class AethernetTeleport
                 }, $"{chainName}::VerifyAetheryteRange")
             .Then(_ =>
                 {
-                    // Stuck destination overlay / leftover task blocks AethernetTeleport (returns false when busy).
                     if (lifestream.IsBusy())
                     {
                         logger.Debug("Lifestream busy before teleport — aborting leftover task");
@@ -149,7 +144,6 @@ public static class AethernetTeleport
 
                 return StepResult.Success();
             }, $"{chainName}::Teleport")
-            // Confirm Lifestream started; silent no-ops burned the arrive timeout.
             .WaitUntil(
                 _ =>
                 {
@@ -172,7 +166,6 @@ public static class AethernetTeleport
                         return ValueTask.FromResult(false);
                     }
 
-                    // Arrived at target shard — close the aethernet menu so we don't stall on IsBusy.
                     if (!AetheryteApproach.IsAtPlaceName(zones.GetZone(), placeNameId, player.Position))
                     {
                         return ValueTask.FromResult(false);
@@ -202,7 +195,6 @@ public static class AethernetTeleport
     }
 }
 
-/// <summary>Shared Lifestream aethernet hop used by Illegal Mode and Treasure Hunt.</summary>
 public class AethernetTeleportChain
 (
     IChainFactory chains,
@@ -232,4 +224,3 @@ public class AethernetTeleportChain
             logger,
             placeNameId);
 }
-

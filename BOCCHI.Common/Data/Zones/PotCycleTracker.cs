@@ -12,13 +12,10 @@ public sealed record PotCycleSnapshot
 
     public bool HasKnownAnchor { get; init; }
 
-    /// <summary>Pot FATE id that established this cycle (local or remote).</summary>
     public int AnchorPotFateId { get; init; }
 
-    /// <summary>Spawn time of <see cref="AnchorPotFateId"/>.</summary>
     public DateTimeOffset AnchorSpawnAt { get; init; }
 
-    /// <summary>True when the anchor came from pot-cycle sync rather than a local sighting.</summary>
     public bool IsRemoteAnchor { get; init; }
 
     public int CurrentActivePotFateId { get; init; }
@@ -40,34 +37,19 @@ public readonly record struct PotFallbackStartDecision(bool AllowStart, string R
 
 public interface IPotCycleTracker
 {
-    /// <summary>Cycle for the Occult Crescent zone you are in now (empty outside OC).</summary>
     PotCycleSnapshot Snapshot { get; }
 
-    /// <summary>South Horn and/or North Horn cycles that have been seen this session.</summary>
     IReadOnlyList<PotCycleSnapshot> KnownCycles { get; }
 
-    /// <summary>
-    ///     Apply a shared pot spawn from another BOCCHI client on the same instance.
-    ///     Ignored when a newer local (or equal) anchor already exists, or a pot is live locally.
-    ///     Pass <paramref name="overwriteExisting"/> for Eureka Linker so a mismatched BOCCHI
-    ///     anchor is replaced (live local pot still wins; matching anchors are a no-op).
-    /// </summary>
     bool TryApplyRemoteAnchor(
         int potFateId,
         DateTimeOffset spawnAt,
         ushort territoryTypeId,
         bool overwriteExisting = false);
 
-    /// <summary>
-    ///     Drop the saved schedule for a territory so a new island/instance can sync or re-anchor.
-    /// </summary>
     void Invalidate(ushort territoryTypeId, string? reason = null);
 }
 
-/// <summary>
-/// Tracks the 30-minute alternating pot FATE cycle per Occult Crescent zone.
-/// Observing one pot predicts the opposite pot's next spawn. SH and NH are kept separately.
-/// </summary>
 public sealed class PotCycleTracker
 (
     IFateRepository fates,
@@ -77,7 +59,6 @@ public sealed class PotCycleTracker
 {
     private static readonly TimeSpan PotCycleInterval = TimeSpan.FromMinutes(30);
 
-    /// <summary>How long after a predicted spawn we keep waiting before rolling the cycle forward.</summary>
     public static readonly TimeSpan PredictionStaleGrace = TimeSpan.FromMinutes(5);
 
     private static readonly PotCycleSnapshot Empty = new();
@@ -188,7 +169,6 @@ public sealed class PotCycleTracker
             ? existing
             : Empty;
 
-        // Live local pot still wins — do not overwrite a pot you can see.
         if (previous.CurrentActivePotFateId != 0)
         {
             return false;
@@ -277,10 +257,6 @@ public sealed class PotCycleTracker
         };
     }
 
-    /// <summary>
-    ///     When no pot is live, advance a missed prediction in 30m steps so the UI and
-    ///     Waiting-for-pot state do not stick on an overdue 00:00 forever.
-    /// </summary>
     private PotCycleSnapshot RollIdlePrediction(
         ushort territoryType,
         List<ActivityData> potFates,
@@ -366,7 +342,6 @@ public static class PotFallbackWindow
 
         TimeSpan timeUntilSpawn = cycle.PredictedNextSpawnAt - now;
 
-        // Overdue prediction (missed spawn) must not block FATEs / force preposition forever.
         if (now > cycle.PredictedNextSpawnAt + PotCycleTracker.PredictionStaleGrace)
         {
             return new(true, $"{activityName} allowed: pot prediction overdue (stale).");
@@ -385,9 +360,6 @@ public static class PotFallbackWindow
         return new(true, $"{activityName} allowed: next pot in {Format(timeUntilSpawn)}.");
     }
 
-    /// <summary>
-    ///     True when it is time to walk to the next pot (spawn lead), regardless of FATE/CE cutoffs.
-    /// </summary>
     public static bool ShouldPreposition(
         PotCycleSnapshot cycle,
         DateTimeOffset now,

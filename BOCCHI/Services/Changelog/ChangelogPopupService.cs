@@ -35,7 +35,6 @@ public sealed class ChangelogPopupService
 
         if (string.IsNullOrWhiteSpace(lastSeen))
         {
-            // First install / first run of this feature: remember silently, no popup.
             Remember(current);
             return;
         }
@@ -47,7 +46,6 @@ public sealed class ChangelogPopupService
 
         if (!ChangelogText.TryGetSectionForVersion(current, out _))
         {
-            // Update with empty stub notes — don't nag; advance last-seen.
             Remember(current);
             return;
         }

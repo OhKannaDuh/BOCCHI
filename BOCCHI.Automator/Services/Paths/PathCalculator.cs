@@ -35,7 +35,6 @@ public class PathCalculator
 {
     public Task<PathCalculationResult> Calculate(IGoal goal) => Calculate(goal, allowAutoRebuild: true);
 
-    /// <inheritdoc />
     public async Task<PathCalculationResult> CalculateToPosition(Vector3 destination, float arrivalRange)
     {
         if (objects.LocalPlayer is not { } player)
@@ -57,7 +56,6 @@ public class PathCalculator
 
         ZoneGraph graph = await zone.GetGraph();
 
-        // Goal is a free Node (like live FATE); Return / aethernet estimate when there are no wired edges.
         Node goalNode = new()
         {
             Type = NodeType.PotChest,
@@ -94,7 +92,6 @@ public class PathCalculator
         }
         catch (Exception ex)
         {
-            // GoalPathStepMemory treats a faulted task as RoutingFailed with no log — catch here.
             logger.Error(ex, "Path calculation faulted for {Goal}", goal.GoalType);
             return PathCalculationResult.Failed();
         }
@@ -115,8 +112,6 @@ public class PathCalculator
             return PathCalculationResult.NoTravelNeeded();
         }
 
-        // Combat None: InFate walks to mobs from the rim. AI cannot — stay on the centre path
-        // until we are actually close enough for AutoTarget / StayCloseToTarget.
         if (goal.GoalType is FateGoal fateGoal
             && fateContext.GetFateId() == fateGoal.id
             && (!config.CombatAutorotation.UsesCombatAutomation()
@@ -140,7 +135,6 @@ public class PathCalculator
             return await AutoRebuildAndRetry(zone, goal, allowAutoRebuild, "missing activity node");
         }
 
-        // Prefer live FATE center; CEs path to the LGB MapRange centre (blue ring), not authored staging.
         Node pathGoal = goalNode;
         Vector3? potPrepositionStandOff = null;
         if (goal.GoalType is FateGoal liveFateGoal
@@ -209,8 +203,6 @@ public class PathCalculator
 
         Vector3 arrivalCheck = potPrepositionStandOff ?? pathGoal.Position;
         float distanceToGoal = player.Position.Distance2D(arrivalCheck);
-        // LGB registration centre can skew from authored staging — accept either disc so we do not
-        // replan (and risk a vnav fault) after already walking to the stand-off.
         bool insideCeWait = ceCombatRadius > 0f && (
             (ceWaitCenter is { } waitCenter
              && NavigationConstants.IsInsideCriticalEncounterWaitArea(
@@ -299,7 +291,6 @@ public class PathCalculator
         int stepsBeforeTeleportOnlyStrip = resolvedSteps.Count;
         if (config.StopAfterReturn)
         {
-            // Keep Return / Teleport; drop the walk to the FATE or CE.
             resolvedSteps = resolvedSteps
                 .Where(step => step.Kind != PathStepKind.Pathfind)
                 .ToList();
@@ -346,7 +337,6 @@ public class PathCalculator
 
         logger.Warning("Auto-rebuilding zone path map ({Reason}) and retrying once", reason);
         zone.InvalidateGraph(reason);
-        // Kick load now so UI shows Loading/Building and the retry uses the fresh map.
         await zone.GetGraph();
         return await Calculate(goal, allowAutoRebuild: false);
     }
@@ -410,10 +400,6 @@ public class PathCalculator
             .ToList();
     }
 
-    /// <summary>
-    ///     Snap the CE stand-off onto the mesh. Never returns an unsnapped off-mesh point —
-    ///     that made PathfindToChain cancel and Illegal Mode replan in a tight loop.
-    /// </summary>
     private bool TryResolveCriticalEncounterPathfindTarget(
         Vector3 approach,
         Vector3 waitCenter,

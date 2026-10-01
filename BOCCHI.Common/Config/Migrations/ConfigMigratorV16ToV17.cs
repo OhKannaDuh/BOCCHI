@@ -2,7 +2,6 @@ using Newtonsoft.Json.Linq;
 
 namespace BOCCHI.Common.Config.Migrations;
 
-/// <summary>Remove KnowledgeCrystalDistance (crystal search range is hardcoded at 60y).</summary>
 public class ConfigMigratorV16ToV17 : IMigrator
 {
     public int FromVersion => 16;

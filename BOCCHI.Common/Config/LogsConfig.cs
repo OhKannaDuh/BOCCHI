@@ -7,7 +7,6 @@ namespace BOCCHI.Common.Config;
 [ConfigGroup("logs", GroupOrder = 950)]
 public class LogsConfig : IAutoConfig
 {
-    // Display-only anchor for LogsViewerRenderer (not a real setting).
     [LogsViewer]
     public bool Viewer { get; set; }
 }

@@ -23,9 +23,6 @@ using CsCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
 
 namespace BOCCHI.Debug.Panels;
 
-/// <summary>
-///     Live dump of Occult Crescent director / MKD excel fields we have not wired into automation yet.
-/// </summary>
 public sealed unsafe class OccultStateDebugPanel(
     IObjectTable objects,
     IDataManager data,

@@ -7,10 +7,6 @@ using System.Numerics;
 
 namespace BOCCHI.Common.Data.Aethernet;
 
-/// <summary>
-///     Shared Return-to-camp tick: walk toward camp while combat/unconscious blocks Return,
-///     otherwise run <see cref="ReturnToBaseCamp"/>. Used by Treasure Hunt, Carrot Hunt, and shopping.
-/// </summary>
 public sealed class CampReturnSession(string chainPrefix)
 {
     public enum TickResult
@@ -37,13 +33,8 @@ public sealed class CampReturnSession(string chainPrefix)
         vnav.Stop();
     }
 
-    /// <summary>Drop the tracked chain without cancelling (caller already cancelled via prefix).</summary>
     public void Detach() => chain = null;
 
-    /// <param name="waitForPathfindIdleOnArrive">
-    ///     Treasure Hunt: wait until Return's last pathfind slot is free before the next camp pad.
-    /// </param>
-    /// <param name="onCombatWalk">Optional side effect while walking toward camp (e.g. sprint).</param>
     public TickResult Tick(
         IZone zone,
         Vector3 playerPosition,

@@ -4,8 +4,6 @@ public class FateScore
 {
     private readonly Dictionary<string, float> sources = [];
 
-    public IReadOnlyDictionary<string, float> Sources => sources;
-
     public float Value => Math.Max(sources.Values.Where(f => f is not (float.MaxValue or float.MinValue)).Sum(), 0f);
 
     public void Add(string source, float value)

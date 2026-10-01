@@ -6,7 +6,6 @@ using Ocelot.Windows;
 
 namespace BOCCHI.Automator;
 
-/// <summary>Shared refresh / rebuild path controls for Illegal Mode and Completionist.</summary>
 internal static class AutomatorPathControls
 {
     public static void Draw(

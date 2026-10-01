@@ -3,10 +3,6 @@ using Dalamud.Plugin.Ipc;
 
 namespace BOCCHI.Common.Ipc.EurekaLinker;
 
-/// <summary>
-/// Subscriber for Eureka Linker's Occult pot-timer CallGate
-/// (<c>EurekaLinker.ApiVersion</c>, <c>EurekaLinker.Pot.GetTimers</c>).
-/// </summary>
 public sealed class EurekaLinkerIpc : IEurekaLinkerIpc
 {
     private readonly ICallGateSubscriber<int> apiVersion;

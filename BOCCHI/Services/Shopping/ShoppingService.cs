@@ -19,10 +19,6 @@ using System.Text.RegularExpressions;
 
 namespace BOCCHI.Services.Shopping;
 
-/// <summary>
-/// When currency thresholds are hit (or debug force-start), soft-suspend other automation,
-/// Return to central base camp if needed, then hand shopping to Knightshopper (Occult Crescent list).
-/// </summary>
 public sealed class ShoppingService(
     ShoppingConfig config,
     IZoneProvider zones,
@@ -42,13 +38,8 @@ public sealed class ShoppingService(
     ILogger<ShoppingService> logger
 ) : IShoppingService, IOnUpdate
 {
-    /// <summary>Normal pause between auto-shop attempts after a completed run.</summary>
     private static readonly TimeSpan DefaultBuyCooldown = TimeSpan.FromSeconds(30);
 
-    /// <summary>
-    /// When Knightshopper cannot afford the next Occult Crescent buy, do not yank Illegal Mode
-    /// back to camp every short cooldown — wait until farming can reasonably change balances.
-    /// </summary>
     private static readonly TimeSpan InsufficientFundsCooldown = TimeSpan.FromMinutes(20);
 
     private readonly CampReturnSession campReturn = new("Shopping::Return");
@@ -83,7 +74,6 @@ public sealed class ShoppingService(
         AbortShopping(resumeAutomation: false, cancelKnightshopper: true);
     }
 
-    /// <inheritdoc />
     public bool TryForceStart(out string detail)
     {
         if (!knightshopper.IsAvailable)
@@ -126,7 +116,6 @@ public sealed class ShoppingService(
         return true;
     }
 
-    /// <inheritdoc />
     public string DescribeStatus()
     {
         string phase = operationId is not null
@@ -294,7 +283,6 @@ public sealed class ShoppingService(
                 start.Result,
                 start.Message);
 
-            // Empty list / not ready: back off so we do not spam Start every tick.
             if (start.Result is StartResult.EmptyList or StartResult.NotReady or StartResult.NotLoggedIn
                 or StartResult.InvalidCurrency)
             {
@@ -303,7 +291,6 @@ public sealed class ShoppingService(
                 return;
             }
 
-            // Busy / transient — keep session and retry next tick.
             return;
         }
 
@@ -398,12 +385,6 @@ public sealed class ShoppingService(
         }
     }
 
-    /// <summary>
-    /// Knightshopper reports success with a message like
-    /// "Insufficient OccultCrescent for … Need N, have M" when nothing was bought.
-    /// Prefer the currency enum name + need/have counts (stable across UI languages);
-    /// keep the English "Insufficient" wording as a fallback.
-    /// </summary>
     private static bool LooksLikeInsufficientFunds(string? message)
     {
         if (string.IsNullOrEmpty(message))
@@ -416,7 +397,6 @@ public sealed class ShoppingService(
             return true;
         }
 
-        // CurrencyId.ToString() stays "OccultCrescent"; item name may be localized.
         if (!message.Contains(nameof(CurrencyId.OccultCrescent), StringComparison.Ordinal))
         {
             return false;
@@ -429,7 +409,6 @@ public sealed class ShoppingService(
                && need > have;
     }
 
-    /// <summary>Trailing need/have integers from Knightshopper's unaffordable finish line.</summary>
     private static readonly Regex NeedHaveCounts = new(
         @"(\d+)\D+(\d+)\.?\s*$",
         RegexOptions.CultureInvariant | RegexOptions.Compiled);
@@ -468,10 +447,6 @@ public sealed class ShoppingService(
         memory.TryRemember<PendingTriageMemory>(out PendingTriageMemory _)
         || memory.TryRemember<TriagingMemory>(out TriagingMemory _);
 
-    /// <summary>
-    /// Mob Farmer mid-pull / stack / fight — same window as other farmer yields.
-    /// Suspended farmer (e.g. treasure) is not busy; shopping may take over.
-    /// </summary>
     private bool IsMobFarmerBusy() =>
         Farmer.Running && !Farmer.Suspended && !Farmer.CanAcceptYield;
 }

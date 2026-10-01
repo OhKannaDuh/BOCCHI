@@ -5,11 +5,6 @@ using System.Numerics;
 
 namespace BOCCHI.MobFarmer.Services;
 
-/// <summary>
-///     Progress timeout → stop → lateral nudge → repath to goal → give up after N failures.
-///     Mob Farmer only repath when Idle, so without this a doomed SimpleMove (or StuckJumpAssist
-///     Stop → same destination) loops forever against walls.
-/// </summary>
 public sealed class FarmerWalkStuckAssist
 {
     private static readonly TimeSpan NudgeTimeout = TimeSpan.FromSeconds(10);
@@ -18,7 +13,6 @@ public sealed class FarmerWalkStuckAssist
 
     private const float ProgressThreshold = 1.5f;
 
-    /// <summary>Recovery cycles (nudge+repath) before the caller should skip / abandon the goal.</summary>
     public const int MaxFailures = 2;
 
     private ulong? key;
@@ -51,10 +45,6 @@ public sealed class FarmerWalkStuckAssist
         lastGoal = default;
     }
 
-    /// <summary>
-    ///     Watch approach toward <paramref name="goal"/>. Pass 2D distance to that goal (mob / home),
-    ///     not distance to a temporary pull offset.
-    /// </summary>
     public Recovery Tick(ulong watchKey, float distance, Vector3 goal, PathfindingState state)
     {
         DateTime now = DateTime.UtcNow;
@@ -81,7 +71,6 @@ public sealed class FarmerWalkStuckAssist
 
         lastGoal = goal;
 
-        // Planner still computing — don't treat as a stuck walk.
         if (state == PathfindingState.Pathfinding)
         {
             return Recovery.None;

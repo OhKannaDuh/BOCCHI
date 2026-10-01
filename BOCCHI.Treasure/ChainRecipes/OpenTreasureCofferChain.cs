@@ -21,16 +21,11 @@ using CsObjectKind = FFXIVClientStructs.FFXIV.Client.Game.Object.ObjectKind;
 
 namespace BOCCHI.Treasure.ChainRecipes;
 
-/// <summary>Where to open a coffer; optional BaseId filter avoids overlapping non-pot chests.</summary>
 public readonly record struct TreasureOpenTarget(Vector3 Position, IReadOnlyList<uint>? PreferredBaseIds = null)
 {
     public static implicit operator TreasureOpenTarget(Vector3 position) => new(position);
 }
 
-/// <summary>
-///     Open a treasure coffer. Interact rules match Pandora's AutoOpenChests;
-///     pathing is ours so automation can walk up first.
-/// </summary>
 public class OpenTreasureCofferChain
 (
     IChainFactory chains,
@@ -40,21 +35,14 @@ public class OpenTreasureCofferChain
     IVNavmeshIpc vnav
 ) : ChainRecipe<TreasureOpenTarget>(chains)
 {
-    /// <summary>Path this close before relying on Pandora's ≤2y interact gate.</summary>
     public const float PathArrivalRange = 1.0f;
 
-    /// <summary>Pandora AutoOpenChests: only Interact when Distance ≤ 2.</summary>
     public const float PreferredOpenDistance = 2.0f;
 
-    /// <summary>
-    ///     Mesh / prop collision often parks just outside 2y. Interact from here instead of
-    ///     walking into the chest or to a navmesh snap that sits a few yalms off the live object.
-    /// </summary>
     public const float OpenAttemptSlack = 1.5f;
 
     public static float MaxOpenAttemptDistance => PreferredOpenDistance + OpenAttemptSlack;
 
-    /// <summary>Alias used by callers / pot farm approach.</summary>
     public const float InteractDistance = PreferredOpenDistance;
 
     public override string Name => "Open Treasure Coffer";
@@ -83,7 +71,6 @@ public class OpenTreasureCofferChain
             return false;
         }
 
-        // Include opened/looted so the chain does not path forever after a successful open (#166).
         IGameObject? nearby = FindMatchingTreasureNear(target, searchRadius: 6f);
         if (nearby != null)
         {
@@ -115,8 +102,6 @@ public class OpenTreasureCofferChain
                     StopNav();
                 }
 
-                // Stay mounted when possible — forced dismount in high-knowledge packs got people killed (#175).
-
                 // Pot reveals open on a cast; re-issuing Interact every 200ms restarts it.
                 if (player.IsCasting()
                     || conditions[ConditionFlag.Casting]
@@ -125,30 +110,22 @@ public class OpenTreasureCofferChain
                     return false;
                 }
 
-                // Pandora: require targetable before Interact.
                 if (!gameObject->GetIsTargetable())
                 {
                     return false;
                 }
 
-                // 500ms, not 200: the casting flags above only go up once the server acknowledges
-                // the interact, and at 200ms we could squeeze a second one in before that and clip
-                // the cast we are trying to protect. Instant coffers are unaffected — they open on
-                // the first interact and never reach a retry.
                 if (!EzThrottler.Throttle("ChestThrottle", 500))
                 {
                     return false;
                 }
 
                 pathState.InteractAttempted = true;
-                // false = ignore LoS (same as carrot bunny open).
                 TargetSystem.Instance()->InteractWithObject(gameObject, false);
                 return IsOpenedOrLooted(nearby, tr);
             }
         }
 
-        // Object gone after we saw / interacted — success (despawned open). Do not treat
-        // "standing on pad with no object yet" as done (pot reveals spawn after a short wait).
         if (pathState.SawChest || pathState.InteractAttempted)
         {
             StopNav();
@@ -200,10 +177,6 @@ public class OpenTreasureCofferChain
         }
     }
 
-    /// <summary>
-    ///     Snap only when still walking in. Near the chest the snap is often beside it
-    ///     and pathing there walks away from an already-interactable coffer.
-    /// </summary>
     private Vector3 PathableWhenFar(Vector3 position)
     {
         if (player.Position.Distance2D(position) <= MaxOpenAttemptDistance + 4f)
@@ -215,7 +188,6 @@ public class OpenTreasureCofferChain
         return pathable;
     }
 
-    /// <summary>Pandora success: Opened/FadedOut flags, or already listed in the Loot window.</summary>
     public static unsafe bool IsOpenedOrLooted(IGameObject chest)
     {
         GameObject* gameObject = (GameObject*)(void*)chest.Address;
@@ -257,9 +229,6 @@ public class OpenTreasureCofferChain
         return false;
     }
 
-    /// <summary>
-    /// Matching Treasure near the hunt/pot target (opened/looted included so success can be detected).
-    /// </summary>
     private IGameObject? FindMatchingTreasureNear(TreasureOpenTarget target, float searchRadius)
     {
         Vector3 position = target.Position;
@@ -273,14 +242,11 @@ public class OpenTreasureCofferChain
                     return false;
                 }
 
-                // 2D: pot reveals at Y ≈ -500 would never match a grounded search point (#170).
                 if (position.Distance2D(o.Position) > searchRadius)
                 {
                     return false;
                 }
 
-                // An explicit BaseId match is the caller naming the exact object, so it stands on
-                // its own — pot reveals are EventObj and would fail a Treasure kind test (#175).
                 if (preferred is { Count: > 0 })
                 {
                     return MatchesOpenFilter(o, preferred);

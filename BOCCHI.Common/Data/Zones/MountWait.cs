@@ -7,18 +7,12 @@ using System.Numerics;
 
 namespace BOCCHI.Common.Data.Zones;
 
-/// <summary>
-///     Shared mount helpers: cast while pathing (mount is usable on the move).
-/// </summary>
 public static class MountWait
 {
     private static DateTime lastTryCastUtc = DateTime.MinValue;
 
     private static readonly TimeSpan TryCastInterval = TimeSpan.FromMilliseconds(750);
 
-    /// <summary>
-    ///     Skip auto-mount near camp only when the route still ends by the crystal.
-    /// </summary>
     private static bool ShouldSuppressMountNearCamp(IZone zone, Vector3 destination) =>
         destination.Distance2D(zone.GetAetherytePosition())
         <= NavigationConstants.CampRadius + NavigationConstants.MountMinDistance;
@@ -69,7 +63,6 @@ public static class MountWait
         return player.Position.Distance(destination) <= NavigationConstants.MountMinDistance;
     }
 
-    /// <summary>Drop hard/soft target (e.g. aetheryte after Lifestream so Mount is not “Invalid target”).</summary>
     public static unsafe void ClearHardAndSoftTarget()
     {
         TargetSystem* targets = TargetSystem.Instance();
@@ -82,7 +75,6 @@ public static class MountWait
         targets->SoftTarget = null;
     }
 
-    /// <param name="preferredMountId">Mount sheet row ID; 0 = Mount Roulette.</param>
     public static void TryCast(uint preferredMountId = 0)
     {
         ClearHardAndSoftTarget();
@@ -94,7 +86,6 @@ public static class MountWait
             return;
         }
 
-        // Preferred mount unavailable (locked / on cooldown) → fall back to roulette.
         if (preferredMountId != 0 && Actions.MountRoulette.CanCast())
         {
             Actions.MountRoulette.Cast();

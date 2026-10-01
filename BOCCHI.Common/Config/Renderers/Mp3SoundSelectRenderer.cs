@@ -11,9 +11,6 @@ using System.Reflection;
 
 namespace BOCCHI.Common.Config.Renderers;
 
-/// <summary>
-///     Combo of MP3s in the plugin Sounds folder, plus an open-folder button for custom clips (Saucy-style).
-/// </summary>
 public sealed class Mp3SoundSelectRenderer(IMp3SoundPlayer sounds) : IFieldRenderer<Mp3SoundSelectAttribute>
 {
     public bool Render(object target, PropertyInfo prop, Mp3SoundSelectAttribute attr, Type owner, ITranslator translator)

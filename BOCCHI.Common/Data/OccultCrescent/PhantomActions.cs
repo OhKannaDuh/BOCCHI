@@ -5,17 +5,12 @@ using Lumina.Excel.Sheets;
 
 namespace BOCCHI.Common.Data.OccultCrescent;
 
-/// <summary>
-///     Phantom duty-action IDs from <see cref="MKDSupportJob"/> (Phantom Action I–V slots).
-///     Fallbacks are the 7.3x row ids so recast checks still work before excel init.
-/// </summary>
 public static class PhantomActions
 {
     public static uint BattleBell { get; private set; } = 41611;
 
     public static byte BattleBellUnlock { get; private set; } = 1;
 
-    /// <summary>Phantom Geomancer III — HoT when hit, 60s.</summary>
     public static uint RingingRespite { get; private set; } = 41619;
 
     public static byte RingingRespiteUnlock { get; private set; } = 3;
@@ -26,7 +21,6 @@ public static class PhantomActions
 
     public static uint OccultRaise { get; private set; } = 49070;
 
-    /// <summary>Phantom Freelancer II — Occult Treasuresight.</summary>
     public static uint OccultTreasuresight { get; private set; } = 41651;
 
     public static byte TreasuresightUnlockLevel { get; private set; } = 10;

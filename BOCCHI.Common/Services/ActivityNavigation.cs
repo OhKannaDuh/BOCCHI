@@ -88,18 +88,10 @@ public class ActivityNavigation
         _ = TeleportOnlyAsync(destination, name, id, generation);
     }
 
-    /// <summary>Horizontal slack when snapping a survey point onto the navmesh.</summary>
     private const float SurveySnapExtentXZ = 5f;
 
-    /// <summary>
-    ///     Vertical search range for a survey point. Generous because the authored coordinate
-    ///     carries no altitude at all — only XZ, which comes straight from the map and is exact.
-    /// </summary>
     private const float SurveySnapExtentY = 200f;
 
-    /// <summary>
-    ///     Authored survey coords are XZ only (Y is 0). Snap onto the mesh from our altitude.
-    /// </summary>
     private Vector3 SeedDestinationAltitude(Vector3 destination)
     {
         Vector3 seed = new(destination.X, player.Position.Y, destination.Z);
@@ -133,7 +125,6 @@ public class ActivityNavigation
             return;
         }
 
-        // World FATE/CE Path: hop only when already in Lifestream range.
         if (CanTeleport(destination, out _))
         {
             int generation = BeginNavigation();
@@ -159,9 +150,6 @@ public class ActivityNavigation
         _ = manager.Manage(BuildPathChain($"{ChainPrefix}Path::{id}", () => approach, treatAsActivity: true));
     }
 
-    /// <summary>
-    ///     Survey / POI: score direct walk vs nearby-shard Lifestream vs Return + Lifestream.
-    /// </summary>
     private async Task PathToSurveyAsync(Vector3 destination, string name, string id, int generation)
     {
         try
@@ -271,7 +259,6 @@ public class ActivityNavigation
             return false;
         }
 
-        // Mounted Occult Return often needs a dismount first — still offer the route.
         return OccultReturn.CanCast()
                || conditions[ConditionFlag.Mounted]
                || conditions[ConditionFlag.Mounting];
@@ -307,7 +294,6 @@ public class ActivityNavigation
             chain = ReturnToBaseCamp.Append(chain, zones, conditions, gui, pathfinder, vnav);
         }
 
-        // After Return, player is still mid-field at compose time — always append hop; teleport skips if already there.
         ManageHopThenWalk(
             chain,
             chainName,
@@ -546,13 +532,11 @@ public class ActivityNavigation
         {
             DistanceThreshold = 2f,
             ShouldSnapToFloor = true,
-            // Authored / map Y is often 0; allow a wide vertical snap once altitude is seeded.
             FloorSnapExtents = 40f,
             WhileMoving = () =>
             {
                 Vector3 dest = destination();
                 IZone zone = zones.GetZone();
-                // Surveys mount even from the base-camp ring; short crystal walks stay on foot.
                 MountWait.TryCastIfNeeded(
                     conditions,
                     objects,
@@ -564,11 +548,6 @@ public class ActivityNavigation
             },
         });
 
-    /// <summary>
-    ///     Pick an aethernet that can walk to <paramref name="destination"/>.
-    ///     Honors authored preferred shards for known activities, then scores Euclidean-near
-    ///     reachable shards by walk distance so island gaps do not win.
-    /// </summary>
     private async Task<AethernetData?> SelectBestAetheryteAsync(Vector3 destination, bool treatAsActivity)
     {
         (AethernetData? best, _) = await SelectBestAetheryteWithDistanceAsync(destination, treatAsActivity)
@@ -586,7 +565,6 @@ public class ActivityNavigation
             return (null, float.PositiveInfinity);
         }
 
-        // Surveys ignore authored FATE/CE preferred shards — just the best hop for the point.
         uint? preferredId = treatAsActivity ? FindPreferredAethernetId(destination) : null;
 
         AethernetData? ByEuclidean() => aetherytes

@@ -4,7 +4,6 @@ using Dalamud.Plugin;
 
 namespace BOCCHI.Common.Services;
 
-/// <summary>Stable anonymized install id shared by Worker sync endpoints.</summary>
 public static class InstallationId
 {
     private const string FileName = "coffer-installation-id.txt";

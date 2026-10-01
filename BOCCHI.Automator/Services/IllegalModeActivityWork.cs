@@ -4,13 +4,8 @@ using BOCCHI.Common.Services;
 
 namespace BOCCHI.Automator.Services;
 
-/// <summary>Shared Illegal Mode activity / job-restore checks for Triage, Sight, and buffs.</summary>
 internal static class IllegalModeActivityWork
 {
-    /// <summary>
-    ///     FATE/CE travel and participation. Excludes pot chests, buffs, and Sight
-    ///     (those are not "raise after activity" moments).
-    /// </summary>
     public static bool HasPrimaryActivity(IAutomatorMemory memory) =>
         memory.TryRemember<GoalMemory>(out GoalMemory _)
         || memory.TryRemember<WaitingForCriticalEncounterMemory>(out WaitingForCriticalEncounterMemory _)
@@ -20,7 +15,6 @@ internal static class IllegalModeActivityWork
         || memory.TryRemember<CommittedCriticalEncounterMemory>(out CommittedCriticalEncounterMemory _)
         || memory.TryRemember<CommittedFateMemory>(out CommittedFateMemory _);
 
-    /// <summary>Anything that should keep the treasure filler from surveying / hunting.</summary>
     public static bool HasFillerBlockingActivity(IAutomatorMemory memory) =>
         HasPrimaryActivity(memory)
         || memory.TryRemember<PotChestFarmMemory>(out PotChestFarmMemory _)
@@ -63,9 +57,6 @@ internal static class IllegalModeActivityWork
         memory.Forget<TriageSupportJobMemory>();
     }
 
-    /// <summary>
-    ///     Clears restore latches that already match the current job.
-    /// </summary>
     public static bool TryClearCompletedJobRestore(IAutomatorMemory memory, ISupportJobFactory jobs)
     {
         if (!HasPendingJobRestore(memory))
@@ -85,10 +76,6 @@ internal static class IllegalModeActivityWork
         return !HasPendingJobRestore(memory);
     }
 
-    /// <summary>
-    ///     Latch the current phantom job before buffs swap (#211), including Freelancer.
-    ///     Does not overwrite an existing latch.
-    /// </summary>
     public static bool TryRememberPreBuffJob(IAutomatorMemory memory, ISupportJobFactory jobs)
     {
         if (memory.TryRemember<BuffSupportJobMemory>(out _))
@@ -104,9 +91,6 @@ internal static class IllegalModeActivityWork
         return memory.TryAdd(new BuffSupportJobMemory(current.Id));
     }
 
-    /// <summary>
-    ///     Drop wait/path latches (not GoalMemory). Soft-suspend / goal-abort / path refresh.
-    /// </summary>
     public static void ForgetTravelLatches(IAutomatorMemory memory, bool includePotChests = false)
     {
         memory.Forget<GoalPathStepMemory>();
@@ -121,7 +105,6 @@ internal static class IllegalModeActivityWork
         }
     }
 
-    /// <summary>Active route-skip latch, or null when missing/expired (expired entries are forgotten).</summary>
     public static RouteUnreachableGoalMemory? TakeActiveUnreachable(IAutomatorMemory memory)
     {
         if (!memory.TryRemember<RouteUnreachableGoalMemory>(out RouteUnreachableGoalMemory skip))
@@ -150,7 +133,6 @@ internal static class IllegalModeActivityWork
     }
 }
 
-/// <summary>Pending / active Triage Mode session flags.</summary>
 internal static class TriageSession
 {
     public static bool IsActive(IAutomatorMemory memory) =>

@@ -194,7 +194,6 @@ public sealed class AethernetDebugPanel
         try
         {
             uint active = lifestream.GetActiveCustomAetheryte();
-            // Lifestream can return huge non-PlaceName handles — only trust sheet row ids.
             if (active != 0 && active < 100_000)
             {
                 placeNameId = active;
@@ -202,10 +201,8 @@ public sealed class AethernetDebugPanel
         }
         catch
         {
-            // Lifestream optional; SubArea is the fallback.
         }
 
-        // Proximity match to authored PlaceNames if SubArea/Lifestream missed.
         if (placeNameId == 0)
         {
             AethernetData? nearest = zones.GetZone().GetAetherytes()

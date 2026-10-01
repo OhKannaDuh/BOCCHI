@@ -29,13 +29,10 @@ public class ActivityNodeMetadata : INodeMetadata
 
     public uint? PreferredAethernetId { get; set; }
 
-    /// <summary>Live LGB registration size for CE nodes; 0 until geometry is applied.</summary>
     public float CombatRadius { get; set; }
 
-    /// <summary>Circle or axis-aligned square join area.</summary>
     public ActivityAreaShape AreaShape { get; set; } = ActivityAreaShape.Circle;
 
-    /// <summary>Stand radius when tighter than CombatRadius; 0 → use CombatRadius.</summary>
     public float StandRadius { get; set; }
 }
 
@@ -45,7 +42,6 @@ public class TeleportNodeMetadata : INodeMetadata
 
     public Vector3 Destination { get; set; } = Vector3.Zero;
 
-    /// <summary>Solid body / Lifestream radius for this pad (matches <c>AethernetData.DeadRadius</c>).</summary>
     public float DeadRadius { get; set; } = AethernetData.DefaultDeadRadius;
 }
 

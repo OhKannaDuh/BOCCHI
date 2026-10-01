@@ -38,7 +38,6 @@ public sealed class BossModPresetOptionsRenderer(ICombatRotationSession session,
         BocchiUi.PushFieldStyle();
         try
         {
-            // Auto-update already rewrites presets when settings change — button is redundant then.
             using (ImRaii.Disabled(!session.BossModPresetsAvailable || updateAuto))
             {
                 if (ImGui.Button(translator.T($"{fieldKey}.button")))

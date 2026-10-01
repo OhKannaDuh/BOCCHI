@@ -2,7 +2,6 @@ using Newtonsoft.Json.Linq;
 
 namespace BOCCHI.Common.Config.Migrations;
 
-/// <summary>Move carrot radar lines into CarrotConfig; bump after carrot hunt split.</summary>
 public class ConfigMigratorV13ToV14 : IMigrator
 {
     public int FromVersion => 13;

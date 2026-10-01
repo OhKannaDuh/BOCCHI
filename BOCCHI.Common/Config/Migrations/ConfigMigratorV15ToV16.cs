@@ -2,7 +2,6 @@ using Newtonsoft.Json.Linq;
 
 namespace BOCCHI.Common.Config.Migrations;
 
-/// <summary>Remove HuntTeleportCost (aethernet hop cost is hardcoded).</summary>
 public class ConfigMigratorV15ToV16 : IMigrator
 {
     public int FromVersion => 15;

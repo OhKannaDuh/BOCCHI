@@ -32,13 +32,11 @@ public class ChoosingBuffToApplyHandler
         uint maxFreshMinutes = forceRefresh ? ManualFreshEnoughMinutes : (uint)config.ReapplyThreshold;
         bool inquired = memory.TryRemember<InquiringMindAttemptedMemory>(out InquiringMindAttemptedMemory _);
 
-        // One Freelancer cast applies every unlocked crystal buff (Romeo / Fortitude / Fleet / Quicker Step).
         if (!inquired && buffs.NeedsInquiringMind(player, maxFreshMinutes))
         {
             return BuffState.CastingInquiringMind;
         }
 
-        // Individual job casts: when IM is off, or as fallback for buffs IM did not refresh.
         foreach (BuffData buff in buffs.GetBuffs().Where(b => b.ShouldApply(config)))
         {
             SupportJob job = supportJobs.Create(buff.SupportJobId);

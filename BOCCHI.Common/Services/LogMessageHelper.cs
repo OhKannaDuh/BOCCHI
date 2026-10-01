@@ -14,9 +14,6 @@ public static class LogMessageHelper
 
     private static readonly Regex OtherMacro = new(@"^<[^>]+>", RegexOptions.Compiled);
 
-    /// <summary>
-    /// Build a regex from a LogMessage row: literal text escaped, <c>&lt;num(Name)&gt;</c> → named \d+ groups.
-    /// </summary>
     public static string GetLogMessagePattern(IDataManager data, uint id) =>
         PatternCache.GetOrAdd(id, key => BuildLogMessagePattern(data, key));
 
@@ -37,7 +34,6 @@ public static class LogMessageHelper
                 continue;
             }
 
-            // Strip other SeString macros like <SoftHyphen/> so they do not break matching.
             Match macro = OtherMacro.Match(rest);
             if (macro.Success)
             {

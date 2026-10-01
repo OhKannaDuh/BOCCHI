@@ -15,10 +15,6 @@ using System.Text.Json.Serialization;
 
 namespace BOCCHI.Treasure.Services;
 
-/// <summary>
-///     Fetches the accepted chewed-carrot catalog for Carrot Hunt and anonymously uploads
-///     sightings when shared maps are enabled. HTTP runs off the framework thread.
-/// </summary>
 public sealed class CarrotLocationSyncService
 (
     TreasureConfig config,
@@ -54,7 +50,6 @@ public sealed class CarrotLocationSyncService
 
     private IReadOnlyList<AcceptedCarrotLocation> acceptedLocations = [];
 
-    /// <summary>After <see cref="CarrotTracker"/> (default Order 0).</summary>
     public int Order => -10;
 
     public UpdateLimit UpdateLimit =>
@@ -64,10 +59,6 @@ public sealed class CarrotLocationSyncService
             Limit = 1000
         };
 
-    /// <summary>
-    ///     Baked pads with accepted remotes overwriting wrong bakes (mutual nearest), plus any
-    ///     remote-only pads. Offline / share off → baked only.
-    /// </summary>
     public IReadOnlyList<CarrotData> GetHuntPads(IZone zone)
     {
         List<CarrotData> baked = zone.GetCarrotData();

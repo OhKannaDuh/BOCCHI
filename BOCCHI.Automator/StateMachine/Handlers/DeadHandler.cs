@@ -25,18 +25,14 @@ public class DeadHandler
     public override void Enter()
     {
         base.Enter();
-        // Stop any in-flight Return so death prompts aren't auto-accepted.
         memory.Forget<ReturningStateMemory>();
         memory.Forget<GoalPathStepMemory>();
-        // Cancel pot-chest / travel opens too — PathStep-only cancel left Interact spam while dead.
         chains.CancelAll();
         pathfinder.Stop();
     }
 
     public override void Exit(AutomatorState next)
     {
-        // Force RSR/Wrath to re-issue Enable on In CE Enter — Henched IPC during unconscious
-        // can no-op while we still cache "applied".
         autoRotation.OnRevived();
         base.Exit(next);
     }

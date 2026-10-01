@@ -12,9 +12,6 @@ using PlayerState = FFXIVClientStructs.FFXIV.Client.Game.UI.PlayerState;
 
 namespace BOCCHI.Common.Config.Renderers;
 
-/// <summary>
-///     Searchable preferred-mount combo (Questionable-style): Mount Roulette + named mounts.
-/// </summary>
 public sealed class MountSelectRenderer(IDataManager data) : IFieldRenderer<MountSelectAttribute>
 {
     private string search = string.Empty;
@@ -38,7 +35,6 @@ public sealed class MountSelectRenderer(IDataManager data) : IFieldRenderer<Moun
         int index = Array.IndexOf(ids, current);
         if (index < 0)
         {
-            // Unknown / locked mount → persist Mount Roulette (id 0).
             index = 0;
             current = 0;
             if (prop.PropertyType == typeof(int))
@@ -64,7 +60,6 @@ public sealed class MountSelectRenderer(IDataManager data) : IFieldRenderer<Moun
                 if (ImGui.IsWindowAppearing())
                 {
                     ImGui.SetKeyboardFocusHere();
-                    // Refresh unlock state when the combo opens.
                     cache = BuildMountList(translator, prop, owner);
                     (ids, names) = cache.Value;
                     index = Array.IndexOf(ids, current);

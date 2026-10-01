@@ -30,7 +30,6 @@ using DalamudObjectKind = Dalamud.Game.ClientState.Objects.Enums.ObjectKind;
 
 namespace BOCCHI.Treasure.Services;
 
-/// <summary>Authored carrot tour with aethernet hops, empty-pad skips, then Fortune Carrot → bunny.</summary>
 public sealed class CarrotHunterService
 (
     ICarrotTracker carrots,
@@ -62,7 +61,6 @@ public sealed class CarrotHunterService
 
     private static readonly TimeSpan BunnySpawnTimeout = TimeSpan.FromSeconds(20);
 
-    /// <summary>After UseItem is issued, wait this long for cast / inventory drop before retrying.</summary>
     private static readonly TimeSpan FortuneCarrotUseConfirmTimeout = TimeSpan.FromSeconds(2.5);
 
     private const int FortuneCarrotUseMaxAttempts = 3;
@@ -120,10 +118,8 @@ public sealed class CarrotHunterService
 
     private Task<ChainResult>? activeTeleportChain;
 
-    /// <summary>After Return succeeds: stop hunt (finish) vs continue to current authored pad.</summary>
     private bool returnThenStop;
 
-    /// <summary>After mid-route Return, teleport from camp before walking to the pad.</summary>
     private bool returnThenAethernet;
 
     private float approachBestDistance = float.MaxValue;
@@ -318,10 +314,6 @@ public sealed class CarrotHunterService
         Teardown();
     }
 
-    /// <summary>
-    ///     Loop mode: a full empty pass means nothing left this wave — clear skips and
-    ///     check every pad again for respawns. Stops when Fortune Carrots run out.
-    /// </summary>
     private bool TryRestartLoop()
     {
         if (!treasureConfig.LoopCarrotHunt)
@@ -361,8 +353,6 @@ public sealed class CarrotHunterService
         Vector3 destination = currentTargetPosition;
         float localDist = player.Position.Distance2D(destination);
         bool wrongFloor = !HuntDistances.IsSameFloor(player.Position, destination);
-        // Keep Return for pad↔pad tour hops — and when 2D looks close but we are on the
-        // wrong shelf (cliff / ridge). Direct then climbs into mesh ("underground").
         bool allowReturn = currentLiveCarrotId == null
             && (localDist > HuntDistances.NearbyLiveDivertRange || wrongFloor);
 
@@ -667,7 +657,6 @@ public sealed class CarrotHunterService
 
         if (player.IsCasting() || conditions[ConditionFlag.Casting])
         {
-            // Cast in progress after UseItem — treat as confirmed and wait for the bunny.
             if (itemUseIssued)
             {
                 ConfirmFortuneCarrotUseAndWait();
@@ -781,7 +770,6 @@ public sealed class CarrotHunterService
             return;
         }
 
-        // Item never consumed — use was a false accept; retry at the pad instead of skipping.
         int remaining = InventoryItemAssist.Count(FortuneCarrotItemId);
         if (fortuneCarrotCountAtIssue >= 0 && remaining >= fortuneCarrotCountAtIssue)
         {
@@ -807,7 +795,6 @@ public sealed class CarrotHunterService
         IGameObject? bunny = FindBunnyNear(currentTargetPosition);
         if (bunny == null)
         {
-            // Bunny opened — stay if another chewed carrot shares this pad (double spawn).
             CompleteOrRebindSamePad();
             return;
         }
@@ -815,7 +802,6 @@ public sealed class CarrotHunterService
         float dist2d = player.Position.Distance2D(bunny.Position);
         float dist3d = player.Position.Distance(bunny.Position);
 
-        // Path in until within open range (do not interact from 5–12y).
         if (dist3d > HuntDistances.BunnyInteractRadius
             && !(dist2d <= HuntDistances.StuckNearRadius && IsStuckNearTarget(dist2d)))
         {
@@ -829,7 +815,6 @@ public sealed class CarrotHunterService
             return;
         }
 
-        // Bunny coffers need feet (same as pot reveals); hunt coffers stay mounted.
         if (DismountAssist.TryDismount(conditions))
         {
             return;
@@ -887,8 +872,6 @@ public sealed class CarrotHunterService
         walkVias.Clear();
         walkViaIndex = 0;
 
-        // West Suspended Masonry tip (~2.4, 35.9): vnav has no walkable jump link, so it routes
-        // the long way around. Same on-mesh via as treasure 2061 (~3.4, 34.2).
         if (zones.GetZone().ZoneId == ZoneId.NorthHorn && authored.Id == 25)
         {
             walkVias.Add(new(-904f, 157.8f, 636f));
@@ -915,10 +898,6 @@ public sealed class CarrotHunterService
         walkViaIndex = 0;
     }
 
-    /// <summary>
-    ///     Walk authored approach vias before the pad. Skips vias we are already on, and skips
-    ///     the rest when already on the pad's floor closer to the carrot than to the via.
-    /// </summary>
     private bool TryWalkVia(CarrotData authored)
     {
         SkipPassedWalkVias(authored.Position);
@@ -952,7 +931,6 @@ public sealed class CarrotHunterService
                 continue;
             }
 
-            // Already on the island and closer to the carrot than this via — don't backtrack.
             if (HuntDistances.IsSameFloor(player.Position, destination)
                 && player.Position.Distance2D(destination) <= player.Position.Distance2D(via))
             {
@@ -964,7 +942,6 @@ public sealed class CarrotHunterService
         }
     }
 
-    /// <summary>Re-solve nearest-neighbor tour on remaining pads, then begin the first hop.</summary>
     private void RecalculateAndAdvance(int? preferStartId = null)
     {
         ClearHop();
@@ -1013,9 +990,6 @@ public sealed class CarrotHunterService
             currentAuthored?.Id ?? 0);
     }
 
-    /// <summary>
-    /// Prefer finishing the local cluster (cave / citadel) before hopping to distant live carrots.
-    /// </summary>
     private int? FindPreferredNextPadId()
     {
         if (FindClosestUnfinishedInCluster(
@@ -1150,7 +1124,6 @@ public sealed class CarrotHunterService
             tour[0].Id);
     }
 
-    /// <summary>Walk the regions in TourOrder — death-zone babysitting stays one stretch.</summary>
     private void RebuildNorthHornRegionTour(
         List<CarrotData> remaining,
         int? preferStartId,
@@ -1211,7 +1184,6 @@ public sealed class CarrotHunterService
         }
     }
 
-    /// <summary>Clear the local cluster on foot before Return / aethernet hops to distant pads.</summary>
     private static int? PickNextTourPad(
         Vector3 from,
         HashSet<int> unvisited,
@@ -1321,8 +1293,6 @@ public sealed class CarrotHunterService
 
         float directCost = from.Distance2D(to);
         bool directCrossesFloors = !HuntDistances.IsSameFloor(from, to);
-        // 2D distance ignores cliffs — do not prefer Direct when the pad is on another shelf
-        // until aethernet/Return have had a chance to win.
         bestCost = directCrossesFloors ? float.PositiveInfinity : directCost;
         HopMode bestMode = HopMode.Direct;
 
@@ -1397,7 +1367,6 @@ public sealed class CarrotHunterService
         return bestMode;
     }
 
-    /// <summary>Lifestream landing pad — camp is always ok; locked field shards are not.</summary>
     private static bool IsUsableCarrotArrival(AethernetData shard, AethernetData main) =>
         shard.Id == main.Id || OccultCrescentHelper.IsAethernetUnlocked(shard.Id);
 
@@ -1411,7 +1380,6 @@ public sealed class CarrotHunterService
         }
     }
 
-    /// <summary>Divert to a nearer live chewed carrot (same pad rebind or other-pad replan).</summary>
     private bool TryDivertToNearbyLiveCarrot()
     {
         if (currentAuthored is not { } current)
@@ -1500,10 +1468,6 @@ public sealed class CarrotHunterService
         return true;
     }
 
-    /// <summary>
-    ///     North Horn: stay in the current region, or the first unfinished region in
-    ///     <see cref="NorthHornCarrotRegions.TourOrder"/> when replanning.
-    /// </summary>
     private bool IsAllowedOnNorthHornTour(CarrotData pad, CarrotData? currentPad = null)
     {
         if (!NorthHornCarrotRegions.AppliesTo(zones.GetZone().ZoneId))
@@ -1532,7 +1496,6 @@ public sealed class CarrotHunterService
                 continue;
             }
 
-            // Use TourIndex, not enum ordinal.
             NorthHornCarrotRegion region = NorthHornCarrotRegions.Classify(remaining.Position);
             int order = NorthHornCarrotRegions.TourIndex(region);
             if (order < activeOrder)
@@ -1650,7 +1613,6 @@ public sealed class CarrotHunterService
             log.Debug("Carrot hunt: finished authored {Id} near {Pos:F0}", authored.Id, currentTargetPosition);
             if (treasureConfig.LoopCarrotHunt)
             {
-                // Finding a carrot means others may have respawned — every pad must be checked again.
                 finishedAuthoredIds.Clear();
                 log.Debug("Carrot hunt: loop — cleared empty skips after using a carrot");
             }
@@ -1675,7 +1637,6 @@ public sealed class CarrotHunterService
         Carrot? match = carrots.Carrots.FirstOrDefault(c => c.IsValid() && c.GameObjectId == id);
         if (match == null)
         {
-            // Live list may have refreshed — rebind from authored if still near.
             if (currentAuthored is { } authored)
             {
                 MaybeBindLiveCarrot(authored);
@@ -1725,7 +1686,6 @@ public sealed class CarrotHunterService
             return;
         }
 
-        // Mount allowed in camp (matches treasure hunt).
         MountWait.TryCastIfNeeded(
             conditions,
             objects,
@@ -1735,7 +1695,6 @@ public sealed class CarrotHunterService
             inBaseCamp: false);
     }
 
-    /// <summary>Path/mount only after Hide is ready when required. Same gate as Treasure Hunt.</summary>
     private bool TryNavigateToward(Vector3 destination, float arrivalRadius)
     {
         if (!ApplyNinjaHideGate())
@@ -1753,7 +1712,6 @@ public sealed class CarrotHunterService
         return true;
     }
 
-    /// <returns>False while still preparing Hide (caller should wait).</returns>
     private bool ApplyNinjaHideGate()
     {
         if (!treasureConfig.UseNinjaHideOnDangerousRoutes)
@@ -1840,7 +1798,6 @@ public sealed class CarrotHunterService
 
     private bool TryRecoverFromStuckWalk(int authoredId, float distance)
     {
-        // Near-target stuck is handled by IsStuckNearTarget (interact from here).
         if (distance <= HuntDistances.StuckNearRadius)
         {
             ResetFarStuckWatch();
@@ -1859,7 +1816,6 @@ public sealed class CarrotHunterService
                 SkipCurrentAuthored();
                 return true;
             case WalkStuckWatch.Action.Repath:
-                // Wrong shelf: repathing Direct climbs the same cliff. Re-pick Return/aethernet.
                 if (!HuntDistances.IsSameFloor(player.Position, currentTargetPosition))
                 {
                     log.Debug(
@@ -1904,7 +1860,6 @@ public sealed class CarrotHunterService
             return false;
         }
 
-        // Still climbing — 2D looks close. Stay mounted.
         if (!HuntDistances.IsSameFloor(player.Position, currentTargetPosition))
         {
             return false;

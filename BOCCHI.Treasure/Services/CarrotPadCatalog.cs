@@ -3,14 +3,8 @@ using System.Numerics;
 
 namespace BOCCHI.Treasure.Services;
 
-/// <summary>
-///     Merge baked Carrot Hunt pads with worker-accepted locations.
-///     Keeps baked ids (path overrides); remote-only pads use <c>1000 + candidateId</c>.
-///     Accepted remotes that mutually match a bake beyond merge radius overwrite that bake's position.
-/// </summary>
 public static class CarrotPadCatalog
 {
-    /// <summary>Match remote centroids to baked pads (worker clusters at ~1.5y).</summary>
     public const float MergeRadius = 3f;
 
     public const float MergeRadiusSq = MergeRadius * MergeRadius;
@@ -54,10 +48,6 @@ public static class CarrotPadCatalog
         return merged;
     }
 
-    /// <summary>
-    ///     Mutual-nearest remote within <see cref="CrowdsourcedPadCorrection.CarrotMaxCorrection"/>
-    ///     that disagrees past <see cref="MergeRadius"/> replaces the bake position (id kept).
-    /// </summary>
     private static List<CarrotData> CorrectBaked(
         IReadOnlyList<CarrotData> baked,
         IReadOnlyList<AcceptedCarrotLocation> remote)

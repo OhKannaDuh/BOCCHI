@@ -20,10 +20,6 @@ public class CriticalEncounterContext
 
     public bool IsRegisteredOrInCriticalEncounter() => TryGetParticipatingCriticalEncounterId(out _);
 
-    /// <summary>
-    ///     Participating in a CE that is in Battle. Uses the player's event id (not the zone
-    ///     <c>CurrentEventId</c>), and ignores Register/Warmup so base camp does not show "In CE".
-    /// </summary>
     public unsafe CriticalEncounterId? GetCriticalEncounterId()
     {
         if (!TryGetParticipatingCriticalEncounterId(out CriticalEncounterId id, battleOnly: true))
@@ -84,7 +80,6 @@ public class CriticalEncounterContext
         return EnumerateEncounterEnemies(id).OrderBy(o => o.Position.Distance2D(player.Position));
     }
 
-    /// <summary>Existence check only — skips the distance ordering a full target list needs.</summary>
     public bool HasEncounterEnemies(CriticalEncounterId id) => EnumerateEncounterEnemies(id).Any();
 
     private unsafe IEnumerable<IBattleNpc> EnumerateEncounterEnemies(CriticalEncounterId id)

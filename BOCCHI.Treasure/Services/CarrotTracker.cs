@@ -35,7 +35,6 @@ public class CarrotTracker(
 
     public void Update()
     {
-        // Occult Crescent only.
         if (!zones.GetZone().IsOccultCrescentZone())
         {
             if (Carrots.Count > 0)

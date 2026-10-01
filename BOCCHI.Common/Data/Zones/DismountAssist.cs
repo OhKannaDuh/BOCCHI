@@ -7,12 +7,8 @@ using Ocelot.Actions;
 
 namespace BOCCHI.Common.Data.Zones;
 
-/// <summary>Shared dismount helper for state handlers.</summary>
 public static class DismountAssist
 {
-    /// <summary>
-    ///     Mounted flag lags a frame — also ask the character. A missed dismount fails the open (#175).
-    /// </summary>
     public static unsafe bool IsMounted(ICondition conditions)
     {
         if (conditions[ConditionFlag.Mounted] || conditions[ConditionFlag.RidingPillion])
@@ -24,27 +20,15 @@ public static class DismountAssist
                && ((BattleChara*)address)->IsMounted();
     }
 
-    /// <summary>
-    ///     Mid mount / dismount animation (MountOrOrnamentTransition, Mounting, Mounting71).
-    /// </summary>
     private static bool IsMountTransition(ICondition conditions) =>
         conditions[ConditionFlag.Mounting]
         || conditions[ConditionFlag.Mounting71]
         || conditions[ConditionFlag.MountOrOrnamentTransition];
 
-    /// <summary>
-    ///     If mounted, mounting, or still in the dismount jump/landing, try to dismount / wait.
-    ///     Returns true when the caller should wait (not act yet).
-    /// </summary>
     public static bool TryDismount(ICondition conditions) => TryDismount(conditions, null);
 
-    /// <param name="report">
-    ///     Optional sink for one line per cast attempt. This path has failed silently more than once,
-    ///     so callers that care can see the flags and the UseAction result instead of guessing.
-    /// </param>
     public static bool TryDismount(ICondition conditions, System.Action<string>? report)
     {
-        // Wait out mount-up / dismount animation without casting Dismount into a mount-in-progress.
         if (IsMountTransition(conditions))
         {
             return true;

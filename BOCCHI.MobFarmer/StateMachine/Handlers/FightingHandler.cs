@@ -71,7 +71,6 @@ public class FightingHandler
                 return null;
             }
 
-            // Auto-target during pull only; with combat AI on, leave targeting to the AI.
             if (!useAi
                 && config.ShouldHandleTargeting
                 && inCombat.Count > 0

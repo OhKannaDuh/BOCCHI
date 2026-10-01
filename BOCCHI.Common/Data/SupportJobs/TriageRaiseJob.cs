@@ -4,7 +4,6 @@ using BOCCHI.Common.Services;
 
 namespace BOCCHI.Common.Data.SupportJobs;
 
-/// <summary>Phantom jobs that can raise in Triage Mode.</summary>
 public static class TriageRaiseJob
 {
     public static bool AnyUnlocked(ISupportJobFactory supportJobs) =>

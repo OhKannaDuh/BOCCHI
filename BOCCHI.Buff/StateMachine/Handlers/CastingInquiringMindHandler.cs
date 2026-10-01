@@ -39,7 +39,6 @@ public class CastingInquiringMindHandler
             return null;
         }
 
-        // Inquiring Mind grants all unlocked crystal buffs in one cast — not Quicker Step only.
         if (buffs.AreInquiringMindTargetsFresh(player))
         {
             memory.TryAdd<InquiringMindAttemptedMemory>();
@@ -75,7 +74,6 @@ public class CastingInquiringMindHandler
             return null;
         }
 
-        // First cast is in flight — wait for statuses before counting another miss.
         TimeSpan time = DateTime.UtcNow - lastCast;
         if (lastCast != DateTime.MinValue && time.TotalSeconds < 2)
         {

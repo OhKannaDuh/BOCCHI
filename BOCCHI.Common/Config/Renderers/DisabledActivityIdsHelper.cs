@@ -7,7 +7,6 @@ using System.Reflection;
 
 namespace BOCCHI.Common.Config.Renderers;
 
-/// <summary>Shared HashSet&lt;uint&gt; enable/disable checkbox list for zone activity config fields.</summary>
 internal static class DisabledActivityIdsHelper
 {
     public static bool Render(

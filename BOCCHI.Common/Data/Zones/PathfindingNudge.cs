@@ -6,7 +6,6 @@ public static class PathfindingNudge
 {
     public const float DefaultDistance = 8f;
 
-    /// <summary>Point 8y to the side of the walk toward <paramref name="dest"/>, same height as <paramref name="from"/>.</summary>
     public static Vector3 LateralFrom(Vector3 from, Vector3 dest, float distance = DefaultDistance)
     {
         Vector3 toDest = dest - from;

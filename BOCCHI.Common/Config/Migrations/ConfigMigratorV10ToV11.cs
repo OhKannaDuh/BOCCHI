@@ -2,9 +2,6 @@ using Newtonsoft.Json.Linq;
 
 namespace BOCCHI.Common.Config.Migrations;
 
-/// <summary>
-///     Clean orphan keys from renames / moved toggles, and map StopAfterActivityAetheryte → StopAfterReturn.
-/// </summary>
 public class ConfigMigratorV10ToV11 : IMigrator
 {
     private static readonly string[] OrphanAutomatorKeys =
@@ -39,7 +36,6 @@ public class ConfigMigratorV10ToV11 : IMigrator
         JObject automator = result["AutomatorConfig"] as JObject
                             ?? new JObject { ["$type"] = "BOCCHI.Common.Config.AutomatorConfig, BOCCHI.Common" };
 
-        // Renamed without a migrator — copy old value if the new key was never written.
         if (automator["StopAfterReturn"] == null
             && automator["StopAfterActivityAetheryte"] is JToken oldStop)
         {
@@ -72,7 +68,6 @@ public class ConfigMigratorV10ToV11 : IMigrator
             treasure.Remove("HuntReturnCost");
         }
 
-        // Fully relocated sections — ignore leftovers.
         result.Remove("CombatConfig");
         result.Remove("ExperienceConfig");
         result.Remove("CurrencyConfig");

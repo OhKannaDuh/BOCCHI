@@ -4,16 +4,12 @@ public readonly record struct DeltaSnapshot(long Delta, DateTime Time);
 
 public sealed class DeltaRateTracker(Func<TimeSpan> getTrackedWindow)
 {
-    /// <summary>How much history the optional graph averages over.</summary>
     public static readonly TimeSpan DefaultWindow = TimeSpan.FromMinutes(5);
 
-    /// <summary>Width of one bar in the tracker graphs.</summary>
     public static readonly TimeSpan DefaultGraphBucket = TimeSpan.FromSeconds(15);
 
-    /// <summary>Don't flash a rate from the first inventory tick.</summary>
     public static readonly TimeSpan MinElapsedForRate = TimeSpan.FromSeconds(20);
 
-    /// <summary>Sliding window for the live per-hour rate.</summary>
     public static readonly TimeSpan RateHour = TimeSpan.FromHours(1);
 
     private static readonly TimeSpan RecoveryWindow = TimeSpan.FromSeconds(2);
@@ -55,10 +51,6 @@ public sealed class DeltaRateTracker(Func<TimeSpan> getTrackedWindow)
         }
     }
 
-    /// <summary>
-    ///     Count wall-clock while farming in Occult Crescent. Pause on leave / state loss so
-    ///     loading screens don't dilute the rate and don't get treated as farm time.
-    /// </summary>
     public void SetCounting(bool counting)
     {
         if (counting)

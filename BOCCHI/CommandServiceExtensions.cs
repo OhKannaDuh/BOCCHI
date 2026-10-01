@@ -8,7 +8,6 @@ public static class CommandServiceExtensions
 {
     public static void AddBocchiCommands(this IServiceCollection services)
     {
-        // Concrete commands are only reached via /bocchi <subcommand> (IMainCommandDelegate).
         services.AddSingleton<BuffCommand>();
         services.AddSingleton<IMainCommandDelegate, BuffCommandDelegate>();
 

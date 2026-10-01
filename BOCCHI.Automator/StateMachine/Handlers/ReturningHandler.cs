@@ -48,10 +48,6 @@ public class ReturningHandler
     ILogger<ReturningHandler> logger
 ) : ScoreStateHandler<AutomatorState, StatePriority>(AutomatorState.Returning)
 {
-    /// <summary>
-    ///     CastDelay can roll up to 60s; give dismount / combat drop / Yesno time after that.
-    ///     Drop the latch so Pathfinding can Teleport+Walk instead of sitting on Returning (#178).
-    /// </summary>
     private static readonly TimeSpan CastAttemptBudget = TimeSpan.FromSeconds(45);
 
     public override StatePriority GetScore()
@@ -61,54 +57,42 @@ public class ReturningHandler
             return StatePriority.Never;
         }
 
-        // Pathfinding already dequeued Return — honor the latch before Pots & Treasure Never.
-        // Managed pot travel (Mob Farmer yield) hands Return here; skipping would leave Pathfinding
-        // idle with no Teleport/Walk (South Horn pot / #King Godfrey).
         if (memory.TryRemember<ReturningStateMemory>(out ReturningStateMemory _))
         {
             return StatePriority.VeryHigh;
         }
 
-        // Stop-after-return paused at the shard — do not Return to camp or the user walk is undone.
         if (memory.TryRemember<NavigationInterruptedMemory>(out NavigationInterruptedMemory _))
         {
             return StatePriority.Never;
         }
 
-        // Treasure hunt is the idle filler in Pots & Treasure — never Return-to-camp.
         if (automator.IsPotsAndTreasure)
         {
             return StatePriority.Never;
         }
 
-        // Return while dead accepts the death prompt and force-respawns.
         if (conditions[ConditionFlag.Unconscious])
         {
             return StatePriority.Never;
         }
 
-        // Raise nearby players before leaving the FATE/CE site — keep the Return latch, but do
-        // not score while triage is pending/active (otherwise VeryHigh hides triage + combat wait).
         if (TriageSession.IsActive(memory))
         {
             return StatePriority.Never;
         }
 
-        // Map-hunt filler (no Treasure Sight): hunt owns opportunistic Return / routing while
-        // actively moving. When paused for a FATE/CE, allow Automator Return (e.g. camp for buffs).
         if (IsIllegalModeMapHuntFillerActive())
         {
             return StatePriority.Never;
         }
 
-        // Pot chest farm / deferred handoff — open the reveal before Sight Return.
         if (memory.TryRemember<PotChestFarmMemory>(out PotChestFarmMemory _)
             || memory.TryRemember<PendingPotChestFarmMemory>(out PendingPotChestFarmMemory _))
         {
             return StatePriority.Never;
         }
 
-        // After activity, get to camp for Treasure Sight before the next CE/FATE.
         if (memory.TryRemember<AutomaticTreasureSurveyMemory>(out AutomaticTreasureSurveyMemory survey)
             && survey.PendingSurvey
             && !zones.GetZone().IsInBasecamp())
@@ -121,20 +105,16 @@ public class ReturningHandler
             return StatePriority.Never;
         }
 
-        // Waiting inside / near the goal FATE circle — don't Return-to-base.
         if (IsNearActiveFateGoal())
         {
             return StatePriority.Never;
         }
 
-        // Committed to a CE (wait latch / SuspendTravel / live Preparing|Battle goal) — never
-        // Opportunistic Return while Goal still shows that CE (e.g. Familiar / Unbridled).
         if (IsCommittedToCriticalEncounterGoal())
         {
             return StatePriority.Never;
         }
 
-        // Opportunistic Occult Return while idle. Overworld Return CD is a different action.
         if (!idle.IsReadyToReturn())
         {
             return StatePriority.Never;
@@ -147,7 +127,6 @@ public class ReturningHandler
     {
         base.Enter();
         autoRotation.DisableAi();
-        // Movement / a mid-hop Lifestream cancel Return mid-cast.
         pathfinder.Stop();
         vnav.Stop();
         AethernetTeleport.AbortIfBusy(lifestream);
@@ -204,7 +183,6 @@ public class ReturningHandler
             return;
         }
 
-        // Gate: true = interval elapsed (was inverted before).
         if (!gate.Milliseconds(this, "ReturningHandler::Gate", 500))
         {
             return;
@@ -225,7 +203,6 @@ public class ReturningHandler
             return;
         }
 
-        // Poll confirm — PostSetup alone can miss when BossMod slows UI setup.
         if (TryConfirmReturnDialog())
         {
             return;
@@ -236,8 +213,6 @@ public class ReturningHandler
             return;
         }
 
-        // Path handoff: hold Returning while the rolled 2..max delay elapses.
-        // Survey latch skips the humanize delay — get to camp for Sight ASAP.
         bool surveyLatch = memory.TryRemember<AutomaticTreasureSurveyMemory>(out AutomaticTreasureSurveyMemory latch)
                            && latch.PendingSurvey;
         if (memory.TryRemember<ReturningStateMemory>(out ReturningStateMemory returning))
@@ -247,8 +222,6 @@ public class ReturningHandler
                 return;
             }
 
-            // Latch spent too long without landing at camp — free Pathfinding to Teleport+Walk,
-            // or drop a stuck Sight survey so Illegal Mode can map-hunt from the field.
             TimeSpan budget = returning.CastDelay + CastAttemptBudget;
             if (returning.GetTimeQueued() >= budget)
             {
@@ -315,7 +288,6 @@ public class ReturningHandler
 
     private void OnReturnTimedOut(TimeSpan queued)
     {
-        // Last try — status can lag after combat while UseAction still works.
         pathfinder.Stop();
         vnav.Stop();
         OccultReturn.Cast();
@@ -329,8 +301,6 @@ public class ReturningHandler
 
         memory.Forget<ReturningStateMemory>();
 
-        // Survey Return never had a Teleport path behind it — without this, GetScore keeps
-        // re-entering Returning forever on PendingSurvey.
         if (memory.TryRemember<AutomaticTreasureSurveyMemory>(out AutomaticTreasureSurveyMemory survey)
             && survey.PendingSurvey
             && !zones.GetZone().IsInBasecamp())
@@ -375,8 +345,6 @@ public class ReturningHandler
     {
         base.Exit(next);
 
-        // The idle latch is spent once we leave Returning — either the Return cast, or something
-        // (triage / a live FATE goal) pulled us off it and the next idle stretch rolls its own wait.
         memory.Forget<IdleStateMemory>();
         addons.UnregisterListener(AddonEvent.PostSetup, "SelectYesno", SelectYesNoListener);
     }
@@ -420,7 +388,6 @@ public class ReturningHandler
 
     private bool IsIllegalModeMapHuntFillerActive()
     {
-        // Paused = yielded to FATE/CE; Automator must be able to Return / buff / choose.
         if (hunter.ManagedByIllegalModeFiller && hunter.Running && !hunter.Paused)
         {
             return true;

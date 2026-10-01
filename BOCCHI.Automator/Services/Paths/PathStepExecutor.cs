@@ -36,10 +36,6 @@ public class PathStepExecutor
             Teleport(var id) => chains.Create($"{PathStepSoftStop.Prefix}Teleport({id})")
                 .Then<AethernetTeleportChain, uint>(id),
 
-            // PathfindingHandler intercepts Return before it reaches here, handing off to
-            // ReturningHandler so the rolled pre-Return delay applies. Callers that drive the
-            // executor directly (the pot chest farm) have no such state to hand off to, and
-            // Returning does not drop the pot — so run the same chain the treasure hunt uses.
             Return _ => ReturnToBaseCamp.Append(
                 chains.Create($"{PathStepSoftStop.Prefix}Return"),
                 zones,

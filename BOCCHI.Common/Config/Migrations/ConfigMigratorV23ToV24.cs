@@ -2,10 +2,6 @@ using Newtonsoft.Json.Linq;
 
 namespace BOCCHI.Common.Config.Migrations;
 
-/// <summary>
-///     Move bronze/silver hunt fill thresholds from Mob Farmer yields onto TreasureConfig so Illegal
-///     Mode auto-hunt and Mob Farmer share the same sliders.
-/// </summary>
 public class ConfigMigratorV23ToV24 : IMigrator
 {
     public int FromVersion => 23;

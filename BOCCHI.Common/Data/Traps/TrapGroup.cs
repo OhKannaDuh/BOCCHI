@@ -28,3 +28,10 @@ public sealed class TrapGroup(List<TrapDatum> traps)
         return best;
     }
 }
+
+public sealed class TrapDatum(Vector3 position, uint type)
+{
+    public Vector3 Position { get; } = position;
+
+    public uint Type { get; } = type;
+}

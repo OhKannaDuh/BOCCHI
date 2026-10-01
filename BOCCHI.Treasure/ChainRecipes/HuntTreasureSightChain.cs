@@ -13,9 +13,6 @@ using Ocelot.Extensions;
 
 namespace BOCCHI.Treasure.ChainRecipes;
 
-/// <summary>
-///     Dismount → Freelancer → Treasure Sight (Phantom Action II) → restore previous phantom job.
-/// </summary>
 public class HuntTreasureSightChain
 (
     IChainFactory chains,
@@ -91,7 +88,6 @@ public class HuntTreasureSightChain
             );
     }
 
-    /// <summary>Ready when on foot and not in the dismount landing beat.</summary>
     private bool IsOnFoot() => !DismountAssist.TryDismount(conditions);
 
     private void CaptureRestoreIfNeeded()
@@ -139,10 +135,6 @@ public class HuntTreasureSightChain
         return player.StatusList.Has(statusId);
     }
 
-    /// <summary>
-    /// Start Treasure Sight and wait until the cast finishes.
-    /// Returning true on UseAction alone restored the previous job mid-cast and cancelled Sight.
-    /// </summary>
     private bool TryCastSight(CastState state)
     {
         CaptureRestoreIfNeeded();
@@ -156,11 +148,9 @@ public class HuntTreasureSightChain
 
         if (state.SawCasting || state.Issued)
         {
-            // Cast completed (or never entered casting for an instant-style success).
             return true;
         }
 
-        // Remount / mount transition after Dismount step — wait instead of burning the cast window.
         if (DismountAssist.TryDismount(conditions))
         {
             return false;
@@ -176,7 +166,6 @@ public class HuntTreasureSightChain
             state.CdBlockedSinceUtc ??= DateTime.UtcNow;
             if (DateTime.UtcNow - state.CdBlockedSinceUtc.Value >= SightCooldownGrace)
             {
-                // Shared action CD (buffs, etc.) — skip the cast but still run restore.
                 sightCastSkippedCd = true;
                 return true;
             }

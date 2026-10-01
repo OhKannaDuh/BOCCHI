@@ -2,7 +2,6 @@ using Newtonsoft.Json.Linq;
 
 namespace BOCCHI.Common.Config.Migrations;
 
-/// <summary>Move Prefer pot FATEs onto Illegal Mode (AutomatorConfig).</summary>
 public class ConfigMigratorV6ToV7 : IMigrator
 {
     public int FromVersion => 6;

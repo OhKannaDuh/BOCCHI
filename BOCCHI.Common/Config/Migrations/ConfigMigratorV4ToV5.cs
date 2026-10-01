@@ -2,7 +2,6 @@ using Newtonsoft.Json.Linq;
 
 namespace BOCCHI.Common.Config.Migrations;
 
-/// <summary>Move Combat page settings into Mob Farmer (targeting) and Illegal Mode (auto-repair).</summary>
 public class ConfigMigratorV4ToV5 : IMigrator
 {
     public int FromVersion => 4;

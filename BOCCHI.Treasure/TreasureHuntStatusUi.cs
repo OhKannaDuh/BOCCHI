@@ -10,10 +10,8 @@ using Ocelot.Windows;
 
 namespace BOCCHI.Treasure;
 
-/// <summary>Shared hunt progress / Discord resume UX (last coffer id + map flag).</summary>
 public static class TreasureHuntStatusUi
 {
-    /// <summary>1-based coffer progress for the session (counts up as locations are checked).</summary>
     public static string FormatProgress(ITreasureHunter hunter, ITranslator<MainWindow> translator)
     {
         if (hunter.WaitingForSafeWindow)
@@ -85,7 +83,6 @@ public static class TreasureHuntStatusUi
                 ImGui.SameLine(0f, 8f);
             }
 
-            // Count only on the bar — Paused is the chip.
             BocchiUi.DrawPercentBar(
                 fraction,
                 Math.Min(220f, ImGui.GetContentRegionAvail().X),

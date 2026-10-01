@@ -9,7 +9,6 @@ namespace BOCCHI.Common.Data.Zones.Graph.Traversal;
 
 public class WalkTeleportWalkCalculator : IGraphCandidateCalculator
 {
-    /// <summary>Graph snap radius (45y; camp pad ~20–25y was too tight).</summary>
     private const float GraphSnapRadius = 45f;
 
     public string Key() => "WalkTeleportWalk";
@@ -64,8 +63,6 @@ public class WalkTeleportWalkCalculator : IGraphCandidateCalculator
                 walkToDepartureCost + walkToGoalFromInbound);
         }
 
-        // Field → camp via shard is a fallback when Occult Return cannot be used.
-        // ReturnTeleportWalk still wins on cost (40 vs hop 50 + walk) when it can.
         return new(
             walkToDepartureCost + NavigationConstants.AethernetHopCost + walkToGoalFromInbound,
             BuildTeleportSteps(departure, inboundMeta.AetheryteId, goal, inbound, start));
@@ -76,14 +73,12 @@ public class WalkTeleportWalkCalculator : IGraphCandidateCalculator
         Vector3 start,
         IPathfinder pathfinder)
     {
-        // Prefer camp aetheryte when standing in camp — never burn a vnav query just to leave base.
         Node? baseCamp = graph.GetBaseCampAetheryteNode();
         if (baseCamp != null && start.Distance2D(baseCamp.Position) <= NavigationConstants.CampRadius)
         {
             return (baseCamp, start.Distance(baseCamp.Position));
         }
 
-        // Snap to teleport nodes only (not FATE/CE nodes).
         if (graph.TryGetNode(start, GraphSnapRadius, out Node node) && node.IsTeleport())
         {
             return (node, start.Distance(node.Position));
@@ -167,7 +162,6 @@ public class WalkTeleportWalkCalculator : IGraphCandidateCalculator
                     NavigationConstants.EventArrivalRadius)
             ]);
 
-    /// <summary>Same shard but far: walk to the pad, then to the activity (no Lifestream hop).</summary>
     private static TraversalCandidate BuildViaShardWalk(
         Vector3 start,
         Node goal,
@@ -191,7 +185,6 @@ public class WalkTeleportWalkCalculator : IGraphCandidateCalculator
         return new(cost, steps);
     }
 
-    /// <summary>Pathfind to departure aetheryte, Teleport, then Pathfind to the goal.</summary>
     private static List<PathStep> BuildTeleportSteps(
         Node departure,
         uint aetheryteId,
@@ -201,7 +194,6 @@ public class WalkTeleportWalkCalculator : IGraphCandidateCalculator
     {
         List<PathStep> steps = [];
 
-        // Skip Pathfind when already inside Lifestream ready (body + arrival slack).
         float ready = departure.GetNodeLifestreamReadyRadius();
         if (start.Distance2D(departure.Position) > ready)
         {

@@ -9,7 +9,6 @@ using Action = Ocelot.Actions.Action;
 
 namespace BOCCHI.MobFarmer.Services;
 
-/// <summary>Tank ranged / Provoke / gap closer during Gathering. No-op on non-tanks.</summary>
 public sealed class FarmerPullAssist(
     MobFarmerConfig config,
     IPlayer player,
@@ -20,7 +19,6 @@ public sealed class FarmerPullAssist(
 
     private const ulong InvalidTargetId = 0xE0000000;
 
-    // Action IDs from Wrath Combo (RoleActions / job helpers).
     private static readonly Action Provoke = new(ActionType.Action, 7533);
 
     private static readonly Action ShieldLob = new(ActionType.Action, 24);
@@ -46,7 +44,6 @@ public sealed class FarmerPullAssist(
             return false;
         }
 
-        // Already on us — do not re-cast Provoke / gap / ranged every PullRange tick.
         if (current.IsTargetingPlayer(objects.LocalPlayer))
         {
             return false;
@@ -68,7 +65,6 @@ public sealed class FarmerPullAssist(
             targets.Target = current;
         }
 
-        // One skill per tick, aimed at this enemy rather than a flickered hard target.
         if (config.UseRangedPull && TryRanged() is { } ranged && ranged.CanCast())
         {
             return ranged.Cast(targetId);

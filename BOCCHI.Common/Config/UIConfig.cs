@@ -71,7 +71,6 @@ public class UIConfig : IAutoConfig
     [Checkbox(Order = 9, Section = "events")]
     public bool ShowSoulShardDrops { get; set; } = true;
 
-    /// <summary>Show FATEs &amp; CEs list — a panel toggle, so it belongs with the others.</summary>
     [Checkbox(Order = 10, Section = "panels")]
     public bool ShowWorldSection { get; set; } = true;
 
@@ -93,7 +92,6 @@ public class UIConfig : IAutoConfig
     [Checkbox(Order = 16, Section = "panels")]
     public bool ShowTreasureSection { get; set; } = true;
 
-    /// <summary>Print plugin chat notifications (always with [BOCCHI] when enabled).</summary>
     [Checkbox(Order = 17, Section = "chat")]
     public bool ShowBocchiChatPrefix { get; set; } = true;
 

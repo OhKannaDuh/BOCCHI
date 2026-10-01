@@ -35,7 +35,6 @@ public static class PathStepFormatHelper
         }
         catch
         {
-            // Fall through to generic label.
         }
 
         return string.IsNullOrWhiteSpace(name)

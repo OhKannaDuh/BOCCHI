@@ -47,7 +47,6 @@ public class ChoosingActivityHandler
             return StatePriority.Never;
         }
 
-        // Only yield to buffs when a crystal is nearby — otherwise Choosing softlocks Idle.
         if (buffConfig.ShouldAutomateBuffs
             && buffs.ShouldRefreshAny()
             && zones.GetZone().GetNearbyKnowledgeCrystals().Any())
@@ -77,7 +76,6 @@ public class ChoosingActivityHandler
             return StatePriority.Never;
         }
 
-        // Only claim Choosing when something can actually start (avoids pot-cutoff softlock).
         bool hasCriticalEncounter = !PotsOnly && startableCriticalEncounters.FindStartable() != null;
         if (!hasCriticalEncounter
             && FindStartableFate() == null
@@ -150,7 +148,6 @@ public class ChoosingActivityHandler
         return true;
     }
 
-    /// <summary>Last reason prepositioning was skipped — logged only when it changes (called per tick).</summary>
     private string? lastPrepositionSkip;
 
     private bool CanPrepositionToPot(out FateId potId)
@@ -219,7 +216,6 @@ public class ChoosingActivityHandler
         return true;
     }
 
-    /// <summary>Always false; records why so the reason can be logged once per change.</summary>
     private bool SkipPreposition(string reason)
     {
         if (lastPrepositionSkip != reason)

@@ -1,10 +1,5 @@
 namespace BOCCHI.Treasure.Hunt;
 
-/// <summary>
-///     Shared approach stuck watch: progress resets the clock; after <see cref="Options.NudgeAfter"/>
-///     issue a lateral nudge; after <see cref="Options.EscalateAfter"/> either give up or repath
-///     (Treasure: escalate = give up; Carrot: escalate = repath until MaxEscalations).
-/// </summary>
 public sealed class WalkStuckWatch
 {
     public enum Action
@@ -41,10 +36,6 @@ public sealed class WalkStuckWatch
         escalationCount = 0;
     }
 
-    /// <summary>
-    ///     After a nudge that was intentionally skipped (Hide / dense pack), do not wait the
-    ///     full escalate window while vnav is stopped — give up within <paramref name="maxRemaining"/>.
-    /// </summary>
     public void CapEscalateAfter(TimeSpan maxRemaining)
     {
         if (!nudgeIssued || key == null || maxRemaining <= TimeSpan.Zero)
@@ -61,7 +52,6 @@ public sealed class WalkStuckWatch
         }
     }
 
-    /// <param name="pathfinding">True while vnav is still computing — do not count as stuck.</param>
     public Action Tick(long watchKey, float distance, bool pathfinding = false)
     {
         DateTime now = DateTime.UtcNow;
@@ -100,15 +90,12 @@ public sealed class WalkStuckWatch
             return Action.None;
         }
 
-        // Treasure: MaxEscalations 0 → GiveUp on first escalate.
-        // Carrot: MaxEscalations 2 → Repath twice, then GiveUp.
         if (options.MaxEscalations <= 0)
         {
             Reset();
             return Action.GiveUp;
         }
 
-        // Carrot only escalates after a nudge was issued.
         if (!nudgeIssued)
         {
             return Action.None;

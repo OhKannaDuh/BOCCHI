@@ -9,13 +9,8 @@ namespace BOCCHI.Common.Data.Aethernet;
 
 public static class AethernetNavigation
 {
-    /// <summary>Arrival radius while closing on aetheryte rings.</summary>
     public const float PathfindArrivalRadius = 0.5f;
 
-    /// <summary>
-    ///     Extra slack when deciding we are already at the stand-off (vnav often stops a touch short).
-    ///     Treasure hunt uses the same figure.
-    /// </summary>
     public const float PathfindArrivalSlack = 0.35f;
 
     public const float EdgeClearance = AethernetData.LifestreamEdgeClearance;
@@ -32,40 +27,21 @@ public static class AethernetNavigation
         return node.Position;
     }
 
-    /// <summary>Magenta ring — solid body / Lifestream zone.</summary>
     public static float GetBodyRadius(this AethernetData data) => MathF.Max(2f, data.DeadRadius);
 
-    /// <summary>Cyan ring — outer edge of the idle band.</summary>
     public static float GetIdleOuterRadius(this AethernetData data) => data.GetBodyRadius() + EdgeClearance;
 
-    /// <summary>Midpoint of the idle band (between magenta and cyan).</summary>
-    public static float GetIdleWaitRadius(this AethernetData data) =>
-        data.GetBodyRadius() + (EdgeClearance * 0.5f);
-
-    /// <summary>
-    ///     Magenta ring + pathfind stop slack. Body alone left Base Camp stuck ~0.2y outside
-    ///     the ring after vnav arrived (crystal Y vs Destination footpad Y).
-    /// </summary>
     public static float GetLifestreamReadyRadius(this AethernetData data) =>
         data.GetBodyRadius() + PathfindArrivalRadius;
 
-    /// <summary>
-    ///     Walk target on the magenta body ring (not inside the mesh). Pathfind may stop a
-    ///     little short; ready radius includes <see cref="PathfindArrivalRadius"/> slack.
-    /// </summary>
     public static float GetLifestreamApproachRadius(this AethernetData data) => data.GetBodyRadius();
 
-    /// <summary>
-    ///     Approach-side point on the magenta Lifestream ring.
-    ///     Idle wandering uses <see cref="GetIdleWaitPosition"/> / cyan candidates instead.
-    /// </summary>
     public static Vector3 GetCampStandOffPosition(this AethernetData data, Vector3? from = null)
         => GetRingPosition(data.Position, data.GetInteractPosition(), data.GetLifestreamApproachRadius(), from);
 
     public static Vector3 GetCampStandOffPosition(this Node node, Vector3? from = null)
         => GetRingPosition(node.Position, node.GetInteractPosition(), GetNodeBodyRadius(node), from);
 
-    /// <summary>Magenta + arrival slack — same meaning as <see cref="GetLifestreamReadyRadius"/>.</summary>
     public static float GetNodeLifestreamReadyRadius(this Node node) =>
         GetNodeBodyRadius(node) + PathfindArrivalRadius;
 
@@ -76,12 +52,8 @@ public static class AethernetNavigation
             ? MathF.Max(2f, dead)
             : DefaultBodyRadius;
 
-    public static Vector3 GetIdleWaitPosition(this AethernetData data, Vector3? from = null)
-        => GetRingPosition(data.Position, data.GetInteractPosition(), data.GetIdleWaitRadius(), from);
-
     private static Vector3 GetRingPosition(Vector3 crystal, Vector3 interactOrHint, float radius, Vector3? from = null)
     {
-        // Prefer the approach side (player). Destination is only a fallback facing.
         Vector3 dir = FlatOffset(from ?? interactOrHint, crystal);
         if (dir.LengthSquared() < 0.25f)
         {
@@ -111,14 +83,9 @@ public static class AethernetNavigation
 
     public static IEnumerable<AethernetData> EnumerateAetherytes(this IZone zone) => zone.GetAetherytes();
 
-    /// <summary>
-    ///     Shards Lifestream can actually land on. Base camp is always included; other pads follow
-    ///     <see cref="OccultCrescentHelper.IsAethernetUnlocked"/>.
-    /// </summary>
     public static IEnumerable<AethernetData> EnumerateUsableAetherytes(this IZone zone) =>
         zone.GetAetherytes().Where(aetheryte => zone.IsUsableAethernetDestination(aetheryte.Id));
 
-    /// <summary>True when Lifestream can teleport <i>to</i> this PlaceName (camp is always yes).</summary>
     public static bool IsUsableAethernetDestination(this IZone zone, uint placeNameId)
     {
         if (placeNameId == 0)
@@ -134,21 +101,18 @@ public static class AethernetNavigation
         return OccultCrescentHelper.IsAethernetUnlocked(placeNameId);
     }
 
-    /// <summary>True when inside the magenta Lifestream ring (ready to teleport).</summary>
     public static bool IsWithinLifestreamRange(this IZone zone, Vector3 position)
     {
         return zone.EnumerateAetherytes()
             .Any(aetheryte => position.Distance2D(aetheryte.Position) <= aetheryte.GetLifestreamReadyRadius());
     }
 
-    /// <summary>Idle can stop once at or inside the drawn cyan ring (no pad past it).</summary>
     public static bool IsWithinIdleWait(this IZone zone, Vector3 position)
     {
         return zone.EnumerateAetherytes()
             .Any(aetheryte => position.Distance2D(aetheryte.Position) <= aetheryte.GetIdleOuterRadius());
     }
 
-    /// <summary>Idle wait spots on the approach side of the crystal (avoid walking around it).</summary>
     public static IEnumerable<Vector3> GetIdleWaitCandidates(this IZone zone, Vector3 from)
     {
         AethernetData? nearest = NearestAetheryte(zone, from);
@@ -157,7 +121,6 @@ public static class AethernetNavigation
             yield break;
         }
 
-        // Keep targets inside cyan after PathfindArrivalRadius so idle does not stop outside the ring.
         float inner = nearest.GetBodyRadius() + 0.25f;
         float outer = nearest.GetIdleOuterRadius() - PathfindArrivalRadius;
         if (outer <= inner)
@@ -172,7 +135,6 @@ public static class AethernetNavigation
             approach = new Vector3(1f, 0f, 0f);
         }
 
-        // Jitter the fan around the approach side so clients don't share one tile.
         float baseAngle = MathF.Atan2(approach.Z, approach.X)
                           + ((Random.Shared.NextSingle() * 2f - 1f) * (MathF.PI / 4f));
         const int steps = 5;

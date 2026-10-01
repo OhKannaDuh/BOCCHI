@@ -4,7 +4,6 @@ using Ocelot.Services.Translation;
 
 namespace BOCCHI.Common.Services.Logging;
 
-/// <summary>Shared log table UI for the standalone window and Config → Logs.</summary>
 public sealed class BocchiLogsPanel
 (
     IBocchiLogBuffer buffer,

@@ -50,7 +50,6 @@ public class InCriticalEncounterHandler
             }
         }
 
-        // Waiting handed off, or we already entered (EventId can lag while fighting).
         if (TryGetCommittedBattleEncounter(out _))
         {
             return StatePriority.VeryHigh;
@@ -61,8 +60,6 @@ public class InCriticalEncounterHandler
             return StatePriority.Never;
         }
 
-        // Combat None: EventId is enough. AI AutoTarget would grab trash on the
-        // registration rim — keep walking until we are inside the wait area.
         if (!config.CombatAutorotation.UsesCombatAutomation())
         {
             return StatePriority.VeryHigh;
@@ -187,7 +184,6 @@ public class InCriticalEncounterHandler
             return false;
         }
 
-        // Waiting handed off — take CE even if wait-area geometry mismatches.
         if (memory.TryRemember<WaitingForCriticalEncounterMemory>(out WaitingForCriticalEncounterMemory wait)
             && wait.IsFor(encounter.Id)
             && objects.LocalPlayer is { } waitingPlayer
@@ -197,8 +193,6 @@ public class InCriticalEncounterHandler
             return true;
         }
 
-        // Stay committed after enter only with real participation or still on the ring
-        // (EventId lag). SuspendTravel alone used to keep In CE forever (#196).
         if (!memory.TryRemember<SuspendTravelForActivityMemory>(out SuspendTravelForActivityMemory _))
         {
             return false;

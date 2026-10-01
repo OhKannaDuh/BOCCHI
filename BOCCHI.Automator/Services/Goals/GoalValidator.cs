@@ -66,7 +66,6 @@ public class GoalValidator
 
         if (ce.IsPreparing())
         {
-            // Prefer pot FATEs: drop a CE you are still walking to when a live pot is up.
             if (!IsCommittedToCriticalEncounter(id)
                 && automatorConfig.PreferPotFates
                 && TryFindLiveAllowedPot(out Fate _))
@@ -86,7 +85,6 @@ public class GoalValidator
             return false;
         }
 
-        // Keep the goal after we entered In CE / waited / still have EventId, tagged enemies, or the ring (#196).
         if (IsCommittedToCriticalEncounter(id))
         {
             return true;
@@ -134,7 +132,6 @@ public class GoalValidator
 
         if (isPot && IsValidPotPreposition(id))
         {
-            // Preposition is not a live pot — CEs still win (LeaveFateTravelForCeSeconds).
             if (!potsOnly
                 && startableCriticalEncounters.FindStartable() is { } prepositionCe
                 && ShouldLeaveFateTravelForCe(prepositionCe))
@@ -158,7 +155,6 @@ public class GoalValidator
         Fate? live = fateRepository.Snapshot().FirstOrDefault(f => f.Id == id);
         bool registered = fateContext.GetFateId() == id;
 
-        // Skip late FATEs while still pathing; once registered, finish (#174).
         if (!registered && live != null)
         {
             if (fatesConfig.ShouldSkipByProgress(live.Progress))
@@ -181,8 +177,6 @@ public class GoalValidator
             }
         }
 
-        // Live pot with Prefer (or pots-only): stay until despawn. Without Prefer, pots are
-        // regular FATEs — a CE can take them while still traveling (#187).
         if (isPot)
         {
             if (potsOnly || automatorConfig.PreferPotFates)
@@ -205,7 +199,6 @@ public class GoalValidator
             return PassesCompletionistFate(id.Value, potsOnly);
         }
 
-        // Live pot beats a non-pot FATE. If a CE is taking us now, CE wins instead.
         if (!potsOnly
             && !IsEngagedWithFate(id)
             && TryFindLiveAllowedPot(out Fate livePot)
@@ -218,8 +211,6 @@ public class GoalValidator
             return false;
         }
 
-        // Yield to a CE only while still traveling, and only when registration is almost up
-        // (or the timer is unknown). Stay if registered or already fighting this FATE (#187).
         if (!potsOnly
             && !IsEngagedWithFate(id)
             && startableCriticalEncounters.FindStartable() is { } ce
@@ -242,7 +233,6 @@ public class GoalValidator
             return false;
         }
 
-        // Pot cutoff only blocks starting a FATE — keep one you are already in.
         if (IsEngagedWithFate(id))
         {
             return true;
@@ -265,10 +255,6 @@ public class GoalValidator
         return decision.AllowStart;
     }
 
-    /// <summary>
-    ///     0 = always leave FATE travel for a startable CE. Otherwise only when registration has
-    ///     this many seconds (or fewer) left, or the timer cannot be read.
-    /// </summary>
     private bool ShouldLeaveFateTravelForCe(CriticalEncounter ce)
     {
         int threshold = automatorConfig.LeaveFateTravelForCeSeconds;
@@ -289,10 +275,6 @@ public class GoalValidator
         startableCriticalEncounters.FindStartable() is { } ce
         && ShouldLeaveFateTravelForCe(ce);
 
-    /// <summary>
-    ///     Registered in the FATE, or already fighting its mobs (rim pull before CurrentFate).
-    ///     Do not abort for a CE / pot in those cases.
-    /// </summary>
     private bool IsEngagedWithFate(FateId id) =>
         fateContext.GetFateId() == id
         || (conditions[ConditionFlag.InCombat] && fateContext.IsInCombatWith(id))
@@ -324,9 +306,6 @@ public class GoalValidator
         return IsSuspendedInCriticalEncounter(id);
     }
 
-    /// <summary>
-    ///     In CE travel latch only counts with EventId, CE-tagged enemies, or still inside the wait ring.
-    /// </summary>
     private bool IsSuspendedInCriticalEncounter(CriticalEncounterId id)
     {
         if (!memory.TryRemember<SuspendTravelForActivityMemory>(out SuspendTravelForActivityMemory _))
@@ -362,9 +341,6 @@ public class GoalValidator
         || !automatorContext.IsCompletionist
         || fieldNotes.ShouldPursueFate(fateId);
 
-    /// <summary>
-    ///     Predicted pot goal kept before the FATE exists (and briefly after predicted spawn).
-    /// </summary>
     private bool IsValidPotPreposition(FateId id)
     {
         bool potsOnly = automatorContext.IsPotsAndTreasure;
@@ -389,13 +365,11 @@ public class GoalValidator
             return false;
         }
 
-        // Drop if prediction is stale (spawn never observed).
         if (DateTimeOffset.UtcNow > cycle.PredictedNextSpawnAt + PotCycleTracker.PredictionStaleGrace)
         {
             return false;
         }
 
-        // Once the FATE is up, normal HasFate validation takes over.
         if (fateRepository.HasFate(id))
         {
             return false;

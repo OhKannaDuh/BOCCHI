@@ -6,7 +6,6 @@ using Ocelot.Services.PluginStatus;
 
 namespace BOCCHI.Common.Config;
 
-/// <summary>Shared Illegal Mode / Mob Farmer combat-backend wiring.</summary>
 public static class CombatAutorotationSetup
 {
     public static CombatRotationRecipe ToRecipe(AutomatorConfig config) => config.CombatAutorotation switch
@@ -15,7 +14,6 @@ public static class CombatAutorotationSetup
             JobRotationBackendKind.Wrath,
             CombatAiKind.MiscAi,
             ManualTargeting: true,
-            // Snapshot: the session keeps this until the next Prepare.
             DisabledOccultOptions: [.. config.DisabledWrathOccultOptions]),
         CombatAutorotation.RotationSolverReborn => new(
             JobRotationBackendKind.RotationSolverReborn,
@@ -26,9 +24,6 @@ public static class CombatAutorotationSetup
         _ => CombatRotationRecipe.None,
     };
 
-    /// <summary>
-    ///     Ensures the configured backend is loaded. Prints chat errors via <paramref name="printError"/>.
-    /// </summary>
     public static bool ValidatePlugins(
         CombatAutorotation value,
         IPluginStatus pluginStatus,

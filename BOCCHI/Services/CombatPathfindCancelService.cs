@@ -19,9 +19,6 @@ using Ocelot.Services.Pathfinding;
 
 namespace BOCCHI.Services;
 
-/// <summary>
-///     OC only: cancel World Path / Illegal travel on combat actions; not hunt or Mob Farmer.
-/// </summary>
 public sealed unsafe class CombatPathfindCancelService
 (
     IGameInteropProvider interop,
@@ -105,7 +102,6 @@ public sealed unsafe class CombatPathfindCancelService
 
     private bool ShouldCancelPathfinding(ActionType actionType, uint actionId)
     {
-        // OC territory check only (#160); don't steal external vnav.
         if (!IsInOccultCrescentTerritory())
         {
             return false;
@@ -116,13 +112,11 @@ public sealed unsafe class CombatPathfindCancelService
             return false;
         }
 
-        // Occult Sprint is travel, not combat (#157).
         if (actionId == PhantomActions.OccultSprint)
         {
             return false;
         }
 
-        // Activity combat owns movement — cancelling on every GCD freezes dodges / pulls.
         if (ActivityOwnsMovement())
         {
             return false;
@@ -142,7 +136,6 @@ public sealed unsafe class CombatPathfindCancelService
             return false;
         }
 
-        // Belt-and-suspenders with the zone provider (NullZone → false).
         return zones.GetZone().IsOccultCrescentZone();
     }
 
@@ -173,7 +166,6 @@ public sealed unsafe class CombatPathfindCancelService
             || (PathStepSoftStop.IsPathStepChain(name)
                 && !name.StartsWith($"{PathStepSoftStop.Prefix}Teleport", StringComparison.Ordinal)));
 
-        // Forget the route latch, keep GoalMemory for replan (#157/#159).
         memory.Forget<GoalPathStepMemory>();
         memory.Forget<BaseTeleportDelayMemory>();
 

@@ -10,7 +10,6 @@ public interface IMobScanner
 
     IReadOnlyList<IBattleNpc> NotInCombat { get; }
 
-    /// <summary>Selected enemies that have a target that is not the local player.</summary>
     IReadOnlyList<IBattleNpc> Contested { get; }
 
     void Update();

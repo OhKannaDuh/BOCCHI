@@ -11,17 +11,10 @@ using TreasureSheet = Lumina.Excel.Sheets.Treasure;
 
 namespace BOCCHI.Debug;
 
-/// <summary>
-///     Shared bronze/silver pad scan from the active layout (Export + Bake debug panels).
-/// </summary>
 public static class LayoutTreasureScan
 {
     public readonly record struct Spot(uint DataId, Vector3 Position, uint SgbId);
 
-    /// <summary>
-    ///     Collects bronze/silver layout coffers for the current zone.
-    ///     Empty when there is no active layout or no treasure instances.
-    /// </summary>
     public static unsafe List<Spot> CollectBronzeSilver(IZone zone, IDataManager data)
     {
         List<Spot> spots = [];

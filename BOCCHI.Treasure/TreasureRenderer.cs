@@ -93,7 +93,6 @@ public class TreasureRenderer
             return;
         }
 
-        // Carrot Hunt owns the section — don't offer Start Hunt beside an active carrot run.
         if (carrotHunter.Running)
         {
             BocchiUi.MutedWrapped(translator.T(".treasure.managed_by_carrot"));
@@ -112,7 +111,6 @@ public class TreasureRenderer
                 ImGui.SetTooltip(translator.T(".treasure.start_hunt_tooltip"));
             }
 
-            // Idle: Start Treasure Hunt | Start Carrot Hunt on one row.
             if (carrotHunter.IsVnavAvailable && carrotHunter.IsVnavReady)
             {
                 ImGui.SameLine();
@@ -154,7 +152,6 @@ public class TreasureRenderer
 
     private void DrawCarrotHuntPanel()
     {
-        // Hide while a coffer hunt owns the section (standalone, Pots, or Illegal filler).
         if (hunter.Running || hunter.ManagedByPotsTreasure || hunter.ManagedByIllegalModeFiller || hunter.ManagedByMobFarmer)
         {
             return;
@@ -169,7 +166,6 @@ public class TreasureRenderer
         bool showCarrotStatus = carrotHunter.Running || carrotHunter.Elapsed > TimeSpan.Zero;
         bool showUseCarrot = showCarrotStatus || carrotHunter.FortuneCarrotsRemaining > 0;
 
-        // Both idle: start buttons already sit on the hunt row — skip empty Carrot section.
         if (startsSharedWithHuntRow && !showCarrotStatus && !showUseCarrot)
         {
             return;
@@ -236,7 +232,6 @@ public class TreasureRenderer
 
     private void DrawNearbyTreasures()
     {
-        // Only while a hunt is active — idle nearby dump was noise for most sessions.
         if (!hunter.Running && !carrotHunter.Running)
         {
             return;
@@ -256,7 +251,6 @@ public class TreasureRenderer
             .OrderBy(t => player.Position.Distance(t.GetPosition()))
             .ToList();
 
-        // Content-sized child (same pattern as FATE/CE lists) — no empty padding for short lists.
         using ImGuiSectionHelper.BoundedListScope list =
             ImGuiSectionHelper.BoundedList("##nearby_treasures", treasures.Count, maxHeight: 120f);
         if (!list.IsOpen)

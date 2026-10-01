@@ -43,7 +43,6 @@ public sealed class TreasureHuntPrecomputePanel
 
     private uint maxProgress;
 
-    /// <summary>Emit the full walk polyline per pair (unused by routing; for inspection only).</summary>
     private bool includeFullPaths;
 
     public string Name => "Treasure Hunt Bake";
@@ -236,8 +235,6 @@ public sealed class TreasureHuntPrecomputePanel
             "precomputed_treasure_hunt_data.json",
             json);
 
-        // The hunt planner caches this file per zone for the session — drop it so a regenerated
-        // bake takes effect without a plugin reload.
         HuntRoutePlanner.InvalidateCaches();
         return written;
     }

@@ -3,9 +3,6 @@ using BOCCHI.Treasure.Services;
 
 namespace BOCCHI.Treasure.Hunt;
 
-/// <summary>
-///     Shared bronze/silver fill gate for Illegal Mode auto-hunt and Mob Farmer yield-to-hunt.
-/// </summary>
 public static class TreasureHuntFillGate
 {
     public const int BronzeCap = 30;

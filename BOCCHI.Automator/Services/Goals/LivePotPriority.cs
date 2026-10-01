@@ -6,9 +6,6 @@ using BOCCHI.Common.Services;
 
 namespace BOCCHI.Automator.Services.Goals;
 
-/// <summary>
-///     Live FATE / pot pick shared by Choosing Activity and hunt yield.
-/// </summary>
 internal static class LivePotPriority
 {
     public static bool IsStartable(
@@ -54,7 +51,6 @@ internal static class LivePotPriority
                && !potsConfig.ShouldSkipLivePot(fate.TimeRemainingSeconds);
     }
 
-    /// <summary>Any live pot Illegal Mode would start (not scored against other FATEs).</summary>
     public static Fate? FindStartable(
         IFateRepository fateRepository,
         IZoneProvider zones,
@@ -79,7 +75,6 @@ internal static class LivePotPriority
                     fieldNotes));
     }
 
-    /// <summary>Best live pot, else best other FATE. No pot preposition.</summary>
     public static Fate? FindBest(
         IReadOnlyList<Fate> snapshot,
         IZone zone,

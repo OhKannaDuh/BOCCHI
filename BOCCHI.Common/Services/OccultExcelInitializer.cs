@@ -5,7 +5,6 @@ using Ocelot.Lifecycle;
 
 namespace BOCCHI.Common.Services;
 
-/// <summary>Loads Occult excel ids and Return Yes/No templates before other start hooks run.</summary>
 public sealed class OccultExcelInitializer(IDataManager data) : IOnStart
 {
     public int Order => int.MaxValue;

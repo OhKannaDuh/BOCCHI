@@ -3,7 +3,6 @@ using Dalamud.Plugin.Services;
 
 namespace BOCCHI.Common;
 
-/// <summary>Plugin chat notifications: always tagged [BOCCHI] when shown; optional silence.</summary>
 public static class BocchiChat
 {
     public const string Tag = "[BOCCHI]";

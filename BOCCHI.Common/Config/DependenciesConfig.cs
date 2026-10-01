@@ -7,7 +7,6 @@ namespace BOCCHI.Common.Config;
 [ConfigGroup("dependencies", GroupOrder = 1000)]
 public class DependenciesConfig : IAutoConfig
 {
-    // Display-only anchor for PluginDependencyStatusRenderer (not a real setting).
     [PluginDependencyStatus]
     public bool Status { get; set; }
 }

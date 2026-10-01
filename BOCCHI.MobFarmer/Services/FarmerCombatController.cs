@@ -9,10 +9,6 @@ using Ocelot.Services.PluginStatus;
 
 namespace BOCCHI.MobFarmer.Services;
 
-/// <summary>
-///     Mob Farmer combat session: same backends as Illegal Mode, but never FATE/CE-syncs.
-///     Rotation is armed only while Fighting.
-/// </summary>
 public sealed class FarmerCombatController(
     ICombatRotationSession session,
     AutomatorConfig automatorConfig,

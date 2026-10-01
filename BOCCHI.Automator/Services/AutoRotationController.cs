@@ -12,9 +12,6 @@ using Ocelot.Services.PluginStatus;
 
 namespace BOCCHI.Automator.Services;
 
-/// <summary>
-///     Illegal Mode adapter: config → <see cref="ICombatRotationSession"/> plus FATE/CE/travel hooks.
-/// </summary>
 public class AutoRotationController(
     ICombatRotationSession session,
     AutomatorConfig config,
@@ -33,11 +30,6 @@ public class AutoRotationController(
     private CombatActivity? lastEnabledActivity;
 
     private string? lastSyncSkipReason;
-    /// <summary>
-    ///     Pot chest farming owns the character outright — it walks to reveals and opens them, and
-    ///     leftover AutoTarget / AI movement from the pot FATE fights that. The FATE is usually still
-    ///     up while farming, so this has to beat the in-activity guards below.
-    /// </summary>
     private bool CombatSuppressedByActivity =>
         memory.TryRemember<PotChestFarmMemory>(out PotChestFarmMemory _)
         || memory.TryRemember<PendingPotChestFarmMemory>(out PendingPotChestFarmMemory _);
@@ -63,14 +55,9 @@ public class AutoRotationController(
 
     public void TeardownForIllegalMode() => session.Teardown();
 
-    /// <summary>
-    ///     After raise: drop job apply latches so the next In CE / Sync Enable re-issues RSR Henched
-    ///     (RSR can ignore Henched while unconscious while we still cached success).
-    /// </summary>
     public void OnRevived()
     {
         session.ClearJobAppliedCache();
-        // Force the next Sync to call Enable again (do not skip as "already Fate").
         lastEnabledActivity = null;
     }
 
@@ -78,19 +65,10 @@ public class AutoRotationController(
 
     public void EnableForCriticalEncounter() => EnableActivity(CombatActivity.CriticalEncounter);
 
-    /// <summary>
-    ///     Fight back while pot chest farming. The farm does not path in combat; the AI dodges
-    ///     so the trailing pot stays out of AoE (#188).
-    /// </summary>
     public void EnableForSelfDefence() => EnableActivity(CombatActivity.Fate);
 
-    /// <summary>
-    ///     Drop combat automation while travelling. Normally a no-op inside a FATE/CE, since the
-    ///     activity still wants the rotation — except when pot chest farming has taken over.
-    /// </summary>
     public void DisableAi()
     {
-        // Keep AI on while In FATE / In CE (travel suspended). EventId alone must not (#200).
         if (!CombatSuppressedByActivity
             && memory.TryRemember<SuspendTravelForActivityMemory>(out SuspendTravelForActivityMemory _)
             && (criticalEncounters.IsInCriticalEncounter()
@@ -144,16 +122,12 @@ public class AutoRotationController(
 
     private void SyncActivityCombat()
     {
-        // Without this the per-tick sync re-enables the rotation immediately: pot chest farming
-        // usually runs while still standing in the pot FATE.
         if (CombatSuppressedByActivity)
         {
             LogSyncSkip("pot-farm");
             return;
         }
 
-        // Pathfinding / CE wait own the character. Tick would re-Enable AutoTarget and pull
-        // trash on the road (or at the registration rim) while we are still walking in.
         if (memory.TryRemember<GoalPathStepMemory>(out GoalPathStepMemory _)
             || memory.TryRemember<WaitingForCriticalEncounterMemory>(out WaitingForCriticalEncounterMemory _)
             || memory.TryRemember<WaitingForPotFateMemory>(out WaitingForPotFateMemory _))
@@ -162,15 +136,12 @@ public class AutoRotationController(
             return;
         }
 
-        // EventId / IsInFate alone is not enough — only arm after In FATE / In CE entered
-        // (SuspendTravel). Otherwise a CE you ride past keeps BOCCHI AI CE + RSR on (#200).
         if (!memory.TryRemember<SuspendTravelForActivityMemory>(out SuspendTravelForActivityMemory _))
         {
             LogSyncSkip("no-suspend-travel");
             return;
         }
 
-        // Committed CE/FATE survives EventId lag after a dodge or raise — still re-arm.
         if (memory.TryRemember<CommittedCriticalEncounterMemory>(out CommittedCriticalEncounterMemory _)
             || criticalEncounters.IsInCriticalEncounter())
         {

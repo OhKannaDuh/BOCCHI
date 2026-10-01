@@ -36,12 +36,10 @@ namespace BOCCHI.Treasure.Services
 
         private TreasureFlags lastFlags = ReadFlags(obj);
 
-        /// <summary>Treasure sheet row (shared by every bronze/silver of that type).</summary>
         public uint Id => obj.BaseId;
 
         public static bool IsBronzeOrSilverSgb(uint sgbId) => sgbId is BronzeSgbId or SilverSgbId;
 
-        /// <summary>Unique live instance id — use this to track multiple coffers of the same type.</summary>
         public ulong GameObjectId => obj.GameObjectId;
 
         public unsafe bool CheckOpened()
@@ -70,8 +68,6 @@ namespace BOCCHI.Treasure.Services
             return ((FFXIVClientStructs.FFXIV.Client.Game.Object.Treasure*)native)->Flags;
         }
 
-        // Don't require IsTargetable — often false until inside interact range.
-        // Hide opened / faded coffers so radar doesn't keep drawing to ghosts.
         public bool IsValid() =>
             obj.IsValid()
             && obj is { IsDead: false }

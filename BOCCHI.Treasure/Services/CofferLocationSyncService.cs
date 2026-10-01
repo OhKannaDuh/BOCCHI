@@ -18,10 +18,6 @@ public readonly record struct CrowdsourcedCofferCandidate(
     uint DataId,
     Vector3 Position);
 
-/// <summary>
-///     Fetches accepted coffer candidates for Treasure Hunt and anonymously uploads opens
-///     when shared maps are enabled. HTTP runs off the framework thread.
-/// </summary>
 public sealed class CofferLocationSyncService
 (
     TreasureConfig config,
@@ -36,7 +32,6 @@ public sealed class CofferLocationSyncService
 
     public const string CandidatesUrl = ApiBaseUrl + "/api/v1/candidates";
 
-    /// <summary>Match layout coffers to crowdsourced centroids (API cluster radius is 1.5).</summary>
     public const float MatchRadius = 3.5f;
 
     public const float MatchRadiusSq = MatchRadius * MatchRadius;
@@ -81,13 +76,6 @@ public sealed class CofferLocationSyncService
         return catalogTerritory == territory ? accepted : [];
     }
 
-    public bool MatchesAccepted(Vector3 position)
-    {
-        IReadOnlyList<CrowdsourcedCofferCandidate> spots = GetAcceptedForCurrentZone();
-        return spots.Any(c => Vector3.DistanceSquared(c.Position, position) <= MatchRadiusSq);
-    }
-
-    /// <summary>Kick a refresh before planning a hunt (non-blocking if already recent).</summary>
     public void EnsureFreshForHunt()
     {
         if (!config.EnableSharedMaps || !zones.GetZone().IsOccultCrescentZone())

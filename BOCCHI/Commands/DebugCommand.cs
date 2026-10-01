@@ -97,11 +97,6 @@ public unsafe class DebugCommand
         }
     }
 
-    /// <summary>
-    ///     Return to base camp if needed, then start Knightshopper’s Occult Crescent list
-    ///     (no currency threshold; works with auto-shop off).
-    ///     <c>/bocchi debug shop</c> · <c>shop status</c> · <c>shop cancel</c>
-    /// </summary>
     private void DebugShopping(string? sub)
     {
         string action = (sub ?? "start").ToLowerInvariant();
@@ -151,11 +146,6 @@ public unsafe class DebugCommand
         BocchiChat.Print(chat, uiConfig, detail);
     }
 
-    /// <summary>
-    ///     Dump nearby objects with their BaseId. Pot reveal detection only matches the BaseIds in
-    ///     PotTreasureIds.RevealCofferBaseIds, so stand next to a revealed chest and run this to see
-    ///     what it actually is.
-    /// </summary>
     private unsafe void PrintInstance()
     {
         UIState* ui = UIState.Instance();
@@ -167,11 +157,6 @@ public unsafe class DebugCommand
                 : $"IsInstancedArea={ui->PublicInstance.IsInstancedArea()} InstanceId={ui->PublicInstance.InstanceId}");
     }
 
-    /// <summary>
-    ///     Measure a CE's registration area vs what BOCCHI uses for travel and waiting.
-    ///     Stand where travel stops (or on the blue rim) and run <c>/bocchi debug ce</c> or
-    ///     <c>/bocchi debug ce 46</c> for a specific encounter.
-    /// </summary>
     private void PrintCriticalEncounterMeasurement(string? ceIdArg)
     {
         List<ActivityData> encounters = zones.GetZone().GetCriticalEncounterData();
@@ -346,10 +331,6 @@ public unsafe class DebugCommand
         return true;
     }
 
-    /// <summary>
-    ///     Report live DynamicEvent marker centre/radius. Occult CE MapMarker.Radius is 0;
-    ///     registration size comes from LGB MapRange via <c>/bocchi debug ce</c>.
-    /// </summary>
     private void PrintLiveEventGeometry()
     {
         PublicContentOccultCrescent* content = PublicContentOccultCrescent.GetInstance();
@@ -407,11 +388,6 @@ public unsafe class DebugCommand
         }
     }
 
-    /// <summary>
-    ///     Prints the raw currency source the per-hour trackers read. Compare against the in-game
-    ///     Enlightenment counters: matching numbers mean the source is fine and any wrong rate is in
-    ///     the rate logic; zeroes or nonsense mean the tracker is reading the wrong field.
-    /// </summary>
     private void PrintCurrency()
     {
         BocchiChat.Print(
@@ -421,9 +397,6 @@ public unsafe class DebugCommand
             + $"GoldTotal={OccultCrescentHelper.GetGoldTotal()} SilverTotal={OccultCrescentHelper.GetSilverTotal()} "
             + $"(pieces {OccultCrescentHelper.GetGoldPieces()}/{OccultCrescentHelper.GetSilverPieces()})");
 
-        // Drops mention currencies we have never heard of ("Enlightenment silver obols"), and they
-        // do not live in InventoryType.Currency. Ask the game's own item sheet which Enlightenment
-        // items exist and how many we hold, so the ids come from the game rather than a guess.
         InventoryManager* inventory = InventoryManager.Instance();
         BocchiChat.Print(chat, uiConfig, "Enlightenment items (itemId / name / held):");
 
@@ -440,11 +413,6 @@ public unsafe class DebugCommand
         }
     }
 
-    /// <summary>
-    ///     Lists nearby objects and, for treasure ones, says whether the pot-reveal filter would
-    ///     accept them and why not. Standing on a revealed pot chest and running this answers the
-    ///     question the logs cannot: is the coffer being rejected, or never seen at all?
-    /// </summary>
     private void PrintNearbyChests()
     {
         Vector3 me = player.Position;
@@ -485,7 +453,6 @@ public unsafe class DebugCommand
         }
     }
 
-    /// <summary>Mirrors FarmingPotChestsHandler's reveal gate so the verdict here matches the farm.</summary>
     private static string ClassifyReveal(IGameObject obj, List<Vector3> potSpots, List<Vector3> huntSpots)
     {
         float pot = potSpots.Count == 0 ? float.MaxValue : potSpots.Min(p => Flat(obj.Position, p));
@@ -502,10 +469,6 @@ public unsafe class DebugCommand
     private static float Flat(Vector3 a, Vector3 b) =>
         Vector2.Distance(new Vector2(a.X, a.Z), new Vector2(b.X, b.Z));
 
-    /// <summary>
-    ///     Print the player position as a TreasureHuntPathOverrides via-point literal. Stand on the
-    ///     safe line, run the command, paste the line.
-    /// </summary>
     private void PrintPosition()
     {
         Vector3 p = player.Position;

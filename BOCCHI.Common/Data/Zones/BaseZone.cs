@@ -39,11 +39,6 @@ public abstract class BaseZone
 
     public bool IsOccultCrescentZone() => true;
 
-    /// <summary>
-    ///     True at expedition base camp. SubAreaPlaceNameId is unreliable (duplicate PlaceName
-    ///     rows / lag), so also accept proximity to the main aetheryte — otherwise Return loops
-    ///     forever after Demi-Return lands "in town".
-    /// </summary>
     public bool IsInBasecamp()
     {
         if (GetCurrentSubAreaPlaceNameId() == BasecampPlaceNameId)
@@ -81,7 +76,6 @@ public abstract class BaseZone
 
     public virtual List<PotChestData> GetRerollPotChestData() => [];
 
-    // Authored chewed-carrot pads for Carrot Hunt (nearest-neighbor tour).
     public virtual List<CarrotData> GetCarrotData() => [];
 
     public virtual BuffZone? GetBuffZone() => null;
@@ -152,8 +146,6 @@ public abstract class BaseZone
             })
             .ToList();
 
-        // Authored camp buff point / tower crystals: still count when the live object is
-        // missing / id-mismatched but the player is standing at the known buff site.
         List<Vector3> authoredSites = [];
         if (GetBuffZone() is { } zone)
         {
@@ -200,7 +192,6 @@ public abstract class BaseZone
 
     private ZoneGraphSource graphSource = ZoneGraphSource.None;
 
-    /// <summary>Schema for on-disk / shipped zone path maps. Bump with Data/ZoneGraphs files.</summary>
     private const int GraphSchemaVersion = 8;
 
     public ZoneGraphLoadState GraphLoadState => graphLoadState;
@@ -308,7 +299,6 @@ public abstract class BaseZone
             cached = null;
         }
 
-        // Prefer a more complete bundled map over an older saved cache.
         if (cached != null
             && shipped != null
             && shipped.CoversZoneActivities(this)
@@ -402,7 +392,6 @@ public abstract class BaseZone
         }
         catch
         {
-            // Rebuild / seed overwrites; delete is best-effort.
         }
     }
 

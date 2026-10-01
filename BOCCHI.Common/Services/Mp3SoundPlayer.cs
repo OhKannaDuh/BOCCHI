@@ -6,7 +6,6 @@ using System.Diagnostics;
 
 namespace BOCCHI.Common.Services;
 
-/// <summary>NAudio MP3 playback from the plugin Sounds directory (mirrors Saucy).</summary>
 public sealed class Mp3SoundPlayer(IDalamudPluginInterface plugin, IPluginLog log) : IMp3SoundPlayer, IOnStop, IDisposable
 {
     private readonly object gate = new();

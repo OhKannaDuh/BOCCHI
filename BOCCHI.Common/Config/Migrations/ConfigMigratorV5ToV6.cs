@@ -2,7 +2,6 @@ using Newtonsoft.Json.Linq;
 
 namespace BOCCHI.Common.Config.Migrations;
 
-/// <summary>Move Do FATEs / Do CEs master toggles onto Illegal Mode (AutomatorConfig).</summary>
 public class ConfigMigratorV5ToV6 : IMigrator
 {
     public int FromVersion => 5;

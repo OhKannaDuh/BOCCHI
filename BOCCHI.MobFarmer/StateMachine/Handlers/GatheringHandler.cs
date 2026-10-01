@@ -57,7 +57,6 @@ public class GatheringHandler
             return FarmerPhase.Stacking;
         }
 
-        // Gather timeout: stop chasing more packs and fight what we have (UI "Gather timeout").
         if (config.StackingTimeoutSeconds > 0
             && TimeInState >= TimeSpan.FromSeconds(config.StackingTimeoutSeconds)
             && inCombat.Count > 0)
@@ -171,10 +170,6 @@ public class GatheringHandler
         });
     }
 
-    /// <summary>
-    ///     Walk toward the mob along player→mob, not current→next (which can aim through walls).
-    ///     When already in pull range, hold on the current mob or step toward the next pack member.
-    /// </summary>
     private static Vector3 Destination(Vector3 mobPos, Vector3? next, float distToMob, bool mobPulled)
     {
         if (distToMob <= FarmerPullAssist.PullRange)

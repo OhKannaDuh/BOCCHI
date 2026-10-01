@@ -5,10 +5,6 @@ using Lumina.Excel.Sheets;
 
 namespace BOCCHI.Common.Data.OccultCrescent;
 
-/// <summary>
-///     Phantom-job identity status ids from <see cref="Status"/> names matching
-///     <see cref="MKDSupportJob.Name"/> (same client language).
-/// </summary>
 public static class PhantomJobStatuses
 {
     private static readonly uint[] FallbackByJobIndex =

@@ -25,7 +25,6 @@ public class BuffConfig : IAutoConfig
     [Checkbox(Order = 5, Indent = 1, Requires = nameof(ShouldAutomateBuffs), Section = "which")]
     public bool ApplyBuffsUsingInquiringMind { get; set; } = true;
 
-    /// <summary>Reapply when remaining buff duration is at or below this many minutes.</summary>
     [IntRange(0, 25, Order = 6, Indent = 1, Requires = nameof(ShouldAutomateBuffs), Section = "which")]
     public int ReapplyThreshold { get; set; } = 10;
 

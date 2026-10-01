@@ -14,16 +14,12 @@ namespace BOCCHI.Automator.StateMachine.Handlers;
 
 internal static class CombatActivityHandler
 {
-    /// <summary>Matches BossMod StayCloseToTarget OnHitbox (±1y).</summary>
     private const float HitboxEdgeTolerance = 1f;
 
-    /// <summary>Ranged/healer/caster standoff past the target hitbox.</summary>
     private const float RangedStandoffRange = 15f;
 
-    /// <summary>Dismount once this close (travel convenience).</summary>
     private const float DismountRange = 20f;
 
-    /// <returns>True when the initial approach is done (in range, or combat took over).</returns>
     public static bool HandleTargets(
         IGameObject player,
         IPlayer playerState,

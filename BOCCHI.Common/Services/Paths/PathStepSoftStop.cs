@@ -4,7 +4,6 @@ using Ocelot.Services.Pathfinding;
 
 namespace BOCCHI.Common.Services.Paths;
 
-/// <summary>Shared cancel/stop for Illegal Mode <c>PathStep::</c> chains.</summary>
 public static class PathStepSoftStop
 {
     public const string Prefix = "PathStep::";

@@ -6,10 +6,6 @@ using ExcelAction = Lumina.Excel.Sheets.Action;
 
 namespace BOCCHI.Common.Data.OccultCrescent;
 
-/// <summary>
-///     Phantom combat buff IDs used by BOCCHI. Job-identity statuses stay on
-///     <see cref="SupportJobs.SupportJob.StatusId"/>.
-/// </summary>
 public static class PhantomBuffs
 {
     public static ushort EnduringFortitude { get; private set; } = 4233;
@@ -22,10 +18,8 @@ public static class PhantomBuffs
 
     public static ushort BattlesClangor { get; private set; } = 4252;
 
-    /// <summary>Phantom Geomancer Ringing Respite (60s HoT-on-hit).</summary>
     public static ushort RingingRespite { get; private set; } = 4253;
 
-    /// <summary>Knowledge-crystal party buff from Dancer Quickstep / Freelancer Inquiring Mind (30m).</summary>
     public static ushort QuickerStep { get; private set; } = 4799;
 
     public static void Initialize(IDataManager data)
@@ -85,17 +79,7 @@ public static class PhantomBuffs
     }
 }
 
-public static class PhantomDebuffs
-{
-    public const ushort FireWeakness = 5322;
-    public const ushort IceWeakness = 5323;
-    public const ushort LightningWeakness = 5324;
-    public const ushort WindWeakness = 5325;
-}
-
-/// <summary>Common player statuses used by Occult automation (not phantom-job exclusives).</summary>
 public static class PlayerStatuses
 {
-    /// <summary>Pending raise prompt on a corpse — skip these for Triage Mode.</summary>
     public const ushort Raise = 148;
 }

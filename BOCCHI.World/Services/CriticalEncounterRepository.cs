@@ -30,10 +30,8 @@ public class CriticalEncounterRepository
 
     public event Action<CriticalEncounterId>? CriticalEncounterRemoved;
 
-    /// <summary>Materialised once per Update — see <see cref="FateRepository"/> for the rationale.</summary>
     private IReadOnlyList<CriticalEncounter> snapshot = [];
 
-    /// <summary>Forked Tower excluded — the variant most readers use.</summary>
     private IReadOnlyList<CriticalEncounter> snapshotWithoutForkedTower = [];
 
     public IReadOnlyList<CriticalEncounter> Snapshot()
@@ -48,13 +46,6 @@ public class CriticalEncounterRepository
         return snapshotWithoutForkedTower;
     }
 
-    /// <summary>
-    ///     Rebuild when the cache is empty but the repository is not. These are normally produced by
-    ///     Update, but not every reader runs inside the update pass — Illegal Mode arms its AI preset
-    ///     from the toggle itself, and an empty cache there reads as "not in a Critical Encounter".
-    ///     Before the snapshots were cached this method read the repository live, so that case worked
-    ///     by accident.
-    /// </summary>
     private void EnsureSnapshots()
     {
         if (snapshot.Count > 0 || !data.GetAll().Any())

@@ -10,10 +10,6 @@ public class DirectWalkCalculator : IGraphCandidateCalculator
 {
     public string Key() => "DirectWalk";
 
-    /// <summary>
-    ///     Straight-line distance minus the approach offset (CE combat radius or FATE stand-off)
-    ///     is an admissible lower bound on the walk vnav would build.
-    /// </summary>
     public float? LowerBoundCost(ZoneGraph graph, Vector3 start, Node goal)
     {
         float approachOffset = goal.Metadata is ActivityNodeMetadata { CombatRadius: > 0 } meta

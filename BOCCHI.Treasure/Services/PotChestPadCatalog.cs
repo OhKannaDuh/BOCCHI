@@ -3,18 +3,11 @@ using System.Numerics;
 
 namespace BOCCHI.Treasure.Services;
 
-/// <summary>
-///     Merge baked Magic Pot chest pads with worker-accepted locations.
-///     Mutual-nearest remotes beyond merge radius overwrite the bake; others add as new pads.
-/// </summary>
 public static class PotChestPadCatalog
 {
     public const float MergeRadius = 3f;
 
     public const float MergeRadiusSq = MergeRadius * MergeRadius;
-
-    /// <summary>Same association window as carrot bake correction.</summary>
-    public const float MaxCorrection = CrowdsourcedPadCorrection.CarrotMaxCorrection;
 
     public const float MaxCorrectionSq = CrowdsourcedPadCorrection.CarrotMaxCorrectionSq;
 

@@ -214,10 +214,6 @@ public sealed class Plugin(IDalamudPluginInterface plugin, IPluginLog logger) : 
         }
     }
 
-    /// <summary>
-    ///     Dalamud/Newtonsoft can leave new IAutoConfig properties null when absent from saved JSON.
-    ///     Null entries break ConfigRenderer and hide those pages.
-    /// </summary>
     private static void EnsureAutoConfigInstances(Configuration cfg)
     {
         foreach (PropertyInfo prop in typeof(IConfiguration).GetProperties(BindingFlags.Instance | BindingFlags.Public))
@@ -231,7 +227,6 @@ public sealed class Plugin(IDalamudPluginInterface plugin, IPluginLog logger) : 
         }
     }
 
-    /// <summary>Null HashSets from bad/partial JSON would NRE in allowlist checks.</summary>
     private static void EnsureConfigDefaults(Configuration cfg)
     {
         cfg.FatesConfig.DisabledFateIds ??= [];
@@ -243,12 +238,6 @@ public sealed class Plugin(IDalamudPluginInterface plugin, IPluginLog logger) : 
         SanitizeShoppingConfig(cfg.ShoppingConfig);
     }
 
-    /// <summary>
-    ///     Drop a combat backend whose plugin has been uninstalled. Keyed on
-    ///     <see cref="IDalamudPluginInterface.InstalledPlugins"/> rather than "is it loaded": load
-    ///     order is not guaranteed, so a plugin that has not initialised yet would look absent and
-    ///     silently reset a valid setting.
-    /// </summary>
     private static void SanitizeCombatAutorotation(
         AutomatorConfig automator,
         IDalamudPluginInterface plugin,
@@ -275,9 +264,6 @@ public sealed class Plugin(IDalamudPluginInterface plugin, IPluginLog logger) : 
         automator.CombatAutorotation = CombatAutorotation.None;
     }
 
-    /// <summary>
-    ///     UI ranges are not enforced on load — early/partial JSON can leave delays that look like stuck pathing.
-    /// </summary>
     private static void SanitizeAutomatorConfig(AutomatorConfig automator)
     {
         automator.MaxRemoteIdleTimeSeconds = Math.Clamp(automator.MaxRemoteIdleTimeSeconds, 2, 60);
@@ -307,5 +293,4 @@ public sealed class Plugin(IDalamudPluginInterface plugin, IPluginLog logger) : 
         shopping.SilverThreshold = Math.Clamp(shopping.SilverThreshold, 0, 9999);
         shopping.GoldThreshold = Math.Clamp(shopping.GoldThreshold, 0, 9999);
     }
-
 }

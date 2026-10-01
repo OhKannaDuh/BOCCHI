@@ -62,7 +62,6 @@ public class AutomatorRenderer
 
         ImGui.Indent();
 
-        // Full pot timer lives under Details — sticky header keeps the compact chip.
         PotTimerUi.Draw(potCycle, zones, data, translator);
         ImGui.Spacing();
 

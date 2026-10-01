@@ -8,7 +8,6 @@ using Ocelot.Windows;
 
 namespace BOCCHI.Treasure;
 
-/// <summary>Shared Active bronze / Active silver bars for Treasure Hunter and Trackers.</summary>
 public static class ActiveTreasureCountUi
 {
     public static void Draw(

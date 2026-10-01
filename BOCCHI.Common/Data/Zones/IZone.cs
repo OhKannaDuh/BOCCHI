@@ -31,10 +31,6 @@ public interface IZone
 
     bool HasNearbyKnowledgeCrystals() => GetNearbyKnowledgeCrystals().Count != 0;
 
-    /// <summary>
-    ///     True when standing where crystal buffs can be cast: inside the authored buff radius
-    ///     (including on the crystal), or ≤5y of a nearby knowledge crystal / shard crystal.
-    /// </summary>
     bool IsInBuffCastRange(Vector3 position)
     {
         if (GetBuffZone() is { } buffZone && buffZone.IsWithinCastRadius2D(position))
@@ -90,25 +86,17 @@ public interface IZone
 
     BuffZone? GetBuffZone() => null;
 
-    /// <summary>
-    ///     Authored knowledge-crystal centers away from camp (e.g. Forked Tower) so manual buff
-    ///     works when the live object is filtered out or missing.
-    /// </summary>
     List<Vector3> GetAuthoredKnowledgeCrystalCenters() => [];
 
     TreasureRoutePolicy GetTreasureRoutePolicy() => new();
 
     Task<ZoneGraph> GetGraph();
 
-    /// <summary>Current path-map load lifecycle for UI / diagnostics.</summary>
     ZoneGraphLoadState GraphLoadState { get; }
 
-    /// <summary>Where the ready path map came from (none until Ready).</summary>
     ZoneGraphSource GraphSource { get; }
 
-    /// <summary>Drop the in-memory and on-disk zone path map so the next GetGraph rebuilds or reseeds.</summary>
     void InvalidateGraph(string? reason = null);
 
-    /// <summary>Write live CE registration size onto the loaded path graph (approach / wait).</summary>
     void ApplyCriticalEncounterCombat(int eventId, float combatRadius, ActivityAreaShape shape);
 }

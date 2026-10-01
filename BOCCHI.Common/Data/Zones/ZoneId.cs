@@ -8,3 +8,13 @@ public enum ZoneId : ushort
 
     NorthHorn = 1346,
 }
+
+public static class ZoneIdExtensions
+{
+    public static string TreasureDataFolder(this ZoneId zoneId) => zoneId switch
+    {
+        ZoneId.SouthHorn => "SouthHorn",
+        ZoneId.NorthHorn => "NorthHorn",
+        var _ => throw new NotSupportedException($"No treasure data folder for zone {zoneId}")
+    };
+}

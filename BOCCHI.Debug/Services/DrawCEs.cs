@@ -20,7 +20,6 @@ public class DrawCEs(IOverlayRenderer overlay, ICriticalEncounterRepository ces,
             float padded = ce.Radius;
             float yellow = NavigationConstants.CriticalEncounterYellowRadius(padded);
             float red = NavigationConstants.CriticalEncounterRedRadius(padded, ce.AreaShape);
-            // Cyan = preferred stand / path target. Red = registration edge (in-zone).
             float stand = NavigationConstants.CriticalEncounterStandRadius(red, ce.AreaShape);
 
             if (ce.AreaShape == ActivityAreaShape.Square)
@@ -44,7 +43,6 @@ public class DrawCEs(IOverlayRenderer overlay, ICriticalEncounterRepository ces,
             overlay.StrokeCircle(crystal.Position, 5f, new(1f, 0f, 1f));
         }
 
-        // Base-camp aetheryte: magenta = Lifestream (must be inside to TP); cyan = idle outer band.
         IZone zone = zones.GetZone();
         if (zone.IsOccultCrescentZone() && zone.IsInBasecamp())
         {

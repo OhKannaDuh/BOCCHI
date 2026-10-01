@@ -25,7 +25,6 @@ public class ReturningToJobHandler
 
     public override StatePriority GetScore()
     {
-        // Yield while Sight / triage / buffs own the phantom job.
         if (memory.TryRemember<CastingTreasureSightMemory>(out CastingTreasureSightMemory _)
             || memory.TryRemember<TriagingMemory>(out TriagingMemory _)
             || memory.TryRemember<ApplyingBuffsMemory>(out ApplyingBuffsMemory _))
@@ -33,7 +32,6 @@ public class ReturningToJobHandler
             return StatePriority.Never;
         }
 
-        // Critical beats Pathfinding / Returning so restore finishes before travel.
         return IllegalModeActivityWork.HasPendingJobRestore(memory)
             ? StatePriority.Critical
             : StatePriority.Never;

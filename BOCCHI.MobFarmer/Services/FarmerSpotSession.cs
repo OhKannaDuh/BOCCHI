@@ -9,7 +9,6 @@ using System.Numerics;
 
 namespace BOCCHI.MobFarmer.Services;
 
-/// <summary>Picks the active farm spot, rotates when a camp is claimed this session.</summary>
 public sealed class FarmerSpotSession(MobFarmerConfig config, IPlayer player, IObjectTable objects)
 {
     private readonly HashSet<int> claimedIndices = [];
@@ -51,7 +50,6 @@ public sealed class FarmerSpotSession(MobFarmerConfig config, IPlayer player, IO
 
     public void MarkArrived() => NeedsApproach = false;
 
-    /// <summary>After a yield (crystal buffs, pots, hunt) took us away, walk back before farming again.</summary>
     public void RequireApproachIfAway()
     {
         if (Origin != Vector3.Zero && player.Position.Distance2D(Origin) > 8f)
@@ -60,7 +58,6 @@ public sealed class FarmerSpotSession(MobFarmerConfig config, IPlayer player, IO
         }
     }
 
-    /// <summary>Returns true when the session moved to a different spot.</summary>
     public bool TickClaimed(IMobScanner scanner)
     {
         if (Current == null || config.Spots.Count == 0)

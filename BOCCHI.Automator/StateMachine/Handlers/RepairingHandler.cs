@@ -14,10 +14,8 @@ public class RepairingHandler(
     IPluginLog log
 ) : ScoreStateHandler<AutomatorState, StatePriority>(AutomatorState.Repairing)
 {
-    /// <summary>After a failed / hung repair, leave camp work alone so Illegal Mode is not wedged.</summary>
     private static readonly TimeSpan FailureBackoff = TimeSpan.FromSeconds(90);
 
-    /// <summary>Hard cap if the chain never completes (dialog / YesAlready / pathing).</summary>
     private static readonly TimeSpan AttemptTimeout = TimeSpan.FromSeconds(75);
 
     private const string ChainName = "Repairs";
@@ -53,7 +51,6 @@ public class RepairingHandler(
             "Enter Repairing stillNeedsRepair={Needs} inCamp={InCamp}",
             repair.ShouldRepair(),
             zones.GetZone().IsInBasecamp());
-        // Manage() so we can CancelWhere on timeout / Exit.
         task = chains.Manage(repair.Repair());
     }
 

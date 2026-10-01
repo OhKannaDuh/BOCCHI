@@ -22,7 +22,6 @@ public interface ICurrencyTracker
 public class CurrencyTracker(IZoneProvider zones, IChatGui chat)
     : ICurrencyTracker, IOnUpdate, IOnTerritoryChanged, IOnStart, IOnStop
 {
-    /// <summary>Chat: “You obtain …” — quantity then item id.</summary>
     private const uint ObtainedItemLogMessageId = 4592;
 
     private readonly DeltaRateTracker goldTracker = new(() => DeltaRateTracker.DefaultWindow);

@@ -77,10 +77,6 @@ public sealed class PluginDependencyStatusRenderer(
         return false;
     }
 
-    /// <summary>
-    ///     Mentions RSR / BossMod Reborn only when those plugins are installed — there is no
-    ///     plain “Rotation Solver”, only Rotation Solver Reborn.
-    /// </summary>
     private string OptionalIntro(ITranslator translator)
     {
         bool rsr = IsInstalled(CombatPluginPresence.RotationSolver);
@@ -95,10 +91,6 @@ public sealed class PluginDependencyStatusRenderer(
         return T(translator, key);
     }
 
-    /// <summary>
-    ///     RSR / BossMod Reborn are alternate forks — hide when not installed unless the player
-    ///     already selected them (so a broken pick still explains itself).
-    /// </summary>
     private bool ShouldShowOptional(string internalName, bool inUse) =>
         inUse || IsInstalled(internalName);
 
@@ -108,7 +100,6 @@ public sealed class PluginDependencyStatusRenderer(
 
     private bool InUse(string internalName) => automator.CombatAutorotation switch
     {
-        // Wrath / RSR need a BossMod fork for BOCCHI AI — only mark forks that are actually installed.
         CombatAutorotation.WrathCombo => internalName == "WrathCombo"
             || ((internalName is "BossMod" or "BossModReborn") && IsInstalled(internalName)),
         CombatAutorotation.RotationSolverReborn =>
@@ -177,8 +168,6 @@ public sealed class PluginDependencyStatusRenderer(
             return (T(translator, "not_installed"), false, false);
         }
 
-        // Loaded plugin counts as Ready. Optional IPC probes (BossMod / RSR) can still refine,
-        // but RSR must not show Not working when the plugin is running and only IPC typing failed.
         if (ipc == null)
         {
             return (T(translator, "ready"), true, false);

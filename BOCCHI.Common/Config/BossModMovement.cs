@@ -24,12 +24,10 @@ public static class BossModMovement
 
     public const float MaxRange = 30f;
 
-    /// <summary>Sage — Phlegma / Dyskrasia need short range; OnHitbox is tighter than needed.</summary>
     public const uint SageJobId = 40;
 
     public const float SageRange = 5f;
 
-    /// <summary>Dancer — Finish PBAoE needs mid range; OnHitbox / melee slider are too close.</summary>
     public const uint DancerJobId = 38;
 
     public const float DancerRange = 10f;
@@ -66,10 +64,6 @@ public static class BossModMovement
             config.BossModSeparateDodgeDelay ? config.BossModDodgeMovementDelay.ToString() : "None");
     }
 
-    /// <summary>
-    ///     Jobs treated as melee for closeness, but with a fixed standoff instead of OnHitbox /
-    ///     the shared melee slider when distance-by-role is on.
-    /// </summary>
     public static bool TryJobOverrideRange(uint? classJobId, out string range)
     {
         range = "";

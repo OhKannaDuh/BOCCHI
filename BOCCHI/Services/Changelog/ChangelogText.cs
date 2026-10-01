@@ -67,7 +67,6 @@ public static class ChangelogText
                 continue;
             }
 
-            // Skip leftover top-level # heading if present inside the section body.
             if (line.StartsWith("# ", StringComparison.Ordinal))
             {
                 continue;

@@ -5,7 +5,6 @@ using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
 namespace BOCCHI.Common.Services;
 
-/// <summary>Shared inventory UseItem path (ClientStructs AgentInventoryContext).</summary>
 public static unsafe class InventoryItemAssist
 {
     public static int Count(uint itemId)
@@ -24,7 +23,6 @@ public static unsafe class InventoryItemAssist
         return includeKeyItems && FindKeyItemSlot(itemId, out _, out _);
     }
 
-    /// <returns>True when UseItem was issued (0/1). False if throttled, missing, or agent failed.</returns>
     public static bool TryUse(
         uint itemId,
         string throttleKey,
@@ -51,7 +49,6 @@ public static unsafe class InventoryItemAssist
             return false;
         }
 
-        // Key items (e.g. Magical Elixir) need inventory type + slot — try that first.
         if (tryKeyItems
             && FindKeyItemSlot(itemId, out InventoryType type, out uint slot))
         {

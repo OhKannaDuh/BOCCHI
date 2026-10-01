@@ -59,7 +59,6 @@ public class PathfindingHandler
     public override void Enter()
     {
         base.Enter();
-        // Drop leftover combat target so rotations don't pull trash mid-path.
         targetManager.Target = null;
         autoRotation.DisableAi();
     }
@@ -68,9 +67,6 @@ public class PathfindingHandler
     {
         base.Exit(next);
 
-        // Don't cancel full pathing on a same-frame return handoff (restart loop).
-        // Cancel leftover PathStep chains + stop the pathfinder; ReturningHandler.Enter
-        // also stops vnav so a lingering move-to cannot cancel the Return cast.
         if (next == AutomatorState.Returning)
         {
             currentPathTask = null;
@@ -79,7 +75,6 @@ public class PathfindingHandler
             return;
         }
 
-        // Soft-interrupt (e.g. Completionist survey click) owns vnav via ActivityGoto — leave it alone.
         if (memory.TryRemember<NavigationInterruptedMemory>(out NavigationInterruptedMemory _))
         {
             currentPathTask = null;
@@ -103,7 +98,6 @@ public class PathfindingHandler
             return StatePriority.Never;
         }
 
-        // Hold still for pot chest farm — leftover GoalPathStep must not Return/TP away first.
         if (memory.TryRemember<PotChestFarmMemory>(out PotChestFarmMemory _)
             || memory.TryRemember<PendingPotChestFarmMemory>(out PendingPotChestFarmMemory _))
         {
@@ -133,8 +127,6 @@ public class PathfindingHandler
 
         path.Update();
 
-        // Route calc found nothing while still far from the goal — retry, then skip that goal.
-        // Do not set NavigationInterruptedMemory: that parked Illegal Mode in Idle until toggle.
         if (path.RoutingFailed && currentPathTask == null)
         {
             consecutiveRoutingFails++;
@@ -148,7 +140,6 @@ public class PathfindingHandler
                 pendingPauseReason = null;
                 memory.Forget<GoalPathStepMemory>();
                 memory.Forget<BaseTeleportDelayMemory>();
-                // GoalMemory kept — Automator rebuilds GoalPathStepMemory next tick.
                 return;
             }
 
@@ -163,7 +154,6 @@ public class PathfindingHandler
             consecutiveRoutingFails = 0;
         }
 
-        // Teleport-only mode: calc produced no Return/Teleport steps → pause for manual.
         if (path.PauseWhenPlanCompletes && path.IsEmptyPlan && currentPathTask == null)
         {
             BeginMountThenPause(TeleportOnlyMessage("no travel steps left"));
@@ -172,7 +162,6 @@ public class PathfindingHandler
 
         if (currentPathTask != null)
         {
-            // Remount mid-route if Treasure Sight (or anything else) left us on foot.
             if (path.GetNextPathStep()?.PathStepData is Pathfind(var destination, _))
             {
                 IZone zone = zones.GetZone();
@@ -209,7 +198,6 @@ public class PathfindingHandler
                     }
                     else if (result.IsCanceled)
                     {
-                        // Soft-stop / CE wait handoff / combat cancel — keep the goal and replan.
                         ReplanAfterPathCancel("Path step canceled");
                         return;
                     }
@@ -280,14 +268,12 @@ public class PathfindingHandler
             return;
         }
 
-        // Empty plan (already at destination) — keep GoalPathStepMemory so Automator doesn't recreate.
         if (!path.IsValid)
         {
             memory.Forget<GoalPathStepMemory>();
         }
     }
 
-    /// <returns>False while still waiting; true when ready to teleport.</returns>
     private bool WaitForBaseTeleportDelay()
     {
         if (config.MaxBaseTeleportDelaySeconds <= 0)
@@ -311,10 +297,6 @@ public class PathfindingHandler
         return delay.IsReady();
     }
 
-    /// <summary>
-    ///     Stay on foot for the short hop from pot preposition into a live pot FATE.
-    ///     Mounting there (often ~25–35y) just delays hitting mobs.
-    /// </summary>
     private bool ShouldAutoMountToward(Vector3 destination, IZone zone)
     {
         if (!movement.ShouldAutoMount)
@@ -354,7 +336,6 @@ public class PathfindingHandler
         }
     }
 
-    /// <returns>True when this frame handled the mount-before-pause wait.</returns>
     private bool FinishMountBeforePause()
     {
         if (pendingPauseReason == null)
@@ -393,7 +374,6 @@ public class PathfindingHandler
         pendingPauseReason = null;
         memory.Forget<GoalPathStepMemory>();
         memory.Forget<BaseTeleportDelayMemory>();
-        // GoalMemory kept — Automator.Update rebuilds GoalPathStepMemory.
     }
 
     private void DropUnreachableGoal(string reason)
@@ -412,7 +392,6 @@ public class PathfindingHandler
         memory.Forget<GoalPathStepMemory>();
         memory.Forget<GoalMemory>();
         memory.Forget<BaseTeleportDelayMemory>();
-        // No NavigationInterruptedMemory — Choosing can start the next activity.
     }
 
     private void PauseForManualPathing(string reason)

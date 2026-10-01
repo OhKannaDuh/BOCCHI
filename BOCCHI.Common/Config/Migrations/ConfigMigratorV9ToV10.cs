@@ -2,7 +2,6 @@ using Newtonsoft.Json.Linq;
 
 namespace BOCCHI.Common.Config.Migrations;
 
-/// <summary>Replace chat SFX hunt-complete sound with Saucy-style MP3 name.</summary>
 public class ConfigMigratorV9ToV10 : IMigrator
 {
     public int FromVersion => 9;

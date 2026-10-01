@@ -14,10 +14,6 @@ using System.Text.Json.Serialization;
 
 namespace BOCCHI.Common.Services;
 
-/// <summary>
-///     Prefer Eureka Linker pot timers when available; otherwise sync anchors with the BOCCHI
-///     Worker when shared maps are enabled.
-/// </summary>
 public sealed class PotCycleSyncService
 (
     TreasureConfig config,
@@ -114,7 +110,6 @@ public sealed class PotCycleSyncService
         ushort territory = zone.TerritoryType;
         if (fingerprintTerritory != territory)
         {
-            // Keep the other zone's pot timer (SH/NH are tracked separately).
             ResetFingerprint(territory);
         }
 
@@ -129,10 +124,6 @@ public sealed class PotCycleSyncService
         StartFetch(snap, territory);
     }
 
-    /// <summary>
-    /// Prefer Eureka Linker timers when loaded. Local live pot still wins inside the tracker.
-    /// Linker-sourced anchors are remote, so they are not uploaded to the BOCCHI Worker.
-    /// </summary>
     private void TryApplyFromEurekaLinker(IZone zone)
     {
         if (!eurekaLinker.IsAvailable)
@@ -361,7 +352,6 @@ public sealed class PotCycleSyncService
         }
 
         long spawnUnix = snap.AnchorSpawnAt.ToUnixTimeSeconds();
-        // Skip re-upload when only the FATE fingerprint rotated.
         if (lastUploadedTerritory == territory
             && lastUploadedPotFateId == snap.AnchorPotFateId
             && lastUploadedSpawnUnix == spawnUnix)
@@ -483,7 +473,6 @@ public sealed class PotCycleSyncService
             return;
         }
 
-        // Hold fingerprint until that FATE ends (avoid timer wipe).
         if (instanceKey != null
             && fingerprintFateId != 0
             && fates.Snapshot().Any(f =>
@@ -542,7 +531,6 @@ public sealed class PotCycleSyncService
         }
     }
 
-    /// <summary>Linker-compatible: SHA-256 hex of three little-endian int32s (dc, fateId, startEpoch).</summary>
     private static string ComputeInstanceKey(uint datacenterId, uint fateId, int startTimeEpoch)
     {
         Span<byte> buffer = stackalloc byte[12];
@@ -576,8 +564,6 @@ public sealed class PotCycleSyncService
             return;
         }
 
-        // Drop sync fingerprint. Territory schedules stay until that zone is entered again
-        // (ResetFingerprint invalidates the destination so a new instance can sync).
         fingerprintTerritory = 0;
         instanceKey = null;
         fingerprintFateId = 0;

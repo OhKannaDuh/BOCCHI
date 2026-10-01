@@ -4,14 +4,9 @@ using Ocelot.Services.Logger;
 
 namespace BOCCHI.Treasure.Services;
 
-/// <summary>
-///     Disables Pandora's "Automatically Open Chests" while BOCCHI chest automation is active,
-///     then restores the previous setting. Ref-counted for overlapping hunt / pot farm.
-/// </summary>
 public sealed class PandoraAutoOpenHold(IPandorasBoxIpc pandora, ILogger<PandoraAutoOpenHold> log)
     : IOnStop
 {
-    /// <summary>Pandora class name (internal IPC), not the display name.</summary>
     public const string AutoOpenChestsInternalName = "AutoOpenChests";
 
     private int holds;

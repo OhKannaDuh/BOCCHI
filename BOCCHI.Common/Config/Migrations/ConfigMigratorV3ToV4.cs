@@ -2,7 +2,6 @@ using Newtonsoft.Json.Linq;
 
 namespace BOCCHI.Common.Config.Migrations;
 
-/// <summary>Split pot timing out of FatesConfig into PotsConfig for clearer UX.</summary>
 public class ConfigMigratorV3ToV4 : IMigrator
 {
     public int FromVersion => 3;

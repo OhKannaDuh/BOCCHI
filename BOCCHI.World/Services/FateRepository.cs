@@ -31,12 +31,10 @@ public class FateRepository
 
     public event Action<FateId>? FateRemoved;
 
-    /// <summary>Materialised once per Update — consumers share this list instead of copying it.</summary>
     private IReadOnlyList<Fate> snapshot = [];
 
     public IReadOnlyList<Fate> Snapshot()
     {
-        // Rebuild when empty but the repo is not — callers outside Update (commands, toggles).
         if (snapshot.Count == 0 && data.GetAll().Any())
         {
             snapshot = data.GetAll().ToList();
@@ -49,7 +47,6 @@ public class FateRepository
 
     public void Update()
     {
-        // Occult Crescent only — drop tracked FATEs so subscribers see the removals once.
         if (!zones.GetZone().IsOccultCrescentZone())
         {
             if (snapshot.Count > 0)
@@ -61,7 +58,6 @@ public class FateRepository
             return;
         }
 
-        // One pass over the fate table; refresh tracked entries from a dictionary, not a rescan.
         Dictionary<ushort, IFate> live = [];
         Dictionary<FateId, Fate> current = [];
         foreach (IFate fate in fates)

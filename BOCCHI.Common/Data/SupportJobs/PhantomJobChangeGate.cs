@@ -3,19 +3,14 @@ using Dalamud.Plugin.Services;
 
 namespace BOCCHI.Common.Data.SupportJobs;
 
-/// <summary>Condition gates shared by phantom job swaps (Illegal Mode, Sight chain, buffs).</summary>
 public static class PhantomJobChangeGate
 {
-    /// <summary>
-    ///     Brief settle after combat clears before ChangeSupportJob is accepted.
-    /// </summary>
     private static readonly TimeSpan PostCombatSettle = TimeSpan.FromSeconds(4);
 
     private static bool wasInCombat;
 
     private static DateTimeOffset combatClearedUtc = DateTimeOffset.MinValue;
 
-    /// <summary>True when a phantom job swap is likely to be rejected.</summary>
     public static bool IsBlocked(ICondition conditions)
     {
         bool inCombat = conditions[ConditionFlag.InCombat];

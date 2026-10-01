@@ -4,10 +4,6 @@ using Ocelot.Lifecycle;
 
 namespace BOCCHI.Common.Ipc.Knightshopper;
 
-/// <summary>
-/// Typed client adapted from Knightshopper's shipped
-/// <c>BOCCHI.Common/Ipc/Knightshopper/</c> (Purchase.* gates).
-/// </summary>
 public sealed class KnightshopperIpc : IKnightshopperIpc, IOnStop, IDisposable
 {
     private readonly ICallGateSubscriber<int> apiVersion;
@@ -137,7 +133,6 @@ public sealed class KnightshopperIpc : IKnightshopperIpc, IOnStop, IDisposable
         }
         catch
         {
-            // Provider may already be gone if Knightshopper unloaded first.
         }
     }
 }

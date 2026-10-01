@@ -2,7 +2,6 @@ using Newtonsoft.Json.Linq;
 
 namespace BOCCHI.Common.Config.Migrations;
 
-/// <summary>Move skip-by-progress from pot timing onto FATEs (applies to all FATEs).</summary>
 public class ConfigMigratorV21ToV22 : IMigrator
 {
     public int FromVersion => 21;

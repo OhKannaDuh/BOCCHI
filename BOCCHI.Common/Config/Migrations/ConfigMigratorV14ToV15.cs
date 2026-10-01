@@ -2,10 +2,6 @@ using Newtonsoft.Json.Linq;
 
 namespace BOCCHI.Common.Config.Migrations;
 
-/// <summary>
-///     Drop CarrotConfig page; restore carrot radar lines under TreasureConfig;
-///     remove HuntDetectionRange / CarrotHuntDetectionRange (now hardcoded).
-/// </summary>
 public class ConfigMigratorV14ToV15 : IMigrator
 {
     public int FromVersion => 14;

@@ -9,9 +9,6 @@ using Ocelot.Services.Pathfinding;
 
 namespace BOCCHI.Common.Data.Aethernet;
 
-/// <summary>
-///     Cast Occult Return and wait until base camp (auto-accepts the Yesno).
-/// </summary>
 public static class ReturnToBaseCamp
 {
     private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(120);
@@ -47,7 +44,6 @@ public static class ReturnToBaseCamp
                         return StepResult.Failure("Cannot Return while in combat.");
                     }
 
-                    // Return is often blocked while mounted.
                     if (DismountAssist.TryDismount(conditions))
                     {
                         return StepResult.Success();

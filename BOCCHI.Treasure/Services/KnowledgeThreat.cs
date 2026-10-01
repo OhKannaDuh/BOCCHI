@@ -10,33 +10,20 @@ using Ocelot.Extensions;
 
 namespace BOCCHI.Treasure.Services;
 
-/// <summary>Live foray knowledge threats that warrant Ninja Hide.</summary>
 public static class KnowledgeThreat
 {
     public const uint OccultIsleblazerBaseId = 17900;
 
     public const float IsleblazerUnhideDistance = 5f;
 
-    /// <summary>Crescent Haunt — sees through Hide; do not arm Hide for it (Mocha / Godfrey, 4.2.0.11).</summary>
     public static readonly uint CrescentHauntNameId = (uint)Mob.Haunt;
 
-    /// <summary>Mounted Hide starts this much earlier so we can dismount first.</summary>
     public const float MountedThreatEnterBonus = 5f;
 
-    /// <summary>
-    ///     <see cref="PlayerState.GetContentValue"/> key — Occult Crescent effective (synced) Knowledge.
-    /// </summary>
     public const uint ContentValueEffectiveKnowledge = 6;
 
-    /// <summary>
-    ///     <see cref="PlayerState.GetContentValue"/> key — Occult Crescent current (actual) Knowledge.
-    /// </summary>
     public const uint ContentValueCurrentKnowledge = 7;
 
-    /// <summary>
-    ///     Player Knowledge used for Hide thresholds. Prefer actual Knowledge (content value 7), not
-    ///     South Horn sync / <c>ForayInfo.Level</c> — enemies ignore sync for aggro (#197).
-    /// </summary>
     public static unsafe int? TryGetPlayerForayLevel(IObjectTable objects)
     {
         PlayerState* playerState = PlayerState.Instance();
@@ -141,11 +128,6 @@ public static class KnowledgeThreat
         return found;
     }
 
-    /// <summary>
-    ///     Mob Knowledge must be ≥ player Knowledge + offset (mobs may exceed the player Knowledge
-    ///     cap). Do not clamp the sum to the player cap — that made offset 6 at Knowledge 40 still
-    ///     hide from every 40+ enemy.
-    /// </summary>
     public static int HideAtOrAbove(int playerForayLevel, int hideOffset) =>
         Math.Max(1, playerForayLevel + hideOffset);
 }
