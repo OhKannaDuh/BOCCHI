@@ -9,6 +9,7 @@ using BOCCHI.Common.Data.Goals;
 using BOCCHI.Common.Data.StateMemory;
 using BOCCHI.Common.Data.Zones;
 using BOCCHI.Common.Services;
+using ECommons.Throttlers;
 using Ocelot.Services.Logger;
 using Ocelot.States.Score;
 
@@ -38,43 +39,43 @@ public class ChoosingActivityHandler
 
     public override StatePriority GetScore()
     {
-        if (memory.TryRemember<GoalMemory>(out GoalMemory _))
+        if (memory.TryRemember<GoalMemory>(out GoalMemory current))
         {
-            return StatePriority.Never;
+            return Blocked($"goal {current.Goal.Describe()}");
         }
 
         if (memory.TryRemember<NavigationInterruptedMemory>(out NavigationInterruptedMemory _))
         {
-            return StatePriority.Never;
+            return Blocked("navigation interrupted");
         }
 
         if (buffConfig.ShouldAutomateBuffs
             && buffs.ShouldRefreshAny()
             && zones.GetZone().GetNearbyKnowledgeCrystals().Any())
         {
-            return StatePriority.Never;
+            return Blocked("buff refresh pending");
         }
 
         if (memory.TryRemember<ApplyingBuffsMemory>(out ApplyingBuffsMemory _))
         {
-            return StatePriority.Never;
+            return Blocked("applying buffs");
         }
 
         if (memory.TryRemember<PotChestFarmMemory>(out PotChestFarmMemory _)
             || memory.TryRemember<PendingPotChestFarmMemory>(out PendingPotChestFarmMemory _))
         {
-            return StatePriority.Never;
+            return Blocked("pot chest farm");
         }
 
         if (TriageSession.IsActive(memory))
         {
-            return StatePriority.Never;
+            return Blocked("triage");
         }
 
         if (memory.TryRemember<AutomaticTreasureSurveyMemory>(out AutomaticTreasureSurveyMemory survey)
             && survey.IsBusy)
         {
-            return StatePriority.Never;
+            return Blocked("treasure survey");
         }
 
         bool hasCriticalEncounter = !PotsOnly && startableCriticalEncounters.FindStartable() != null;
@@ -87,6 +88,17 @@ public class ChoosingActivityHandler
         }
 
         return StatePriority.Low;
+    }
+
+    private StatePriority Blocked(string reason)
+    {
+        if (EzThrottler.Throttle("ChoosingActivity::ForkedTowerBlocked", 15000)
+            && forkedTower.FindRegistrable() is { } tower)
+        {
+            logger.Info("Forked Tower {Id} registration open but not choosing: {Reason}", tower.Id.Value, reason);
+        }
+
+        return StatePriority.Never;
     }
 
     public override void Handle()

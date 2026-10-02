@@ -46,6 +46,7 @@ public class Automator
     PotsConfig potsConfig,
     AutomatorConfig automatorConfig,
     ForkedTowerConfig forkedTowerConfig,
+    IForkedTowerRegistration forkedTower,
     UIConfig uiConfig,
     AutoRotationController autoRotation,
     IAutomationModeGuard modeGuard,
@@ -79,6 +80,8 @@ public class Automator
         IsActive && !SuspendedForTreasure && !SuspendedForShopping ? StateMachine.State : null;
 
     private AutomatorState? lastLoggedState;
+
+    private bool wasInsideForkedTower;
 
     public void OnStop() => StopAutomation();
 
@@ -320,6 +323,11 @@ public class Automator
 
     public void Update()
     {
+        // Tracked while off too, so starting Illegal Mode by hand inside the tower is not undone.
+        bool insideTower = forkedTower.IsInsideTower();
+        bool justEnteredTower = insideTower && !wasInsideForkedTower;
+        wasInsideForkedTower = insideTower;
+
         if (!IsActive)
         {
             return;
@@ -331,7 +339,7 @@ public class Automator
             return;
         }
 
-        if (forkedTowerConfig.AutoRegisterInIllegalMode && context.IsIllegalMode && zones.GetZone().IsInForkedTower())
+        if (justEnteredTower && forkedTowerConfig.AutoRegisterInIllegalMode && context.IsIllegalMode)
         {
             DisableDueToEnteringForkedTower();
             return;

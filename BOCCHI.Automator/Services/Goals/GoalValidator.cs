@@ -277,7 +277,7 @@ public class GoalValidator
 
     private bool ValidateForkedTower(CriticalEncounterId id)
     {
-        if (!forkedTower.IsEnabled || zones.GetZone().IsInForkedTower())
+        if (!forkedTower.IsEnabled || forkedTower.IsInsideTower())
         {
             return false;
         }
