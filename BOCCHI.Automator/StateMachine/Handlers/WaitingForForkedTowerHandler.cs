@@ -37,7 +37,6 @@ public class WaitingForForkedTowerHandler
     IVNavmeshIpc vnav,
     IChainManager manager,
     IZoneProvider zones,
-    IForkedTowerRegistration registration,
     AutomatorConfig config,
     UIConfig uiConfig,
     IChatGui chat,
@@ -118,7 +117,7 @@ public class WaitingForForkedTowerHandler
         if (!wait.ReminderPrinted)
         {
             wait.ReminderPrinted = true;
-            bool needsCiphers = zones.GetZone().ZoneId == ZoneId.SouthHorn && !registration.HasRightOfEntry();
+            bool needsCiphers = zones.GetZone().ZoneId == ZoneId.SouthHorn;
             BocchiChat.Print(
                 chat,
                 uiConfig,

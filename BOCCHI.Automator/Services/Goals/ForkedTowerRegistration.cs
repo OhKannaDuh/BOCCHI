@@ -20,9 +20,6 @@ public interface IForkedTowerRegistration
     /// <summary>The tower Illegal Mode should walk to and wait on, or null to keep farming.</summary>
     CriticalEncounter? FindRegistrable();
 
-    /// <summary>Blood only: the player has already offered ciphers this registration.</summary>
-    bool HasRightOfEntry();
-
     /// <summary>Whether this tower can still be entered from the pad in its current state.</summary>
     bool CanStillEnter(CriticalEncounter tower);
 
@@ -77,12 +74,6 @@ public sealed class ForkedTowerRegistration(
             return null;
         }
 
-        if (!CanStillEnter(tower))
-        {
-            LogSkip(zone, "no Right of Entry and no ciphers");
-            return null;
-        }
-
         if (IllegalModeActivityWork.TakeActiveUnreachable(memory)?.MatchesForkedTower(tower.Id) == true)
         {
             LogSkip(zone, "tower pad marked unreachable");
@@ -134,9 +125,6 @@ public sealed class ForkedTowerRegistration(
                && player.Position.Distance2D(pad) > InsideTowerMinDistanceFromPad;
     }
 
-    public bool HasRightOfEntry() =>
-        objects.LocalPlayer?.StatusList.Has(PlayerStatuses.ForkedTowerRightOfEntry) == true;
-
     // Magic turns away anyone below Knowledge 40, and dying can drop the player under it.
     private const int NorthHornRequiredKnowledgeLevel = 40;
 
@@ -152,20 +140,6 @@ public sealed class ForkedTowerRegistration(
                || level >= required;
     }
 
-    public bool CanStillEnter(CriticalEncounter tower)
-    {
-        if (!MeetsKnowledgeRequirement())
-        {
-            return false;
-        }
-
-        if (zones.GetZone().ZoneId != ZoneId.SouthHorn || HasRightOfEntry())
-        {
-            return true;
-        }
-
-        // Blood needs ciphers offered while registration is open; without them there is no way in.
-        return tower.State == DynamicEventState.Register
-               && InventoryItemAssist.Count(OccultCurrencies.SouthHornCipherItemId) > 0;
-    }
+    // Blood's ciphers are offered by hand, so only the knowledge gate is checked here.
+    public bool CanStillEnter(CriticalEncounter tower) => MeetsKnowledgeRequirement();
 }
