@@ -130,6 +130,7 @@ public class AutoRotationController(
 
         if (memory.TryRemember<GoalPathStepMemory>(out GoalPathStepMemory _)
             || memory.TryRemember<WaitingForCriticalEncounterMemory>(out WaitingForCriticalEncounterMemory _)
+            || memory.TryRemember<WaitingForForkedTowerMemory>(out WaitingForForkedTowerMemory _)
             || memory.TryRemember<WaitingForPotFateMemory>(out WaitingForPotFateMemory _))
         {
             LogSyncSkip("path-or-wait");

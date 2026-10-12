@@ -4,8 +4,8 @@
     "net10.0-windows7.0": {
       "ECommons": {
         "type": "Transitive",
-        "resolved": "3.2.1.21",
-        "contentHash": "t8aWdB5cIOjuCT+fR8L1h9EF9+VUB/YVDdocbB9Ig5qb6s2/RYTtLmR8dskBeRlIIi0OPh840F4Y/3MVz/o3Xw=="
+        "resolved": "3.2.1.22",
+        "contentHash": "dGjjULRQtFbTdau9Cu1VcIQTwsbdomRxugyLciWrawHQ7nfNm76H8oUwAZFztwKtt3moiMdevzRVGIBsrgHO3g=="
       },
       "KamiToolKit": {
         "type": "Transitive",
@@ -192,7 +192,7 @@
       "FFXIVOcelot": {
         "type": "Project",
         "dependencies": {
-          "ECommons": "[3.2.1.21, )",
+          "ECommons": "[3.2.1.22, )",
           "Microsoft.Extensions.DependencyInjection": "[10.0.7, )"
         }
       },
@@ -206,7 +206,7 @@
       "FFXIVOcelot.ECommons": {
         "type": "Project",
         "dependencies": {
-          "ECommons": "[3.2.1.21, )",
+          "ECommons": "[3.2.1.22, )",
           "FFXIVOcelot": "[1.0.0, )"
         }
       },

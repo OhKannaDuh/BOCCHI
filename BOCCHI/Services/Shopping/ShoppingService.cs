@@ -344,6 +344,7 @@ public sealed class ShoppingService(
         }
 
         return memory.TryRemember<WaitingForCriticalEncounterMemory>(out WaitingForCriticalEncounterMemory _)
+               || memory.TryRemember<WaitingForForkedTowerMemory>(out WaitingForForkedTowerMemory _)
                || memory.TryRemember<CommittedCriticalEncounterMemory>(out CommittedCriticalEncounterMemory _)
                || memory.TryRemember<CommittedFateMemory>(out CommittedFateMemory _)
                || memory.TryRemember<WaitingForPotFateMemory>(out WaitingForPotFateMemory _)

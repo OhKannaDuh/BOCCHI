@@ -141,7 +141,7 @@
       "illegal_mode_off": "[BOCCHI] 자동 모드 꺼짐",
       "illegal_mode_off_left_zone": "[BOCCHI] 초승달 섬를 떠나 자동 모드 꺼짐",
       "illegal_mode_off_forked_tower": "[BOCCHI] 포크 타워 입장 — 자동 모드 꺼짐",
-      "forked_tower_offer_ciphers": "[BOCCHI] 포크 타워 발판 도착 — 근처 장치에서 등록용 아이템(Sanguine Cipher)을 봉헌해 등록하세요. 전송될 때까지 발판을 벗어나지 마세요.",
+      "forked_tower_offer_ciphers": "[BOCCHI] 포크 타워 발판 도착 — 전송 마법문양 기동등에서 「마법문양 기동증: 힘의 탑」을 봉헌해 등록하세요. 전송될 때까지 발판을 벗어나지 마세요.",
       "forked_tower_on_pad": "[BOCCHI] 포크 타워 발판 도착 — 전송될 때까지 발판을 벗어나지 마세요.",
       "pathfinding_refreshed": "[BOCCHI] 경로를 다시 짰습니다",
       "pathfinding_refreshed_no_goal": "[BOCCHI] 경로를 지웠습니다 (지금 갈 곳이 없음)",

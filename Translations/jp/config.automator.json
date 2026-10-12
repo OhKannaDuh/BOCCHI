@@ -124,7 +124,8 @@
       }
     },
     "stay_mounted_while_waiting_for_ce": {
-      "label": "CE 待機中はマウントしたまま"
+      "label": "CE / フォークタワー待機中はマウントしたまま",
+      "tooltip": "不正モードが CE 待ち、またはフォークタワーの入場地点で待機しているあいだ、マウントしたままにします。"
     },
     "stop_after_return": {
       "label": "帰還とテレポのあと停止",

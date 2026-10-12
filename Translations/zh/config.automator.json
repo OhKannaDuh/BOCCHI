@@ -124,7 +124,8 @@
       }
     },
     "stay_mounted_while_waiting_for_ce": {
-      "label": "等待紧急遭遇战时保持坐骑"
+      "label": "等待紧急遭遇战 / 两歧塔时保持坐骑",
+      "tooltip": "违规模式等待紧急遭遇战，或在两歧塔平台上等待时，保持坐骑不下。"
     },
     "stop_after_return": {
       "label": "返回并传送后停止",

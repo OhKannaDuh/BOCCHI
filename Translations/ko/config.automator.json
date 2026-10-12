@@ -124,7 +124,8 @@
       }
     },
     "stay_mounted_while_waiting_for_ce": {
-      "label": "비상 조우 대기 중 탈것 유지"
+      "label": "비상 조우·포크 타워 대기 중 탈것 유지",
+      "tooltip": "자동 모드가 비상 조우를 기다리거나 포크 타워 발판에서 대기하는 동안 탈것을 유지합니다."
     },
     "stop_after_return": {
       "label": "귀환과 텔레포트 후 정지",

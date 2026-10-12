@@ -124,7 +124,8 @@
       }
     },
     "stay_mounted_while_waiting_for_ce": {
-      "label": "Stay mounted while waiting for CEs"
+      "label": "Stay mounted while waiting for CEs / Forked Tower",
+      "tooltip": "Keeps you mounted while Illegal Mode waits for a CE, and while waiting on the Forked Tower pad."
     },
     "stop_after_return": {
       "label": "Stop after return and teleport",
