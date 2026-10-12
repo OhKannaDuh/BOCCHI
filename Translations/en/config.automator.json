@@ -182,7 +182,7 @@
     },
     "pause_auto_treasure_hunt_for_critical_encounter": {
       "label": "Pause auto treasure hunt for CEs",
-      "tooltip": "On: while Auto treasure hunt is running, pause when a Critical Encounter is available (or already in one), then resume nearby afterward.\nOff: with Treasure Sight, keep hunting through CEs (a hunt using the default chest list always pauses for CEs).\nNeeds Auto treasure hunt in Illegal Mode."
+      "tooltip": "On: while Auto treasure hunt is running, pause when a Critical Encounter is available (or already in one), then resume nearby afterward. If you are in combat when a CE opens, waits until combat ends before pausing.\nOff: with Treasure Sight, keep hunting through CEs (a hunt using the default chest list always pauses for CEs).\nNeeds Auto treasure hunt in Illegal Mode."
     }
   }
 }

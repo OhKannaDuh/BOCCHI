@@ -931,13 +931,8 @@ public sealed class CarrotHunterService
                 continue;
             }
 
-            if (HuntDistances.IsSameFloor(player.Position, destination)
-                && player.Position.Distance2D(destination) <= player.Position.Distance2D(via))
-            {
-                walkViaIndex = walkVias.Count;
-                return;
-            }
-
+            // Carrot walk vias are hazard overrides (e.g. Suspended Masonry wind) — never distance-skip.
+            _ = destination;
             return;
         }
     }

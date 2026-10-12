@@ -8,6 +8,8 @@ using BOCCHI.Common.Data.Zones;
 using BOCCHI.Common.Services;
 using BOCCHI.Treasure.Hunt;
 using BOCCHI.Treasure.Services;
+using Dalamud.Game.ClientState.Conditions;
+using Dalamud.Plugin.Services;
 using ECommons.Throttlers;
 using Ocelot.Lifecycle;
 using Ocelot.Services.Logger;
@@ -26,6 +28,7 @@ public class IllegalModeTreasureFillerService
     IPotCycleTracker potCycle,
     IFateRepository fates,
     IIllegalModeStartableActivityProbe startableActivities,
+    ICondition conditions,
     AutomatorConfig automatorConfig,
     FatesConfig fatesConfig,
     PotsConfig potsConfig,
@@ -271,6 +274,17 @@ public class IllegalModeTreasureFillerService
             || hunter.Paused
             || !HasStartableYieldTarget(out string kind))
         {
+            return false;
+        }
+
+        // CE open mid-pull: wait until combat clears so Pause does not soft-stop / dismount under aggro.
+        if (kind == "CE" && conditions[ConditionFlag.InCombat])
+        {
+            if (EzThrottler.Throttle("IllegalModeMapHuntYieldCombat", 5000))
+            {
+                logger.Debug("Illegal Mode: deferring hunt pause for CE — still in combat");
+            }
+
             return false;
         }
 

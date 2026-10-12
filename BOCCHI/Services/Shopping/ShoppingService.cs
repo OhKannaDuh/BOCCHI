@@ -283,14 +283,12 @@ public sealed class ShoppingService(
                 start.Result,
                 start.Message);
 
-            if (start.Result is StartResult.EmptyList or StartResult.NotReady or StartResult.NotLoggedIn
-                or StartResult.InvalidCurrency)
-            {
-                buyCooldownUntil = DateTimeOffset.UtcNow + DefaultBuyCooldown;
-                AbortShopping(resumeAutomation: true, cancelKnightshopper: false);
-                return;
-            }
-
+            // Busy and IPC deny (NotAllowed / unknown) used to leave shopping claimed and retry every tick.
+            TimeSpan cooldown = start.Result == StartResult.Busy
+                ? TimeSpan.FromSeconds(5)
+                : DefaultBuyCooldown;
+            buyCooldownUntil = DateTimeOffset.UtcNow + cooldown;
+            AbortShopping(resumeAutomation: true, cancelKnightshopper: false);
             return;
         }
 

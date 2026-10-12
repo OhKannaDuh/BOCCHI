@@ -146,6 +146,20 @@ public sealed class MobFarmerYieldService
         if (farmerConfig.YieldToTreasureHunt && HuntIsDue())
         {
             farmer.SetSuspended(true, FarmerYieldReason.TreasureHunt);
+            if (farmerConfig.TreasureHuntPreferPots)
+            {
+                startedHunt = pots.StartManagedHuntFromFarmer();
+                if (!startedHunt)
+                {
+                    farmer.SetSuspended(false);
+                    return;
+                }
+
+                nextHuntAt = DateTimeOffset.UtcNow + HuntIntervalMinutes;
+                logger.Info("Mob Farmer: timed hunt as Pots & Treasure (pots interrupt)");
+                return;
+            }
+
             hunter.ManagedByMobFarmer = true;
             hunter.StartManaged();
             startedHunt = hunter.Running;
@@ -189,13 +203,22 @@ public sealed class MobFarmerYieldService
                 break;
 
             case FarmerYieldReason.TreasureHunt:
-                if (startedHunt && (!hunter.Running || !hunter.ManagedByMobFarmer))
+                if (!startedHunt)
                 {
-                    startedHunt = false;
-                    if (farmer.Suspended)
-                    {
-                        farmer.SetSuspended(false);
-                    }
+                    break;
+                }
+
+                // Plain hunt: ManagedByMobFarmer on hunter. P&T path: ManagedByMobFarmer on pots.
+                if (pots.ManagedByMobFarmer
+                    || (hunter.ManagedByMobFarmer && hunter.Running))
+                {
+                    break;
+                }
+
+                startedHunt = false;
+                if (farmer.Suspended)
+                {
+                    farmer.SetSuspended(false);
                 }
 
                 break;
@@ -303,6 +326,11 @@ public sealed class MobFarmerYieldService
         if (startedHunt)
         {
             startedHunt = false;
+            if (pots.ManagedByMobFarmer)
+            {
+                pots.StopManagedFromFarmer();
+            }
+
             if (hunter.ManagedByMobFarmer && hunter.Running)
             {
                 hunter.Toggle();

@@ -23,6 +23,8 @@ public enum StartResult
     EmptyList = 3,
     NotReady = 4,
     NotLoggedIn = 5,
+    /// <summary>IPC / ACL denied (Knightshopper returned 6).</summary>
+    NotAllowed = 6,
 }
 
 public enum PurchaseState

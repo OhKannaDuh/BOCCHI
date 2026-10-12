@@ -141,6 +141,10 @@ public class TreasureHunterService
     private readonly List<Vector3> walkVias = [];
 
     private int walkViaIndex;
+
+    /// <summary>First <see cref="walkVias"/> entries from path overrides — never distance-skipped.</summary>
+    private int walkOverrideViaCount;
+
     private int walkViaStepIndex = -1;
     private int viaStuckIndex = -1;
     private float viaStuckBestDistance = float.MaxValue;
@@ -674,6 +678,8 @@ public class TreasureHunterService
 
         Paused = true;
         SoftStopMovement();
+        ClearNinjaHideRequirement();
+        ninjaHide.EndStealthForInteract(keepNinjaWhileThreatened: false);
         stopwatch.Stop();
         log.Debug(
             "Treasure hunt Pause step={Step} vnavRunning={Vnav}",
@@ -2796,6 +2802,7 @@ public class TreasureHunterService
         walkViaStepIndex = StepIndex;
         walkViaIndex = 0;
         walkVias.Clear();
+        walkOverrideViaCount = 0;
         ResetViaStuckWatch();
 
         ZoneId zoneId = zones.GetZone().ZoneId;
@@ -2832,6 +2839,8 @@ public class TreasureHunterService
             walkVias.AddRange(approach);
         }
 
+        walkOverrideViaCount = walkVias.Count;
+
         SkipPassedWalkVias(TryGetLayout(step.NodeId, out TreasureLayoutDatum skipLayout)
             ? skipLayout.Position
             : player.Position);
@@ -2856,6 +2865,12 @@ public class TreasureHunterService
                 walkViaIndex++;
                 ResetViaStuckWatch();
                 continue;
+            }
+
+            // Path-override vias (wind / edge) must not be skipped when the coffer is closer.
+            if (walkViaIndex < walkOverrideViaCount)
+            {
+                return;
             }
 
             if (HuntDistances.IsSameFloor(player.Position, destination)

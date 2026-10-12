@@ -136,6 +136,10 @@
     "treasure_hunt_interval_minutes": {
       "label": "Interval (minutes)"
     },
+    "treasure_hunt_prefer_pots": {
+      "label": "Prioritize pots during timed hunt",
+      "tooltip": "On: the timed hunt runs as Pots & Treasure, so a Magic Pot (and pot chests if that General option is on) still interrupts the route.\nOff: plain Treasure Hunt only — use Stop for Magic Pots above to leave while farming, not mid-hunt.\nNeeds Treasure Hunt on a timer."
+    },
     "yield_to_crystal_buffs": {
       "label": "Refresh crystal buffs when low",
       "tooltip": "On: pause to reapply knowledge-crystal buffs at or below the reapply time on the Buffs page.\nOff: keep farming without buff pauses.\nNeeds Automate buffs on the Buffs page."

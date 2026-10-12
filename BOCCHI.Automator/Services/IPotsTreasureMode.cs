@@ -27,5 +27,8 @@ public interface IPotsTreasureMode : Ocelot.Lifecycle.IOnUpdate
 
     bool StartManagedFromFarmer();
 
+    /// <summary>Timed Mob Farmer hunt as Pots &amp; Treasure (pots interrupt the route).</summary>
+    bool StartManagedHuntFromFarmer();
+
     void StopManagedFromFarmer();
 }

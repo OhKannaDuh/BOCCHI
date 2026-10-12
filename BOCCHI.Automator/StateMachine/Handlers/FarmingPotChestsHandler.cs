@@ -199,64 +199,78 @@ public class FarmingPotChestsHandler
 
         if (activeChain is { IsCompleted: false })
         {
-            if (farm.Phase == PotChestFarmPhase.OpeningReveal
-                || farm.Phase == PotChestFarmPhase.BlindSweep)
+            // Open/travel chains used to return before self-defence — aggro mid-open left AI off.
+            if (conditions[ConditionFlag.InCombat])
             {
-                MaintainNinjaHideDuringInteract();
-            }
-
-            bool interrupt = false;
-            bool hidePrepInterrupt = false;
-            if (farm.Mode == PotChestFarmMode.Smart
-                && farm.Phase is (PotChestFarmPhase.SearchingCandidates
-                    or PotChestFarmPhase.ElixirAtCenter
-                    or PotChestFarmPhase.OpeningReveal)
-                && hints.TryGetEventSince(farm.HintRevisionBaseline, out PotTreasureHintEvent travelHint)
-                && travelHint.Kind == PotTreasureHintKind.Hint)
-            {
-                farm.HintRevisionBaseline = travelHint.Revision;
-                if (TryNarrowByHint(farm, travelHint)
-                    && farm.Phase == PotChestFarmPhase.OpeningReveal)
-                {
-                    farm.Phase = PotChestFarmPhase.SearchingCandidates;
-                    farm.PhaseStartedUtc = DateTimeOffset.UtcNow;
-                    farm.SettledAtUtc = DateTimeOffset.MinValue;
-                }
-
-                logger.Debug("Pot treasure: compass hint during travel — cancelling path to re-route");
-                interrupt = true;
-            }
-
-            if (!interrupt
-                && farm.Phase is (PotChestFarmPhase.SearchingCandidates
-                    or PotChestFarmPhase.ElixirAtCenter)
-                && lastPathDestination is { } hideDest
-                && !ApplyNinjaHideGate(hideDest))
-            {
-                logger.Debug("Pot treasure: Hide prep mid-travel — pausing path");
-                interrupt = true;
-                hidePrepInterrupt = true;
-            }
-
-            if (!interrupt)
-            {
-                return;
-            }
-
-            chainManager.CancelAll();
-            pathfinder.Stop();
-            activeChain = null;
-            ClearTravelPlan();
-            lastPathIssueAt = DateTimeOffset.MinValue;
-            ResetApproachWatch();
-            if (hidePrepInterrupt)
-            {
-                preferDirectApproach = true;
+                chainManager.CancelAll();
+                pathfinder.Stop();
+                activeChain = null;
+                ClearTravelPlan();
+                preferDirectApproach = false;
+                lastPathIssueAt = DateTimeOffset.MinValue;
+                lastPathDestination = null;
             }
             else
             {
-                preferDirectApproach = false;
-                lastPathDestination = null;
+                if (farm.Phase == PotChestFarmPhase.OpeningReveal
+                    || farm.Phase == PotChestFarmPhase.BlindSweep)
+                {
+                    MaintainNinjaHideDuringInteract();
+                }
+
+                bool interrupt = false;
+                bool hidePrepInterrupt = false;
+                if (farm.Mode == PotChestFarmMode.Smart
+                    && farm.Phase is (PotChestFarmPhase.SearchingCandidates
+                        or PotChestFarmPhase.ElixirAtCenter
+                        or PotChestFarmPhase.OpeningReveal)
+                    && hints.TryGetEventSince(farm.HintRevisionBaseline, out PotTreasureHintEvent travelHint)
+                    && travelHint.Kind == PotTreasureHintKind.Hint)
+                {
+                    farm.HintRevisionBaseline = travelHint.Revision;
+                    if (TryNarrowByHint(farm, travelHint)
+                        && farm.Phase == PotChestFarmPhase.OpeningReveal)
+                    {
+                        farm.Phase = PotChestFarmPhase.SearchingCandidates;
+                        farm.PhaseStartedUtc = DateTimeOffset.UtcNow;
+                        farm.SettledAtUtc = DateTimeOffset.MinValue;
+                    }
+
+                    logger.Debug("Pot treasure: compass hint during travel — cancelling path to re-route");
+                    interrupt = true;
+                }
+
+                if (!interrupt
+                    && farm.Phase is (PotChestFarmPhase.SearchingCandidates
+                        or PotChestFarmPhase.ElixirAtCenter)
+                    && lastPathDestination is { } hideDest
+                    && !ApplyNinjaHideGate(hideDest))
+                {
+                    logger.Debug("Pot treasure: Hide prep mid-travel — pausing path");
+                    interrupt = true;
+                    hidePrepInterrupt = true;
+                }
+
+                if (!interrupt)
+                {
+                    return;
+                }
+
+                chainManager.CancelAll();
+                pathfinder.Stop();
+                activeChain = null;
+                ClearTravelPlan();
+                lastPathIssueAt = DateTimeOffset.MinValue;
+                ResetApproachWatch();
+                if (hidePrepInterrupt)
+                {
+                    preferDirectApproach = true;
+                }
+                else
+                {
+                    preferDirectApproach = false;
+                    lastPathDestination = null;
+                }
             }
         }
 
@@ -1706,7 +1720,11 @@ public class FarmingPotChestsHandler
 
             if (PotTreasureIds.RevealCofferBaseIds.Contains(obj.BaseId))
             {
-                tickReveals.Add(obj);
+                if (PotTreasureFilter.IsOnAuthoredPotSpot(obj.Position, authoredSpots, foreignSpots))
+                {
+                    tickReveals.Add(obj);
+                }
+
                 continue;
             }
 
@@ -1716,18 +1734,6 @@ public class FarmingPotChestsHandler
             }
 
             tickChests.Add(obj);
-
-            if (PotTreasureFilter.IsOnAuthoredPotSpot(obj.Position, authoredSpots, foreignSpots))
-            {
-                tickReveals.Add(obj);
-                if (EzThrottler.Throttle("PotChestFarm::UnknownRevealId", 5000))
-                {
-                    logger.Info(
-                        "Pot treasure: coffer {BaseId} on a pot spot is not a known reveal id — "
-                        + "accepting it, worth adding to RevealCofferBaseIds",
-                        obj.BaseId);
-                }
-            }
         }
     }
 

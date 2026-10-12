@@ -169,7 +169,8 @@ public class GoalValidator
         Fate? live = fateRepository.Snapshot().FirstOrDefault(f => f.Id == id);
         bool registered = fateContext.GetFateId() == id;
 
-        if (!registered && live != null)
+        // Pots & Treasure forces late pots; progress/time skip here caused inject↔drop thrash.
+        if (!registered && live != null && !(potsOnly && isPot))
         {
             if (fatesConfig.ShouldSkipByProgress(live.Progress))
             {

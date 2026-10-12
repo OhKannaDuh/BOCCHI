@@ -56,6 +56,11 @@ public class PotsTreasureService
 
     public bool ManagedByMobFarmer { get; private set; }
 
+    /// <summary>Farmer timed hunt: keep hunting (with pot interrupts) until one hunt finishes.</summary>
+    private bool managedIncludeHunt;
+
+    private bool managedHuntStarted;
+
     public PotsTreasurePhase Phase { get; private set; } = PotsTreasurePhase.Off;
 
     public void OnStop()
@@ -70,6 +75,8 @@ public class PotsTreasureService
         Paused = false;
         Phase = PotsTreasurePhase.Off;
         ManagedByMobFarmer = false;
+        managedIncludeHunt = false;
+        managedHuntStarted = false;
     }
 
     public void Toggle()
@@ -82,6 +89,8 @@ public class PotsTreasureService
             Paused = false;
             Phase = PotsTreasurePhase.Off;
             ManagedByMobFarmer = false;
+            managedIncludeHunt = false;
+            managedHuntStarted = false;
             return;
         }
 
@@ -112,6 +121,8 @@ public class PotsTreasureService
         if (Running)
         {
             ManagedByMobFarmer = true;
+            managedIncludeHunt = false;
+            managedHuntStarted = false;
             Phase = PotsTreasurePhase.DoingPots;
             return true;
         }
@@ -123,12 +134,58 @@ public class PotsTreasureService
         }
 
         ManagedByMobFarmer = true;
+        managedIncludeHunt = false;
+        managedHuntStarted = false;
         automator.TogglePotsAndTreasure();
         hunter.ManagedByPotsTreasure = false;
         ResetTreasureLoop();
         Paused = false;
         Phase = PotsTreasurePhase.DoingPots;
         logger.Debug("Pots & Treasure: managed pot window for Mob Farmer");
+        return Running;
+    }
+
+    public bool StartManagedHuntFromFarmer()
+    {
+        if (Running && ManagedByMobFarmer && managedIncludeHunt)
+        {
+            return true;
+        }
+
+        if (!hunter.IsVnavAvailable)
+        {
+            BocchiChat.PrintError(chat, uiConfig, translator.T(".automation.pots_treasure.requires_vnav"));
+            return false;
+        }
+
+        if (Running && !ManagedByMobFarmer)
+        {
+            // Standalone P&T already on — do not hijack.
+            return false;
+        }
+
+        ManagedByMobFarmer = true;
+        managedIncludeHunt = true;
+        managedHuntStarted = false;
+        if (!Running)
+        {
+            automator.TogglePotsAndTreasure();
+        }
+
+        hunter.ManagedByPotsTreasure = true;
+        ResetTreasureLoop();
+        Paused = false;
+        if (NeedsPotWork())
+        {
+            EnterPotPhase();
+        }
+        else
+        {
+            Phase = PotsTreasurePhase.Hunting;
+            automator.SetSuspendedForTreasure(true);
+        }
+
+        logger.Debug("Pots & Treasure: managed timed hunt for Mob Farmer (pots interrupt)");
         return Running;
     }
 
@@ -140,6 +197,8 @@ public class PotsTreasureService
         }
 
         ManagedByMobFarmer = false;
+        managedIncludeHunt = false;
+        managedHuntStarted = false;
         if (Running)
         {
             StopHuntSession();
@@ -237,6 +296,12 @@ public class PotsTreasureService
                 return;
             }
 
+            if (managedIncludeHunt)
+            {
+                TickManagedHuntFromFarmer();
+                return;
+            }
+
             StopManagedFromFarmer();
             return;
         }
@@ -318,6 +383,59 @@ public class PotsTreasureService
             "Pots & Treasure: targeting live pot FATE {Id} ({Name})",
             pot.Id.Value,
             pot.Name);
+    }
+
+    private void TickManagedHuntFromFarmer()
+    {
+        Phase = PotsTreasurePhase.Hunting;
+        ensuredPotFateId = 0;
+        automator.SetSuspendedForTreasure(true);
+        hunter.ManagedByPotsTreasure = true;
+
+        if (!hunter.IsVnavReady)
+        {
+            return;
+        }
+
+        if (hunter.Paused)
+        {
+            hunter.Resume();
+            huntWasRunning = true;
+            managedHuntStarted = true;
+            hunter.RecalculateRoute();
+            logger.Debug("Pots & Treasure: resumed farmer timed hunt after pot");
+            return;
+        }
+
+        if (hunter.Running)
+        {
+            huntWasRunning = true;
+            managedHuntStarted = true;
+            return;
+        }
+
+        if (!managedHuntStarted)
+        {
+            hunter.ConfigureManagedRun(visitedTreasureNodes);
+            hunter.StartManaged();
+            managedHuntStarted = hunter.Running;
+            huntWasRunning = hunter.Running;
+            if (managedHuntStarted)
+            {
+                logger.Debug("Pots & Treasure: started farmer timed hunt");
+            }
+            else
+            {
+                logger.Debug("Pots & Treasure: farmer timed hunt did not start — ending yield");
+                StopManagedFromFarmer();
+            }
+
+            return;
+        }
+
+        // One hunt finished (after optional pot interrupts) — back to Mob Farmer.
+        logger.Debug("Pots & Treasure: farmer timed hunt finished — ending yield");
+        StopManagedFromFarmer();
     }
 
     private void EnterHuntPhase()
