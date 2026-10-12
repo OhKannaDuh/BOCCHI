@@ -296,6 +296,12 @@ public class IllegalModeTreasureFillerService
 
     private bool HasStartableYieldTarget(out string kind)
     {
+        if (startableActivities.HasStartableForkedTower())
+        {
+            kind = "Forked Tower";
+            return true;
+        }
+
         if (YieldsHuntToCriticalEncounter && startableActivities.HasStartableCriticalEncounter())
         {
             kind = "CE";

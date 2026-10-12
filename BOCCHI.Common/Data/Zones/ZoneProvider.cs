@@ -44,6 +44,8 @@ public class NullZone : IZone
 
     public ushort ForkedTowerEventId => 0;
 
+    public Vector3? ForkedTowerEntrance => null;
+
     public bool IsInForkedTower() => false;
 
     public Task<ZoneGraph> GetGraph() => Task.FromResult(new ZoneGraph());

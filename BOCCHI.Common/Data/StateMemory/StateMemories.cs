@@ -48,6 +48,17 @@ public sealed class WaitingForCriticalEncounterMemory(CriticalEncounterId encoun
     public bool IsFor(CriticalEncounterId id) => EncounterId == id;
 }
 
+public sealed class WaitingForForkedTowerMemory(CriticalEncounterId towerId)
+{
+    public CriticalEncounterId TowerId { get; } = towerId;
+
+    public bool ReminderPrinted { get; set; }
+
+    public DateTimeOffset? BattleSeenAt { get; set; }
+
+    public bool IsFor(CriticalEncounterId id) => TowerId == id;
+}
+
 public sealed class CommittedCriticalEncounterMemory(CriticalEncounterId encounterId)
 {
     public CriticalEncounterId EncounterId { get; } = encounterId;
@@ -83,6 +94,9 @@ public sealed class RouteUnreachableGoalMemory(IGoal goal, TimeSpan ttl)
 
     public bool MatchesCriticalEncounter(CriticalEncounterId id) =>
         !IsExpired && Goal.GoalType is CriticalEncounterGoal(var ce) && ce == id;
+
+    public bool MatchesForkedTower(CriticalEncounterId id) =>
+        !IsExpired && Goal.GoalType is ForkedTowerGoal(var tower) && tower == id;
 
     public bool MatchesFate(FateId id) =>
         !IsExpired && Goal.GoalType is FateGoal(var fate) && fate == id;

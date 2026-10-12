@@ -56,7 +56,8 @@
   },
   "goals": {
     "fate": "危命任务：{0}",
-    "critical_encounter": "紧急遭遇战：{0}"
+    "critical_encounter": "紧急遭遇战：{0}",
+    "forked_tower": "报名：{0}"
   },
   "trackers": {
     "experience": {
@@ -139,6 +140,9 @@
       "illegal_mode_on": "[BOCCHI] 违规模式已开启",
       "illegal_mode_off": "[BOCCHI] 违规模式已关闭",
       "illegal_mode_off_left_zone": "[BOCCHI] 已离开神典石 — 违规模式已关闭",
+      "illegal_mode_off_forked_tower": "[BOCCHI] 已进入两歧塔 — 违规模式已关闭",
+      "forked_tower_offer_ciphers": "[BOCCHI] 已到达两歧塔平台 — 请在传送魔纹启动灯处献上「魔纹启动凭证：力之塔」完成报名，传送前不要离开平台。",
+      "forked_tower_on_pad": "[BOCCHI] 已到达两歧塔平台 — 传送前不要离开平台。",
       "pathfinding_refreshed": "[BOCCHI] 已重新规划路线",
       "pathfinding_refreshed_no_goal": "[BOCCHI] 已清除路线（当前没有可前往的目标）",
       "path_routing_failed": "[BOCCHI] 无法规划前往该 FATE/CE 的路线。会暂时跳过 — 若反复出现请切换违规模式或点击「重建路径图」。",

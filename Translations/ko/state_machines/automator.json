@@ -38,6 +38,9 @@
   "waiting_for_pot_fate": {
     "label": "항아리 대기 중"
   },
+  "waiting_for_forked_tower": {
+    "label": "포크 타워 대기 중"
+  },
   "in_critical_encounter": {
     "label": "비상 조우 중"
   },

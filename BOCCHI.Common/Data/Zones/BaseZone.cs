@@ -37,6 +37,8 @@ public abstract class BaseZone
 
     public ushort ForkedTowerEventId => GetForkedTowerEventId();
 
+    public Vector3? ForkedTowerEntrance => GetForkedTowerEntrance();
+
     public bool IsOccultCrescentZone() => true;
 
     public bool IsInBasecamp()
@@ -419,4 +421,6 @@ public abstract class BaseZone
     }
 
     protected abstract ushort GetForkedTowerEventId();
+
+    protected abstract Vector3? GetForkedTowerEntrance();
 }

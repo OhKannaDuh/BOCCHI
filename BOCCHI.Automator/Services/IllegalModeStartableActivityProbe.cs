@@ -14,10 +14,13 @@ public interface IIllegalModeStartableActivityProbe
     bool HasStartableCriticalEncounter();
 
     bool HasStartableFate();
+
+    bool HasStartableForkedTower();
 }
 
 public sealed class IllegalModeStartableActivityProbe(
     IStartableCriticalEncounterFinder startableCriticalEncounters,
+    IForkedTowerRegistration forkedTower,
     IFateRepository fateRepository,
     IFateScorer fateScorer,
     IPotCycleTracker potCycle,
@@ -30,7 +33,9 @@ public sealed class IllegalModeStartableActivityProbe(
 ) : IIllegalModeStartableActivityProbe
 {
     public bool HasStartableFateOrCriticalEncounter() =>
-        HasStartableCriticalEncounter() || HasStartableFate();
+        HasStartableForkedTower() || HasStartableCriticalEncounter() || HasStartableFate();
+
+    public bool HasStartableForkedTower() => forkedTower.FindRegistrable() != null;
 
     public bool HasStartableCriticalEncounter() =>
         !automatorContext.IsPotsAndTreasure

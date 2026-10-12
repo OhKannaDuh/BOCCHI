@@ -104,6 +104,9 @@ public class NorthHorn
 
     protected override ushort GetForkedTowerEventId() => 64;
 
+    // Forked Tower: Magic aetherial node (DynamicEvent 64 position / planmap MapRange).
+    protected override Vector3? GetForkedTowerEntrance() => new Vector3(-320f, 11f, 422f);
+
     public override List<ActivityData> GetNormalFateData() =>
     [
         new(2081, new(-440f, 47.02659f, -790f), PreferredAethernetId: MolderingOutskirts.Id), // A Rotten Affair

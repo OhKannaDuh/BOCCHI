@@ -38,6 +38,9 @@
   "waiting_for_pot_fate": {
     "label": "等待魔法罐"
   },
+  "waiting_for_forked_tower": {
+    "label": "等待两歧塔"
+  },
   "in_critical_encounter": {
     "label": "紧急遭遇战中"
   },

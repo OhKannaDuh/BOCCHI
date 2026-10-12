@@ -96,6 +96,9 @@ public class SouthHorn
 
     protected override ushort GetForkedTowerEventId() => 48;
 
+    // Forked Tower: Blood teleport pad (planmap MapRange; cipher reliquaries sit on its four corners).
+    protected override Vector3? GetForkedTowerEntrance() => new Vector3(63f, 126.5f, 4f);
+
     public override List<ActivityData> GetNormalFateData() =>
     [
         new(1962, new(162f, 56f, 676f)), // "Rough Waters"

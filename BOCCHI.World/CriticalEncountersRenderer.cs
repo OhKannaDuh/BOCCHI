@@ -93,11 +93,6 @@ public class CriticalEncountersRenderer
             return;
         }
 
-        if (zones.GetZone().ZoneId != ZoneId.SouthHorn)
-        {
-            return;
-        }
-
         CriticalEncounter? tower = criticalEncounters.TryGetForkedTower();
         if (tower == null || tower.State == DynamicEventState.Battle)
         {
