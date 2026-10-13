@@ -27,7 +27,10 @@ public class AutomatorConfig : IAutoConfig
     [IntRange(0, 180, Order = 5, Section = "activities")]
     public int LeaveFateTravelForCeSeconds { get; set; } = 90;
 
-    [EnumSelect<CombatAutorotation, CombatAutorotationDisplay, CombatAutorotationFilter>(Order = 6, Section = "combat")]
+    [Checkbox(Order = 6, Indent = 1, Section = "activities")]
+    public bool LeaveEngagedFateForCriticalEncounter { get; set; } = false;
+
+    [EnumSelect<CombatAutorotation, CombatAutorotationDisplay, CombatAutorotationFilter>(Order = 7, Section = "combat")]
     public CombatAutorotation CombatAutorotation { get; set; } = CombatAutorotation.WrathCombo;
 
     [WrathOccultOptionBlacklist(Order = 7, Indent = 1, Requires = nameof(UsesWrathCombo), Section = "combat")]

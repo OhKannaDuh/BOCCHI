@@ -37,6 +37,10 @@
       "label": "Loop Carrot Hunt",
       "tooltip": "On: skip empty carrot locations; after each Fortune Carrot, check every location again. If a full pass finds none, keep checking until Stop or you run out of carrots.\nOff: one pass, then finish."
     },
+    "carrot_hunt_scout_without_item": {
+      "label": "Scout without Fortune Carrots",
+      "tooltip": "On: start Carrot Hunt with no Fortune Carrots — walk the route and skip pads that need an item. Handy for checking respawns.\nOff: need at least one Fortune Carrot to start; hunt stops when you run out."
+    },
     "play_sound_on_hunt_complete": {
       "label": "Play sound when Treasure Hunt finishes"
     },

@@ -74,6 +74,11 @@ public class BuffingHandler
 
     public override FarmerPhase? Handle()
     {
+        if (conditions[ConditionFlag.InCombat])
+        {
+            return FarmerPhase.Fighting;
+        }
+
         if (DismountAssist.TryDismount(conditions))
         {
             return null;

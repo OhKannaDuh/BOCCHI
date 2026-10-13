@@ -43,17 +43,7 @@ public class WaitingHandler
 
     public override FarmerPhase? Handle()
     {
-        if (scanner.InCombat.Any())
-        {
-            return FarmerPhase.Fighting;
-        }
-
-        if (config.OnlyStartOutOfCombat && conditions[ConditionFlag.InCombat])
-        {
-            return null;
-        }
-
-        if (conditions[ConditionFlag.InCombat])
+        if (scanner.InCombat.Any() || conditions[ConditionFlag.InCombat])
         {
             return FarmerPhase.Fighting;
         }

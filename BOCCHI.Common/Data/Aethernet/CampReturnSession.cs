@@ -69,13 +69,9 @@ public sealed class CampReturnSession(string chainPrefix)
             return TickResult.InProgress;
         }
 
-        if (vnav.IsRunning())
-        {
-            vnav.Stop();
-        }
-
         if (chain is not null)
         {
+            // Do not vnav.Stop() while the Return chain owns movement — that stuttered every tick.
             if (!chain.IsCompleted)
             {
                 return TickResult.InProgress;

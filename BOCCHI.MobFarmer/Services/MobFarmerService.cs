@@ -180,8 +180,16 @@ public class MobFarmerService
             return;
         }
 
-        if (Phase == FarmerPhase.Fighting)
+        // Self-defence while still gathering / buffing / stacking — AI used to stay off until Fighting.
+        if (Phase == FarmerPhase.Fighting
+            || ((Phase is FarmerPhase.Gathering or FarmerPhase.Buffing or FarmerPhase.Stacking)
+                && (scanner.InCombat.Any() || conditions[ConditionFlag.InCombat])))
         {
+            if (Phase != FarmerPhase.Fighting)
+            {
+                combat.EnableFighting();
+            }
+
             combat.Tick();
         }
 

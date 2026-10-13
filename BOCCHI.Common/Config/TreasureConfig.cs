@@ -35,46 +35,49 @@ public class TreasureConfig : IAutoConfig
     [Checkbox(Order = 8, Section = "carrot_hunt")]
     public bool LoopCarrotHunt { get; set; } = false;
 
-    [Checkbox(Order = 9, Section = "treasure_hunt")]
+    [Checkbox(Order = 9, Section = "carrot_hunt")]
+    public bool CarrotHuntScoutWithoutItem { get; set; } = false;
+
+    [Checkbox(Order = 10, Section = "treasure_hunt")]
     public bool CastTreasureSightDuringHunt { get; set; } = true;
 
-    [IntRange(1, 50, Order = 10, Indent = 1, Requires = nameof(CastTreasureSightDuringHunt), Section = "treasure_hunt")]
+    [IntRange(1, 50, Order = 11, Indent = 1, Requires = nameof(CastTreasureSightDuringHunt), Section = "treasure_hunt")]
     public int TreasureSightEveryNLocations { get; set; } = 10;
 
-    [IntRange(1, 50, Order = 11, Section = "treasure_hunt")]
+    [IntRange(1, 50, Order = 12, Section = "treasure_hunt")]
     public int HuntMaxLevel { get; set; } = 50;
 
-    [Checkbox(Order = 12, Section = "treasure_hunt")]
+    [Checkbox(Order = 13, Section = "treasure_hunt")]
     public bool HuntSilverChestsOnly { get; set; } = false;
 
-    [IntRange(0, 100, Order = 13, Section = "treasure_hunt")]
+    [IntRange(0, 100, Order = 14, Section = "treasure_hunt")]
     public int HuntMinBronzePercent { get; set; } = 50;
 
-    [IntRange(0, 100, Order = 14, Section = "treasure_hunt")]
+    [IntRange(0, 100, Order = 15, Section = "treasure_hunt")]
     public int HuntMinSilverPercent { get; set; } = 50;
 
-    [FloatRange(10f, 60f, Order = 15, Section = "treasure_hunt")]
+    [FloatRange(10f, 60f, Order = 16, Section = "treasure_hunt")]
     public float EmptyPadTrustDistance { get; set; } = 60f;
 
-    [Checkbox(Order = 16, Section = "treasure_hunt")]
+    [Checkbox(Order = 17, Section = "treasure_hunt")]
     public bool SkipUnsafeTreasureWindows { get; set; } = true;
 
-    [Checkbox(Order = 17, Section = "ninja_hide")]
+    [Checkbox(Order = 18, Section = "ninja_hide")]
     public bool UseNinjaHideOnDangerousRoutes { get; set; } = false;
 
-    [Checkbox(Order = 18, Section = "ninja_hide")]
+    [Checkbox(Order = 19, Section = "ninja_hide")]
     public bool UseOccultSprintWhileHidden { get; set; } = false;
 
-    [IntRange(0, 100, Order = 19, Section = "ninja_hide")]
+    [IntRange(0, 100, Order = 20, Section = "ninja_hide")]
     public int NinjaGearsetNumber { get; set; } = 0;
 
-    [IntRange(-5, 10, Order = 20, Section = "ninja_hide")]
+    [IntRange(-5, 10, Order = 21, Section = "ninja_hide")]
     public int KnowledgeHideOffset { get; set; } = 0;
 
-    [FloatRange(5f, 40f, Order = 21, Section = "ninja_hide")]
+    [FloatRange(5f, 40f, Order = 22, Section = "ninja_hide")]
     public float KnowledgeThreatEnterDistance { get; set; } = 10f;
 
-    [FloatRange(10f, 60f, Order = 22, Section = "ninja_hide")]
+    [FloatRange(10f, 60f, Order = 23, Section = "ninja_hide")]
     public float KnowledgeThreatExitDistance { get; set; } = 20f;
 
     [ConfigHidden]

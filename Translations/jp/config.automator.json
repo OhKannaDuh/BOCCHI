@@ -32,7 +32,11 @@
     },
     "leave_fate_travel_for_ce_seconds": {
       "label": "FATE 移動中に CE へ切り替える残り秒",
-      "tooltip": "FATE へ歩いているとき、参加受付がこの秒数以下なら CE に切り替える。高いほど早く離れる。0＝CE が出たらすぐ。すでに FATE 内なら先に終わらせる。"
+      "tooltip": "FATE へ歩いているとき、参加受付がこの秒数以下なら CE に切り替える。高いほど早く離れる。0＝CE が出たらすぐ。すでに FATE 内なら先に終わらせる（「FATE 途中でも CE へ」がオンなら途中離脱可）。"
+    },
+    "leave_engaged_fate_for_critical_encounter": {
+      "label": "FATE 途中でも CE へ",
+      "tooltip": "オン：すでに始めた FATE でも、上の秒数以内の CE なら離れて CE へ（移動中と同じタイミング）。ポット優先やポッツ＆トレジャーでポットを強制しているときはマジックポット FATE からは離れない。\nオフ：参加中の FATE を先に終わらせてから CE。"
     },
     "combat_autorotation": {
       "label": "戦闘ローテーション",

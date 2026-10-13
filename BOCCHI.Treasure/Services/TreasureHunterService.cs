@@ -1956,8 +1956,20 @@ public class TreasureHunterService
             return;
         }
 
+        // Mounted threat range is wider — remounting while still near packs re-triggers Hide → dismount loop.
+        if (config.UseNinjaHideOnDangerousRoutes && StillThreatenedForRemount())
+        {
+            return;
+        }
+
         if (ninjaHide.IsStealthed
             && !ninjaHide.TryEndStealthForTravel(StillThreatenedForRemount))
+        {
+            return;
+        }
+
+        // Stay on foot for the last stretch to a coffer / open.
+        if (player.Position.Distance2D(destination) <= OpenTreasureCofferChain.OffMeshFinishRange)
         {
             return;
         }

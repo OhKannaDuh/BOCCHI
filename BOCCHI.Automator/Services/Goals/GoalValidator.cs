@@ -256,6 +256,19 @@ public class GoalValidator
 
         if (IsEngagedWithFate(id))
         {
+            if (!potsOnly
+                && automatorConfig.LeaveEngagedFateForCriticalEncounter
+                && startableCriticalEncounters.FindStartable() is { } engagedCe
+                && ShouldLeaveFateTravelForCe(engagedCe))
+            {
+                logger.Debug(
+                    "Invalidating engaged FATE {FateId} — startable CE {CeId} ({CeName}) with Leave mid-FATE for CE on",
+                    id.Value,
+                    engagedCe.Id.Value,
+                    engagedCe.Name);
+                return false;
+            }
+
             return true;
         }
 

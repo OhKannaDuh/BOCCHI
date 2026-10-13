@@ -192,6 +192,19 @@ public class TreasureRenderer
 
         if (carrotHunter.Running)
         {
+            if (carrotHunter.Paused)
+            {
+                if (ImGui.Button(translator.T(".treasure.resume_hunt")))
+                {
+                    carrotHunter.Resume();
+                }
+            }
+            else if (ImGui.Button(translator.T(".treasure.pause_hunt")))
+            {
+                carrotHunter.Pause();
+            }
+
+            ImGui.SameLine();
             if (ImGui.Button(translator.T(".treasure.stop_carrot_hunt")))
             {
                 carrotHunter.Toggle();

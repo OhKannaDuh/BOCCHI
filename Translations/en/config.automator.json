@@ -32,7 +32,11 @@
     },
     "leave_fate_travel_for_ce_seconds": {
       "label": "Leave FATE travel for a CE when (seconds left)",
-      "tooltip": "While walking to a FATE, switch to a CE only when registration has this many seconds or fewer left. Higher = leave sooner. 0 = switch as soon as a CE is up. Already in the FATE: finish it first."
+      "tooltip": "While walking to a FATE, switch to a CE only when registration has this many seconds or fewer left. Higher = leave sooner. 0 = switch as soon as a CE is up. Already in the FATE: finish it first unless Leave mid-FATE for CE is on."
+    },
+    "leave_engaged_fate_for_critical_encounter": {
+      "label": "Leave mid-FATE for a CE",
+      "tooltip": "On: also leave a FATE you already started when a CE is within the seconds above (same timing as travel). Does not leave Magic Pot FATEs when Prefer pot FATEs or Pots & Treasure is forcing pots.\nOff: finish the FATE you are in before taking a CE."
     },
     "combat_autorotation": {
       "label": "Combat rotation",
