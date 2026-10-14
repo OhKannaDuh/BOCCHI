@@ -23,6 +23,8 @@ public class Configuration : IConfiguration
 
     public BuffConfig BuffConfig { get; set; } = new();
 
+    public RaiseConfig RaiseConfig { get; set; } = new();
+
     public MobFarmerConfig MobFarmerConfig { get; set; } = new();
 
     public FatesConfig FatesConfig { get; set; } = new();

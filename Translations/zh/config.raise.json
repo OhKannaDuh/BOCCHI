@@ -1,0 +1,18 @@
+{
+  "label": "复活",
+  "tooltip": "在新月岛倒下并被其他玩家复活时 BOCCHI 的行为。",
+  "fields": {
+    "auto_accept_raise": {
+      "label": "自动接受复活",
+      "tooltip": "开：在新月岛有人复活你时，立即接受确认框。\n关：自己选择接受或拒绝。"
+    },
+    "say_thanks_after_raise": {
+      "label": "复活后道谢",
+      "tooltip": "自动接受的复活让你起身后，用 /say 发送下面的消息。"
+    },
+    "thanks_message": {
+      "label": "消息",
+      "tooltip": "起身后用 /say 发送。留空则不发送。"
+    }
+  }
+}

@@ -6,6 +6,9 @@ namespace BOCCHI.Common.Config.Fields;
 public sealed class BossModPresetOptionsAttribute()
     : UIFieldAttribute(typeof(BossModPresetOptionsRenderer));
 
+public sealed class ChatMessageAttribute()
+    : UIFieldAttribute(typeof(ChatMessageRenderer));
+
 public sealed class DisabledCriticalEncounterIdsAttribute()
     : UIFieldAttribute(typeof(DisabledCriticalEncounterIdsRenderer));
 

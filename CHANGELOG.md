@@ -18,6 +18,10 @@
 - Less mount / dismount looping near packs or when almost at a coffer (Ninja Hide)
 - Keeps the wind-safe approach to the Suspended Masonry coffer (no longer cuts the path short when the chest looks closer)
 
+### Raise
+- Optional: Auto-accept raises when someone revives you in Occult Crescent (Config → Raise)
+- Optional: Say thanks in /say once you are back up (message is editable)
+
 ### Fixes
 - Pots & Treasure keeps finishing a live Magic Pot even if it is past Skip FATE progress %
 - Auto shopping backs off when the shop helper is busy or refuses to start, instead of retrying endlessly

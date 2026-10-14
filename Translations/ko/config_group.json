@@ -25,5 +25,8 @@
   },
   "movement": {
     "label": "이동"
+  },
+  "raise": {
+    "label": "부활"
   }
 }

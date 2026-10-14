@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+using BOCCHI.Common.Services;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -37,12 +37,12 @@ public static class ReturnYesNo
             return false;
         }
 
-        if (templatesLoaded && returnTemplate.Length > 0 && MatchesLocalizedPrompt(prompt, returnTemplate))
+        if (templatesLoaded && returnTemplate.Length > 0 && SelectYesnoPrompt.Matches(prompt, returnTemplate))
         {
             return true;
         }
 
-        if (templatesLoaded && partyInviteTemplate.Length > 0 && MatchesLocalizedPrompt(prompt, partyInviteTemplate))
+        if (templatesLoaded && partyInviteTemplate.Length > 0 && SelectYesnoPrompt.Matches(prompt, partyInviteTemplate))
         {
             return false;
         }
@@ -91,71 +91,9 @@ public static class ReturnYesNo
 
     private static bool LooksLikeReturnPrompt(string prompt)
     {
-        string n = NormalizePrompt(prompt);
+        string n = SelectYesnoPrompt.Normalize(prompt);
         return n.Contains("return", StringComparison.OrdinalIgnoreCase)
                || n.Contains("帰還", StringComparison.Ordinal)
                || n.Contains("リターン", StringComparison.Ordinal);
-    }
-
-    private static bool MatchesLocalizedPrompt(string prompt, string template)
-    {
-        string normalizedPrompt = NormalizePrompt(prompt);
-        string normalizedTemplate = NormalizePrompt(template);
-        if (normalizedPrompt.Length == 0 || normalizedTemplate.Length == 0)
-        {
-            return false;
-        }
-
-        string[] templateParts = Regex.Split(normalizedTemplate, @"<string\([^>]+\)>", RegexOptions.IgnoreCase);
-        if (templateParts.Length == 1)
-        {
-            if (string.Equals(normalizedPrompt, normalizedTemplate, StringComparison.CurrentCultureIgnoreCase))
-            {
-                return true;
-            }
-
-            return MatchesPromptWithInsertedText(normalizedPrompt, normalizedTemplate);
-        }
-
-        string pattern = "^" + string.Join(".+?", templateParts.Select(Regex.Escape)) + "$";
-        return Regex.IsMatch(normalizedPrompt, pattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
-               || MatchesPromptWithInsertedText(normalizedPrompt, normalizedTemplate);
-    }
-
-    private static bool MatchesPromptWithInsertedText(string prompt, string template)
-    {
-        if (prompt.Length <= template.Length)
-        {
-            return false;
-        }
-
-        int prefixLength = 0;
-        while (prefixLength < template.Length
-               && prefixLength < prompt.Length
-               && CharEqualsIgnoreCase(prompt[prefixLength], template[prefixLength]))
-        {
-            prefixLength++;
-        }
-
-        int suffixLength = 0;
-        while (suffixLength < template.Length - prefixLength
-               && suffixLength < prompt.Length - prefixLength
-               && CharEqualsIgnoreCase(
-                   prompt[prompt.Length - suffixLength - 1],
-                   template[template.Length - suffixLength - 1]))
-        {
-            suffixLength++;
-        }
-
-        return prefixLength + suffixLength == template.Length;
-    }
-
-    private static bool CharEqualsIgnoreCase(char left, char right)
-        => char.ToUpperInvariant(left) == char.ToUpperInvariant(right);
-
-    private static string NormalizePrompt(string value)
-    {
-        string withoutLineBreakTags = Regex.Replace(value, @"<br\s*/?>", " ", RegexOptions.IgnoreCase);
-        return string.Join(" ", withoutLineBreakTags.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries));
     }
 }
