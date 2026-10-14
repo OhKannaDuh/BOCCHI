@@ -25,5 +25,8 @@
   },
   "movement": {
     "label": "移动"
+  },
+  "raise": {
+    "label": "复活"
   }
 }

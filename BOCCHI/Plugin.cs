@@ -76,6 +76,7 @@ public sealed class Plugin(IDalamudPluginInterface plugin, IPluginLog logger) : 
         services.AddSingleton<OperationalStatusBar>();
         services.AddSingleton<OccultCrescentWindowAutoOpener>();
         services.AddSingleton<CombatPathfindCancelService>();
+        services.AddSingleton<RaiseAutoAccept>();
         services.AddSingleton<IMainWindowTitleBarContributor, IllegalModeTitleBarContributor>();
         services.AddSingleton<IMainWindowTitleBarContributor, LogsTitleBarContributor>();
         services.AddSingleton<IMainWindowTitleBarContributor, KofiTitleBarContributor>();
@@ -95,6 +96,7 @@ public sealed class Plugin(IDalamudPluginInterface plugin, IPluginLog logger) : 
         services.AddSingleton<AutoRepairMethodDisplay>();
         services.AddSingleton<NoOpFilter<AutoRepairMethod>>();
         services.AddSingleton<IFieldRenderer<TriageRaiseJobAttribute>, TriageRaiseJobRenderer>();
+        services.AddSingleton<IFieldRenderer<ChatMessageAttribute>, ChatMessageRenderer>();
         services.AddSingleton<IFieldRenderer<BossModPresetOptionsAttribute>, BossModPresetOptionsRenderer>();
         services.AddSingleton<IFieldRenderer<WrathOccultOptionBlacklistAttribute>, WrathOccultOptionBlacklistRenderer>();
         services.AddSingleton<IFieldRenderer<FarmSpotListAttribute>, FarmSpotListRenderer>();

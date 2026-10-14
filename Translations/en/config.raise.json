@@ -1,0 +1,18 @@
+{
+  "label": "Raise",
+  "tooltip": "What BOCCHI does when you are KO'd in Occult Crescent and another player raises you.",
+  "fields": {
+    "auto_accept_raise": {
+      "label": "Auto-accept raises",
+      "tooltip": "On: when someone raises you in Occult Crescent, accept the prompt right away.\nOff: accept or decline the prompt yourself."
+    },
+    "say_thanks_after_raise": {
+      "label": "Say thanks after being raised",
+      "tooltip": "After an auto-accepted raise brings you back, send the message below in /say."
+    },
+    "thanks_message": {
+      "label": "Message",
+      "tooltip": "Sent in /say once you are back on your feet. Leave empty to send nothing."
+    }
+  }
+}

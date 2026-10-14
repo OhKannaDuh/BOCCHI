@@ -25,5 +25,8 @@
   },
   "movement": {
     "label": "Movement"
+  },
+  "raise": {
+    "label": "Raise"
   }
 }
