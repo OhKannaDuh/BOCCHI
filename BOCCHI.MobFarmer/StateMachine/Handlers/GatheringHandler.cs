@@ -95,7 +95,15 @@ public class GatheringHandler
         float dist = player.Position.Distance2D(current.Position);
         if (dist <= FarmerPullAssist.PullRange)
         {
-            pull.TryPull(current);
+            // Non-tanks have no pull tool; without the AI nothing ever starts the fight.
+            if (player.IsTank())
+            {
+                pull.TryPull(current);
+            }
+            else
+            {
+                farmer.RequestAiPull();
+            }
         }
 
         bool pulled = current.IsTargetingPlayer(objects.LocalPlayer);

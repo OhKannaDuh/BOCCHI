@@ -142,13 +142,40 @@ public class ConfigMigrator(IDalamudPluginInterface plugin, IPluginLog logger)
         }
     }
 
+    public void PruneBackups()
+    {
+        try
+        {
+            var backups = Directory
+                .EnumerateFiles(GetPluginConfigsDirectory(), $"{BackupPrefix}*.json")
+                .Select(path => (Path: path, Version: TryParseBackupVersion(path)))
+                .Where(b => b.Version != null)
+                .OrderByDescending(b => b.Version);
+
+            foreach ((string path, int? version) in backups.Skip(1))
+            {
+                File.Delete(path);
+                logger.Info("Removed old config backup v{0}: {1}", version, path);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.Error(ex, "Failed to prune old config backups");
+        }
+    }
+
     private string GetPluginConfigsDirectory() => Directory.GetParent(plugin.GetPluginConfigDirectory())!.FullName;
 
     private string GetConfigFilePath() =>
         Path.Combine(GetPluginConfigsDirectory(), $"{plugin.InternalName}.json");
 
+    private string BackupPrefix => $"{plugin.InternalName}.";
+
     private string GetConfigFileBackupPath(int version) =>
-        Path.Combine(GetPluginConfigsDirectory(), $"{plugin.InternalName}.{version}.json");
+        Path.Combine(GetPluginConfigsDirectory(), $"{BackupPrefix}{version}.json");
+
+    private int? TryParseBackupVersion(string path) =>
+        int.TryParse(Path.GetFileNameWithoutExtension(path)[BackupPrefix.Length..], out int version) ? version : null;
 
     private JObject? GetCurrentConfigJObject()
     {
