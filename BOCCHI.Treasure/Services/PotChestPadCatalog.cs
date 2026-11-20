@@ -9,7 +9,7 @@ public static class PotChestPadCatalog
 
     public const float MergeRadiusSq = MergeRadius * MergeRadius;
 
-    public const float MaxCorrectionSq = CrowdsourcedPadCorrection.CarrotMaxCorrectionSq;
+    public const float MaxCorrectionSq = CrowdsourcedPadCorrection.MaxCorrectionSq;
 
     public static List<PotChestData> Merge(
         IReadOnlyList<PotChestData> baked,

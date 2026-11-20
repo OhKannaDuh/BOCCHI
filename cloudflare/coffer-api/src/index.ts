@@ -6,14 +6,6 @@ import {
   writeCatalogCache,
 } from "./catalogCache";
 import {
-  processCarrotObservationById,
-  processPendingCarrotObservations,
-} from "./carrotProcessor";
-import {
-  processPendingPotChestObservations,
-  processPotChestObservationById,
-} from "./potChestProcessor";
-import {
   invalidatePotHitCache,
   POT_HIT_CACHE_TTL_SECONDS,
   readPotHitCache,
@@ -24,6 +16,7 @@ import {
   processObservationById,
   processPendingObservations,
 } from "./processor";
+import { reporterHash } from "./reporter";
 import { MIN_VALID_WORLD_Y, isUnloadAltitude } from "./worldBounds";
 
 interface CofferObservationRequest {
@@ -290,7 +283,7 @@ async function buildAcceptedCandidatesPayload(request: Request, env: Env, compac
     throw jsonResponse({ error: "territoryId must be an Occult Crescent zone." }, 400);
   }
 
-  const dataId = url.searchParams.get("dataId");
+  const dataId = compact ? null : url.searchParams.get("dataId");
   const parsedDataId = dataId === null ? null : parsePositiveInteger(dataId);
   if (dataId !== null && parsedDataId === null) {
     throw jsonResponse({ error: "Invalid dataId." }, 400);
@@ -1482,6 +1475,7 @@ async function getPotCycle(request: Request, env: Env, ctx: ExecutionContext): P
 async function submitCarrotLocation(
   request: Request,
   env: Env,
+  reporter: string | null,
 ): Promise<{ response: Response; observationId: number | null }> {
   const body = await parseJsonBody(request);
   const validationError = validateCarrotLocation(body);
@@ -1494,9 +1488,9 @@ async function submitCarrotLocation(
   const result = await env.DB.prepare(`
     INSERT INTO carrot_observations (
       territory_id, world_x, world_y, world_z,
-      object_base_id, installation_hash, plugin_version, observed_at_utc
+      object_base_id, installation_hash, reporter_hash, plugin_version, observed_at_utc
     )
-    SELECT ?, ?, ?, ?, ?, ?, ?, ?
+    SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?
     WHERE NOT EXISTS (
       SELECT 1
       FROM carrot_observations
@@ -1514,6 +1508,7 @@ async function submitCarrotLocation(
     observation.worldZ,
     CARROT_OBJECT_BASE_ID,
     observation.installationHash.trim(),
+    reporter,
     observation.pluginVersion.trim(),
     observedAtUtc,
     observation.installationHash.trim(),
@@ -1548,6 +1543,7 @@ async function submitCarrotLocation(
 async function submitObservation(
   request: Request,
   env: Env,
+  reporter: string | null,
 ): Promise<{ response: Response; observationId: number | null }> {
   const body = await parseJsonBody(request);
   const validationError = validateObservation(body);
@@ -1560,10 +1556,10 @@ async function submitObservation(
   const result = await env.DB.prepare(`
     INSERT INTO observations (
       territory_id, data_id, map_id, world_x, world_y, world_z,
-      coffer_type, installation_hash, plugin_version,
+      coffer_type, installation_hash, reporter_hash, plugin_version,
       game_version, observed_at_utc
     )
-    SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+    SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
     WHERE NOT EXISTS (
       SELECT 1
       FROM observations
@@ -1583,6 +1579,7 @@ async function submitObservation(
     observation.worldZ,
     observation.cofferType?.trim() || null,
     observation.installationHash.trim(),
+    reporter,
     observation.pluginVersion.trim(),
     observation.gameVersion?.trim() || null,
     observedAtUtc,
@@ -1618,6 +1615,7 @@ async function submitObservation(
 async function submitPotChestLocation(
   request: Request,
   env: Env,
+  reporter: string | null,
 ): Promise<{ response: Response; observationId: number | null }> {
   const body = await parseJsonBody(request);
   const validationError = validatePotChestLocation(body);
@@ -1631,9 +1629,9 @@ async function submitPotChestLocation(
   const result = await env.DB.prepare(`
     INSERT INTO pot_chest_observations (
       territory_id, pot_fate_id, is_reroll, world_x, world_y, world_z,
-      installation_hash, plugin_version, observed_at_utc
+      installation_hash, reporter_hash, plugin_version, observed_at_utc
     )
-    SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?
+    SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
     WHERE NOT EXISTS (
       SELECT 1
       FROM pot_chest_observations
@@ -1654,6 +1652,7 @@ async function submitPotChestLocation(
     observation.worldY,
     observation.worldZ,
     observation.installationHash.trim(),
+    reporter,
     observation.pluginVersion.trim(),
     observedAtUtc,
     observation.installationHash.trim(),
@@ -1831,9 +1830,9 @@ export default {
           return rateLimitResponse;
         }
 
-        const submitted = await submitObservation(request, env);
+        const submitted = await submitObservation(request, env, await reporterHash(request, env));
         if (submitted.observationId !== null) {
-          ctx.waitUntil(processObservationById(env, submitted.observationId).then(async result => {
+          ctx.waitUntil(processObservationById(env, "coffers", submitted.observationId).then(async result => {
             console.log("Observation processor (post-submit)", result);
             if (result.newlyAccepted > 0) {
               await invalidateAcceptedCatalogCaches();
@@ -1861,9 +1860,9 @@ export default {
           return rateLimitResponse;
         }
 
-        const submitted = await submitCarrotLocation(request, env);
+        const submitted = await submitCarrotLocation(request, env, await reporterHash(request, env));
         if (submitted.observationId !== null) {
-          ctx.waitUntil(processCarrotObservationById(env, submitted.observationId).then(async result => {
+          ctx.waitUntil(processObservationById(env, "carrots", submitted.observationId).then(async result => {
             console.log("Carrot processor (post-submit)", result);
             if (result.newlyAccepted > 0) {
               await invalidateAcceptedCatalogCaches();
@@ -1891,9 +1890,9 @@ export default {
           return rateLimitResponse;
         }
 
-        const submitted = await submitPotChestLocation(request, env);
+        const submitted = await submitPotChestLocation(request, env, await reporterHash(request, env));
         if (submitted.observationId !== null) {
-          ctx.waitUntil(processPotChestObservationById(env, submitted.observationId).then(async result => {
+          ctx.waitUntil(processObservationById(env, "pot-chests", submitted.observationId).then(async result => {
             console.log("Pot-chest processor (post-submit)", result);
             if (result.newlyAccepted > 0) {
               await invalidateAcceptedCatalogCaches();
@@ -1954,11 +1953,11 @@ export default {
   },
 
   async scheduled(_controller: ScheduledController, env: Env, _ctx: ExecutionContext): Promise<void> {
-    const cofferResult = await processPendingObservations(env);
+    const cofferResult = await processPendingObservations(env, "coffers");
     console.log("Observation processor completed", cofferResult);
-    const carrotResult = await processPendingCarrotObservations(env);
+    const carrotResult = await processPendingObservations(env, "carrots");
     console.log("Carrot processor completed", carrotResult);
-    const potChestResult = await processPendingPotChestObservations(env);
+    const potChestResult = await processPendingObservations(env, "pot-chests");
     console.log("Pot-chest processor completed", potChestResult);
     const rejectedUnload = await rejectUnloadAltitudeCandidates(env);
     console.log("Unload-altitude candidate reject completed", rejectedUnload);

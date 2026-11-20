@@ -7,6 +7,7 @@
     "deploy": "wrangler deploy",
     "types": "wrangler types",
     "check": "wrangler types && tsc --noEmit",
+    "test": "node --test \"test/**/*.test.ts\"",
     "db:migrate:local": "wrangler d1 migrations apply bocchi-coffer-observations --local",
     "db:migrate:remote": "wrangler d1 migrations apply bocchi-coffer-observations --remote"
   },

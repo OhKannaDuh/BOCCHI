@@ -4,9 +4,9 @@ namespace BOCCHI.Treasure.Services;
 
 public static class CrowdsourcedPadCorrection
 {
-    public const float CarrotMaxCorrection = 50f;
+    public const float MaxCorrection = 50f;
 
-    public const float CarrotMaxCorrectionSq = CarrotMaxCorrection * CarrotMaxCorrection;
+    public const float MaxCorrectionSq = MaxCorrection * MaxCorrection;
 
     public static Vector3 CorrectCofferPosition(
         uint dataId,
@@ -32,7 +32,9 @@ public static class CrowdsourcedPadCorrection
             best = candidate.Position;
         }
 
-        if (best is { } corrected && bestDistSq > CofferLocationSyncService.MatchRadiusSq)
+        if (best is { } corrected
+            && bestDistSq > CofferLocationSyncService.MatchRadiusSq
+            && bestDistSq <= MaxCorrectionSq)
         {
             return corrected;
         }

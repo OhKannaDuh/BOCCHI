@@ -1,9 +1,44 @@
-import { isUnloadAltitude } from "./worldBounds";
+import { isUnloadAltitude } from "./worldBounds.ts";
 
 const MAX_OBSERVATIONS_PER_RUN = 500;
 const CLUSTER_RADIUS = 1.5;
+const CLUSTER_RADIUS_SQUARED = CLUSTER_RADIUS * CLUSTER_RADIUS;
 const REVIEW_REPORTER_THRESHOLD = 3;
-const AUTO_ACCEPT_NOTE = "Automatically accepted after three distinct installation reports.";
+const AUTO_ACCEPT_NOTE = "Automatically accepted after three different reporters.";
+
+export type ClusterKind = "coffers" | "carrots" | "pot-chests";
+
+interface ClusterTables {
+  observations: string;
+  candidates: string;
+  members: string;
+  keys: readonly string[];
+  label: string;
+}
+
+export const CLUSTER_KINDS: Record<ClusterKind, ClusterTables> = {
+  coffers: {
+    observations: "observations",
+    candidates: "observation_candidates",
+    members: "observation_candidate_members",
+    keys: ["data_id"],
+    label: "observation",
+  },
+  carrots: {
+    observations: "carrot_observations",
+    candidates: "carrot_candidates",
+    members: "carrot_candidate_members",
+    keys: [],
+    label: "carrot observation",
+  },
+  "pot-chests": {
+    observations: "pot_chest_observations",
+    candidates: "pot_chest_candidates",
+    members: "pot_chest_candidate_members",
+    keys: ["pot_fate_id", "is_reroll"],
+    label: "pot-chest observation",
+  },
+};
 
 interface DatabaseEnv {
   DB: D1Database;
@@ -12,19 +47,13 @@ interface DatabaseEnv {
 interface PendingObservation {
   id: number;
   territory_id: number;
-  data_id: number;
   world_x: number;
   world_y: number;
   world_z: number;
   installation_hash: string;
+  reporter: string;
   observed_at_utc: string;
-}
-
-interface Candidate {
-  id: number;
-  centroid_x: number;
-  centroid_y: number;
-  centroid_z: number;
+  [key: string]: unknown;
 }
 
 export interface ProcessorResult {
@@ -34,96 +63,78 @@ export interface ProcessorResult {
   newlyAccepted: number;
 }
 
-export async function processObservationById(
-  env: DatabaseEnv,
-  observationId: number,
-): Promise<ProcessorResult> {
-  const observation = await env.DB.prepare(`
-    SELECT
-      o.id,
-      o.territory_id,
-      o.data_id,
-      o.world_x,
-      o.world_y,
-      o.world_z,
+function pendingQuery(tables: ClusterTables, byId: boolean): string {
+  const keyColumns = tables.keys.map(key => `o.${key},`).join(" ");
+  const keyFilters = tables.keys.map(key => `AND o.${key} IS NOT NULL`).join(" ");
+  return `
+    SELECT o.id, o.territory_id, ${keyColumns}
+      o.world_x, o.world_y, o.world_z,
       o.installation_hash,
+      COALESCE(o.reporter_hash, o.installation_hash) AS reporter,
       o.observed_at_utc
-    FROM observations o
-    WHERE o.id = ?
-      AND o.processed = 0
-      AND o.data_id IS NOT NULL
+    FROM ${tables.observations} o
+    WHERE o.processed = 0
+      ${keyFilters}
+      ${byId ? "AND o.id = ?" : ""}
       AND NOT EXISTS (
         SELECT 1
-        FROM observation_candidate_members m
+        FROM ${tables.members} m
         WHERE m.observation_id = o.id
       )
-  `).bind(observationId).first<PendingObservation>();
+    ORDER BY o.id
+    LIMIT ?
+  `;
+}
+
+export async function processObservationById(
+  env: DatabaseEnv,
+  kind: ClusterKind,
+  observationId: number,
+): Promise<ProcessorResult> {
+  const tables = CLUSTER_KINDS[kind];
+  const observation = await env.DB.prepare(pendingQuery(tables, true))
+    .bind(observationId, 1)
+    .first<PendingObservation>();
 
   if (observation === null) {
     return { scanned: 0, assigned: 0, failed: 0, newlyAccepted: 0 };
   }
 
-  return processOne(env.DB, observation);
+  return processOne(env.DB, kind, observation);
 }
 
-export async function processPendingObservations(env: DatabaseEnv): Promise<ProcessorResult> {
-  const pending = await env.DB.prepare(`
-    SELECT
-      o.id,
-      o.territory_id,
-      o.data_id,
-      o.world_x,
-      o.world_y,
-      o.world_z,
-      o.installation_hash,
-      o.observed_at_utc
-    FROM observations o
-    WHERE o.processed = 0
-      AND o.data_id IS NOT NULL
-      AND NOT EXISTS (
-        SELECT 1
-        FROM observation_candidate_members m
-        WHERE m.observation_id = o.id
-      )
-    ORDER BY o.id
-    LIMIT ?
-  `).bind(MAX_OBSERVATIONS_PER_RUN).all<PendingObservation>();
+export async function processPendingObservations(env: DatabaseEnv, kind: ClusterKind): Promise<ProcessorResult> {
+  const pending = await env.DB.prepare(pendingQuery(CLUSTER_KINDS[kind], false))
+    .bind(MAX_OBSERVATIONS_PER_RUN)
+    .all<PendingObservation>();
 
-  let assigned = 0;
-  let failed = 0;
-  let newlyAccepted = 0;
+  const total: ProcessorResult = { scanned: pending.results.length, assigned: 0, failed: 0, newlyAccepted: 0 };
   for (const observation of pending.results) {
-    const result = await processOne(env.DB, observation);
-    assigned += result.assigned;
-    failed += result.failed;
-    newlyAccepted += result.newlyAccepted;
+    const result = await processOne(env.DB, kind, observation);
+    total.assigned += result.assigned;
+    total.failed += result.failed;
+    total.newlyAccepted += result.newlyAccepted;
   }
 
-  return {
-    scanned: pending.results.length,
-    assigned,
-    failed,
-    newlyAccepted,
-  };
+  return total;
 }
 
-async function processOne(db: D1Database, observation: PendingObservation): Promise<ProcessorResult> {
+async function processOne(
+  db: D1Database,
+  kind: ClusterKind,
+  observation: PendingObservation,
+): Promise<ProcessorResult> {
+  const tables = CLUSTER_KINDS[kind];
   try {
     if (isUnloadAltitude(observation.world_y)) {
-      await db.prepare(`
-        UPDATE observations
-        SET processed = 1
-        WHERE id = ?
-      `).bind(observation.id).run();
+      await db.prepare(`UPDATE ${tables.observations} SET processed = 1 WHERE id = ?`)
+        .bind(observation.id)
+        .run();
       return { scanned: 1, assigned: 0, failed: 0, newlyAccepted: 0 };
     }
 
-    let candidate = await findCandidate(db, observation);
-    if (candidate === null) {
-      candidate = await createCandidate(db, observation);
-    }
-
-    const newlyAccepted = await assignObservation(db, candidate.id, observation);
+    const candidateId = await findOrCreateCandidate(db, tables, observation);
+    const newlyAccepted = await assignObservation(db, kind, candidateId, observation);
     return {
       scanned: 1,
       assigned: 1,
@@ -131,88 +142,77 @@ async function processOne(db: D1Database, observation: PendingObservation): Prom
       newlyAccepted: newlyAccepted ? 1 : 0,
     };
   } catch (error) {
-    console.error(`Failed to process observation ${observation.id}`, error);
+    console.error(`Failed to process ${tables.label} ${observation.id}`, error);
     return { scanned: 1, assigned: 0, failed: 1, newlyAccepted: 0 };
   }
 }
 
-async function findCandidate(
+async function findOrCreateCandidate(
   db: D1Database,
+  tables: ClusterTables,
   observation: PendingObservation,
-): Promise<Candidate | null> {
-  const candidates = await db.prepare(`
-    SELECT id, centroid_x, centroid_y, centroid_z
-    FROM observation_candidates
-    WHERE territory_id = ?
-      AND data_id = ?
+): Promise<number> {
+  const keyValues = tables.keys.map(key => observation[key]);
+  const keyParams = tables.keys.map((_, i) => `?${7 + i}`);
+  const keyMatch = tables.keys.map((key, i) => `AND ${key} = ?${7 + i}`).join(" ");
+  const distance = `
+    (centroid_x - ?2) * (centroid_x - ?2)
+    + (centroid_y - ?3) * (centroid_y - ?3)
+    + (centroid_z - ?4) * (centroid_z - ?4)`;
+  const nearby = `
+    FROM ${tables.candidates}
+    WHERE territory_id = ?1
+      ${keyMatch}
       AND status != 'rejected'
-      AND ABS(centroid_x - ?) <= ?
-      AND ABS(centroid_y - ?) <= ?
-      AND ABS(centroid_z - ?) <= ?
-  `).bind(
+      AND ${distance} <= ?6`;
+  const params = [
     observation.territory_id,
-    observation.data_id,
-    observation.world_x,
-    CLUSTER_RADIUS,
-    observation.world_y,
-    CLUSTER_RADIUS,
-    observation.world_z,
-    CLUSTER_RADIUS,
-  ).all<Candidate>();
-
-  const radiusSquared = CLUSTER_RADIUS * CLUSTER_RADIUS;
-  return candidates.results
-    .map(candidate => ({
-      candidate,
-      distanceSquared: distanceSquared(candidate, observation),
-    }))
-    .filter(entry => entry.distanceSquared <= radiusSquared)
-    .sort((left, right) => left.distanceSquared - right.distanceSquared)[0]?.candidate ?? null;
-}
-
-async function createCandidate(
-  db: D1Database,
-  observation: PendingObservation,
-): Promise<Candidate> {
-  const result = await db.prepare(`
-    INSERT INTO observation_candidates (
-      territory_id,
-      data_id,
-      centroid_x,
-      centroid_y,
-      centroid_z,
-      first_observed_at_utc,
-      last_observed_at_utc
-    ) VALUES (?, ?, ?, ?, ?, ?, ?)
-  `).bind(
-    observation.territory_id,
-    observation.data_id,
     observation.world_x,
     observation.world_y,
     observation.world_z,
     observation.observed_at_utc,
-    observation.observed_at_utc,
-  ).run();
+    CLUSTER_RADIUS_SQUARED,
+    ...keyValues,
+  ];
 
-  if (!result.success || result.meta.last_row_id === undefined) {
+  // One statement, so two reports of the same new spot cannot each create a candidate.
+  const inserted = await db.prepare(`
+    INSERT INTO ${tables.candidates} (
+      territory_id, ${tables.keys.map(key => `${key},`).join(" ")}
+      centroid_x, centroid_y, centroid_z,
+      first_observed_at_utc, last_observed_at_utc
+    )
+    SELECT ?1, ${keyParams.map(param => `${param},`).join(" ")} ?2, ?3, ?4, ?5, ?5
+    WHERE NOT EXISTS (SELECT 1 ${nearby})
+  `).bind(...params).run();
+
+  if (!inserted.success) {
     throw new Error("Candidate insert failed.");
   }
 
-  return {
-    id: result.meta.last_row_id,
-    centroid_x: observation.world_x,
-    centroid_y: observation.world_y,
-    centroid_z: observation.world_z,
-  };
+  const nearest = await db.prepare(`
+    SELECT id
+    ${nearby}
+    ORDER BY ${distance}, id
+    LIMIT 1
+  `).bind(...params).first<{ id: number }>();
+
+  if (nearest === null) {
+    throw new Error("Candidate missing after insert.");
+  }
+
+  return nearest.id;
 }
 
 async function assignObservation(
   db: D1Database,
+  kind: ClusterKind,
   candidateId: number,
   observation: PendingObservation,
 ): Promise<boolean> {
+  const tables = CLUSTER_KINDS[kind];
   const inserted = await db.prepare(`
-    INSERT OR IGNORE INTO observation_candidate_members (
+    INSERT OR IGNORE INTO ${tables.members} (
       candidate_id,
       observation_id,
       installation_hash
@@ -223,92 +223,68 @@ async function assignObservation(
     throw new Error("Member insert failed.");
   }
 
+  const markProcessed = db.prepare(`UPDATE ${tables.observations} SET processed = 1 WHERE id = ?`)
+    .bind(observation.id);
+
   if ((inserted.meta.changes ?? 0) === 0) {
-    await db.prepare(`
-      UPDATE observations
-      SET processed = 1
-      WHERE id = ?
-    `).bind(observation.id).run();
+    await markProcessed.run();
     return false;
   }
 
   const results = await db.batch([
-    db.prepare(`
-      SELECT status
-      FROM observation_candidates
-      WHERE id = ?
-    `).bind(candidateId),
+    db.prepare(`SELECT status FROM ${tables.candidates} WHERE id = ?`).bind(candidateId),
     db.prepare(`
       WITH delta AS (
         SELECT IIF(
           EXISTS (
             SELECT 1
-            FROM observation_candidate_members
-            WHERE candidate_id = ?
-              AND installation_hash = ?
-              AND observation_id != ?
+            FROM candidate_reporters
+            WHERE kind = ?1
+              AND candidate_id = ?2
+              AND reporter_hash = ?3
           ),
           0,
           1
         ) AS distinct_delta
+      ),
+      reached AS (
+        SELECT status = 'pending'
+          AND distinct_installation_count + (SELECT distinct_delta FROM delta) >= ?7 AS accept
+        FROM ${tables.candidates}
+        WHERE id = ?2
       )
-      UPDATE observation_candidates
+      UPDATE ${tables.candidates}
       SET observation_count = observation_count + 1,
         distinct_installation_count = distinct_installation_count
           + (SELECT distinct_delta FROM delta),
-        centroid_x = (centroid_x * observation_count + ?) / (observation_count + 1),
-        centroid_y = (centroid_y * observation_count + ?) / (observation_count + 1),
-        centroid_z = (centroid_z * observation_count + ?) / (observation_count + 1),
-        first_observed_at_utc = MIN(first_observed_at_utc, ?),
-        last_observed_at_utc = MAX(last_observed_at_utc, ?),
-        status = CASE
-          WHEN status = 'pending'
-            AND distinct_installation_count + (SELECT distinct_delta FROM delta) >= ?
-            THEN 'accepted'
-          ELSE status
-        END,
-        acceptance_method = CASE
-          WHEN status = 'pending'
-            AND distinct_installation_count + (SELECT distinct_delta FROM delta) >= ?
-            THEN 'automatic'
-          ELSE acceptance_method
-        END,
-        reviewed_at_utc = CASE
-          WHEN status = 'pending'
-            AND distinct_installation_count + (SELECT distinct_delta FROM delta) >= ?
-            THEN COALESCE(reviewed_at_utc, CURRENT_TIMESTAMP)
-          ELSE reviewed_at_utc
-        END,
-        review_note = CASE
-          WHEN status = 'pending'
-            AND distinct_installation_count + (SELECT distinct_delta FROM delta) >= ?
-            THEN ?
-          ELSE review_note
-        END,
+        centroid_x = (centroid_x * observation_count + ?4) / (observation_count + 1),
+        centroid_y = (centroid_y * observation_count + ?5) / (observation_count + 1),
+        centroid_z = (centroid_z * observation_count + ?6) / (observation_count + 1),
+        first_observed_at_utc = MIN(first_observed_at_utc, ?8),
+        last_observed_at_utc = MAX(last_observed_at_utc, ?8),
+        status = IIF((SELECT accept FROM reached), 'accepted', status),
+        acceptance_method = IIF((SELECT accept FROM reached), 'automatic', acceptance_method),
+        reviewed_at_utc = IIF((SELECT accept FROM reached), COALESCE(reviewed_at_utc, CURRENT_TIMESTAMP), reviewed_at_utc),
+        review_note = IIF((SELECT accept FROM reached), ?9, review_note),
         updated_at_utc = CURRENT_TIMESTAMP
-      WHERE id = ?
+      WHERE id = ?2
       RETURNING status
     `).bind(
+      kind,
       candidateId,
-      observation.installation_hash,
-      observation.id,
+      observation.reporter,
       observation.world_x,
       observation.world_y,
       observation.world_z,
+      REVIEW_REPORTER_THRESHOLD,
       observation.observed_at_utc,
-      observation.observed_at_utc,
-      REVIEW_REPORTER_THRESHOLD,
-      REVIEW_REPORTER_THRESHOLD,
-      REVIEW_REPORTER_THRESHOLD,
-      REVIEW_REPORTER_THRESHOLD,
       AUTO_ACCEPT_NOTE,
-      candidateId,
     ),
     db.prepare(`
-      UPDATE observations
-      SET processed = 1
-      WHERE id = ?
-    `).bind(observation.id),
+      INSERT OR IGNORE INTO candidate_reporters (kind, candidate_id, reporter_hash)
+      VALUES (?, ?, ?)
+    `).bind(kind, candidateId, observation.reporter),
+    markProcessed,
   ]);
 
   const previous = results[0].results[0] as { status: string } | undefined;
@@ -318,11 +294,4 @@ async function assignObservation(
 
   const next = results[1].results[0] as { status: string } | undefined;
   return next !== undefined && previous.status === "pending" && next.status === "accepted";
-}
-
-function distanceSquared(candidate: Candidate, observation: PendingObservation): number {
-  const deltaX = candidate.centroid_x - observation.world_x;
-  const deltaY = candidate.centroid_y - observation.world_y;
-  const deltaZ = candidate.centroid_z - observation.world_z;
-  return deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ;
 }

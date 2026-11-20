@@ -18,6 +18,8 @@ public sealed record PotCycleSnapshot
 
     public bool IsRemoteAnchor { get; init; }
 
+    public bool IsPredictedAnchor { get; init; }
+
     public int CurrentActivePotFateId { get; init; }
 
     public int PredictedNextPotFateId { get; init; }
@@ -314,6 +316,7 @@ public sealed class PotCycleTracker
             AnchorPotFateId = anchorId,
             AnchorSpawnAt = anchorSpawn,
             IsRemoteAnchor = previous.IsRemoteAnchor,
+            IsPredictedAnchor = true,
             CurrentActivePotFateId = 0,
             PredictedNextPotFateId = nextPotId,
             PredictedNextSpawnAt = nextPotId == 0 ? DateTimeOffset.MinValue : nextSpawn,

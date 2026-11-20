@@ -5,10 +5,12 @@
  */
 interface Env {
   ADMIN_TOKEN?: string;
+  REPORTER_SALT?: string;
 }
 
 declare namespace Cloudflare {
   interface Env {
     ADMIN_TOKEN?: string;
+  REPORTER_SALT?: string;
   }
 }

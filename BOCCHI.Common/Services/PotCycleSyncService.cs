@@ -340,6 +340,7 @@ public sealed class PotCycleSyncService
             || snap.TerritoryTypeId != territory
             || !snap.HasKnownAnchor
             || snap.IsRemoteAnchor
+            || snap.IsPredictedAnchor
             || snap.AnchorPotFateId == 0
             || snap.AnchorSpawnAt == DateTimeOffset.MinValue)
         {

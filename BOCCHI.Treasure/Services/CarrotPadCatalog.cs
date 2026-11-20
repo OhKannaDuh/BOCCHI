@@ -78,7 +78,7 @@ public static class CarrotPadCatalog
 
             if (bestRemote < 0
                 || bestSq <= MergeRadiusSq
-                || bestSq > CrowdsourcedPadCorrection.CarrotMaxCorrectionSq)
+                || bestSq > CrowdsourcedPadCorrection.MaxCorrectionSq)
             {
                 result.Add(bake);
                 continue;

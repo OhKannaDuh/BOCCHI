@@ -2520,9 +2520,23 @@ public class TreasureHunterService
             }
         }
 
-        MergeBakedTreasurePads(zones.GetZone().GetTreasureData());
-        ApplyCrowdsourcedCofferCorrections(cofferLocations.GetAcceptedForCurrentZone());
-        MergeCrowdsourcedTreasurePads(cofferLocations.GetAcceptedForCurrentZone());
+        int bakedAdded = CofferPadCatalog.MergeBaked(layoutTreasure, zones.GetZone().GetTreasureData());
+        if (bakedAdded > 0)
+        {
+            log.Debug("Treasure hunt: merged {Count} baked location(s) not in active layout", bakedAdded);
+        }
+
+        int corrected = CofferPadCatalog.ApplyCorrections(layoutTreasure, cofferLocations.GetAcceptedForCurrentZone());
+        if (corrected > 0)
+        {
+            log.Info("Treasure hunt: corrected {Count} baked location(s) from shared catalog", corrected);
+        }
+
+        int crowdAdded = CofferPadCatalog.MergeCrowdsourced(layoutTreasure, cofferLocations.GetAcceptedForCurrentZone());
+        if (crowdAdded > 0)
+        {
+            log.Info("Treasure hunt: merged {Count} shared location(s) not in active layout", crowdAdded);
+        }
 
         if (layoutTreasure.Count == 0)
         {
@@ -2555,90 +2569,6 @@ public class TreasureHunterService
 
     private bool TryGetLayout(uint nodeId, out TreasureLayoutDatum layout) =>
         layoutById.TryGetValue(nodeId, out layout);
-
-    private void MergeBakedTreasurePads(List<TreasureData> treasureData)
-    {
-        HashSet<uint> present = layoutTreasure.Select(t => t.Id).ToHashSet();
-        int added = 0;
-        foreach (TreasureData pad in treasureData)
-        {
-            if (pad.Position is not { } baked || !present.Add((uint)pad.Id))
-            {
-                continue;
-            }
-
-            layoutTreasure.Add(new((uint)pad.Id, baked, TreasureCoffer.BronzeSgbId));
-            added++;
-        }
-
-        if (added > 0)
-        {
-            log.Debug("Treasure hunt: merged {Count} baked location(s) not in active layout", added);
-        }
-    }
-
-    private void ApplyCrowdsourcedCofferCorrections(IReadOnlyList<CrowdsourcedCofferCandidate> liveSpots)
-    {
-        if (liveSpots.Count == 0)
-        {
-            return;
-        }
-
-        int corrected = 0;
-        for (int i = 0; i < layoutTreasure.Count; i++)
-        {
-            TreasureLayoutDatum pad = layoutTreasure[i];
-            Vector3 next = CrowdsourcedPadCorrection.CorrectCofferPosition(pad.Id, pad.Position, liveSpots);
-            if (!CrowdsourcedPadCorrection.IsCofferCorrection(pad.Position, next))
-            {
-                continue;
-            }
-
-            layoutTreasure[i] = pad with { Position = next };
-            corrected++;
-        }
-
-        if (corrected > 0)
-        {
-            log.Info("Treasure hunt: corrected {Count} baked location(s) from shared catalog", corrected);
-        }
-    }
-
-    private void MergeCrowdsourcedTreasurePads(IReadOnlyList<CrowdsourcedCofferCandidate> liveSpots)
-    {
-        if (liveSpots.Count == 0)
-        {
-            return;
-        }
-
-        int added = 0;
-        foreach (CrowdsourcedCofferCandidate spot in liveSpots)
-        {
-            if (TreasurePathing.IsUnloadAltitude(spot.Position))
-            {
-                continue;
-            }
-
-            if (layoutTreasure.Any(t =>
-                    Vector3.DistanceSquared(t.Position, spot.Position) <= CofferLocationSyncService.MatchRadiusSq))
-            {
-                continue;
-            }
-
-            if (layoutTreasure.Any(t => t.Id == spot.DataId))
-            {
-                continue;
-            }
-
-            layoutTreasure.Add(new(spot.DataId, spot.Position, TreasureCoffer.BronzeSgbId));
-            added++;
-        }
-
-        if (added > 0)
-        {
-            log.Info("Treasure hunt: merged {Count} shared location(s) not in active layout", added);
-        }
-    }
 
     private void RefreshAuthoredSegmentCache(IHuntRoutePlanner planner)
     {
