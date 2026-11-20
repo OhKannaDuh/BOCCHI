@@ -53,6 +53,7 @@ interface PendingObservation {
   installation_hash: string;
   reporter: string;
   observed_at_utc: string;
+  linked_candidate: number | null;
   [key: string]: unknown;
 }
 
@@ -71,16 +72,12 @@ function pendingQuery(tables: ClusterTables, byId: boolean): string {
       o.world_x, o.world_y, o.world_z,
       o.installation_hash,
       COALESCE(o.reporter_hash, o.installation_hash) AS reporter,
-      o.observed_at_utc
+      o.observed_at_utc,
+      (SELECT m.candidate_id FROM ${tables.members} m WHERE m.observation_id = o.id) AS linked_candidate
     FROM ${tables.observations} o
     WHERE o.processed = 0
       ${keyFilters}
       ${byId ? "AND o.id = ?" : ""}
-      AND NOT EXISTS (
-        SELECT 1
-        FROM ${tables.members} m
-        WHERE m.observation_id = o.id
-      )
     ORDER BY o.id
     LIMIT ?
   `;
@@ -133,7 +130,7 @@ async function processOne(
       return { scanned: 1, assigned: 0, failed: 0, newlyAccepted: 0 };
     }
 
-    const candidateId = await findOrCreateCandidate(db, tables, observation);
+    const candidateId = observation.linked_candidate ?? await findOrCreateCandidate(db, tables, observation);
     const newlyAccepted = await assignObservation(db, kind, candidateId, observation);
     return {
       scanned: 1,
@@ -211,27 +208,29 @@ async function assignObservation(
   observation: PendingObservation,
 ): Promise<boolean> {
   const tables = CLUSTER_KINDS[kind];
-  const inserted = await db.prepare(`
-    INSERT OR IGNORE INTO ${tables.members} (
-      candidate_id,
-      observation_id,
-      installation_hash
-    ) VALUES (?, ?, ?)
-  `).bind(candidateId, observation.id, observation.installation_hash).run();
-
-  if (!inserted.success) {
-    throw new Error("Member insert failed.");
-  }
-
-  const markProcessed = db.prepare(`UPDATE ${tables.observations} SET processed = 1 WHERE id = ?`)
-    .bind(observation.id);
-
-  if ((inserted.meta.changes ?? 0) === 0) {
-    await markProcessed.run();
-    return false;
-  }
+  // Link, count and mark in one batch so a report is never linked without being counted.
+  const counts = `
+    EXISTS (SELECT 1 FROM ${tables.members} WHERE observation_id = ?10 AND candidate_id = ?2)
+    AND (SELECT processed FROM ${tables.observations} WHERE id = ?10) = 0`;
+  const params = [
+    kind,
+    candidateId,
+    observation.reporter,
+    observation.world_x,
+    observation.world_y,
+    observation.world_z,
+    REVIEW_REPORTER_THRESHOLD,
+    observation.observed_at_utc,
+    AUTO_ACCEPT_NOTE,
+    observation.id,
+    observation.linked_candidate === null ? 0 : 1,
+  ];
 
   const results = await db.batch([
+    db.prepare(`
+      INSERT OR IGNORE INTO ${tables.members} (candidate_id, observation_id, installation_hash)
+      VALUES (?, ?, ?)
+    `).bind(candidateId, observation.id, observation.installation_hash),
     db.prepare(`SELECT status FROM ${tables.candidates} WHERE id = ?`).bind(candidateId),
     db.prepare(`
       WITH delta AS (
@@ -242,7 +241,17 @@ async function assignObservation(
             WHERE kind = ?1
               AND candidate_id = ?2
               AND reporter_hash = ?3
-          ),
+          )
+          -- Migration 0014 put reporters of linked-but-uncounted rows in the ledger, so those rows need a counted twin.
+          AND (?11 = 0 OR EXISTS (
+            SELECT 1
+            FROM ${tables.members} m
+            JOIN ${tables.observations} o ON o.id = m.observation_id
+            WHERE m.candidate_id = ?2
+              AND m.observation_id <> ?10
+              AND o.processed = 1
+              AND COALESCE(o.reporter_hash, o.installation_hash) = ?3
+          )),
           0,
           1
         ) AS distinct_delta
@@ -267,31 +276,22 @@ async function assignObservation(
         reviewed_at_utc = IIF((SELECT accept FROM reached), COALESCE(reviewed_at_utc, CURRENT_TIMESTAMP), reviewed_at_utc),
         review_note = IIF((SELECT accept FROM reached), ?9, review_note),
         updated_at_utc = CURRENT_TIMESTAMP
-      WHERE id = ?2
+      WHERE id = ?2 AND ${counts}
       RETURNING status
-    `).bind(
-      kind,
-      candidateId,
-      observation.reporter,
-      observation.world_x,
-      observation.world_y,
-      observation.world_z,
-      REVIEW_REPORTER_THRESHOLD,
-      observation.observed_at_utc,
-      AUTO_ACCEPT_NOTE,
-    ),
+    `).bind(...params),
     db.prepare(`
       INSERT OR IGNORE INTO candidate_reporters (kind, candidate_id, reporter_hash)
-      VALUES (?, ?, ?)
-    `).bind(kind, candidateId, observation.reporter),
-    markProcessed,
+      SELECT ?1, ?2, ?3
+      WHERE ${counts}
+    `).bind(...params.slice(0, 10)),
+    db.prepare(`UPDATE ${tables.observations} SET processed = 1 WHERE id = ?`).bind(observation.id),
   ]);
 
-  const previous = results[0].results[0] as { status: string } | undefined;
+  const previous = results[1].results[0] as { status: string } | undefined;
   if (previous === undefined) {
     throw new Error("Candidate missing during assign.");
   }
 
-  const next = results[1].results[0] as { status: string } | undefined;
+  const next = results[2].results[0] as { status: string } | undefined;
   return next !== undefined && previous.status === "pending" && next.status === "accepted";
 }

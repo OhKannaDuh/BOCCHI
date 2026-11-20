@@ -18,6 +18,8 @@ public static class TreasureHuntPathOverrides
     [
         // Unhallowed Hamlet basement — vnav cannot finish the stair run reliably; high death risk.
         (ZoneId.NorthHorn, 2072u),
+        // Wanderer's Haven ledge — the stuck-jump can't climb it; re-enable once an approach point is measured.
+        (ZoneId.SouthHorn, 1842u),
     ];
 
     /// <summary>

@@ -35,9 +35,12 @@ public class WaitingHandler
 
     private readonly FarmerWalkStuckAssist stuckAssist = new();
 
+    private DateTime? readySinceUtc;
+
     public override void Exit(FarmerPhase next)
     {
         stuckAssist.Reset();
+        readySinceUtc = null;
         base.Exit(next);
     }
 
@@ -80,13 +83,17 @@ public class WaitingHandler
             }
         }
 
+        readySinceUtc ??= DateTime.UtcNow;
         int free = MobFarmerPack.CountTowardMinimum(scanner.NotInCombat, config.CountSpecialMobsTowardMinimum);
         if (free == 0)
         {
             return null;
         }
 
-        return free >= config.MinimumMobsToStartLoop ? FarmerPhase.Buffing : null;
+        return free >= config.MinimumMobsToStartLoop
+               || DateTime.UtcNow - readySinceUtc >= TimeSpan.FromSeconds(config.StackingTimeoutSeconds)
+            ? FarmerPhase.Buffing
+            : null;
     }
 
     private bool TryRecoverFromStuck(float distance, Vector3 goal)

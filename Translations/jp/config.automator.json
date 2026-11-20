@@ -9,7 +9,8 @@
     "triage": "トリアージ",
     "treasure": "トレジャー",
     "delays": "待機",
-    "repair": "修理"
+    "repair": "修理",
+    "death": "戦闘不能"
   },
   "fields": {
     "should_do_fates": {
@@ -187,6 +188,18 @@
     "pause_auto_treasure_hunt_for_critical_encounter": {
       "label": "自動トレジャーハントを CE で一時停止",
       "tooltip": "オン：自動トレジャーハント中にクリティカルエンカウンターがあると一時停止し、終わったら近くから再開。CE 出現時に戦闘中なら、戦闘が終わるまで一時停止を待つ。\nオフ：トレジャーサイトありのときは CE 中もハントを続ける（サイトなしで内蔵の宝箱一覧を使うときはいつも一時停止）。\n不正モードの自動トレジャーハントが必要。"
+    },
+    "auto_accept_raise": {
+      "label": "蘇生を受け入れる",
+      "tooltip": "オカルトクレセントで蘇生を受けたらすぐに受け入れます。"
+    },
+    "return_to_base_camp_after_death": {
+      "label": "蘇生されなければベースキャンプへ戻る",
+      "tooltip": "誰にも蘇生されない場合、下の待ち時間のあとにベースキャンプへ戻ります。\nフォークタワーやCEの中では戻りません。"
+    },
+    "return_after_death_delay_seconds": {
+      "label": "戻るまでの待ち時間（秒）",
+      "tooltip": "ベースキャンプへ戻る前に蘇生を待つ時間です。"
     }
   }
 }

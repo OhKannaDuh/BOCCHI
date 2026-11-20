@@ -109,7 +109,7 @@ public static class CombatAutorotationSetup
             && !pluginStatus.IsLoaded(JobRotationBackendKeys.BossModReborn))
         {
             printError(
-                "Combat rotation isn’t ready — load BossMod or BossMod Reborn, then pick it under General → Combat rotation.");
+                "Without BossMod or BossMod Reborn, nothing picks targets or moves you in fights — your rotation only attacks what you target yourself.");
         }
     }
 }

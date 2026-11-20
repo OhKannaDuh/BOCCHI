@@ -1,10 +1,11 @@
 ﻿using BOCCHI.Automator.Data;
+using BOCCHI.Automator.Services;
 using BOCCHI.Common.Data.StateMemory;
+using BOCCHI.Common.Data.Zones;
 using BOCCHI.Common.Services;
+using BOCCHI.Treasure.Services;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Plugin.Services;
-using ECommons.Throttlers;
-using Ocelot.Actions;
 using Ocelot.Services.Pathfinding;
 using Ocelot.States.Score;
 
@@ -17,13 +18,21 @@ public class InCombatHandler
     IFateContext fateContext,
     ICriticalEncounterContext criticalEncounterContext,
     IPathfinder pathfinder,
-    IAutomatorMemory memory
+    IAutomatorMemory memory,
+    AutoRotationController autoRotation
 ) : ScoreStateHandler<AutomatorState, StatePriority>(AutomatorState.InCombat)
 {
+    private const StatePriority AboveWaiting = StatePriority.VeryHigh + 1;
+
+    private bool defendingWaitSpot;
+
+    private bool aiEnabled;
+
     public override StatePriority GetScore()
     {
-        if (objects.LocalPlayer == null)
+        if (objects.LocalPlayer == null || !conditions[ConditionFlag.InCombat])
         {
+            defendingWaitSpot = false;
             return StatePriority.Never;
         }
 
@@ -32,20 +41,28 @@ public class InCombatHandler
             return StatePriority.Never;
         }
 
-        // Pot chest farming also scores High, and this handler only dismounts and stops the
-        // pathfinder — so winning the tie just interrupts the farm on every combat flicker.
+        // Pot chest farming also scores High and runs its own fight-or-keep-searching logic.
         if (memory.TryRemember<PotChestFarmMemory>(out PotChestFarmMemory _)
             || memory.TryRemember<PendingPotChestFarmMemory>(out PendingPotChestFarmMemory _))
         {
             return StatePriority.Never;
         }
 
-        if (memory.TryRemember<GoalPathStepMemory>(out GoalPathStepMemory _))
+        // The pot wait forgets its memory on exit, so remember here or the two states flip every tick.
+        defendingWaitSpot |= memory.TryRemember<WaitingForPotFateMemory>(out WaitingForPotFateMemory _)
+            || memory.TryRemember<WaitingForCriticalEncounterMemory>(out WaitingForCriticalEncounterMemory _)
+            || memory.TryRemember<WaitingForForkedTowerMemory>(out WaitingForForkedTowerMemory _);
+        if (defendingWaitSpot)
         {
-            return StatePriority.Never;
+            return AboveWaiting;
         }
 
-        return conditions[ConditionFlag.InCombat] ? StatePriority.High : StatePriority.Never;
+        if (memory.TryRemember<GoalPathStepMemory>(out GoalPathStepMemory _))
+        {
+            return KnowledgeThreat.CanFightAggro(objects) ? StatePriority.High + 1 : StatePriority.Never;
+        }
+
+        return StatePriority.High;
     }
 
     public override void Handle()
@@ -55,13 +72,30 @@ public class InCombatHandler
             return;
         }
 
-        if (conditions[ConditionFlag.Mounted])
+        pathfinder.Stop();
+        if (DismountAssist.TryDismount(conditions) || aiEnabled)
         {
-            if (EzThrottler.Throttle("InCombat::Unmount") && Actions.Unmount.CanCast())
-            {
-                Actions.Unmount.Cast();
-                pathfinder.Stop();
-            }
+            return;
+        }
+
+        aiEnabled = true;
+        autoRotation.EnableForSelfDefence();
+    }
+
+    public override void Enter()
+    {
+        base.Enter();
+        aiEnabled = false;
+    }
+
+    public override void Exit(AutomatorState next)
+    {
+        base.Exit(next);
+        defendingWaitSpot = false;
+        if (aiEnabled)
+        {
+            aiEnabled = false;
+            autoRotation.DisableAi();
         }
     }
 }

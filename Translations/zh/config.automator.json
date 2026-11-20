@@ -9,7 +9,8 @@
     "triage": "急救",
     "treasure": "寻宝",
     "delays": "等待",
-    "repair": "修理"
+    "repair": "修理",
+    "death": "战斗不能"
   },
   "fields": {
     "should_do_fates": {
@@ -187,6 +188,18 @@
     "pause_auto_treasure_hunt_for_critical_encounter": {
       "label": "紧急遭遇时暂停自动寻宝",
       "tooltip": "开启：自动寻宝进行中若有紧急遭遇则暂停，结束后从附近继续。紧急遭遇出现时若仍在战斗中，会等战斗结束后再暂停。\n关闭：有魔寻宝时紧急遭遇中仍继续寻宝（无魔寻宝而用默认宝箱列表时总会暂停）。\n需要开启违规模式中自动寻宝。"
+    },
+    "auto_accept_raise": {
+      "label": "接受复活",
+      "tooltip": "在新月岛有人复活你时立即接受。"
+    },
+    "return_to_base_camp_after_death": {
+      "label": "未被复活时返回营地",
+      "tooltip": "如果没人复活你，在下面的等待时间后返回营地。\n在分叉塔或紧急遭遇战中不会返回。"
+    },
+    "return_after_death_delay_seconds": {
+      "label": "返回前等待（秒）",
+      "tooltip": "返回营地前等待复活的时间。"
     }
   }
 }

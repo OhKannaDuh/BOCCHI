@@ -107,11 +107,9 @@ public class WaitingForForkedTowerHandler
         vnav.Stop();
 
         if (!config.StayMountedWhileWaitingForCe
-            && conditions[ConditionFlag.Mounted]
-            && EzThrottler.Throttle("WaitingForForkedTower::Unmount")
-            && Actions.Unmount.CanCast())
+            && DismountAssist.IsMounted(conditions))
         {
-            Actions.Unmount.Cast();
+            DismountAssist.TryDismount(conditions);
         }
 
         if (!wait.ReminderPrinted)

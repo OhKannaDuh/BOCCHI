@@ -93,6 +93,7 @@ public class GatheringHandler
         }
 
         float dist = player.Position.Distance2D(current.Position);
+        bool pulled = current.IsTargetingPlayer(objects.LocalPlayer);
         if (dist <= FarmerPullAssist.PullRange)
         {
             // Non-tanks have no pull tool; without the AI nothing ever starts the fight.
@@ -100,13 +101,18 @@ public class GatheringHandler
             {
                 pull.TryPull(current);
             }
-            else
+            else if (!pulled)
             {
                 farmer.RequestAiPull();
+                // vnav movement cancels the AI's cast, so stand still until the mob is tagged.
+                if (farmer.CanAiPull && dist <= player.GetAttackRange() + current.HitboxRadius)
+                {
+                    pathfinder.Stop();
+                    return null;
+                }
             }
         }
 
-        bool pulled = current.IsTargetingPlayer(objects.LocalPlayer);
         Vector3 destination = Destination(current.Position, nextPos, dist, pulled);
 
         FarmerWalkStuckAssist.Recovery recovery = stuckAssist.Tick(

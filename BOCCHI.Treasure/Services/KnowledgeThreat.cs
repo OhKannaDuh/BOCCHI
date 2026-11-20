@@ -1,5 +1,6 @@
 using System.Numerics;
 using BOCCHI.Common.Data.Mobs;
+using BOCCHI.Common.Extensions;
 using BOCCHI.Common.Services;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Plugin.Services;
@@ -98,6 +99,32 @@ public static class KnowledgeThreat
         }
 
         return threat != null;
+    }
+
+    public static unsafe bool CanFightAggro(IObjectTable objects)
+    {
+        if (objects.LocalPlayer is not { } player)
+        {
+            return false;
+        }
+
+        if (TryGetPlayerForayLevel(objects) is not int playerLevel)
+        {
+            return true;
+        }
+
+        foreach (IGameObject obj in objects)
+        {
+            if (obj is IBattleNpc { IsDead: false } battle
+                && battle.IsHostile()
+                && battle.IsTargetingPlayer(player)
+                && ((BattleChara*)battle.Address)->ForayInfo.Level > playerLevel)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public static bool TryFindIsleblazer(IObjectTable objects, Vector3 origin, float radius, out float distance)

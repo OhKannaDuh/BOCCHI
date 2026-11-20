@@ -52,6 +52,8 @@ namespace BOCCHI.MobFarmer.Services
 
         void RequestAiPull();
 
+        bool CanAiPull { get; }
+
         void Toggle();
 
         void SetSuspended(bool suspended, FarmerYieldReason reason = FarmerYieldReason.None);

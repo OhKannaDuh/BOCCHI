@@ -31,6 +31,7 @@ public sealed class FarmerCombatController(
                 rsr,
                 message => CombatAutorotationSetup.PrintError(chat, uiConfig, message)))
         {
+            session.Teardown();
             return;
         }
 
@@ -38,9 +39,20 @@ public sealed class FarmerCombatController(
         session.Disable();
     }
 
-    public void EnableFighting() => session.Enable(CombatActivity.MobFarm);
+    public void EnableFighting()
+    {
+        if (!automatorConfig.CombatAutorotation.UsesCombatAutomation())
+        {
+            session.Teardown();
+            return;
+        }
+
+        session.Enable(CombatActivity.MobFarm);
+    }
 
     public void Disable() => session.Disable();
+
+    public bool IsActive => session.ActiveRecipe.IsActive;
 
     public void Tick()
     {

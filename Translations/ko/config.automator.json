@@ -9,7 +9,8 @@
     "triage": "다른 유저 부활",
     "treasure": "보물",
     "delays": "대기",
-    "repair": "수리"
+    "repair": "수리",
+    "death": "전투 불능"
   },
   "fields": {
     "should_do_fates": {
@@ -187,6 +188,18 @@
     "pause_auto_treasure_hunt_for_critical_encounter": {
       "label": "비상 조우 때 자동 보물 찾기 일시 중지",
       "tooltip": "켜짐: 자동 보물 찾기 중 비상 조우가 있으면 잠시 멈추고, 끝난 뒤 근처에서 재개. 비상 조우가 떴을 때 전투 중이면 전투가 끝날 때까지 일시 중지를 기다림.\n꺼짐: 탐색이 있으면 비상 조우 중에도 보물 찾기를 계속함(탐색 없이 기본 상자 목록을 쓸 때는 항상 일시 중지).\n자동 모드 자동 보물 찾기가 필요."
+    },
+    "auto_accept_raise": {
+      "label": "부활 수락",
+      "tooltip": "오컬트 크레센트에서 부활을 받으면 바로 수락합니다."
+    },
+    "return_to_base_camp_after_death": {
+      "label": "부활되지 않으면 베이스캠프로 귀환",
+      "tooltip": "아무도 부활시켜 주지 않으면 아래 대기 시간 후 베이스캠프로 돌아갑니다.\n포크 타워나 CE 안에서는 돌아가지 않습니다."
+    },
+    "return_after_death_delay_seconds": {
+      "label": "귀환 전 대기 시간(초)",
+      "tooltip": "베이스캠프로 돌아가기 전에 부활을 기다리는 시간입니다."
     }
   }
 }

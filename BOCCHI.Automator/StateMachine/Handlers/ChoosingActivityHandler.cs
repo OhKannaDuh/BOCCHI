@@ -194,10 +194,8 @@ public class ChoosingActivityHandler
                 automatorConfig.ShouldPrepositionToPots))
         {
             return SkipPreposition(
-                !automatorConfig.ShouldDoFates
-                    ? "\"Do FATEs\" is off"
-                    : $"pot FATE {cycle.PredictedNextPotFateId} is not an allowed FATE "
-                      + "(tick it under Allowed FATEs, or turn on \"Prefer pot FATEs\")");
+                $"pot FATE {cycle.PredictedNextPotFateId} is not an allowed FATE "
+                + "(tick it under Allowed FATEs, or turn on \"Prefer pot FATEs\")");
         }
 
         if (CompletionistBlocksFate((uint)cycle.PredictedNextPotFateId))

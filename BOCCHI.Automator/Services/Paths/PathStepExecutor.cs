@@ -68,11 +68,19 @@ public class PathStepExecutor
                         conditions,
                         objects,
                         destination,
-                        movement.ShouldAutoMount,
+                        movement.ShouldAutoMount && !IsShortHopNearPot(zone, destination),
                         movement.PreferredMountId,
                         zone.IsInBasecamp(),
                         zone);
                 },
             });
+    }
+
+    private bool IsShortHopNearPot(IZone zone, System.Numerics.Vector3 destination)
+    {
+        const float reach = NavigationConstants.PotPrepositionMaxRadius * 1.5f;
+        return objects.LocalPlayer is { } player
+               && player.Position.Distance2D(destination) <= reach
+               && zone.GetPotFateData().Any(p => p.Position.Distance2D(destination) <= reach);
     }
 }

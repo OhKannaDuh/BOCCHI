@@ -1,4 +1,5 @@
 using System.Numerics;
+using BOCCHI.Common.Data.Zones;
 using BOCCHI.Common.Targeting;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.Types;
@@ -42,12 +43,9 @@ internal static class CombatActivityHandler
         float distance = player.Position.Distance2D(target.Position) - target.HitboxRadius;
         bool nearTarget = distance <= DismountRange;
 
-        if (conditions[ConditionFlag.Mounted]
-            && nearTarget
-            && EzThrottler.Throttle($"{throttlePrefix}::Unmount")
-            && Actions.Unmount.CanCast())
+        if (nearTarget && DismountAssist.IsMounted(conditions))
         {
-            Actions.Unmount.Cast();
+            DismountAssist.TryDismount(conditions);
             pathfinder.Stop();
             return false;
         }

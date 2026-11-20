@@ -45,6 +45,7 @@ public class AutoRotationController(
                 rsr,
                 message => CombatAutorotationSetup.PrintError(chat, uiConfig, message)))
         {
+            session.Teardown();
             return;
         }
 
@@ -99,12 +100,25 @@ public class AutoRotationController(
     {
         session.OverwriteBossModPresets = config.UpdateBossModPresetsAutomatically;
         session.MovementSettings = BossModMovement.From(config, player.IsMelee(), player.GetClassJob()?.RowId);
+        if (!config.CombatAutorotation.UsesCombatAutomation() && session.ActiveRecipe.IsActive)
+        {
+            session.Teardown();
+            lastEnabledActivity = null;
+        }
+
         SyncActivityCombat();
         session.Tick(CurrentPhantomJobId());
     }
 
     private void EnableActivity(CombatActivity activity)
     {
+        if (!config.CombatAutorotation.UsesCombatAutomation())
+        {
+            session.Teardown();
+            lastEnabledActivity = null;
+            return;
+        }
+
         // Re-issuing Enable every tick made RSR flip Targeting Henched ↔ Off in FATEs (Lumi).
         if (lastEnabledActivity == activity)
         {

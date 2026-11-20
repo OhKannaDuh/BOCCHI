@@ -39,6 +39,8 @@ public class MobFarmerService
 
     private bool aiPullRequested;
 
+    private bool gatheringAiOn;
+
     private IStateMachine<FarmerPhase> StateMachine => stateMachine ??= stateMachineFactory();
 
     public bool Running { get; private set; }
@@ -182,17 +184,22 @@ public class MobFarmerService
             return;
         }
 
-        // Self-defence while still gathering / buffing / stacking — AI used to stay off until Fighting.
-        if (Phase == FarmerPhase.Fighting
-            || ((Phase is FarmerPhase.Gathering or FarmerPhase.Buffing or FarmerPhase.Stacking)
-                && (scanner.InCombat.Any() || conditions[ConditionFlag.InCombat] || aiPullRequested)))
+        // Outside the fight the rotation only runs to tag a mob, or it spends cooldowns before the pack is stacked.
+        if (Phase == FarmerPhase.Fighting)
         {
-            if (Phase != FarmerPhase.Fighting)
-            {
-                combat.EnableFighting();
-            }
-
+            gatheringAiOn = false;
             combat.Tick();
+        }
+        else if (aiPullRequested)
+        {
+            gatheringAiOn = true;
+            combat.EnableFighting();
+            combat.Tick();
+        }
+        else if (gatheringAiOn)
+        {
+            gatheringAiOn = false;
+            combat.Disable();
         }
 
         if (Phase == FarmerPhase.Waiting && spots.TickClaimed(scanner))
@@ -206,6 +213,8 @@ public class MobFarmerService
     }
 
     public void RequestAiPull() => aiPullRequested = true;
+
+    public bool CanAiPull => combat.IsActive;
 
     private void StopInternal()
     {

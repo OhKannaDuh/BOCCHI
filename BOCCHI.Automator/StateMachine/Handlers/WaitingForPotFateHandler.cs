@@ -128,11 +128,9 @@ public class WaitingForPotFateHandler
             return;
         }
 
-        if (conditions[ConditionFlag.Mounted]
-            && EzThrottler.Throttle("WaitingForPotFate::Unmount")
-            && Actions.Unmount.CanCast())
+        if (DismountAssist.IsMounted(conditions))
         {
-            Actions.Unmount.Cast();
+            DismountAssist.TryDismount(conditions);
             pathfinder.Stop();
         }
     }

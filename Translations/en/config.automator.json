@@ -9,7 +9,8 @@
     "triage": "Triage",
     "treasure": "Treasure",
     "delays": "Delays",
-    "repair": "Repair"
+    "repair": "Repair",
+    "death": "Death"
   },
   "fields": {
     "should_do_fates": {
@@ -187,6 +188,18 @@
     "pause_auto_treasure_hunt_for_critical_encounter": {
       "label": "Pause auto treasure hunt for CEs",
       "tooltip": "On: while Auto treasure hunt is running, pause when a Critical Encounter is available (or already in one), then resume nearby afterward. If you are in combat when a CE opens, waits until combat ends before pausing.\nOff: with Treasure Sight, keep hunting through CEs (a hunt using the default chest list always pauses for CEs).\nNeeds Auto treasure hunt in Illegal Mode."
+    },
+    "auto_accept_raise": {
+      "label": "Accept raises",
+      "tooltip": "Accepts a raise as soon as someone offers one, in Occult Crescent."
+    },
+    "return_to_base_camp_after_death": {
+      "label": "Return to camp if not raised",
+      "tooltip": "If nobody raises you, returns you to base camp after the delay below.\nNever inside Forked Tower or a critical encounter."
+    },
+    "return_after_death_delay_seconds": {
+      "label": "Wait before returning (seconds)",
+      "tooltip": "How long to wait for a raise before returning to base camp."
     }
   }
 }

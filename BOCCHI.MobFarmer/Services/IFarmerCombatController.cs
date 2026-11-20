@@ -8,6 +8,8 @@ public interface IFarmerCombatController
 
     void Disable();
 
+    bool IsActive { get; }
+
     void Tick();
 
     void Teardown();

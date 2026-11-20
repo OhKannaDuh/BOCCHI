@@ -38,7 +38,7 @@ public class FatesConfig : IAutoConfig
         bool shouldFarmPotChests,
         bool shouldPrepositionToPots)
     {
-        if (!shouldDoFates || (!shouldFarmPotChests && !shouldPrepositionToPots))
+        if (!shouldFarmPotChests && !shouldPrepositionToPots)
         {
             return false;
         }

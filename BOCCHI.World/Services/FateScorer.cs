@@ -22,10 +22,10 @@ public class FateScorer
     {
         FateScore score = new();
 
-        if (!automatorConfig.ShouldDoFates || !config.IsFateEnabledForIllegalMode(
-                fate.Id.Value,
-                zones.GetZone().IsPotFate(fate.Id.Value),
-                automatorConfig.PreferPotFates))
+        bool isPot = zones.GetZone().IsPotFate(fate.Id.Value);
+        bool potAllowed = isPot && (automatorConfig.ShouldFarmPotChests || automatorConfig.ShouldPrepositionToPots);
+        if ((!automatorConfig.ShouldDoFates && !potAllowed)
+            || !config.IsFateEnabledForIllegalMode(fate.Id.Value, isPot, automatorConfig.PreferPotFates))
         {
             return score;
         }

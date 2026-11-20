@@ -77,7 +77,7 @@ public static class NavigationConstants
 
     public const float PotPrepositionMinRadius = 12f;
 
-    public const float PotPrepositionMaxRadius = 32f;
+    public const float PotPrepositionMaxRadius = 20f;
 
     public const float MountMinDistance = 20f;
 

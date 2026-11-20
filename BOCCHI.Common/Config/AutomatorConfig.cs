@@ -129,4 +129,13 @@ public class AutomatorConfig : IAutoConfig
 
     [EnumSelectDisplay<AutoRepairMethod, AutoRepairMethodDisplay>(Order = 22, Section = "repair")]
     public AutoRepairMethod AutoRepairMethod { get; set; } = AutoRepairMethod.SelfRepair;
+
+    [Checkbox(Order = 23, Section = "death")]
+    public bool AutoAcceptRaise { get; set; } = false;
+
+    [Checkbox(Order = 24, Section = "death")]
+    public bool ReturnToBaseCampAfterDeath { get; set; } = false;
+
+    [IntRange(10, 300, Order = 25, Indent = 1, Requires = nameof(ReturnToBaseCampAfterDeath), Section = "death")]
+    public int ReturnAfterDeathDelaySeconds { get; set; } = 60;
 }

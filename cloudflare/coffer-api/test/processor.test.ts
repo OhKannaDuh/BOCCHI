@@ -169,6 +169,48 @@ test("simultaneous reports of a new spot share one candidate", async () => {
   ]);
 });
 
+test("a report linked but never counted is counted once on the next run", async () => {
+  addCoffer("one", "ip-a");
+  addCoffer("two", "ip-b");
+  await processPendingObservations(env, "coffers");
+  const stuck = addCoffer("three", "ip-c");
+  db.prepare("INSERT INTO observation_candidate_members (candidate_id, observation_id, installation_hash) VALUES (?, ?, 'three')")
+    .run(cofferCandidates()[0].id as number, stuck);
+
+  await processPendingObservations(env, "coffers");
+  await processPendingObservations(env, "coffers");
+
+  assert.deepEqual(cofferCandidates().map(c => [c.status, c.observation_count, c.distinct_installation_count]), [
+    ["accepted", 3, 3],
+  ]);
+});
+
+test("a stuck report whose reporter the migration already recorded still counts", async () => {
+  addCoffer("one", "ip-a");
+  addCoffer("two", "ip-b");
+  await processPendingObservations(env, "coffers");
+  const candidateId = cofferCandidates()[0].id as number;
+  const stuck = addCoffer("three", "ip-c");
+  db.prepare("INSERT INTO observation_candidate_members (candidate_id, observation_id, installation_hash) VALUES (?, ?, 'three')")
+    .run(candidateId, stuck);
+  db.prepare("INSERT INTO candidate_reporters (kind, candidate_id, reporter_hash) VALUES ('coffers', ?, 'ip-c')")
+    .run(candidateId);
+
+  await processPendingObservations(env, "coffers");
+
+  assert.deepEqual(cofferCandidates().map(c => [c.status, c.observation_count, c.distinct_installation_count]), [
+    ["accepted", 3, 3],
+  ]);
+});
+
+test("the same report processed twice at once is counted once", async () => {
+  const id = addCoffer("one", "ip-a");
+
+  await Promise.all([processObservationById(env, "coffers", id), processPendingObservations(env, "coffers")]);
+
+  assert.deepEqual(cofferCandidates().map(c => [c.observation_count, c.distinct_installation_count]), [[1, 1]]);
+});
+
 test("rows without a reporter hash fall back to the installation hash", async () => {
   for (const hash of ["one", "two", "three"]) {
     db.prepare(`
