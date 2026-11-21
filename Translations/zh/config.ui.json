@@ -1,11 +1,11 @@
 {
   "label": "界面",
-  "tooltip": "语言、主窗口分区、奖励图标、统计图表。",
+  "tooltip": "语言、显示哪些标签页和统计，以及聊天消息。",
   "sections": {
     "general": "常规",
     "trackers": "统计",
-    "events": "活动",
-    "panels": "主窗口",
+    "events": "奖励图标",
+    "panels": "标签页",
     "chat": "聊天"
   },
   "fields": {
@@ -29,14 +29,14 @@
     },
     "show_active_treasure_tracker": {
       "label": "显示可采青铜 / 白银",
-      "tooltip": "开：在统计区显示魔寻宝剩余的青铜 / 白银。\n关：仅在寻宝猎人分区显示。\n施放魔寻宝后更新数量。"
+      "tooltip": "把鼠标移到统计行上时，显示还剩多少青铜和白银宝箱。使用魔寻宝后数字会更新。"
     },
     "show_world_section": {
-      "label": "显示危命任务与紧急遭遇战列表"
+      "label": "显示“世界”标签页（危命和紧急遭遇战）"
     },
     "show_demiatma_drops": {
       "label": "显示魂晶掉落（南部）",
-      "tooltip": "绿框：仍需要。\n红框：已有 3 个。"
+      "tooltip": "绿框：你还需要。\n红框：你已有 3 个。"
     },
     "show_note_drops": {
       "label": "显示调查笔记掉落"
@@ -48,23 +48,23 @@
       "label": "显示附加增益按钮"
     },
     "show_automation_section": {
-      "label": "显示违规模式板块"
+      "label": "显示“违规模式”标签页"
     },
     "show_completionist_section": {
-      "label": "显示收集者板块"
+      "label": "显示收集者"
     },
     "show_mob_farmer_section": {
-      "label": "显示刷怪板块"
+      "label": "显示“刷怪”标签页"
     },
     "show_pots_treasure_section": {
-      "label": "显示魔法罐与寻宝板块"
+      "label": "显示“魔法罐与寻宝”标签页"
     },
     "show_treasure_section": {
-      "label": "显示寻宝板块"
+      "label": "显示“寻宝”标签页"
     },
     "show_bocchi_chat_prefix": {
       "label": "显示 BOCCHI 聊天消息",
-      "tooltip": "开启：在聊天中显示带 [BOCCHI] 标签的插件消息。\n关闭：隐藏（启动 MOTD 仍显示）。"
+      "tooltip": "在聊天栏中输出 BOCCHI 的消息，并标注 [BOCCHI]。"
     }
   }
 }

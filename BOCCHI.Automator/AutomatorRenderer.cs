@@ -32,6 +32,8 @@ public class AutomatorRenderer
 
     public void Render()
     {
+        BocchiUi.DrawIntro(translator.T(".automation.automator.description"));
+
         if (ImGui.Button(Automator.Enabled
             ? translator.T(".automation.automator.disable")
             : translator.T(".automation.automator.enable")))

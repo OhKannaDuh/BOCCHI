@@ -1,6 +1,6 @@
 {
   "label": "버프",
-  "tooltip": "서포트 잡 버프를 자동으로 유지.",
+  "tooltip": "지식 크리스탈 버프를 계속 유지합니다.",
   "sections": {
     "automation": "자동화",
     "which": "어떤 버프"
@@ -8,7 +8,7 @@
   "fields": {
     "should_automate_buffs": {
       "label": "버프 자동화",
-      "tooltip": "켬: 자동 모드 중과 몹 파머의 크리스탈 버프 일시정지 시, 선택한 버프를 지식 크리스탈에서 갱신.\n끔: 자동 버프 갱신 없음."
+      "tooltip": "아래에서 체크한 버프가 곧 끝나면 지식 크리스탈에서 다시 겁니다. 자동 모드와 몹 파머에서 쓰입니다."
     },
     "apply_romeos_ballad": {
       "label": "사랑의 노래"
@@ -24,7 +24,7 @@
     },
     "apply_buffs_using_inquiring_mind": {
       "label": "가능하면 탐구심 사용",
-      "tooltip": "지식 크리스탈 근처에서 서포트 자유직이 선택한 해금 버프를 한 번에 겁니다."
+      "tooltip": "지식 크리스탈 근처에서 서포트 자유직은 체크한 버프를 한 번에 걸 수 있습니다."
     },
     "reapply_threshold": {
       "label": "남은 (분) 이하에서 다시 걸기"

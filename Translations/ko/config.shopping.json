@@ -1,21 +1,21 @@
 {
   "label": "쇼핑",
-  "tooltip": "은화 또는 금화가 임계값에 도달하면 다른 자동화를 잠시 멈추고, 필요하면 본진으로 리턴한 뒤 Knightshopper의 Occult Crescent 쇼핑 목록을 시작합니다. Knightshopper가 필요합니다(의존성 참조). FATE/CE 중에는 시작하지 않습니다.",
+  "tooltip": "은화나 금화가 충분히 모이면 BOCCHI가 멈추고 캠프로 돌아가 Knightshopper로 목록의 물건을 삽니다. 돌발이나 비상 조우 중에는 하지 않습니다. Knightshopper 플러그인이 필요합니다.",
   "sections": {
     "auto": "자동 쇼핑"
   },
   "fields": {
     "enable_auto_shop": {
       "label": "자동 쇼핑 사용",
-      "tooltip": "켜기: 은화나 금화가 임계값에 도달했고 FATE/CE 중이 아니면, 다른 자동화를 잠시 멈추고 필드에 있으면 본진으로 리턴한 뒤 Knightshopper의 Occult Crescent 쇼핑 목록을 시작합니다. 품목은 Knightshopper에서 설정합니다. 보물찾기나 몹 파머 대기 중에는 중단할 수 있지만, 풀/전투 중에는 하지 않습니다. Knightshopper가 없거나 준비되지 않으면 아무 것도 하지 않습니다.\n끄기: 자동 쇼핑하지 않습니다."
+      "tooltip": "은화나 금화가 아래 수량에 도달하면 BOCCHI가 하던 일을 멈추고 캠프로 돌아가 Knightshopper 목록을 시작합니다. 돌발, 비상 조우, 몹 파머 전투는 끝날 때까지 기다립니다. 살 물건은 Knightshopper에서 고르세요."
     },
     "silver_threshold": {
       "label": "은 임계값",
-      "tooltip": "남뿔은 은화·북뿔은 은 오볼이 이 값에 도달하면 쇼핑을 시작합니다. FATE/CE 중, 몹 파머 풀/전투 중에는 시작하지 않습니다. 0 = 은으로는 시작하지 않음."
+      "tooltip": "은화가 이만큼 모이면 쇼핑하러 갑니다. 0 = 은화로는 가지 않음."
     },
     "gold_threshold": {
       "label": "금 임계값",
-      "tooltip": "남뿔은 금화·북뿔은 금 오볼이 이 값에 도달하면 쇼핑을 시작합니다. FATE/CE 중, 몹 파머 풀/전투 중에는 시작하지 않습니다. 0 = 금으로는 시작하지 않음."
+      "tooltip": "금화가 이만큼 모이면 쇼핑하러 갑니다. 0 = 금화로는 가지 않음."
     }
   }
 }

@@ -1,10 +1,10 @@
 {
   "label": "Treasure Hunter",
-  "tooltip": "Treasure chest and carrot lines, Treasure Hunt, and Carrot Hunt.",
+  "tooltip": "Treasure Hunt, Carrot Hunt, and lines to coffers and carrots.",
   "sections": {
-    "shared_maps": "Chest locations",
-    "radar": "Radar",
-    "completion": "When hunt ends",
+    "shared_maps": "Shared locations",
+    "radar": "Lines on screen",
+    "completion": "When a hunt ends",
     "carrot_hunt": "Carrot Hunt",
     "treasure_hunt": "Treasure Hunt",
     "ninja_hide": "Ninja Hide"
@@ -12,96 +12,96 @@
   "fields": {
     "enable_shared_maps": {
       "label": "Share chest locations",
-      "tooltip": "On: while in Occult Crescent, download shared treasure chest, carrot, and Magic Pot chest locations and pot timers, and anonymously upload locations you open or find (not where your character is standing). Shared locations can also fix wrong built-in ones. The built-in list still works if download fails.\nOff: no download or upload — built-in locations and local pot timing only."
+      "tooltip": "On: download coffer, carrot and pot chest locations and pot timers found by other BOCCHI players, and send in the ones you find. Nothing about you or your character is sent, only where the chest was.\nOff: use only the locations that come with BOCCHI."
     },
     "draw_line_to_bronze_chests": {
       "label": "Lines to bronze coffers",
-      "tooltip": "On: while out of combat, draw a brown line to nearby bronze coffers.\nOff: no line."
+      "tooltip": "Draw a brown line to bronze coffers near you. Hidden while you fight."
     },
     "draw_line_to_silver_chests": {
       "label": "Lines to silver coffers",
-      "tooltip": "On: while out of combat, draw a silver line to nearby silver coffers.\nOff: no line."
+      "tooltip": "Draw a silver line to silver coffers near you. Hidden while you fight."
     },
     "draw_line_to_carrots": {
       "label": "Lines to carrots",
-      "tooltip": "On: while out of combat, draw a green line to nearby carrots.\nOff: no line."
+      "tooltip": "Draw a green line to carrots near you. Hidden while you fight."
     },
     "show_percentage_active_treasure_count": {
       "label": "Show remaining coffers as %"
     },
     "return_to_base_camp_after_hunt": {
       "label": "Cast Return after hunt",
-      "tooltip": "On: cast Return after Treasure Hunt or Carrot Hunt finishes.\nOff: do not cast Return when the hunt ends.\nLoop Carrot Hunt: Return waits until looping stops."
+      "tooltip": "Cast Return when a Treasure Hunt or Carrot Hunt finishes. With Loop Carrot Hunt on, Return waits until you stop the loop."
     },
     "loop_carrot_hunt": {
       "label": "Loop Carrot Hunt",
-      "tooltip": "On: skip empty carrot locations; after each Fortune Carrot, check every location again. If a full pass finds none, keep checking until Stop or you run out of carrots.\nOff: one pass, then finish."
+      "tooltip": "On: keep going round the carrot spots until you press Stop or run out of Fortune Carrots.\nOff: go round once, then finish."
     },
     "carrot_hunt_scout_without_item": {
       "label": "Scout without Fortune Carrots",
-      "tooltip": "On: start Carrot Hunt with no Fortune Carrots — walk the route and skip pads that need an item. Handy for checking respawns.\nOff: need at least one Fortune Carrot to start; hunt stops when you run out."
+      "tooltip": "On: the Carrot Hunt can start with no Fortune Carrots. It walks the route to see which carrots are there.\nOff: you need at least one Fortune Carrot, and the hunt stops when you run out."
     },
     "play_sound_on_hunt_complete": {
       "label": "Play sound when Treasure Hunt finishes"
     },
     "hunt_complete_sound": {
       "label": "Hunt finished sound",
-      "tooltip": "MP3 from the plugin Sounds folder. Click a name to preview.",
-      "open_folder": "Open sound folder — drop MP3s here to add your own."
+      "tooltip": "Click a name to hear it.",
+      "open_folder": "Open the sound folder. Put your own MP3 files there to add them."
     },
     "cast_treasure_sight_during_hunt": {
       "label": "Cast Treasure Sight during hunt",
-      "tooltip": "On: cast at hunt start and on the interval below. Stops early if Sight says nothing is left.\nOff: do not cast Sight during the hunt."
+      "tooltip": "Cast Treasure Sight at the start and every few locations. The hunt ends early when it shows nothing is left."
     },
     "treasure_sight_every_n_locations": {
       "label": "Locations between casts"
     },
     "hunt_max_level": {
       "label": "Max coffer level",
-      "tooltip": "Skip coffers whose nearby enemies are above this level. 50 = no limit."
+      "tooltip": "Coffers guarded by enemies above this level are skipped. 50 = skip nothing."
     },
     "hunt_silver_chests_only": {
       "label": "Silver coffers only"
     },
     "hunt_min_bronze_percent": {
       "label": "Min bronze remaining to auto-hunt (%)",
-      "tooltip": "With Treasure Sight: start when bronze remaining is at least this % of 30 — or when silver meets its %.\nUsed by General → Auto treasure hunt and Mob Farmer → Treasure Hunt on a timer.\nWithout Sight: Illegal Mode uses the built-in chest list and ignores this."
+      "tooltip": "Auto treasure hunts start when at least this share of the 30 bronze coffers is left, or when enough silver is left. Used by Illegal Mode and Mob Farmer."
     },
     "hunt_min_silver_percent": {
       "label": "Min silver remaining to auto-hunt (%)",
-      "tooltip": "With Treasure Sight: start when silver remaining is at least this % of 8 — or when bronze meets its %.\nUsed by General → Auto treasure hunt and Mob Farmer → Treasure Hunt on a timer.\nWithout Sight: Illegal Mode uses the built-in chest list and ignores this."
+      "tooltip": "Auto treasure hunts start when at least this share of the 8 silver coffers is left, or when enough bronze is left. Used by Illegal Mode and Mob Farmer."
     },
     "empty_pad_trust_distance": {
       "label": "Empty chest check distance",
-      "tooltip": "How close (yalms) before treating a chest location as empty and moving on. Lower = walk closer (safer when chests load late); higher = skip sooner."
+      "tooltip": "How close BOCCHI walks to a spot before it decides no coffer is there. Lower is safer, because coffers can show up late. Higher is faster."
     },
     "skip_unsafe_treasure_windows": {
       "label": "Skip dangerous weather / Ashkin",
-      "tooltip": "On: pause Treasure Hunt on South Horn during Ashkin or other unsafe weather.\nOff: keep hunting through those windows."
+      "tooltip": "Pause the Treasure Hunt in South Horn during Ashkin or other dangerous weather, and continue when it is over."
     },
     "use_ninja_hide_on_dangerous_routes": {
       "label": "Ninja Hide near strong enemies",
-      "tooltip": "On: near a high-Knowledge enemy, swap to Ninja, Hide, and walk the last stretch. Stays on Ninja through the open so Hide is not dropped by a job swap next to the pack.\nOff: do not use Hide for route threats.\nTreasure Hunt, Carrot Hunt, and Magic Pot chest farm."
+      "tooltip": "Near a strong enemy, switch to Ninja, use Hide and walk the last part unseen. Used by Treasure Hunt, Carrot Hunt and pot chests."
     },
     "use_occult_sprint_while_hidden": {
       "label": "Occult Sprint while Hidden",
-      "tooltip": "On: while Hidden, switch to Phantom Thief and cast Occult Sprint.\nOff: stay Hidden without Occult Sprint."
+      "tooltip": "While hidden, switch to Phantom Thief and use Occult Sprint."
     },
     "ninja_gearset_number": {
       "label": "Ninja gearset number",
-      "tooltip": "Gearset that equips Ninja (list number, starting at 1). 0 = do not swap — you must already be on Ninja."
+      "tooltip": "The number of your Ninja gearset in the gearset list. 0 = don't switch gear. You then have to be on Ninja already."
     },
     "knowledge_hide_offset": {
       "label": "Hide vs enemies this many Knowledge above you",
-      "tooltip": "Hide when a nearby enemy's Knowledge is at least yours plus this. Higher = only stronger enemies. Negative = also weaker ones. Uses your real Knowledge, not the Knowledge sync on South Horn. 0 = same Knowledge or higher."
+      "tooltip": "Hide from enemies whose Knowledge Level is at least yours plus this number. 0 = your level or higher. A negative number also hides from weaker enemies."
     },
     "knowledge_threat_enter_distance": {
       "label": "Start Hide within (yalms)",
-      "tooltip": "Start Hide when a dangerous enemy is this close. While mounted, starts 5 yalms earlier. A few crowded North Horn chest locations start Hide farther out automatically."
+      "tooltip": "Hide starts when a strong enemy is this close. On a mount it starts 5 yalms sooner."
     },
     "knowledge_threat_exit_distance": {
       "label": "Keep Hide until farther than (yalms)",
-      "tooltip": "Once Hide is on, keep it until enemies are farther than this."
+      "tooltip": "Once hidden, stay hidden until the enemies are farther away than this."
     }
   }
 }

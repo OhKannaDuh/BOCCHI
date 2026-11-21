@@ -20,6 +20,10 @@ public class ExperienceRenderer
 {
     public MainWindowSection Section => MainWindowSection.Trackers;
 
+    public string CompactText => string.Format(
+        translator.T(".trackers.experience.compact"),
+        tracker.ExperiencePerHour.ToString("N0"));
+
     public void Render()
     {
         if (!supportJobs.TryGetCurrent(out SupportJob current))

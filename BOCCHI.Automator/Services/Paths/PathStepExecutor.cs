@@ -10,6 +10,7 @@ using Ocelot.Chain.Extensions;
 using Ocelot.Chain.Recipes;
 using Ocelot.Extensions;
 using Ocelot.Ipc.VNavmesh;
+using Ocelot.Services.Logger;
 using Ocelot.Services.Pathfinding;
 
 namespace BOCCHI.Automator.Services.Paths;
@@ -24,7 +25,8 @@ public class PathStepExecutor
     IGameGui gui,
     IPathfinder pathfinder,
     IVNavmeshIpc vnav,
-    MovementConfig movement
+    MovementConfig movement,
+    ILogger<PathStepExecutor> logger
 ) : IPathStepExecutor
 {
     public Task<ChainResult> Execute(IPathStep step)
@@ -56,7 +58,12 @@ public class PathStepExecutor
         bool nearAetheryte = zones.GetZone().EnumerateAetherytes()
             .Any(a => destination.Distance2D(a.Position) <= a.GetIdleOuterRadius() + 3f);
 
-        return chains.Create($"{PathStepSoftStop.Prefix}Pathfind({destination:f2}, {range:f2})")
+        if (movement.ShouldAutoMount && IsShortHopNearPot(zones.GetZone(), destination))
+        {
+            logger.Debug("Not mounting for this step: short hop near a pot");
+        }
+
+        return chains.Create(FormattableString.Invariant($"{PathStepSoftStop.Prefix}Pathfind({destination.X:f0}, {destination.Y:f0}, {destination.Z:f0}; range {range:f1})"))
             .Then<PathfindToChain, PathfinderConfig>(new(destination)
             {
                 DistanceThreshold = range > 0f ? range : 2f,

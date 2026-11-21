@@ -1,19 +1,19 @@
 {
   "label": "FATE",
-  "tooltip": "不正モードがやってよい FATE と、進行が進んだ FATE の見送り。",
+  "tooltip": "不正モードがやる FATE を選びます。",
   "sections": {
-    "skip": "スキップ",
+    "skip": "終わりかけの FATE を飛ばす",
     "allowlist": "許可する FATE"
   },
   "fields": {
     "max_fate_progress_percent": {
       "label": "進行度（%）以上のFATEはスキップ",
-      "tooltip": "すでにこの進行度の FATE は始めない。0＝スキップしない。すでに参加中は最後までやる。"
+      "tooltip": "すでにここまで進んでいる FATE には行きません。0＝飛ばさない。参加中の FATE は必ず最後までやります。"
     },
     "disabled_fate_ids": {
       "label": "許可する FATE",
-      "tooltip": "オン：やる。\nオフ：スキップ。\nマジックポット FATE 優先がオンのあいだ、ポットは必須のまま表示。",
-      "empty": "このゾーンに表示する FATE がありません。",
+      "tooltip": "チェックあり：やる。\nチェックなし：飛ばす。\n「マジックポットFATEを優先」の間、マジックポットはチェックされたままです。",
+      "empty": "このゾーンに FATE はありません。",
       "forced_note": "「マジックポットFATEを優先」がオンです — ポットは必須です。",
       "forced_suffix": " — 必須",
       "forced_by_prefer": "「マジックポットFATEを優先」がオンのため必須です。このポットをスキップしたい場合は、そちらをオフにしてください。"

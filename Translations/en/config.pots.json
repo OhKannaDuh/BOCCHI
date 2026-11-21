@@ -1,6 +1,6 @@
 {
   "label": "Pot timing",
-  "tooltip": "When to leave for pots, when to skip late pots, and second-chance chests.",
+  "tooltip": "When to leave for Magic Pots and which ones to skip.",
   "sections": {
     "timing": "Timing",
     "chests": "Chests"
@@ -8,23 +8,23 @@
   "fields": {
     "min_pot_fate_minutes_remaining": {
       "label": "Skip pots with under (minutes left)",
-      "tooltip": "Skip a pot with fewer minutes left than this. 0 = off."
+      "tooltip": "Don't go to a pot FATE that is about to end. 0 = never skip."
     },
     "pot_spawn_lead_minutes": {
       "label": "Leave for pots this many minutes early",
-      "tooltip": "Minutes before the next pot spawn to stop other work and head there. Also used by Illegal Mode “Pause auto treasure hunt for pots”. Independent of the FATE/CE cutoffs below."
+      "tooltip": "This many minutes before the next pot appears, BOCCHI stops what it is doing and goes there."
     },
     "fate_fallback_cutoff_minutes": {
       "label": "Do not start FATEs within (minutes of pots)",
-      "tooltip": "Do not start a normal FATE when the next pot is this many minutes away or less. 0 = no cutoff. Not affected by leave-early."
+      "tooltip": "Don't start a normal FATE when the next pot is this many minutes away or less. 0 = always start FATEs."
     },
     "ce_fallback_cutoff_minutes": {
       "label": "Do not start CEs within (minutes of pots)",
-      "tooltip": "Do not start a Critical Encounter when the next pot is this many minutes away or less. 0 = no cutoff. Not affected by leave-early."
+      "tooltip": "Don't start a Critical Encounter when the next pot is this many minutes away or less. 0 = always start CEs."
     },
     "should_farm_reroll_pot_chests": {
       "label": "Also farm second-chance pot chests",
-      "tooltip": "On: after a pot FATE chest run, also visit second-chance chest locations while Cache Me is still up.\nOff: skip those locations."
+      "tooltip": "After the pot chests, also check the second-chance chest spots while the buff still lasts."
     }
   }
 }

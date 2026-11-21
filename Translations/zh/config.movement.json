@@ -1,6 +1,6 @@
 {
   "label": "移动",
-  "tooltip": "上坐骑、冲刺与卡住处理。适用于违规模式、寻宝、胡萝卜狩猎、刷怪的所有赶路。",
+  "tooltip": "坐骑、冲刺和脱困。所有模式都会使用。",
   "sections": {
     "mount": "坐骑与冲刺",
     "unstuck": "卡住处理",
@@ -8,11 +8,11 @@
   },
   "fields": {
     "sprint_on_aetheryte_approach": {
-      "label": "前往以太之光时冲刺"
+      "label": "冲刺前往以太之光"
     },
     "should_auto_mount": {
       "label": "赶路时上坐骑",
-      "tooltip": "开：长途赶路时上坐骑，中途下马会再上（违规模式、寻宝、胡萝卜寻宝、刷怪）。\n关：除非别处让你上马，否则步行。"
+      "tooltip": "开启：长途移动时上坐骑，被打下来后会重新上。\n关闭：步行。"
     },
     "preferred_mount_id": {
       "label": "偏好坐骑",
@@ -21,14 +21,14 @@
     },
     "should_jump_when_stuck": {
       "label": "卡住时跳跃",
-      "tooltip": "在岩石、台阶或楼梯上卡住时。"
+      "tooltip": "卡在石头、台阶或楼梯上时跳跃。"
     },
     "jump_when_stuck_seconds": {
       "label": "跳跃前等待秒数"
     },
     "prefer_return_over_shard_walk": {
       "label": "使用返回代替步行到以太之晶",
-      "tooltip": "返回可用时，长距离移动会用返回回到营地，而不是步行到以太之晶。\n关闭：选择最短的路线。"
+      "tooltip": "开启：长途移动时，如果返回可用就返回营地，这样不必从敌人身边走到以太之晶。\n关闭：选择最短的路线。"
     }
   }
 }

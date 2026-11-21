@@ -1,21 +1,21 @@
 {
   "label": "Shopping",
-  "tooltip": "When silver or gold hits a threshold, pause other automation, Return to base camp if needed, then let Knightshopper buy your Occult Crescent list. Needs Knightshopper (see Dependencies). Never starts during a FATE or CE.",
+  "tooltip": "When you have enough silver or gold, BOCCHI stops, returns to camp and lets Knightshopper buy your list. Never during a FATE or CE. Needs the Knightshopper plugin.",
   "sections": {
     "auto": "Auto-shop"
   },
   "fields": {
     "enable_auto_shop": {
       "label": "Enable auto-shop",
-      "tooltip": "On: when silver or gold is at its threshold (and you are not in a FATE or CE), pause other automation, Return to base camp if you are out in the field, then start Knightshopper’s Occult Crescent shopping list. Configure items in Knightshopper. Can interrupt treasure hunting and idle Mob Farmer waits; not mid-pull or mid-fight. Does nothing if Knightshopper is missing or not ready.\nOff: never auto-shop."
+      "tooltip": "When your silver or gold reaches the amounts below, BOCCHI stops what it is doing, returns to camp and starts your Knightshopper list. It waits for a FATE, CE or Mob Farmer fight to end first. Choose what to buy in Knightshopper."
     },
     "silver_threshold": {
       "label": "Silver threshold",
-      "tooltip": "Start shopping when silver pieces (South Horn) or silver obols (North Horn) reach this. Never during a FATE or CE, or mid Mob Farmer pull/fight. 0 = never start from silver."
+      "tooltip": "Go shopping when you have this much silver. 0 = don't shop for silver."
     },
     "gold_threshold": {
       "label": "Gold threshold",
-      "tooltip": "Start shopping when gold pieces (South Horn) or gold obols (North Horn) reach this. Never during a FATE or CE, or mid Mob Farmer pull/fight. 0 = never start from gold."
+      "tooltip": "Go shopping when you have this much gold. 0 = don't shop for gold."
     }
   }
 }

@@ -19,6 +19,8 @@ public interface IDynamicRenderer
 
     string? SubsectionTitle => null;
 
+    string? CompactText => null;
+
     void Render();
 
     bool ShouldRender();

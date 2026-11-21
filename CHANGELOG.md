@@ -1,7 +1,14 @@
 # 4.2.0.20
 
 ### New
-- Auto revive (Illegal Mode → Death): accept raises, and go back to base camp if nobody raises you in time. Both are off by default and never trigger inside Forked Tower or a critical encounter
+- New look
+- The main window now has a tab per mode (Illegal Mode, Pots & Treasure, Mob Farmer, Treasure Hunter, World). Status, coffers left and gold / silver / XP per hour stay visible on top, and the window jumps to a mode's tab when it starts
+- Completionist is now a switch inside the Illegal Mode tab
+- Search box in the settings, and a cog on each tab that opens that tab's settings
+- Each tab says in one line what the mode does, and warns you when a plugin it needs isn't running
+- Triage Mode: optional wait before raising, so nearby healers get a chance first
+- Hover texts rewritten in plainer words, in all four languages. Spotted odd wording in Japanese, Korean or Chinese? Let us know
+- Auto revive (Illegal Mode → General → When you die): accept raises, and go back to base camp if nobody raises you in time. Both are off by default and never trigger inside Forked Tower or a critical encounter. While you are dead, YesAlready is paused so it can't answer the prompt first
 - New option (Movement → Routes): use Return for long trips instead of walking through mobs to an aethernet shard
 
 ### Fixes

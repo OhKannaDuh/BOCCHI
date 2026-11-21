@@ -127,7 +127,7 @@ public class ChoosingActivityHandler
         {
             IGoal goal = goalFactory.Fate(fate.Id);
             memory.TryAdd(new GoalMemory(goal));
-            logger.Info("Chose FATE {Id} ({Name})", fate.Id.Value, fate.Name);
+            logger.Info("Chose FATE {Id} ({Name}) at {Progress}%", fate.Id.Value, fate.Name, fate.Progress);
             return;
         }
 

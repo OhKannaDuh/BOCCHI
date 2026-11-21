@@ -113,7 +113,7 @@ public class OperationalStatusBar
             {
                 Chip(
                     translator.T(".status.automator"),
-                    Automator.CurrentState is { } state ? FormatAutomatorState(state) : translator.T(".status.on"),
+                    IllegalModeDetail(),
                     MainWindowSection.Automation);
             }
 
@@ -121,7 +121,7 @@ public class OperationalStatusBar
             {
                 Chip(
                     translator.T(".status.completionist"),
-                    Automator.CurrentState is { } state ? FormatAutomatorState(state) : translator.T(".status.on"),
+                    IllegalModeDetail(),
                     MainWindowSection.Completionist);
             }
 
@@ -298,6 +298,21 @@ public class OperationalStatusBar
             ImGui.SameLine(0f, 8f);
             BocchiUi.DrawStatusChip(translator.T(".buffs.applying"), BocchiUi.StatusChipKind.Warn);
         }
+    }
+
+    private string IllegalModeDetail()
+    {
+        if (Automator.CurrentState is { } state)
+        {
+            return FormatAutomatorState(state);
+        }
+
+        if (Automator.SuspendedForTreasure)
+        {
+            return translator.T(".status.treasure_hunt");
+        }
+
+        return translator.T(Automator.SuspendedForShopping ? ".status.shopping_paused" : ".status.on");
     }
 
     private string FormatAutomatorState(AutomatorState state) =>

@@ -101,9 +101,31 @@ public static class KnowledgeThreat
         return threat != null;
     }
 
-    public static unsafe bool CanFightAggro(IObjectTable objects)
+    public static unsafe int? HighestAttackerLevel(IObjectTable objects)
     {
         if (objects.LocalPlayer is not { } player)
+        {
+            return null;
+        }
+
+        int? highest = null;
+        foreach (IGameObject obj in objects)
+        {
+            if (obj is IBattleNpc { IsDead: false } battle
+                && battle.IsHostile()
+                && battle.IsTargetingPlayer(player))
+            {
+                int level = ((BattleChara*)battle.Address)->ForayInfo.Level;
+                highest = highest is { } current ? Math.Max(current, level) : level;
+            }
+        }
+
+        return highest;
+    }
+
+    public static bool CanFightAggro(IObjectTable objects)
+    {
+        if (objects.LocalPlayer is null)
         {
             return false;
         }
@@ -113,18 +135,7 @@ public static class KnowledgeThreat
             return true;
         }
 
-        foreach (IGameObject obj in objects)
-        {
-            if (obj is IBattleNpc { IsDead: false } battle
-                && battle.IsHostile()
-                && battle.IsTargetingPlayer(player)
-                && ((BattleChara*)battle.Address)->ForayInfo.Level > playerLevel)
-            {
-                return false;
-            }
-        }
-
-        return true;
+        return HighestAttackerLevel(objects) is not { } enemy || enemy <= playerLevel;
     }
 
     public static bool TryFindIsleblazer(IObjectTable objects, Vector3 origin, float radius, out float distance)

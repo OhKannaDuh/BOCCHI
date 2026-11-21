@@ -144,6 +144,11 @@ public sealed class BocchiLogBuffer : IBocchiLogBuffer
 
         foreach (BocchiLogEntry log in copy)
         {
+            if (log.Level == BocchiLogLevel.Verbose)
+            {
+                continue;
+            }
+
             string countSuffix = log.Count > 1 ? $" (x{log.Count})" : string.Empty;
             string time = log.Count > 1
                 ? $"{log.Timestamp:HH:mm:ss} - {log.LastOccurrence:HH:mm:ss}"

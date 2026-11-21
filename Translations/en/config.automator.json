@@ -1,16 +1,16 @@
 {
   "label": "General",
-  "tooltip": "FATEs, Critical Encounters, pots, BOCCHI AI, Triage Mode, treasure, delays, and repair.",
+  "tooltip": "What Illegal Mode does: FATEs, Critical Encounters, pots, combat, treasure, waiting times, repairs and what happens when you die.",
   "sections": {
     "activities": "Activities",
     "combat": "Combat",
-    "travel": "Illegal Mode travel",
+    "travel": "Travel",
     "jobs": "Phantom jobs",
     "triage": "Triage",
     "treasure": "Treasure",
     "delays": "Delays",
     "repair": "Repair",
-    "death": "Death"
+    "death": "When you die"
   },
   "fields": {
     "should_do_fates": {
@@ -18,36 +18,36 @@
     },
     "prefer_pot_fates": {
       "label": "Prefer pot FATEs",
-      "tooltip": "On: always do Magic Pot FATEs (order: pot, then CE, then other FATEs).\nOff: CE, then pot, then other.\nWhile on, pots stay required on the FATEs page."
+      "tooltip": "On: Magic Pot FATEs always come first, then Critical Encounters, then other FATEs. Pots can't be turned off on the FATEs page while this is on.\nOff: Critical Encounters come first, then pots, then other FATEs."
     },
     "should_farm_pot_chests": {
       "label": "Farm pot chests after pot FATEs",
-      "tooltip": "On: after a pot FATE, drink Magical Elixir and follow the compass while Cache Me lasts. If the compass doesn’t point to a chest, walk the known chest list instead.\nOff: leave after the pot FATE without farming chests."
+      "tooltip": "After a pot FATE, drink the Magical Elixir and follow the compass to the chests for as long as the buff lasts. If the compass shows nothing, BOCCHI checks the known chest spots instead."
     },
     "should_preposition_to_pots": {
       "label": "Wait near pots before they spawn",
-      "tooltip": "On: leave early and wait near the next pot. Timing is under Pot timing. Needs Do FATEs, and that pot allowed (or Prefer pot FATEs).\nOff: do not leave early for pots."
+      "tooltip": "Go to the next pot early and wait there. How early is set on the Pot timing page."
     },
     "should_do_critical_encounters": {
       "label": "Do Critical Encounters"
     },
     "leave_fate_travel_for_ce_seconds": {
-      "label": "Leave FATE travel for a CE when (seconds left)",
-      "tooltip": "While walking to a FATE, switch to a CE only when registration has this many seconds or fewer left. Higher = leave sooner. 0 = switch as soon as a CE is up. Already in the FATE: finish it first unless Leave mid-FATE for CE is on."
+      "label": "Switch to a CE when it has this many seconds left",
+      "tooltip": "While walking to a FATE, BOCCHI turns around for a Critical Encounter once its registration has this many seconds left or fewer. A higher number means it leaves sooner. 0 = switch as soon as a CE appears.\nA FATE you already started is finished first, unless Leave mid-FATE for a CE is on."
     },
     "leave_engaged_fate_for_critical_encounter": {
       "label": "Leave mid-FATE for a CE",
-      "tooltip": "On: also leave a FATE you already started when a CE is within the seconds above (same timing as travel). Does not leave Magic Pot FATEs when Prefer pot FATEs or Pots & Treasure is forcing pots.\nOff: finish the FATE you are in before taking a CE."
+      "tooltip": "On: also leave a FATE you are fighting in when a Critical Encounter's registration is about to close (same seconds as above). Pot FATEs are never left while Prefer pot FATEs is on.\nOff: finish the FATE first."
     },
     "combat_autorotation": {
       "label": "Combat rotation",
-      "tooltip": "Which plugin runs your rotation in FATEs, CEs, and Mob Farmer fights.\nPaused while traveling or pulling.\nNone: you fight manually."
+      "tooltip": "The plugin that fights for you in FATEs, Critical Encounters and Mob Farmer. It is switched off while you travel.\nNone: you fight yourself."
     },
     "disabled_wrath_occult_options": {
-      "label": "Phantom job actions BOCCHI may use (Wrath Combo)",
-      "tooltip": "Unchecked actions stay off when BOCCHI takes over Wrath's Occult Crescent settings, e.g. Berserker Rage, which can make you eat mechanics.\nChanges apply the next time Illegal Mode or Mob Farmer starts.\nHover an action to see its Wrath option name.",
-      "empty": "Wrath Combo is not loaded, or this Wrath version does not list phantom job options.",
-      "built_in": "BOCCHI always leaves this one off.",
+      "label": "Phantom job actions Wrath Combo may use",
+      "tooltip": "Uncheck an action to stop Wrath Combo from using it while BOCCHI is running. For example Berserker's Rage, which can get you hit by mechanics.\nChanges apply the next time you start Illegal Mode or Mob Farmer.\nHover an action to see what it is called in Wrath Combo.",
+      "empty": "Wrath Combo isn't running, or this version of it has no phantom job options.",
+      "built_in": "BOCCHI always keeps this one off.",
       "jobs": {
         "freelancer": "Phantom Freelancer",
         "knight": "Phantom Knight",
@@ -77,19 +77,19 @@
     },
     "update_boss_mod_presets_automatically": {
       "label": "Update presets automatically",
-      "tooltip": "On: rewrite BOCCHI AI presets from the settings below when they change, Illegal Mode starts, or you change job / melee / ranged.\nOff: keep current presets; press Update presets to apply the settings below.",
+      "tooltip": "On: BOCCHI rewrites its BossMod presets whenever you change the settings below, start Illegal Mode or change job.\nOff: your presets are left alone. Press Update presets to apply the settings below.",
       "button": "Update presets",
-      "button_tooltip": "Rebuild BOCCHI AI presets from the settings below now. Overwrites other BossMod edits on those presets.",
+      "button_tooltip": "Rebuild BOCCHI's BossMod presets from the settings below. Changes you made to those presets in BossMod are lost.",
       "button_tooltip_auto_on": "Not needed while Update presets automatically is on."
     },
     "boss_mod_movement": {
       "max_distance_by_role": {
         "label": "Set max distance to target based on role",
-        "tooltip": "On: melee uses melee distance (or stay on hitbox); ranged / caster / healer use ranged distance.\nOff: one shared max distance."
+        "tooltip": "On: melee jobs and ranged jobs each get their own distance to the target.\nOff: every job uses the same distance."
       },
       "melee_on_hitbox": {
         "label": "Melee stay on hitbox",
-        "tooltip": "On: melee stands on the hitbox edge.\nOff: use the melee distance in yalms. Sage always 5y and Dancer 10y when distance-by-role is on."
+        "tooltip": "On: melee jobs stand at the edge of the enemy's hitbox.\nOff: melee jobs use the melee distance below.\nSage always stays at 5 yalms and Dancer at 10."
       },
       "max_distance": {
         "label": "Max distance to target"
@@ -103,7 +103,7 @@
       },
       "overdodge": {
         "label": "Extra dodge space",
-        "tooltip": "Extra space from dangerous areas while traveling.",
+        "tooltip": "How much extra space to keep from AoEs.",
         "none": "None",
         "small": "Small (0.5y)",
         "medium": "Medium (1.5y)",
@@ -111,7 +111,7 @@
       },
       "delay": {
         "label": "Delay movement",
-        "tooltip": "Wait this long before BOCCHI AI starts moving. Keep low or you can get hit.",
+        "tooltip": "How long the combat AI waits before it moves. Keep this short or you will get hit.",
         "none": "None",
         "short": "Short (0.5s)",
         "long": "Long (1s)"
@@ -130,19 +130,19 @@
     },
     "stay_mounted_while_waiting_for_ce": {
       "label": "Stay mounted while waiting for CEs / Forked Tower",
-      "tooltip": "Keeps you mounted while Illegal Mode waits for a CE, and while waiting on the Forked Tower pad."
+      "tooltip": "Stay on your mount while waiting for a Critical Encounter or for Forked Tower to start."
     },
     "stop_after_return": {
       "label": "Stop after return and teleport",
-      "tooltip": "On: after a FATE or CE: Return, teleport toward the next one, mount, then stop. Toggle Illegal Mode to resume.\nOff: keep running after Return."
+      "tooltip": "On: after a FATE or CE, BOCCHI uses Return, teleports towards the next one, mounts up and then stops. Start Illegal Mode again to continue.\nOff: keep going."
     },
     "phantom_jobs_leveling_mode": {
       "label": "Level phantom jobs automatically",
-      "tooltip": "When your phantom job is maxed, switch to the next unlocked one that is not. Skips Freelancer."
+      "tooltip": "When your phantom job reaches max level, switch to the next one you've unlocked that isn't maxed yet. Freelancer is skipped."
     },
     "enable_triage_mode": {
       "label": "Triage Mode",
-      "tooltip": "After a FATE or CE, raise nearby dead players with your chosen phantom job, then continue. Skips anyone who already has a raise."
+      "tooltip": "After a FATE or CE, raise dead players nearby with the phantom job below, then carry on. Players who already have a raise are skipped."
     },
     "preferred_triage_raise_job": {
       "label": "Triage raise job",
@@ -151,55 +151,59 @@
     },
     "should_cast_treasure_sight": {
       "label": "Cast Treasure Sight at camp",
-      "tooltip": "On: at camp, cast Treasure Sight on the Interval below when Auto treasure hunt is off.\nOff: do not cast Sight at camp on a timer.",
-      "tooltip_disabled": "Unavailable while Auto treasure hunt is on. That mode already casts Sight after a FATE or CE and while waiting at camp."
+      "tooltip": "Cast Treasure Sight at camp every so often to see how many coffers are left. The interval is set below.",
+      "tooltip_disabled": "Not needed while Auto treasure hunt is on: it already casts Treasure Sight."
     },
     "treasure_sight_recast_interval_seconds": {
-      "label": "Interval (seconds)",
-      "tooltip": "How often to cast Treasure Sight at camp while waiting. Used by Auto treasure hunt between activities, or by Cast Treasure Sight at camp when auto-hunt is off."
+      "label": "Seconds between Treasure Sight casts",
+      "tooltip": "How often Treasure Sight is used while waiting at camp."
     },
     "max_remote_idle_time_seconds": {
       "label": "Max wait before Return (seconds)",
-      "tooltip": "After a FATE or CE, wait a random time from 2s up to this before Return. If Treasure Sight is queued, Return immediately so Sight can land."
+      "tooltip": "After a FATE or CE, BOCCHI waits a random time between 2 seconds and this before it uses Return."
     },
     "max_base_teleport_delay_seconds": {
       "label": "Max wait before leaving camp (seconds)",
-      "tooltip": "At camp, wait 0 to this many seconds before leaving for a FATE or CE. 0 = leave right away."
+      "tooltip": "At camp, BOCCHI waits a random time up to this before it leaves for a FATE or CE. 0 = leave right away."
     },
     "auto_repair_threshold": {
       "label": "Repair gear below (%)"
     },
     "auto_repair_method": {
       "label": "Repair method",
-      "tooltip": "Self-repair: Repair action (needs crafter levels and dark matter).\nMender NPC: talk to a nearby mender at base camp (no crafter). If none is found, falls back to self-repair.\nPrefer mender: mender when nearby, otherwise self-repair.\nIf repair fails or hangs, Illegal Mode skips it for a short time so it does not sit on Repairing forever."
+      "tooltip": "Self-repair: repair your own gear. Needs crafter levels and dark matter.\nMender: use the mender at base camp. If none is found, BOCCHI repairs itself.\nPrefer mender: use the mender when one is close, otherwise repair yourself.\nIf a repair fails, BOCCHI skips it for a while and carries on."
     },
     "enable_automatic_treasure_hunt_during_illegal_mode": {
       "label": "Auto treasure hunt in Illegal Mode",
-      "tooltip": "On: after a FATE or CE, return to camp and run Treasure Sight if known. Starts a hunt when bronze/silver remaining meets the % on Treasure Hunter.\nAlso casts Sight at camp while waiting (Interval below), then hunts if enough chests remain — so you are not sitting idle between CEs.\nWithout Sight: uses the built-in chest list (those % ignored), always pauses for FATE/CE, then resumes.\nOff: do not start treasure hunts from Illegal Mode."
+      "tooltip": "When there is no FATE or CE to do, BOCCHI returns to camp, uses Treasure Sight and goes on a treasure hunt if enough coffers are left. How many is enough is set on the Treasure Hunter page.\nWithout Treasure Sight it checks every known coffer spot instead, and always stops for FATEs and CEs."
     },
     "pause_auto_treasure_hunt_for_fate": {
       "label": "Pause auto treasure hunt for FATEs",
-      "tooltip": "On: while Auto treasure hunt is running, pause when a FATE is available (or already in one), then resume nearby afterward.\nOff: with Treasure Sight, keep hunting through FATEs (a hunt using the default chest list always pauses for FATEs).\nNeeds Auto treasure hunt in Illegal Mode."
+      "tooltip": "On: when a FATE appears, pause the hunt, do the FATE, then continue the hunt.\nOff: keep hunting and ignore FATEs. Without Treasure Sight the hunt always pauses."
     },
     "pause_auto_treasure_hunt_for_pots": {
       "label": "Pause auto treasure hunt for pots",
-      "tooltip": "On: pause the hunt when Pot timing says leave for the next pot (or a pot is already up), then resume nearby afterward. Uses “Leave for pots this many minutes early” on Pot timing.\nOff: keep hunting through pot leave-early (live pots still pause if Pause for FATEs is on, or always when using the default chest list without Sight).\nNeeds Auto treasure hunt in Illegal Mode, and farm pots or wait near pots."
+      "tooltip": "On: pause the hunt when it is time to leave for the next pot, or a pot is already up, then continue afterwards.\nOff: keep hunting until the pot FATE actually starts.\nNeeds Farm pot chests or Wait near pots to be on."
     },
     "pause_auto_treasure_hunt_for_critical_encounter": {
       "label": "Pause auto treasure hunt for CEs",
-      "tooltip": "On: while Auto treasure hunt is running, pause when a Critical Encounter is available (or already in one), then resume nearby afterward. If you are in combat when a CE opens, waits until combat ends before pausing.\nOff: with Treasure Sight, keep hunting through CEs (a hunt using the default chest list always pauses for CEs).\nNeeds Auto treasure hunt in Illegal Mode."
+      "tooltip": "On: when a Critical Encounter appears, pause the hunt, do the CE, then continue the hunt. If you are in a fight, BOCCHI finishes it first.\nOff: keep hunting and ignore CEs. Without Treasure Sight the hunt always pauses."
     },
     "auto_accept_raise": {
       "label": "Accept raises",
-      "tooltip": "Accepts a raise as soon as someone offers one, in Occult Crescent."
+      "tooltip": "Accept a raise as soon as someone gives you one. Works anywhere in Occult Crescent, also when Illegal Mode is off.\nYesAlready is paused while you are dead, so it cannot answer the prompt first."
     },
     "return_to_base_camp_after_death": {
       "label": "Return to camp if not raised",
-      "tooltip": "If nobody raises you, returns you to base camp after the delay below.\nNever inside Forked Tower or a critical encounter."
+      "tooltip": "If nobody raises you in time, go back to base camp. Never happens inside Forked Tower or a Critical Encounter.\nYesAlready is paused while you are dead, so it cannot answer the prompt first."
     },
     "return_after_death_delay_seconds": {
       "label": "Wait before returning (seconds)",
-      "tooltip": "How long to wait for a raise before returning to base camp."
+      "tooltip": "How long to wait for a raise before going back to base camp."
+    },
+    "triage_delay_seconds": {
+      "label": "Wait before raising (seconds)",
+      "tooltip": "How long to wait after a FATE or CE before raising, so healers nearby get a chance first. 0 = raise right away."
     }
   }
 }

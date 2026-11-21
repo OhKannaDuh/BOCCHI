@@ -1,10 +1,17 @@
 using BOCCHI.Common;
+using BOCCHI.Common.Config;
 using BOCCHI.Common.Data.Zones;
 using BOCCHI.Common.UI;
 using BOCCHI.UI;
 using Dalamud.Bindings.ImGui;
+using Dalamud.Interface;
 using Dalamud.Interface.Utility.Raii;
 using Microsoft.Extensions.DependencyInjection;
+using Ocelot.Ipc.Lifestream;
+using Ocelot.Ipc.RotationSolverReborn;
+using Ocelot.Ipc.VNavmesh;
+using Ocelot.Rotation.Services;
+using Ocelot.Services.PluginStatus;
 using Ocelot.Services.Translation;
 using Ocelot.Services.WindowManager;
 using Ocelot.Windows;
@@ -17,18 +24,38 @@ public class MainRenderer
     IServiceProvider services,
     IZoneProvider zones,
     OperationalStatusBar statusBar,
+    IConfigWindow configWindow,
+    IVNavmeshIpc vnav,
+    ILifestreamIpc lifestream,
+    IPluginStatus pluginStatus,
+    IRotationSolverRebornIpc rsr,
+    AutomatorConfig automatorConfig,
     ITranslator<MainWindow> translator
 ) : IMainRenderer
 {
+    private static readonly (MainWindowSection Tab, MainWindowSection[] Sections, string ConfigGroup)[] Tabs =
+    [
+        (MainWindowSection.Automation, [MainWindowSection.Automation, MainWindowSection.Completionist], "automation"),
+        (MainWindowSection.PotsTreasure, [MainWindowSection.PotsTreasure], "treasure"),
+        (MainWindowSection.MobFarmer, [MainWindowSection.MobFarmer], "mob_farmer"),
+        (MainWindowSection.Treasure, [MainWindowSection.Treasure], "treasure"),
+        (MainWindowSection.World, [MainWindowSection.World], "automation"),
+    ];
+
     private IEnumerable<IDynamicRenderer>? renderers;
 
-    private readonly HashSet<MainWindowSection> openedWhileActive = [];
+    private readonly HashSet<MainWindowSection> activeSections = [];
 
-    private IEnumerable<IDynamicRenderer> OrderedRenderers =>
+    private MainWindowSection? pendingTab;
+
+    private bool showCompletionist;
+
+    private List<IDynamicRenderer> OrderedRenderers =>
         (renderers ??= services.GetServices<IDynamicRenderer>())
         .Where(r => r.ShouldRender())
         .OrderBy(r => r.Section)
-        .ThenBy(r => r.Order);
+        .ThenBy(r => r.Order)
+        .ToList();
 
     public void Render()
     {
@@ -38,115 +65,235 @@ public class MainRenderer
             return;
         }
 
+        List<IDynamicRenderer> all = OrderedRenderers;
+
         statusBar.Render();
+        DrawTrackerLine(all.Where(r => r.Section == MainWindowSection.Trackers).ToList());
         BocchiUi.EndStickyHeader();
 
-        using var body = ImRaii.Child("##bocchi_main_body", new Vector2(0, -1), false);
-        if (!body.Success)
+        FollowRunningMode();
+
+        using var tabBar = ImRaii.TabBar("##bocchi_main_tabs");
+        if (!tabBar.Success)
         {
             return;
         }
 
-        MainWindowSection? expandRequest = statusBar.ExpandSectionRequest;
-        if (expandRequest != null)
+        foreach ((MainWindowSection tab, MainWindowSection[] sections, string configGroup) in Tabs)
         {
-            statusBar.ConsumeExpandRequest();
+            List<IDynamicRenderer> tabRenderers = all.Where(r => sections.Contains(r.Section)).ToList();
+            if (tabRenderers.Count == 0)
+            {
+                continue;
+            }
+
+            ImGuiTabItemFlags flags = pendingTab == tab ? ImGuiTabItemFlags.SetSelected : ImGuiTabItemFlags.None;
+            using var item = ImRaii.TabItem($"{GetSectionTitle(tab)}###tab_{tab}", flags);
+            if (pendingTab == tab)
+            {
+                pendingTab = null;
+            }
+
+            if (!item.Success)
+            {
+                continue;
+            }
+
+            using var body = ImRaii.Child($"##bocchi_tab_body_{tab}", new Vector2(0, -1), false);
+            if (!body.Success)
+            {
+                continue;
+            }
+
+            DrawTabBody(tab, tabRenderers, configGroup);
         }
 
-        foreach (MainWindowSection section in Enum.GetValues<MainWindowSection>())
+        // A hidden tab can't be selected; don't keep the request for a later frame.
+        pendingTab = null;
+    }
+
+    private void FollowRunningMode()
+    {
+        if (statusBar.ExpandSectionRequest is { } request)
         {
-            List<IDynamicRenderer> sectionRenderers = OrderedRenderers.Where(r => r.Section == section).ToList();
-            if (sectionRenderers.Count == 0)
-            {
-                continue;
-            }
+            statusBar.ConsumeExpandRequest();
+            Select(request);
+        }
 
-            if (section == MainWindowSection.Trackers)
+        Follow(MainWindowSection.Completionist, statusBar.CompletionistActive);
+        Follow(MainWindowSection.Automation, statusBar.IllegalModeActive && !statusBar.CompletionistActive);
+        Follow(MainWindowSection.PotsTreasure, statusBar.PotsTreasureActive);
+        Follow(MainWindowSection.MobFarmer, statusBar.MobFarmerActive);
+        Follow(MainWindowSection.Treasure, statusBar.StandaloneTreasureHuntActive || statusBar.CarrotHuntActive);
+    }
+
+    private void Follow(MainWindowSection section, bool active)
+    {
+        if (!active)
+        {
+            activeSections.Remove(section);
+            return;
+        }
+
+        if (activeSections.Add(section))
+        {
+            Select(section);
+        }
+    }
+
+    private void Select(MainWindowSection section)
+    {
+        if (section is MainWindowSection.Automation or MainWindowSection.Completionist)
+        {
+            showCompletionist = section == MainWindowSection.Completionist;
+            pendingTab = MainWindowSection.Automation;
+            return;
+        }
+
+        pendingTab = section;
+    }
+
+    private void DrawTabBody(MainWindowSection tab, List<IDynamicRenderer> tabRenderers, string configGroup)
+    {
+        ImGui.Spacing();
+
+        if (tab == MainWindowSection.Automation)
+        {
+            bool hasNormal = tabRenderers.Any(r => r.Section == MainWindowSection.Automation);
+            bool hasCompletionist = tabRenderers.Any(r => r.Section == MainWindowSection.Completionist);
+            if (hasNormal && hasCompletionist)
             {
-                BocchiUi.SectionTitle(GetSectionTitle(section));
-                ImGui.Spacing();
-                if (BocchiUi.BeginPanel("trackers"))
+                if (ImGui.RadioButton(translator.T(".sections.automation_normal"), !showCompletionist))
                 {
-                    foreach (IDynamicRenderer renderer in sectionRenderers)
-                    {
-                        if (renderer.SubsectionTitle is { } title)
-                        {
-                            BocchiUi.MutedText(title);
-                        }
-
-                        renderer.Render();
-                        ImGui.Spacing();
-                    }
-
-                    BocchiUi.EndPanel();
+                    showCompletionist = false;
                 }
 
-                continue;
-            }
-
-            bool forceOpen = section switch
-            {
-                MainWindowSection.Automation => statusBar.IllegalModeActive,
-                MainWindowSection.Completionist => statusBar.CompletionistActive,
-                MainWindowSection.PotsTreasure => statusBar.PotsTreasureActive,
-                MainWindowSection.MobFarmer => statusBar.MobFarmerActive,
-                MainWindowSection.Treasure => statusBar.StandaloneTreasureHuntActive
-                                             || statusBar.CarrotHuntActive,
-                _ => false,
-            };
-
-            if (expandRequest == section)
-            {
-                ImGui.SetNextItemOpen(true);
-            }
-            else if (forceOpen)
-            {
-                if (openedWhileActive.Add(section))
+                ImGui.SameLine(0f, 16f);
+                if (ImGui.RadioButton(GetSectionTitle(MainWindowSection.Completionist), showCompletionist))
                 {
-                    ImGui.SetNextItemOpen(true);
+                    showCompletionist = true;
                 }
+
+                ImGui.SameLine();
             }
-            else
+
+            MainWindowSection shown = hasCompletionist && (showCompletionist || !hasNormal)
+                ? MainWindowSection.Completionist
+                : MainWindowSection.Automation;
+            tabRenderers = tabRenderers.Where(r => r.Section == shown).ToList();
+        }
+
+        DrawSettingsButton(configGroup);
+        ImGui.Spacing();
+        DrawMissingPlugin(tab);
+
+        foreach (IDynamicRenderer renderer in tabRenderers)
+        {
+            if (renderer.SubsectionTitle is { } title)
             {
-                openedWhileActive.Remove(section);
-                ImGui.SetNextItemOpen(false, ImGuiCond.FirstUseEver);
+                BocchiUi.SectionTitle(title);
             }
 
-            ImGui.PushStyleColor(ImGuiCol.Text, BocchiUi.Header);
-            bool open = ImGui.CollapsingHeader(GetSectionTitle(section));
-            ImGui.PopStyleColor();
-
-            if (!open)
+            if (BocchiUi.BeginPanel($"{renderer.Section}_{renderer.GetType().Name}"))
             {
-                continue;
+                renderer.Render();
+                BocchiUi.EndPanel();
             }
 
-            ImGui.Indent();
             ImGui.Spacing();
+        }
+    }
 
-            foreach (IDynamicRenderer renderer in sectionRenderers)
+    private void DrawMissingPlugin(MainWindowSection tab)
+    {
+        if (tab == MainWindowSection.World || MissingPlugin(tab) is not { } missing)
+        {
+            return;
+        }
+
+        BocchiUi.DrawStatusChip(string.Format(translator.T(".status.plugin_missing"), missing), BocchiUi.StatusChipKind.Warn);
+        ImGui.SameLine(0f, 8f);
+        if (ImGui.SmallButton(translator.T(".status.open_dependencies")))
+        {
+            configWindow.OpenGroup("dependencies");
+        }
+
+        ImGui.Spacing();
+    }
+
+    private string? MissingPlugin(MainWindowSection tab)
+    {
+        if (!vnav.IsAvailable())
+        {
+            return "vnavmesh";
+        }
+
+        if (!lifestream.IsAvailable)
+        {
+            return "Lifestream";
+        }
+
+        if (tab is not (MainWindowSection.Automation or MainWindowSection.MobFarmer))
+        {
+            return null;
+        }
+
+        return automatorConfig.CombatAutorotation switch
+        {
+            CombatAutorotation.WrathCombo when !pluginStatus.IsLoaded(JobRotationBackendKeys.Wrath) => "Wrath Combo",
+            CombatAutorotation.RotationSolverReborn when !CombatPluginPresence.RotationSolverReborn(pluginStatus, rsr) => "Rotation Solver Reborn",
+            CombatAutorotation.BossMod when !pluginStatus.IsLoaded(JobRotationBackendKeys.BossMod) => "BossMod",
+            CombatAutorotation.BossModReborn when !pluginStatus.IsLoaded(JobRotationBackendKeys.BossModReborn) => "BossMod Reborn",
+            _ => null,
+        };
+    }
+
+    private void DrawSettingsButton(string configGroup)
+    {
+        string icon = FontAwesomeIcon.Cog.ToIconString();
+        float width;
+        using (ImRaii.PushFont(UiBuilder.IconFont))
+        {
+            width = ImGui.CalcTextSize(icon).X + ImGui.GetStyle().FramePadding.X * 2f;
+            ImGui.SetCursorPosX(ImGui.GetCursorPosX() + Math.Max(0f, ImGui.GetContentRegionAvail().X - width));
+            if (ImGui.Button($"{icon}##settings_{configGroup}"))
             {
-                if (renderer.SubsectionTitle is { } title)
-                {
-                    BocchiUi.MutedText(title);
-                    ImGui.Indent();
-                }
-
-                if (BocchiUi.BeginPanel($"{section}_{renderer.GetType().Name}"))
-                {
-                    renderer.Render();
-                    BocchiUi.EndPanel();
-                }
-
-                if (renderer.SubsectionTitle != null)
-                {
-                    ImGui.Unindent();
-                }
-
-                ImGui.Spacing();
+                configWindow.OpenGroup(configGroup);
             }
+        }
 
-            ImGui.Unindent();
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(translator.T(".sections.open_settings"));
+        }
+    }
+
+    private void DrawTrackerLine(List<IDynamicRenderer> trackers)
+    {
+        if (trackers.Count == 0)
+        {
+            return;
+        }
+
+        string line = string.Join("  ·  ", trackers.Select(t => t.CompactText).Where(t => !string.IsNullOrEmpty(t)));
+        if (line.Length == 0)
+        {
+            return;
+        }
+
+        ImGui.Spacing();
+        BocchiUi.MutedText(line);
+        if (!ImGui.IsItemHovered())
+        {
+            return;
+        }
+
+        using var tooltip = ImRaii.Tooltip();
+        ImGui.Dummy(new Vector2(ImGui.GetFontSize() * 16f, 0f));
+        foreach (IDynamicRenderer tracker in trackers)
+        {
+            tracker.Render();
+            ImGui.Spacing();
         }
     }
 

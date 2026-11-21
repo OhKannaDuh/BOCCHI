@@ -105,14 +105,14 @@ public class PathCalculator
     {
         if (objects.LocalPlayer is not { } player)
         {
-            logger.Warn("No Player");
+            logger.Debug("Path for {Goal}: no player", goal.GoalType);
             return PathCalculationResult.NoTravelNeeded();
         }
 
         IZone zone = zones.GetZone();
         if (!zone.IsOccultCrescentZone())
         {
-            logger.Warn("In wrong zone");
+            logger.Debug("Path for {Goal}: not in Occult Crescent", goal.GoalType);
             return PathCalculationResult.NoTravelNeeded();
         }
 

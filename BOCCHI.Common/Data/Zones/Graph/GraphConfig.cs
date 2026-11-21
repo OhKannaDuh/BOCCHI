@@ -85,7 +85,6 @@ public class GraphConfig(IPathfinder pathfinder, ILogger logger)
 
     public async Task<float> GetWalkingCost(Vector3 from, Vector3 to)
     {
-        logger.Debug($"Calculating walking cost (from = {from:f2}, to = {to:f2})");
         Path result = await pathfinder.Pathfind(new(to)
         {
             From = from,

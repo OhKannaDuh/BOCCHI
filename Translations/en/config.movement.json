@@ -1,6 +1,6 @@
 {
   "label": "Movement",
-  "tooltip": "Mounting, sprinting, and unsticking for all travel (Illegal Mode, Treasure Hunt, Carrot Hunt, Mob Farmer).",
+  "tooltip": "Mounts, sprinting and getting unstuck. Used by every mode.",
   "sections": {
     "mount": "Mount & sprint",
     "unstuck": "Getting unstuck",
@@ -12,7 +12,7 @@
     },
     "should_auto_mount": {
       "label": "Mount while traveling",
-      "tooltip": "On: mount for long travel and remount if you dismount mid-route (Illegal Mode, Treasure Hunt, Carrot Hunt, Mob Farmer).\nOff: stay on foot unless something else mounts you."
+      "tooltip": "On: mount for long trips, and get back on if you are knocked off.\nOff: stay on foot."
     },
     "preferred_mount_id": {
       "label": "Preferred mount",
@@ -21,14 +21,14 @@
     },
     "should_jump_when_stuck": {
       "label": "Jump when stuck",
-      "tooltip": "When movement stalls on rocks, ledges, or stairs."
+      "tooltip": "Jump when you are stuck on a rock, ledge or stairs."
     },
     "jump_when_stuck_seconds": {
       "label": "Seconds before jumping"
     },
     "prefer_return_over_shard_walk": {
       "label": "Use Return instead of walking to a shard",
-      "tooltip": "When Return is ready, take Return to camp for long trips instead of walking to an aethernet shard.\nOff: pick whichever route is shortest."
+      "tooltip": "On: for long trips, use Return to camp when it is ready, so you don't walk past enemies to reach a shard.\nOff: take whichever route is shortest."
     }
   }
 }

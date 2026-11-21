@@ -75,6 +75,9 @@ public class AutomatorConfig : IAutoConfig
     [TriageRaiseJob(Order = 12, Indent = 1, Requires = nameof(EnableTriageMode), Section = "triage")]
     public TriageRaiseJobPreference PreferredTriageRaiseJob { get; set; } = TriageRaiseJobPreference.PhantomChemist;
 
+    [IntRange(0, 30, Order = 12, Indent = 1, Requires = nameof(EnableTriageMode), Section = "triage")]
+    public int TriageDelaySeconds { get; set; } = 0;
+
     [Checkbox(Order = 13, Section = "treasure")]
     public bool EnableAutomaticTreasureHuntDuringIllegalMode { get; set; } = false;
 

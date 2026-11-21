@@ -1,9 +1,9 @@
 {
   "label": "Logs",
-  "tooltip": "Live BOCCHI log. Extra detail lines are included automatically — you do not need to change Dalamud’s log level.",
+  "tooltip": "What BOCCHI is doing, line by line. Useful when you report a problem.",
   "fields": {
     "viewer": {
-      "label": "Viewer"
+      "label": "Log"
     }
   }
 }

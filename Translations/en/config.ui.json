@@ -1,11 +1,11 @@
 {
   "label": "UI",
-  "tooltip": "Language, main window sections, reward icons, and tracker graphs.",
+  "tooltip": "Language, which tabs and trackers to show, and chat messages.",
   "sections": {
     "general": "General",
     "trackers": "Trackers",
-    "events": "Events",
-    "panels": "Main window",
+    "events": "Reward icons",
+    "panels": "Tabs",
     "chat": "Chat"
   },
   "fields": {
@@ -29,10 +29,10 @@
     },
     "show_active_treasure_tracker": {
       "label": "Show active bronze / silver",
-      "tooltip": "On: show remaining bronze / silver from Treasure Sight in Trackers.\nOff: only show those bars under Treasure Hunter.\nCounts update after you cast Treasure Sight."
+      "tooltip": "Show how many bronze and silver coffers are left when you hover the tracker line. The numbers update when Treasure Sight is used."
     },
     "show_world_section": {
-      "label": "Show FATEs & CEs list"
+      "label": "Show the World tab (FATEs and CEs)"
     },
     "show_demiatma_drops": {
       "label": "Show demiatma drops (South Horn)",
@@ -48,23 +48,23 @@
       "label": "Show Apply Buffs button"
     },
     "show_automation_section": {
-      "label": "Show Illegal Mode section"
+      "label": "Show the Illegal Mode tab"
     },
     "show_completionist_section": {
-      "label": "Show Completionist section"
+      "label": "Show Completionist"
     },
     "show_mob_farmer_section": {
-      "label": "Show Mob Farmer section"
+      "label": "Show the Mob Farmer tab"
     },
     "show_pots_treasure_section": {
-      "label": "Show Pots & Treasure section"
+      "label": "Show the Pots & Treasure tab"
     },
     "show_treasure_section": {
-      "label": "Show Treasure Hunter section"
+      "label": "Show the Treasure Hunter tab"
     },
     "show_bocchi_chat_prefix": {
       "label": "Show BOCCHI chat messages",
-      "tooltip": "On: print plugin messages to chat with a [BOCCHI] tag.\nOff: hide them (the startup MOTD still shows)."
+      "tooltip": "Print BOCCHI's messages in your chat, marked [BOCCHI]."
     }
   }
 }

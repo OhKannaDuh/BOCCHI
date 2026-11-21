@@ -17,8 +17,9 @@ public sealed class AutoRevive(
     IObjectTable objects,
     IZoneProvider zones,
     ICriticalEncounterContext criticalEncounters,
+    YesAlreadyPause yesAlready,
     ILogger<AutoRevive> logger
-) : IOnUpdate
+) : IOnUpdate, IOnStop
 {
     private const uint RaisePendingStatusId = 148; // Raise
 
@@ -28,12 +29,16 @@ public sealed class AutoRevive(
 
     private bool sawAlive;
 
+    private string? lastNote;
+
     public unsafe void Update()
     {
         if (!zones.GetZone().IsOccultCrescentZone())
         {
             deadSinceUtc = null;
             sawAlive = false;
+            lastNote = null;
+            yesAlready.Release();
             return;
         }
 
@@ -42,7 +47,9 @@ public sealed class AutoRevive(
         {
             deadSinceUtc = null;
             sawAlive = true;
+            lastNote = null;
             protectedContent = inProtectedContent;
+            yesAlready.Release();
             return;
         }
 
@@ -52,24 +59,70 @@ public sealed class AutoRevive(
 
         if (!config.AutoAcceptRaise && !config.ReturnToBaseCampAfterDeath)
         {
+            yesAlready.Release();
             return;
         }
+
+        // A YesAlready rule would click the revive prompt first, also inside Forked Tower.
+        yesAlready.Hold();
 
         if (!AddonHelpers.TryGetSelectYesno(out AddonSelectYesno* yesno) || ReturnYesNo.IsPartyInvite(&yesno->AtkUnitBase))
         {
+            Note("you are down; no revive prompt yet");
             return;
         }
 
-        bool raiseOffered = objects.LocalPlayer?.StatusList.Any(s => s.StatusId == RaisePendingStatusId) == true
-                            && !ReturnYesNo.IsReturnConfirmation(&yesno->AtkUnitBase);
+        bool raisePending = objects.LocalPlayer?.StatusList.Any(s => s.StatusId == RaisePendingStatusId) == true;
+        bool raiseOffered = raisePending && !ReturnYesNo.IsReturnConfirmation(&yesno->AtkUnitBase);
         string? reason = raiseOffered ? AcceptRaiseReason() : ReturnReason();
-        if (reason == null || !EzThrottler.Throttle("AutoRevive::Yes", 1000))
+        if (reason == null)
+        {
+            Note(raiseOffered ? "a raise is offered, but Accept raises is off" : WhyNotReturning(raisePending));
+            return;
+        }
+
+        if (!EzThrottler.Throttle("AutoRevive::Yes", 1000))
         {
             return;
         }
 
+        lastNote = null;
         logger.Info("Auto revive: {Reason}", reason);
         new AddonMaster.SelectYesno((nint)yesno).Yes();
+    }
+
+    public void OnStop() => yesAlready.Release();
+
+    private void Note(string note)
+    {
+        if (note == lastNote)
+        {
+            return;
+        }
+
+        lastNote = note;
+        logger.Info("Auto revive: {Note}", note);
+    }
+
+    private string WhyNotReturning(bool raisePending)
+    {
+        string prompt = raisePending ? "a raise is pending but the prompt looks like a return prompt" : "no raise pending";
+        if (!config.ReturnToBaseCampAfterDeath)
+        {
+            return $"{prompt}; Return to camp is off";
+        }
+
+        if (protectedContent)
+        {
+            return $"{prompt}; inside Forked Tower or a critical encounter, so not returning";
+        }
+
+        if (!sawAlive)
+        {
+            return $"{prompt}; BOCCHI did not see you alive first, so not returning";
+        }
+
+        return $"{prompt}; returning to camp after {config.ReturnAfterDeathDelaySeconds}s without a raise";
     }
 
     private string? AcceptRaiseReason() => config.AutoAcceptRaise ? "accepting raise" : null;

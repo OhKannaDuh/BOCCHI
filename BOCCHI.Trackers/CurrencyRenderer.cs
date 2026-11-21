@@ -19,6 +19,11 @@ public class CurrencyRenderer
 
     public uint Order => 10;
 
+    public string CompactText => string.Format(
+        translator.T(".trackers.currency.compact"),
+        tracker.GoldPerHour.ToString("N0"),
+        tracker.SilverPerHour.ToString("N0"));
+
     public void Render()
     {
         TimeSpan graphBucketSize = DeltaRateTracker.DefaultGraphBucket;

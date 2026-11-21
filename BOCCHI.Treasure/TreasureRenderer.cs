@@ -39,6 +39,7 @@ public class TreasureRenderer
     private void DrawHuntPanel()
     {
         ImGui.Spacing();
+        BocchiUi.DrawIntro(translator.T(".treasure.start_hunt_tooltip"));
 
         if (!hunter.IsVnavAvailable)
         {

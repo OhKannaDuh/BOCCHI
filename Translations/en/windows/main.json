@@ -15,7 +15,9 @@
     "potstreasure": "Pots & Treasure",
     "mobfarmer": "Mob Farmer",
     "world": "World",
-    "treasure": "Treasure Hunter"
+    "treasure": "Treasure Hunter",
+    "automation_normal": "Normal",
+    "open_settings": "Open the settings for this tab"
   },
   "status": {
     "automator": "Illegal Mode",
@@ -29,7 +31,7 @@
     "idle": "Nothing running",
     "whats_running": "Running",
     "shopping_paused": "Shopping",
-    "click_section": "Open this section",
+    "click_section": "Open this tab",
     "emergency_stop_tooltip": "Emergency Stop — stop all automation, movement, and buffs",
     "emergency_stop_done": "[BOCCHI] Emergency Stop",
     "goal": "Goal",
@@ -38,12 +40,14 @@
     "path_step_teleport": "Teleporting",
     "path_step_teleport_to": "Teleport to {0}",
     "path_step_return": "Returning to base camp",
-    "chests": "Pot chests"
+    "chests": "Pot chests",
+    "plugin_missing": "{0} isn't running. This mode can't work without it.",
+    "open_dependencies": "Open Dependencies"
   },
   "pot_timer": {
     "active": "Pot FATE active",
     "next": "Next pot",
-    "unknown": "Next pot: unknown — stay for one pot FATE to start the timer.",
+    "unknown": "Next pot: unknown. Do one pot FATE and BOCCHI will know the timer.",
     "chip_active": "active",
     "south_horn": "South Horn",
     "north_horn": "North Horn",
@@ -64,11 +68,13 @@
       "current_job": "Current job",
       "no_job": "No job found",
       "level": "Level: {0} ({1})",
-      "per_hour": "Experience per hour"
+      "per_hour": "Experience per hour",
+      "compact": "XP {0}/h"
     },
     "currency": {
       "gold_per_hour": "Gold per hour",
-      "silver_per_hour": "Silver per hour"
+      "silver_per_hour": "Silver per hour",
+      "compact": "Gold {0}/h  ·  Silver {1}/h"
     }
   },
   "buffs": {
@@ -86,7 +92,7 @@
     "mode_off": "[BOCCHI] Completionist Mode Off",
     "mode_off_left_zone": "[BOCCHI] Left Occult Crescent — Completionist Mode Off",
     "about": "About",
-    "description": "Uses Illegal Mode for missing FATE and CE notes. Survey points: click to flag; Ctrl+click to travel. Forked Tower notes are tracking only.",
+    "description": "Illegal Mode, but it only goes for FATEs and CEs whose field notes you are still missing. Survey points: click to mark one on the map, Ctrl+click to go there. Forked Tower notes are only listed.",
     "legend": "Check = unlocked · × = still needed · star = phantom job maxed",
     "notes_header": "Field notes",
     "jobs_header": "Phantom jobs",
@@ -126,7 +132,7 @@
       "refresh_pathfinding": "Replan route",
       "refresh_pathfinding_tooltip": "Drop the current route and plan a new one from where you are.",
       "rebuild_path_map": "Rebuild path map",
-      "rebuild_path_map_tooltip": "Reload this zone’s route map (not the same as rebuilding the travel plugin’s mesh). Use if routes fail or you freeze near camp.",
+      "rebuild_path_map_tooltip": "Reload BOCCHI's path map of this zone. Try this if it can't find a route or stands still near camp.",
       "path_map": "Path map",
       "path_map_idle": "Loads when Illegal Mode starts",
       "path_map_loading": "Loading…",
@@ -145,10 +151,11 @@
       "forked_tower_on_pad": "[BOCCHI] On the Forked Tower pad — stay here until you are teleported.",
       "pathfinding_refreshed": "[BOCCHI] Route replanned",
       "pathfinding_refreshed_no_goal": "[BOCCHI] Route cleared (nothing to go to right now)",
-      "path_routing_failed": "[BOCCHI] Couldn't plan a route to that FATE/CE. Skipping it briefly — toggle Illegal Mode or Rebuild path map if it keeps happening.",
+      "path_routing_failed": "[BOCCHI] Couldn't find a route to that FATE or CE, so it is skipped for now. If this keeps happening, restart Illegal Mode or rebuild the path map.",
       "pot_chest_farm": "Pot chest farm",
       "chests_remaining": "Chests remaining",
-      "time_idle": "Time idle"
+      "time_idle": "Time idle",
+      "description": "Does FATEs, Critical Encounters and Magic Pots for you, one after another."
     },
     "mob_farmer": {
       "title": "Mob Farmer",
@@ -167,25 +174,26 @@
         "crystal_buffs": "Crystal buffs",
         "shopping": "Shopping"
       },
-      "configure_mobs": "Pick enemies in /bocchi config → Mob Farmer.",
-      "off_left_zone": "[BOCCHI] Left Occult Crescent — Mob Farmer Off"
+      "configure_mobs": "Choose which enemies to farm in the settings (the cog on this tab).",
+      "off_left_zone": "[BOCCHI] Left Occult Crescent — Mob Farmer Off",
+      "description": "Pulls the enemies you picked into a pack and fights them, over and over."
     },
     "pots_treasure": {
       "start": "Start Pots & Treasure",
       "stop": "Stop Pots & Treasure",
       "pause": "Pause",
-      "pause_tooltip": "Stop moving for now, but keep this run. Press Resume when you’re ready.",
+      "pause_tooltip": "Stop moving for now but keep your progress. Press Resume to continue.",
       "resume": "Resume",
-      "resume_tooltip": "Continue pots and treasure from where you left off.",
+      "resume_tooltip": "Continue where you stopped.",
       "paused": "Paused",
       "on": "[BOCCHI] Pots & Treasure On",
       "off": "[BOCCHI] Pots & Treasure Off",
       "off_left_zone": "[BOCCHI] Left Occult Crescent — Pots & Treasure Off",
-      "description": "Does pot FATEs and pot chests, then treasure hunts until it is time to leave for the next pot.",
+      "description": "Does every Magic Pot and its chests, and hunts treasure in between.",
       "phase": "Phase",
       "requires_vnav": "[BOCCHI] Pots & Treasure needs the travel plugin (vnavmesh).",
       "resume_treasure_hunt": "Resume treasure hunt",
-      "resume_treasure_hunt_tooltip": "Skip the wait and start another treasure hunt pass.",
+      "resume_treasure_hunt_tooltip": "Don't wait: start another treasure hunt now.",
       "active_fates": "Active pot FATE",
       "no_active_fate": "No pot FATE up right now.",
       "phases": {
@@ -223,7 +231,7 @@
     "requires_vnav": "Needs the travel plugin (vnavmesh).",
     "waiting_navmesh": "Waiting for the travel plugin to finish loading this zone…",
     "start_hunt": "Start Treasure Hunt",
-    "start_hunt_tooltip": "Route bronze and silver coffers from the map, open them, and skip empty locations.",
+    "start_hunt_tooltip": "Walk to every bronze and silver coffer, open it, and skip the empty spots.",
     "pause_hunt": "Pause",
     "resume_hunt": "Resume",
     "stop_hunt": "Stop Treasure Hunt",
@@ -231,32 +239,31 @@
     "carrot_hunt_off_left_zone": "[BOCCHI] Left Occult Crescent — Carrot Hunt Off",
     "paused": "Paused",
     "waiting_safe_window": "Waiting for safe weather",
-    "waiting_safe_window_detail": "Paused for Ashkin or unsafe weather on South Horn. Resumes when it is safe.",
+    "waiting_safe_window_detail": "Paused for Ashkin or dangerous weather in South Horn. Continues when it is safe.",
     "elapsed": "Elapsed",
     "progress": "Progress",
     "last_checked": "Last coffer checked",
     "resume_coffer": "Resume from coffer",
     "flag_resume_tooltip": "Put a map flag on the coffer where the hunt will continue",
     "recalculate_route_tooltip": "Recalculate the treasure hunt route from your current position",
-    "managed_by_pots": "Hunt is controlled by Pots & Treasure — start or stop it there.",
-    "managed_by_illegal_mode": "Hunt is controlled by Illegal Mode (runs between activities).",
-    "managed_by_mob_farmer": "Hunt is controlled by Mob Farmer (runs on its timer).",
-    "managed_by_carrot": "Carrot Hunt is running — stop it below before starting Treasure Hunt.",
-    "managed_by_treasure": "Treasure Hunt is running — stop it above before starting Carrot Hunt.",
+    "managed_by_pots": "This hunt is run by Pots & Treasure. Start or stop it on that tab.",
+    "managed_by_illegal_mode": "This hunt is run by Illegal Mode, between activities.",
+    "managed_by_mob_farmer": "This hunt is run by Mob Farmer, on its timer.",
+    "managed_by_carrot": "A Carrot Hunt is running. Stop it below before you start a Treasure Hunt.",
     "distance_to_chest": "Distance to coffer",
     "nearby_title": "Nearby treasures",
     "none_nearby": "No treasures nearby.",
     "active_bronze": "Active bronze",
     "active_silver": "Active silver",
-    "active_counts_idle": "Cast Treasure Sight to update bronze and silver counts.",
+    "active_counts_idle": "Cast Treasure Sight to see how many coffers are left.",
     "distance": "Distance: {0:F1}y",
     "position": "({0:F1}, {1:F1}, {2:F1})",
     "carrot_hunt_title": "Carrot Hunt",
-    "carrot_hunt_description": "Visits chewed carrot locations, uses Fortune Carrots, and opens bunny chests.",
+    "carrot_hunt_description": "Walks to every carrot spot, uses a Fortune Carrot and opens the bunny's chest.",
     "start_carrot_hunt": "Start Carrot Hunt",
     "stop_carrot_hunt": "Stop Carrot Hunt",
     "use_fortune_carrot": "Use Fortune Carrot",
-    "use_fortune_carrot_tooltip": "Use one Fortune Carrot from your inventory right now. Handy if the hunt is stuck near a chewed carrot.",
+    "use_fortune_carrot_tooltip": "Use one Fortune Carrot right now. Helps when the hunt is stuck next to a carrot.",
     "carrot_hunt_phase": "Phase",
     "fortune_carrots": "Fortune Carrots",
     "carrot_hunt_phases": {
@@ -268,6 +275,7 @@
       "approaching_aetheryte": "Walking to aetheryte",
       "teleporting": "Using aethernet",
       "returning": "Returning to base camp"
-    }
+    },
+    "active_compact": "Bronze {0}/{1}  ·  Silver {2}/{3}"
   }
 }

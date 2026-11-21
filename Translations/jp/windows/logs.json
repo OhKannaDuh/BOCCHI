@@ -2,7 +2,7 @@
   "title": "BOCCHI — Logs",
   "search_hint": "ログを検索...",
   "copy_all": "BOCCHIログをすべてコピー",
-  "copy_all_tooltip": "バージョン・ローテーション・最近のBOCCHIログをすべてDiscord用にコピーします（フィルタ結果だけではありません）。詳細行も自動で取り込まれます。",
+  "copy_all_tooltip": "バージョン、戦闘プラグイン、最近のログをすべてコピーします。そのまま Discord に貼り付けられます。",
   "clear": "クリア",
   "copied": "コピーしました。",
   "col_time": "時刻",

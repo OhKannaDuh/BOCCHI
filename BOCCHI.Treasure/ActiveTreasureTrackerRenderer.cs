@@ -1,5 +1,6 @@
 using BOCCHI.Common;
 using BOCCHI.Common.Config;
+using BOCCHI.Treasure.Hunt;
 using BOCCHI.Treasure.Services;
 using Ocelot.Services.Translation;
 using Ocelot.Windows;
@@ -17,6 +18,15 @@ public class ActiveTreasureTrackerRenderer
     public MainWindowSection Section => MainWindowSection.Trackers;
 
     public uint Order => 20;
+
+    public string? CompactText => tracker.CountInitialised
+        ? string.Format(
+            translator.T(".treasure.active_compact"),
+            tracker.BronzeChests,
+            TreasureHuntFillGate.BronzeCap,
+            tracker.SilverChests,
+            TreasureHuntFillGate.SilverCap)
+        : null;
 
     public void Render() =>
         ActiveTreasureCountUi.Draw(tracker, treasureConfig, translator, showIdleHint: true);

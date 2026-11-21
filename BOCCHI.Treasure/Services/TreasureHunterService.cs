@@ -166,6 +166,8 @@ public class TreasureHunterService
 
     public void OnStop() => Teardown();
 
+    private bool wasInCombat;
+
     public void Update()
     {
         if (!Running)
@@ -181,7 +183,7 @@ public class TreasureHunterService
 
         if (Paused)
         {
-            if (EzThrottler.Throttle("TreasureHunt::IdlePaused", 5000))
+            if (EzThrottler.Throttle("TreasureHunt::IdlePaused", 60000))
             {
                 log.Debug(
                     "Treasure hunt idle: Paused step={Step} vnavRunning={Vnav} mounted={Mounted}",
@@ -193,10 +195,22 @@ public class TreasureHunterService
             return;
         }
 
+        bool inCombatNow = conditions[ConditionFlag.InCombat];
+        if (inCombatNow && !wasInCombat)
+        {
+            log.Info(
+                "Treasure hunt: attacked at {Step} (attacker level {Enemy}, your Knowledge Level {Mine})",
+                DescribeCurrentStep(),
+                KnowledgeThreat.HighestAttackerLevel(objects)?.ToString() ?? "?",
+                KnowledgeThreat.TryGetPlayerForayLevel(objects)?.ToString() ?? "?");
+        }
+
+        wasInCombat = inCombatNow;
+
         if (conditions[ConditionFlag.Unconscious])
         {
             SoftStopMovement();
-            if (EzThrottler.Throttle("TreasureHunt::IdleUnconscious", 5000))
+            if (EzThrottler.Throttle("TreasureHunt::IdleUnconscious", 60000))
             {
                 log.Debug("Treasure hunt idle: Unconscious");
             }
@@ -206,7 +220,7 @@ public class TreasureHunterService
 
         if (config.SkipUnsafeTreasureWindows && IsUnsafeTreasureWindow())
         {
-            if (EzThrottler.Throttle("TreasureHunt::IdleUnsafe", 5000))
+            if (EzThrottler.Throttle("TreasureHunt::IdleUnsafe", 60000))
             {
                 log.Debug("Treasure hunt idle: Unsafe window (SkipUnsafeTreasureWindows)");
             }
@@ -216,7 +230,7 @@ public class TreasureHunterService
 
         if (!IsVnavReady)
         {
-            if (EzThrottler.Throttle("TreasureHunt::IdleNoVnav", 5000))
+            if (EzThrottler.Throttle("TreasureHunt::IdleNoVnav", 60000))
             {
                 log.Debug("Treasure hunt idle: vnavmesh not ready");
             }
@@ -229,7 +243,7 @@ public class TreasureHunterService
         if (activeChain is { IsCompleted: false })
         {
             MaintainNinjaHideDuringInteract();
-            if (EzThrottler.Throttle("TreasureHunt::IdleOpenChain", 5000))
+            if (EzThrottler.Throttle("TreasureHunt::IdleOpenChain", 60000))
             {
                 log.Debug("Treasure hunt idle: open chain running step={Step}", DescribeCurrentStep());
             }
@@ -241,7 +255,7 @@ public class TreasureHunterService
         {
             if (pathPlanner.State != HuntPathfinderState.FileLoaded)
             {
-                if (EzThrottler.Throttle("TreasureHunt::IdlePlanner", 5000))
+                if (EzThrottler.Throttle("TreasureHunt::IdlePlanner", 60000))
                 {
                     log.Debug("Treasure hunt idle: path planner state={State}", pathPlanner.State);
                 }
@@ -251,7 +265,7 @@ public class TreasureHunterService
 
             if (!planningRoute)
             {
-                if (EzThrottler.Throttle("TreasureHunt::IdlePlannerIdle", 5000))
+                if (EzThrottler.Throttle("TreasureHunt::IdlePlannerIdle", 60000))
                 {
                     log.Debug("Treasure hunt idle: planner loaded but not planning route");
                 }
@@ -575,6 +589,11 @@ public class TreasureHunterService
 
     private void BeginHuntSession()
     {
+        log.Info(
+            "Treasure hunt started (pots={Pots}, filler={Filler}, farmer={Farmer})",
+            ManagedByPotsTreasure,
+            ManagedByIllegalModeFiller,
+            ManagedByMobFarmer);
         stopwatch.Restart();
         StepIndex = 0;
         LastCheckedNodeId = null;
@@ -2885,6 +2904,13 @@ public class TreasureHunterService
         bool wasStandalone = Running && !wasManagedByPotsTreasure && !ManagedByIllegalModeFiller && !ManagedByMobFarmer;
         bool wasIllegalFiller = ManagedByIllegalModeFiller;
         bool wasMobFarmer = ManagedByMobFarmer;
+        if (Running)
+        {
+            log.Info(
+                "Treasure hunt stopped after {Seconds}s, {Checked} location(s) checked",
+                (int)stopwatch.Elapsed.TotalSeconds,
+                checkedNodeIds.Count);
+        }
 
         Running = false;
         Paused = false;

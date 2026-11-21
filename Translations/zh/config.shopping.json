@@ -1,21 +1,21 @@
 {
   "label": "购物",
-  "tooltip": "银币或金币达到阈值时，暂停其他自动化；若不在大本营则先 Return，再启动 Knightshopper 的 Occult Crescent 购物清单。需要 Knightshopper（见依赖项）。FATE/CE 进行中不会开始。",
+  "tooltip": "银币或金币足够时，BOCCHI 会停下来返回营地，让 Knightshopper 购买你的清单。危命或紧急遭遇战期间不会进行。需要 Knightshopper 插件。",
   "sections": {
     "auto": "自动购物"
   },
   "fields": {
     "enable_auto_shop": {
       "label": "启用自动购物",
-      "tooltip": "开：银币或金币达到阈值且不在 FATE/CE 中时，暂停其他自动化；若在野外则先 Return 回大本营，再启动 Knightshopper 的 Occult Crescent 购物清单。物品在 Knightshopper 中配置。可打断寻宝和刷怪待机；不会打断拉怪/战斗中。若未安装或未就绪 Knightshopper 则不操作。\n关：不自动购物。"
+      "tooltip": "银币或金币达到下面的数量时，BOCCHI 会停下手头的事，返回营地并启动你的 Knightshopper 清单。它会先等危命、紧急遭遇战或刷怪战斗结束。要买什么在 Knightshopper 中选择。"
     },
     "silver_threshold": {
       "label": "银币阈值",
-      "tooltip": "南角银币、北角银奥博达到该值时开始购物。FATE/CE 进行中、刷怪拉怪/战斗中不会开始。0 = 不因银币开始。"
+      "tooltip": "银币达到这个数量时去购物。0＝不因银币去购物。"
     },
     "gold_threshold": {
       "label": "金币阈值",
-      "tooltip": "南角金币、北角金奥博达到该值时开始购物。FATE/CE 进行中、刷怪拉怪/战斗中不会开始。0 = 不因金币开始。"
+      "tooltip": "金币达到这个数量时去购物。0＝不因金币去购物。"
     }
   }
 }

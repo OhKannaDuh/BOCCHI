@@ -1,11 +1,11 @@
 {
   "label": "UI",
-  "tooltip": "言語、メインウィンドウの表示、報酬アイコン、トラッカーのグラフ。",
+  "tooltip": "言語、表示するタブとトラッカー、チャットメッセージ。",
   "sections": {
     "general": "一般",
     "trackers": "トラッカー",
-    "events": "イベント",
-    "panels": "メインウィンドウ",
+    "events": "報酬アイコン",
+    "panels": "タブ",
     "chat": "チャット"
   },
   "fields": {
@@ -29,14 +29,14 @@
     },
     "show_active_treasure_tracker": {
       "label": "アクティブな銅箱／銀箱を表示",
-      "tooltip": "オン：Treasure Sight でわかっている銅／銀の残りをトラッカーに表示します。\nオフ：Treasure Hunter の下にだけ表示します。\n数値は Treasure Sight を詠唱すると更新されます。"
+      "tooltip": "トラッカーの行にカーソルを合わせると、銅と銀の宝箱の残り数を表示します。数はトレジャーサイトを使うと更新されます。"
     },
     "show_world_section": {
-      "label": "FATE・CE 一覧を表示"
+      "label": "ワールドタブを表示（FATE と CE）"
     },
     "show_demiatma_drops": {
       "label": "デミアートマを表示（南征編）",
-      "tooltip": "緑枠：まだ必要。\n赤枠：すでに 3 個所持。"
+      "tooltip": "緑枠：まだ必要です。\n赤枠：すでに 3 個持っています。"
     },
     "show_note_drops": {
       "label": "探査記録を表示"
@@ -48,23 +48,23 @@
       "label": "バフ付与ボタンを表示"
     },
     "show_automation_section": {
-      "label": "不正モードセクションを表示"
+      "label": "不正モードのタブを表示"
     },
     "show_completionist_section": {
-      "label": "コンプリーショニストセクションを表示"
+      "label": "コンプリーショニストを表示"
     },
     "show_mob_farmer_section": {
-      "label": "モブファームセクションを表示"
+      "label": "モブファームのタブを表示"
     },
     "show_pots_treasure_section": {
-      "label": "ポット＆トレジャーセクションを表示"
+      "label": "ポット＆トレジャーのタブを表示"
     },
     "show_treasure_section": {
-      "label": "トレジャーハンターセクションを表示"
+      "label": "トレジャーハンターのタブを表示"
     },
     "show_bocchi_chat_prefix": {
       "label": "BOCCHI チャットメッセージを表示",
-      "tooltip": "オン：プラグインのメッセージを [BOCCHI] 付きでチャットに出す。\nオフ：非表示（起動時の MOTD は出る）。"
+      "tooltip": "BOCCHI のメッセージを [BOCCHI] 付きでチャットに表示します。"
     }
   }
 }

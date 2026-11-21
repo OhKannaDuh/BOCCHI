@@ -48,6 +48,8 @@ public sealed class WaitingForCriticalEncounterMemory(CriticalEncounterId encoun
     public bool IsFor(CriticalEncounterId id) => EncounterId == id;
 }
 
+public sealed class TreasureHuntSelfDefenceMemory;
+
 public sealed class WaitingForForkedTowerMemory(CriticalEncounterId towerId)
 {
     public CriticalEncounterId TowerId { get; } = towerId;

@@ -2,7 +2,7 @@
   "title": "BOCCHI — Logs",
   "search_hint": "로그 검색...",
   "copy_all": "BOCCHI 로그 모두 복사",
-  "copy_all_tooltip": "버전, 로테이션, 최근 BOCCHI 로그를 Discord용으로 모두 복사합니다(필터된 보기만이 아님). 자세한 줄도 자동으로 담깁니다.",
+  "copy_all_tooltip": "버전, 전투 플러그인, 최근 로그를 모두 복사합니다. Discord에 바로 붙여 넣을 수 있습니다.",
   "clear": "지우기",
   "copied": "복사됨.",
   "col_time": "시간",

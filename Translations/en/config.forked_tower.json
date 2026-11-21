@@ -1,6 +1,6 @@
 {
   "label": "Forked Tower",
-  "tooltip": "Forked Tower helpers. Trap spots are South Horn only.",
+  "tooltip": "Help for Forked Tower. Trap spots are only known for South Horn.",
   "sections": {
     "helpers": "Helpers",
     "illegal_mode": "Illegal Mode"
@@ -8,18 +8,18 @@
   "fields": {
     "draw_potential_trap_positions": {
       "label": "Show possible trap spots",
-      "tooltip": "Draw circles on known trap spawn points inside South Horn Forked Tower."
+      "tooltip": "Draw circles where traps can appear inside the South Horn Forked Tower."
     },
     "show_registration_countdown": {
       "label": "Show registration countdown",
-      "tooltip": "Show Forked Tower registration / warmup countdown in the Critical Encounters list (North and South Horn)."
+      "tooltip": "Show how long Forked Tower registration stays open in the Critical Encounters list."
     },
     "trap_draw_range": {
       "label": "Only show traps within (yalms)"
     },
     "auto_register_in_illegal_mode": {
       "label": "Go to the tower when registration opens",
-      "tooltip": "While Illegal Mode is on and Forked Tower registration opens, drop the current trip, travel to the entry pad and wait on it until you are teleported in. Illegal Mode turns off once you are inside. Magic (North Horn) is skipped below Knowledge Level 40. Blood (South Horn): you still offer Sanguine Ciphers at a reliquary yourself — BOCCHI only reminds you."
+      "tooltip": "When Forked Tower registration opens, BOCCHI stops what it is doing, goes to the entry pad and waits there until you are teleported in. Illegal Mode switches off once you are inside.\nNorth Horn: skipped below Knowledge Level 40.\nSouth Horn: you still have to offer your Sanguine Ciphers yourself. BOCCHI reminds you."
     }
   }
 }

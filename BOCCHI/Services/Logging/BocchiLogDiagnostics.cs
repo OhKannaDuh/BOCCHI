@@ -2,12 +2,14 @@ using System.Text;
 using BOCCHI.Automator.Data;
 using BOCCHI.Automator.Services;
 using BOCCHI.Common.Config;
+using BOCCHI.Common.Data.SupportJobs;
 using BOCCHI.Common.Data.Zones;
 using BOCCHI.Common.Services;
 using BOCCHI.MobFarmer.Data;
 using BOCCHI.MobFarmer.Services;
 using BOCCHI.Services.Changelog;
 using BOCCHI.Treasure.Services;
+using Dalamud.Plugin.Services;
 using Ocelot.Services.PluginStatus;
 
 namespace BOCCHI.Services.Logging;
@@ -22,6 +24,9 @@ public sealed class BocchiLogDiagnostics
     AutomatorConfig automatorConfig,
     Func<IAutomator> automatorFactory,
     Func<IMobFarmer> farmerFactory,
+    Func<IPotsTreasureMode> potsTreasureFactory,
+    IObjectTable objects,
+    ISupportJobFactory supportJobs,
     ITreasureHunter hunter,
     ICarrotHunter carrotHunter,
     IZoneProvider zones,
@@ -73,6 +78,13 @@ public sealed class BocchiLogDiagnostics
                         ? "off-tick"
                         : "off");
         sb.AppendLine($"IllegalState: {illegalState}");
+        sb.AppendLine(
+            $"Other modes: Completionist={OnOff(Automator.IsCompletionist)} "
+            + $"PotsTreasure={OnOff(potsTreasureFactory().Running)} "
+            + $"MobFarmerPhase={(Farmer.Running ? Farmer.Phase.ToString() : "off")}");
+        sb.AppendLine(
+            $"Other plugins: vnavmesh={Status("vnavmesh")} Lifestream={Status("Lifestream")} YesAlready={Status("YesAlready")}");
+        sb.AppendLine(DescribePlayer());
 
         IZone zone = zones.GetZone();
         string zoneName = zone.ZoneId switch
@@ -83,6 +95,16 @@ public sealed class BocchiLogDiagnostics
         };
         sb.AppendLine($"Zone: {zoneName} ({zone.TerritoryType})");
         return sb.ToString();
+    }
+
+    private string DescribePlayer()
+    {
+        string job = objects.LocalPlayer?.ClassJob.ValueNullable?.Abbreviation.ToString() ?? "?";
+        string phantom = supportJobs.TryGetCurrent(out SupportJob current)
+            ? $"{current.Data.Name} {current.Level}"
+            : "none";
+        string knowledge = KnowledgeThreat.TryGetPlayerForayLevel(objects)?.ToString() ?? "?";
+        return $"Player: job={job} phantom={phantom} knowledge={knowledge}";
     }
 
     private string Status(string internalName) =>

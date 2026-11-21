@@ -29,6 +29,8 @@ public class MobFarmerRenderer
     {
         panelState.MarkRendered();
 
+        BocchiUi.DrawIntro(translator.T(".automation.mob_farmer.description"));
+
         if (ImGui.Button(Farmer.Running
             ? translator.T(".automation.mob_farmer.stop")
             : translator.T(".automation.mob_farmer.start")))

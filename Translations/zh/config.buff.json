@@ -1,6 +1,6 @@
 {
   "label": "增益",
-  "tooltip": "自动维持辅助职业增益。",
+  "tooltip": "保持知识水晶的增益不断。",
   "sections": {
     "automation": "自动化",
     "which": "选择增益"
@@ -8,7 +8,7 @@
   "fields": {
     "should_automate_buffs": {
       "label": "自动维持增益",
-      "tooltip": "开：违规模式中，以及刷怪为水晶增益暂停时，在知识水晶刷新所选增益。\n关：不自动刷新增益。"
+      "tooltip": "下面勾选的增益快要结束时，在知识水晶处刷新。违规模式和刷怪都会使用。"
     },
     "apply_romeos_ballad": {
       "label": "爱之歌"
@@ -24,7 +24,7 @@
     },
     "apply_buffs_using_inquiring_mind": {
       "label": "尽量使用探求心",
-      "tooltip": "在知识水晶附近，辅助自由人可一次附加所选已解锁增益。"
+      "tooltip": "在知识水晶附近，辅助自由人可以一次附加所有勾选的增益。"
     },
     "reapply_threshold": {
       "label": "剩余不足（分钟）时刷新"

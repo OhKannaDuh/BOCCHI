@@ -1,9 +1,9 @@
 {
   "label": "로그",
-  "tooltip": "BOCCHI 실시간 로그입니다. 자세한 줄도 자동으로 담깁니다. Dalamud 로그 레벨을 바꿀 필요 없습니다.",
+  "tooltip": "BOCCHI가 하는 일을 한 줄씩 보여 줍니다. 문제를 신고할 때 유용합니다.",
   "fields": {
     "viewer": {
-      "label": "뷰어"
+      "label": "로그"
     }
   }
 }

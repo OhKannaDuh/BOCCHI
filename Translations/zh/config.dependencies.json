@@ -3,10 +3,10 @@
   "fields": {
     "status": {
       "label": "状态",
-      "intro": "赶路插件必须就绪。战斗只需「常规 → 战斗」中所选的插件就绪即可。自动购物需要 Knightshopper。",
+      "intro": "BOCCHI 需要下面的赶路插件。战斗只需要你在“常规 → 战斗循环”中选择的插件。购物需要 Knightshopper。",
       "required": "赶路",
       "shopping": "购物",
-      "shopping_intro": "自动购物在银/金达到阈值时，若不在大本营则先 Return，再启动 Knightshopper 的 Occult Crescent 清单。物品在 Knightshopper 中配置。",
+      "shopping_intro": "银币或金币足够时，BOCCHI 会返回营地，让 Knightshopper 购买你的清单。清单在 Knightshopper 中设置。",
       "optional": "战斗",
       "optional_intro": "Wrath Combo 还需要 BossMod。",
       "optional_intro_bmr": "Wrath Combo 还需要 BossMod 或 BossMod Reborn。",
@@ -15,7 +15,7 @@
       "using": "正在使用 {0}",
       "in_use": "使用中",
       "ready": "就绪",
-      "map_loading": "地图仍在加载",
+      "map_loading": "地图仍在加载。请等到这里显示“就绪”。",
       "not_working": "无法使用",
       "not_enabled": "未启用",
       "not_installed": "未安装",
@@ -27,9 +27,9 @@
       "open_installer": "打开插件安装器",
       "repo_added": "已添加 {plugin} 的仓库。",
       "repo_exists": "{plugin} 的仓库已添加。",
-      "repo_failed": "无法添加 {plugin} 的仓库。详情请查看 /xllog。",
+      "repo_failed": "无法添加 {plugin} 的仓库。输入 /xllog 查看详情。",
       "installed": "已安装 {plugin}。",
-      "install_failed": "无法安装 {plugin}。请检查插件安装器或 /xllog。"
+      "install_failed": "无法安装 {plugin}。请检查插件安装器，或输入 /xllog 查看详情。"
     }
   }
 }

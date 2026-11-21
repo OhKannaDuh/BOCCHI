@@ -1,19 +1,19 @@
 {
   "label": "FATEs",
-  "tooltip": "Which FATEs Illegal Mode may do, and when to skip ones already far along.",
+  "tooltip": "Choose which FATEs Illegal Mode does.",
   "sections": {
-    "skip": "Skip",
+    "skip": "Skip almost finished FATEs",
     "allowlist": "Allowed FATEs"
   },
   "fields": {
     "max_fate_progress_percent": {
       "label": "Skip FATEs at or above (% progress)",
-      "tooltip": "Do not start a FATE already this far along. 0 = never skip. FATEs you are already in are finished."
+      "tooltip": "Don't go to a FATE that is already this far done. 0 = never skip. A FATE you are already in is always finished."
     },
     "disabled_fate_ids": {
       "label": "Allowed FATEs",
-      "tooltip": "On: do it.\nOff: skip.\nWhile Prefer pot FATEs is on, Magic Pots stay on and show as required.",
-      "empty": "No FATEs listed for this zone.",
+      "tooltip": "Checked: do it.\nUnchecked: skip it.\nMagic Pots stay checked while Prefer pot FATEs is on.",
+      "empty": "No FATEs in this zone.",
       "forced_note": "Prefer pot FATEs is on — Magic Pots are required.",
       "forced_suffix": " — required",
       "forced_by_prefer": "Required while Prefer pot FATEs is on. Turn that off if you want to skip this pot."

@@ -15,7 +15,9 @@
     "potstreasure": "ポット＆トレジャー",
     "mobfarmer": "モブファーム",
     "world": "ワールド",
-    "treasure": "トレジャーハンター"
+    "treasure": "トレジャーハンター",
+    "automation_normal": "通常",
+    "open_settings": "このタブの設定を開く"
   },
   "status": {
     "automator": "不正モード",
@@ -29,7 +31,7 @@
     "idle": "何も実行していません",
     "whats_running": "稼働中",
     "shopping_paused": "買い物中",
-    "click_section": "このセクションを開く",
+    "click_section": "このタブを開く",
     "emergency_stop_tooltip": "緊急停止 — すべての自動化・移動・バフを止めます",
     "emergency_stop_done": "[BOCCHI] 緊急停止",
     "goal": "目標",
@@ -38,12 +40,14 @@
     "path_step_teleport": "テレポート中",
     "path_step_teleport_to": "{0} へテレポート",
     "path_step_return": "ベースキャンプへ帰還中",
-    "chests": "マジックポット宝箱"
+    "chests": "マジックポット宝箱",
+    "plugin_missing": "{0} が動いていません。このモードには必要です。",
+    "open_dependencies": "依存関係を開く"
   },
   "pot_timer": {
     "active": "マジックポットFATE進行中",
     "next": "次のマジックポット",
-    "unknown": "次のマジックポット：不明 — マジックポットFATEを一度見るとタイマーが始まります。",
+    "unknown": "次のポット：不明。ポット FATE を 1 回やるとタイマーが分かります。",
     "chip_active": "進行中",
     "south_horn": "南征編",
     "north_horn": "北征編",
@@ -64,11 +68,13 @@
       "current_job": "現在のジョブ",
       "no_job": "ジョブが見つかりません",
       "level": "レベル: {0} ({1})",
-      "per_hour": "1時間あたりの経験値"
+      "per_hour": "1時間あたりの経験値",
+      "compact": "経験値 {0}/時"
     },
     "currency": {
       "gold_per_hour": "1時間あたりの金貨",
-      "silver_per_hour": "1時間あたりの銀貨"
+      "silver_per_hour": "1時間あたりの銀貨",
+      "compact": "金貨 {0}/時  ·  銀貨 {1}/時"
     }
   },
   "buffs": {
@@ -86,7 +92,7 @@
     "mode_off": "[BOCCHI] コンプリーショニストモード オフ",
     "mode_off_left_zone": "[BOCCHI] オカルトクレセントを離れたためコンプリーショニストモード オフ",
     "about": "説明",
-    "description": "未所持ノートの FATE / CE は不正モードで行います。調査ポイント：クリックでフラグ、Ctrl＋クリックで移動。フォークドタワーのノートは確認用です。",
+    "description": "不正モードと同じですが、まだ持っていない探査記録の FATE と CE だけに行きます。調査ポイント：クリックでマップに印、Ctrl＋クリックでそこへ移動。フォークタワーのノートは一覧表示のみです。",
     "legend": "チェック＝所持 · ×＝未所持 · 星＝サポートジョブ最大",
     "notes_header": "フィールドノート",
     "jobs_header": "サポートジョブ",
@@ -126,9 +132,9 @@
       "refresh_pathfinding": "ルートを作り直す",
       "refresh_pathfinding_tooltip": "いまのルートを捨てて、現在地から新しく計画します。",
       "rebuild_path_map": "経路マップを再構築",
-      "rebuild_path_map_tooltip": "このゾーンの経路マップを再読み込みします（移動プラグインのメッシュ再構築とは別です）。ルート失敗やキャンプ付近で止まるときに使います。",
+      "rebuild_path_map_tooltip": "このゾーンの BOCCHI のマップを読み込み直します。ルートが見つからないときや、キャンプ付近で動かなくなったときに試してください。",
       "path_map": "経路マップ",
-      "path_map_idle": "不正モード開始時に読み込みます",
+      "path_map_idle": "不正モードの開始時に読み込みます",
       "path_map_loading": "読み込み中…",
       "path_map_building": "構築中（完了まで不正モードは待ちます）…",
       "path_map_ready_cache": "準備完了（保存済み）",
@@ -145,10 +151,11 @@
       "forked_tower_on_pad": "[BOCCHI] フォークタワーの入場地点に到着 — 転送されるまで地点から離れないでください。",
       "pathfinding_refreshed": "[BOCCHI] ルートを作り直しました",
       "pathfinding_refreshed_no_goal": "[BOCCHI] ルートを解除しました（いま行く先がありません）",
-      "path_routing_failed": "[BOCCHI] そのFATE/CEへのルートを計画できませんでした。しばらくスキップします — 繰り返す場合は不正モードを切り替えるか「経路マップを再構築」してください。",
+      "path_routing_failed": "[BOCCHI] その FATE / CE へのルートが見つからないため、しばらく飛ばします。何度も起きる場合は、不正モードを再開するかルートマップを作り直してください。",
       "pot_chest_farm": "マジックポット宝箱回収",
       "chests_remaining": "残り宝箱数",
-      "time_idle": "待機時間"
+      "time_idle": "待機時間",
+      "description": "FATE、クリティカルエンカウント、マジックポットを次々に自動でこなします。"
     },
     "mob_farmer": {
       "title": "モブファーム",
@@ -167,25 +174,26 @@
         "crystal_buffs": "クリスタルバフ",
         "shopping": "買い物"
       },
-      "configure_mobs": "敵は /bocchi config → モブファーム で選んでください。",
-      "off_left_zone": "[BOCCHI] オカルトクレセントを離れたためモブファーム オフ"
+      "configure_mobs": "狩る敵は設定で選びます（このタブの歯車）。",
+      "off_left_zone": "[BOCCHI] オカルトクレセントを離れたためモブファーム オフ",
+      "description": "選んだ敵を集めてまとめて倒す、を繰り返します。"
     },
     "pots_treasure": {
       "start": "ポット＆トレジャーを開始",
       "stop": "ポット＆トレジャーを停止",
       "pause": "一時停止",
-      "pause_tooltip": "移動だけ止めます。実行は続いているので、再開で続きから。",
+      "pause_tooltip": "進行状況はそのままで、いったん動きを止めます。再開を押すと続きます。",
       "resume": "再開",
-      "resume_tooltip": "ポットとトレジャーを中断したところから続けます。",
+      "resume_tooltip": "止めたところから続けます。",
       "paused": "一時停止中",
       "on": "[BOCCHI] ポット＆トレジャー オン",
       "off": "[BOCCHI] ポット＆トレジャー オフ",
       "off_left_zone": "[BOCCHI] オカルトクレセントを離れたためポット＆トレジャー オフ",
-      "description": "マジックポットFATEと宝箱を行い、次のマジックポットへ向かう時間までトレジャーハントします。",
+      "description": "すべてのマジックポットとその宝箱をやり、合間にトレジャーハントをします。",
       "phase": "フェーズ",
       "requires_vnav": "[BOCCHI] ポット＆トレジャーには移動プラグイン（vnavmesh）が必要です。",
       "resume_treasure_hunt": "トレジャーハントを再開",
-      "resume_treasure_hunt_tooltip": "待機をスキップして、次のトレジャーハント巡回を開始します。",
+      "resume_treasure_hunt_tooltip": "待たずに、次のトレジャーハントを今すぐ始めます。",
       "active_fates": "進行中のマジックポットFATE",
       "no_active_fate": "現在マジックポットFATEはありません。",
       "phases": {
@@ -223,7 +231,7 @@
     "requires_vnav": "移動プラグイン（vnavmesh）が必要です。",
     "waiting_navmesh": "マップの準備を待っています…",
     "start_hunt": "トレジャーハント開始",
-    "start_hunt_tooltip": "マップ上の銅・銀の宝箱を巡回して開け、空の場所はスキップします。",
+    "start_hunt_tooltip": "銅と銀の宝箱をすべて回って開け、空の場所は飛ばします。",
     "pause_hunt": "一時停止",
     "resume_hunt": "再開",
     "stop_hunt": "トレジャーハント停止",
@@ -231,32 +239,31 @@
     "carrot_hunt_off_left_zone": "[BOCCHI] オカルトクレセントを離れたためキャロットハント オフ",
     "paused": "一時停止中",
     "waiting_safe_window": "安全な天候待ち",
-    "waiting_safe_window_detail": "南征編のアシュキンまたは危険な天候のため一時停止しています。安全になれば再開します。",
+    "waiting_safe_window_detail": "南征編のアシュキンや危険な天候のため中断中。安全になったら再開します。",
     "elapsed": "経過時間",
     "progress": "進行状況",
     "last_checked": "最後に確認した宝箱",
     "resume_coffer": "再開する宝箱",
     "flag_resume_tooltip": "ハントを続ける宝箱にマップフラグを立てます",
     "recalculate_route_tooltip": "現在地からトレジャーハントのルートを再計算します",
-    "managed_by_pots": "ハントはポット＆トレジャーが管理しています — 開始／停止はそちらから行ってください。",
-    "managed_by_illegal_mode": "ハントは不正モードが管理しています（活動の合間に実行）。",
-    "managed_by_mob_farmer": "ハントはモブファームが管理しています（タイマーで実行）。",
-    "managed_by_carrot": "キャロットハント実行中 — 下で停止してからトレジャーハントを開始してください。",
-    "managed_by_treasure": "トレジャーハント実行中 — 上で停止してからキャロットハントを開始してください。",
+    "managed_by_pots": "このハントはポット＆トレジャーが動かしています。開始と停止はそのタブで行ってください。",
+    "managed_by_illegal_mode": "このハントは不正モードが合間に動かしています。",
+    "managed_by_mob_farmer": "このハントはモブファームがタイマーで動かしています。",
+    "managed_by_carrot": "キャロットハントの実行中です。トレジャーハントを始める前に下で止めてください。",
     "distance_to_chest": "宝箱までの距離",
     "nearby_title": "近くの宝箱",
     "none_nearby": "近くに宝箱はありません。",
     "active_bronze": "アクティブな銅箱",
     "active_silver": "アクティブな銀箱",
-    "active_counts_idle": "Treasure Sight を詠唱すると銅箱・銀箱の数が更新されます。",
+    "active_counts_idle": "トレジャーサイトを使うと残りの宝箱の数が分かります。",
     "distance": "距離: {0:F1}y",
     "position": "({0:F1}, {1:F1}, {2:F1})",
     "carrot_hunt_title": "キャロットハント",
-    "carrot_hunt_description": "噛まれたニンジンを巡回し、フォーチュンキャロットを使ってバニーチェストを開けます。",
+    "carrot_hunt_description": "ニンジンの場所をすべて回り、フォーチュンキャロットを使ってウサギの宝箱を開けます。",
     "start_carrot_hunt": "キャロットハント開始",
     "stop_carrot_hunt": "キャロットハント停止",
     "use_fortune_carrot": "フォーチュンキャロットを使う",
-    "use_fortune_carrot_tooltip": "インベントリから今すぐ1つ使います。噛まれたニンジンのそばで詰まったときに便利です。",
+    "use_fortune_carrot_tooltip": "フォーチュンキャロットを今すぐ 1 個使います。ニンジンのそばでハントが止まったときに役立ちます。",
     "carrot_hunt_phase": "フェーズ",
     "fortune_carrots": "フォーチュンキャロット",
     "carrot_hunt_phases": {
@@ -268,6 +275,7 @@
       "approaching_aetheryte": "エーテルへ移動中",
       "teleporting": "イーサネット転送中",
       "returning": "ベースキャンプへデジョン中"
-    }
+    },
+    "active_compact": "銅 {0}/{1}  ·  銀 {2}/{3}"
   }
 }

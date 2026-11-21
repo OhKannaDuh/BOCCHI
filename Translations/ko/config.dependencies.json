@@ -3,10 +3,10 @@
   "fields": {
     "status": {
       "label": "상태",
-      "intro": "이동 플러그인은 준비되어야 합니다. 전투는 일반 → 전투에서 고른 것만 준비되면 됩니다. 자동 쇼핑에는 Knightshopper가 필요합니다.",
+      "intro": "BOCCHI에는 아래의 이동 플러그인이 필요합니다. 전투에는 일반 → 전투 로테이션에서 고른 플러그인만 있으면 됩니다. 쇼핑에는 Knightshopper가 필요합니다.",
       "required": "이동",
       "shopping": "쇼핑",
-      "shopping_intro": "자동 쇼핑은 은/금 임계값에서, 필요하면 본진으로 리턴한 뒤 Knightshopper의 Occult Crescent 목록을 시작합니다. 품목은 Knightshopper에서 설정합니다.",
+      "shopping_intro": "은화나 금화가 충분히 모이면 BOCCHI가 캠프로 돌아가 Knightshopper로 목록의 물건을 삽니다. 목록은 Knightshopper에서 설정하세요.",
       "optional": "전투",
       "optional_intro": "Wrath Combo는 BossMod도 필요합니다.",
       "optional_intro_bmr": "Wrath Combo는 BossMod 또는 BossMod Reborn도 필요합니다.",
@@ -15,7 +15,7 @@
       "using": "사용 중: {0}",
       "in_use": "사용 중",
       "ready": "준비됨",
-      "map_loading": "맵 로딩 중",
+      "map_loading": "지도를 불러오는 중입니다. 준비됨으로 바뀔 때까지 기다리세요.",
       "not_working": "동작 안 함",
       "not_enabled": "꺼짐",
       "not_installed": "미설치",
@@ -27,9 +27,9 @@
       "open_installer": "설치 관리자 열기",
       "repo_added": "{plugin} 저장소를 추가했습니다.",
       "repo_exists": "{plugin} 저장소가 이미 추가되어 있습니다.",
-      "repo_failed": "{plugin} 저장소를 추가하지 못했습니다. 자세한 내용은 /xllog를 확인하세요.",
+      "repo_failed": "{plugin} 저장소를 추가하지 못했습니다. 자세한 내용은 /xllog를 입력하세요.",
       "installed": "{plugin}을(를) 설치했습니다.",
-      "install_failed": "{plugin}을(를) 설치하지 못했습니다. 플러그인 설치 관리자 또는 /xllog를 확인하세요."
+      "install_failed": "{plugin}을(를) 설치하지 못했습니다. 플러그인 설치 창을 확인하거나 /xllog를 입력하세요."
     }
   }
 }

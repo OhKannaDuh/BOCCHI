@@ -2,7 +2,7 @@
   "title": "BOCCHI — Logs",
   "search_hint": "Search logs...",
   "copy_all": "Copy all BOCCHI logs",
-  "copy_all_tooltip": "Copies version, rotation, and every recent BOCCHI log line for Discord (not just the filtered view). Extra detail is included automatically.",
+  "copy_all_tooltip": "Copy your version, combat plugin and all recent log lines, ready to paste in Discord.",
   "clear": "Clear",
   "copied": "Copied.",
   "col_time": "Time",

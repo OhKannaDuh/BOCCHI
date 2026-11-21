@@ -1,9 +1,9 @@
 {
   "label": "ログ",
-  "tooltip": "BOCCHIのライブログ。詳細行も自動で取り込みます。Dalamudのログレベルを変える必要はありません。",
+  "tooltip": "BOCCHI の動作を 1 行ずつ表示します。不具合を報告するときに役立ちます。",
   "fields": {
     "viewer": {
-      "label": "ビューア"
+      "label": "ログ"
     }
   }
 }

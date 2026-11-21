@@ -6,6 +6,7 @@ using BOCCHI.Common.Services;
 using BOCCHI.Treasure.Services;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Plugin.Services;
+using Ocelot.Services.Logger;
 using Ocelot.Services.Pathfinding;
 using Ocelot.States.Score;
 
@@ -19,7 +20,8 @@ public class InCombatHandler
     ICriticalEncounterContext criticalEncounterContext,
     IPathfinder pathfinder,
     IAutomatorMemory memory,
-    AutoRotationController autoRotation
+    AutoRotationController autoRotation,
+    ILogger<InCombatHandler> logger
 ) : ScoreStateHandler<AutomatorState, StatePriority>(AutomatorState.InCombat)
 {
     private const StatePriority AboveWaiting = StatePriority.VeryHigh + 1;
@@ -28,11 +30,14 @@ public class InCombatHandler
 
     private bool aiEnabled;
 
+    private bool loggedNotFighting;
+
     public override StatePriority GetScore()
     {
         if (objects.LocalPlayer == null || !conditions[ConditionFlag.InCombat])
         {
             defendingWaitSpot = false;
+            loggedNotFighting = false;
             return StatePriority.Never;
         }
 
@@ -51,7 +56,8 @@ public class InCombatHandler
         // The pot wait forgets its memory on exit, so remember here or the two states flip every tick.
         defendingWaitSpot |= memory.TryRemember<WaitingForPotFateMemory>(out WaitingForPotFateMemory _)
             || memory.TryRemember<WaitingForCriticalEncounterMemory>(out WaitingForCriticalEncounterMemory _)
-            || memory.TryRemember<WaitingForForkedTowerMemory>(out WaitingForForkedTowerMemory _);
+            || memory.TryRemember<WaitingForForkedTowerMemory>(out WaitingForForkedTowerMemory _)
+            || memory.TryRemember<TreasureHuntSelfDefenceMemory>(out TreasureHuntSelfDefenceMemory _);
         if (defendingWaitSpot)
         {
             return AboveWaiting;
@@ -59,7 +65,21 @@ public class InCombatHandler
 
         if (memory.TryRemember<GoalPathStepMemory>(out GoalPathStepMemory _))
         {
-            return KnowledgeThreat.CanFightAggro(objects) ? StatePriority.High + 1 : StatePriority.Never;
+            if (KnowledgeThreat.CanFightAggro(objects))
+            {
+                return StatePriority.High + 1;
+            }
+
+            if (!loggedNotFighting)
+            {
+                loggedNotFighting = true;
+                logger.Info(
+                    "Attacked while travelling by a level {Enemy} enemy (your Knowledge Level: {Mine}) — not stopping to fight",
+                    Level(KnowledgeThreat.HighestAttackerLevel(objects)),
+                    Level(KnowledgeThreat.TryGetPlayerForayLevel(objects)));
+            }
+
+            return StatePriority.Never;
         }
 
         return StatePriority.High;
@@ -86,7 +106,16 @@ public class InCombatHandler
     {
         base.Enter();
         aiEnabled = false;
+        logger.Info(
+            "In combat: {Reason} (attacker level {Enemy}, your Knowledge Level {Mine})",
+            memory.TryRemember<TreasureHuntSelfDefenceMemory>(out TreasureHuntSelfDefenceMemory _)
+                ? "could not outrun it during the treasure hunt"
+                : defendingWaitSpot ? "defending the waiting spot" : "fighting back",
+            Level(KnowledgeThreat.HighestAttackerLevel(objects)),
+            Level(KnowledgeThreat.TryGetPlayerForayLevel(objects)));
     }
+
+    private static object Level(int? level) => level is { } value ? value : "?";
 
     public override void Exit(AutomatorState next)
     {

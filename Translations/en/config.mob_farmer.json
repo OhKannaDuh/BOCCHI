@@ -1,10 +1,10 @@
 {
   "label": "Mob Farmer",
-  "tooltip": "Which enemies to farm and how pulls work.",
+  "tooltip": "Which enemies to farm, where, and how to pull them.",
   "sections": {
-    "targets": "Targets",
-    "spots": "Spots",
-    "pulls": "Pulls",
+    "targets": "Enemies",
+    "spots": "Farm spots",
+    "pulls": "Pulling",
     "home": "After combat",
     "buffs": "Pull buffs",
     "yields": "Pause for",
@@ -13,19 +13,19 @@
   "fields": {
     "should_handle_targeting": {
       "label": "Auto-target enemies",
-      "tooltip": "During the pull, BOCCHI picks targets. Once fighting with combat AI on, targeting is left to the AI."
+      "tooltip": "BOCCHI picks the targets while pulling. Once the fight starts, your combat plugin picks them."
     },
     "force_target_central_enemy": {
       "label": "Prefer the middle of the pack",
-      "tooltip": "Without combat AI, target the enemy nearest the pack center instead of the closest one. Needs Auto-target enemies."
+      "tooltip": "Target the enemy in the middle of the pack, not the closest one. Only used when you fight without a combat plugin."
     },
     "consider_special_mobs": {
       "label": "Include special enemies",
-      "tooltip": "Also pull special enemies that only appear in certain weather or times of day."
+      "tooltip": "Also pull enemies that only appear in certain weather or at certain times."
     },
     "count_special_mobs_toward_minimum": {
       "label": "Count specials toward minimums",
-      "tooltip": "On: specials count toward the start / fight minimums below.\nOff: specials can still be pulled, but they do not count toward the start / fight minimums below."
+      "tooltip": "On: special enemies count towards the minimums below.\nOff: they are still pulled, but don't count."
     },
     "only_start_out_of_combat": {
       "label": "Wait until combat fully ends"
@@ -35,12 +35,12 @@
     },
     "max_euclidean_distance": {
       "label": "Max pull range",
-      "tooltip": "Ignore enemies farther than this (yalms)."
+      "tooltip": "Enemies farther away than this are ignored."
     },
     "spots": {
       "label": "Farm spots",
-      "tooltip": "Named farm points. Start uses the highest-priority enabled spot (nearest on a tie). Empty list = start where you stand. Optional stack/stop is for caves and SW Tower.",
-      "empty": "No spots — Start uses where you are standing.",
+      "tooltip": "Your saved farm spots. BOCCHI starts at the enabled spot with the highest priority (the closest one on a tie). With no spots, it farms where you are standing.\nA stack point is where the pack is gathered, useful in caves.",
+      "empty": "No spots yet. BOCCHI farms where you are standing.",
       "add": "Add spot here",
       "remove": "Remove",
       "name": "Name",
@@ -55,62 +55,62 @@
     },
     "claimed_spot_seconds": {
       "label": "Leave if claimed after (seconds)",
-      "tooltip": "If other players keep this pack or stand on the stack point this long, mark the spot claimed for this session and go to the next one."
+      "tooltip": "If other players keep claiming the enemies or stand on your spot for this long, BOCCHI treats the spot as claimed and moves to the next one until you restart."
     },
     "claimed_player_radius": {
       "label": "Claimed player radius (yalms)",
-      "tooltip": "Treat the spot as claimed if another player stays this close to the farm point or stack point."
+      "tooltip": "How close another player has to stay to your farm spot before it counts as claimed."
     },
     "min_euclidean_distance_to_return_home": {
-      "label": "Go home if farther than",
-      "tooltip": "After a fight, walk back to the farm point only if farther than this (yalms)."
+      "label": "Walk back if farther than (yalms)",
+      "tooltip": "After a fight, only walk back to the farm spot if you ended up farther away than this."
     },
     "return_to_start_in_waiting_phase": {
       "label": "Return to spot after combat",
-      "tooltip": "Walk back to the current farm point when the fight ends. No spots: where you stood when you pressed Start."
+      "tooltip": "Walk back to the farm spot when combat ends. With no spots, that is where you pressed Start."
     },
     "render_debug_lines": {
       "label": "Show debug lines",
-      "tooltip": "While farming: red lines to valid enemies out of combat, green while fighting."
+      "tooltip": "While farming, draw red lines to enemies BOCCHI can pull and green lines to enemies you are fighting."
     },
     "apply_battle_bell": {
       "label": "Use Battle Bell",
-      "tooltip": "Before each pull: Geomancer, recast Battle Bell, then Sprint and switch back."
+      "tooltip": "Before each pull, switch to Geomancer, use Battle Bell, then switch back."
     },
     "apply_ringing_respite": {
       "label": "Use Ringing Respite",
-      "tooltip": "With Battle Bell (or alone): Geomancer III heals you when hit. Needs Geomancer III. Waits briefly if Quickstep just used the shared cooldown."
+      "tooltip": "Before each pull, use Ringing Respite, which heals you when you are hit. Needs Geomancer level 3."
     },
     "apply_quickstep": {
       "label": "Use Quickstep",
-      "tooltip": "Before each pull: Phantom Dancer Quickstep (90s evasion). Needs Dancer 2. Shares a short cooldown with Ringing Respite."
+      "tooltip": "Before each pull, use the Phantom Dancer's Quickstep to dodge attacks for 90 seconds. Needs Dancer level 2."
     },
     "apply_counterstance": {
       "label": "Use Counterstance",
-      "tooltip": "Near the end of pull buffs: Phantom Monk Counterstance for Fleetfooted. Needs Monk 3. Applied late so it covers the start of the pull."
+      "tooltip": "Just before the pull, use the Phantom Monk's Counterstance. Needs Monk level 3."
     },
     "maximum_battle_bell_wait_time": {
-      "label": "Max wait for Bell / Respite / Stance",
-      "tooltip": "Skip Battle Bell, Ringing Respite, or Counterstance for this pull if their cooldown is longer than this (seconds)."
+      "label": "Longest wait for a buff (seconds)",
+      "tooltip": "If Battle Bell, Ringing Respite or Counterstance is on cooldown for longer than this, pull without it."
     },
     "quickstep_skip_if_remaining_minutes": {
-      "label": "Skip Quickstep if remaining (minutes)",
-      "tooltip": "Skip Quickstep when crystal Quicker Step still has at least this many minutes left. 0 = recast every pull."
+      "label": "Skip Quickstep if Quicker Step has (minutes left)",
+      "tooltip": "Don't use Quickstep while your Quicker Step crystal buff still has at least this many minutes left. 0 = use it every pull."
     },
     "minimum_mobs_to_start_loop": {
       "label": "Minimum enemies to start"
     },
     "minimum_mobs_to_start_fight": {
       "label": "Minimum enemies before fighting",
-      "tooltip": "How many to gather before fighting. A spot can override this."
+      "tooltip": "How many enemies to gather before the fight starts. A farm spot can have its own number."
     },
     "stacking_timeout_seconds": {
       "label": "Gather timeout (seconds)",
-      "tooltip": "Max time gathering before fighting starts anyway."
+      "tooltip": "After this long, start fighting with whatever has been gathered."
     },
     "use_ranged_pull": {
       "label": "Ranged pull (tanks)",
-      "tooltip": "While gathering, tanks use Shield Lob / Tomahawk / Unmend / Lightning Shot instead of walking into melee."
+      "tooltip": "Tanks pull with their ranged attack and don't walk up to each enemy."
     },
     "use_provoke": {
       "label": "Use Provoke while pulling"
@@ -120,29 +120,29 @@
     },
     "yield_to_pots": {
       "label": "Stop for Magic Pots",
-      "tooltip": "On: pause for a live or soon-to-spawn Magic Pot (and pot chests if that General option is on). Timing under Pot timing.\nOff: keep farming through pots.\nResumes after the pot."
+      "tooltip": "Stop farming for a Magic Pot that is up or about to appear, then come back. How early to leave is set on the Pot timing page."
     },
     "cast_treasure_sight_at_farm": {
       "label": "Cast Treasure Sight at the farm spot",
-      "tooltip": "On: cast Sight at your farm spot on the interval below, then resume pulling — no Treasure Hunt run.\nNeeds Freelancer 10+. Works with no Spots list (Start uses where you are standing).\nOff: only the full Treasure Hunt yield below can refresh counts."
+      "tooltip": "Every so often, cast Treasure Sight at your farm spot to see how many coffers are left, then keep farming. Needs Freelancer level 10."
     },
     "treasure_sight_interval_minutes": {
       "label": "Interval (minutes)"
     },
     "yield_to_treasure_hunt": {
       "label": "Treasure Hunt on a timer",
-      "tooltip": "On: pause and run Treasure Hunt on the interval below if remaining bronze/silver meets the % on Treasure Hunter.\nNeeds a recent Treasure Sight reading.\nOff: no timed Treasure Hunt from Mob Farmer."
+      "tooltip": "Every so often, stop farming and go on a treasure hunt if enough coffers are left, then come back. How many is enough is set on the Treasure Hunter page. Needs a recent Treasure Sight."
     },
     "treasure_hunt_interval_minutes": {
       "label": "Interval (minutes)"
     },
     "treasure_hunt_prefer_pots": {
       "label": "Prioritize pots during timed hunt",
-      "tooltip": "On: the timed hunt runs as Pots & Treasure, so a Magic Pot (and pot chests if that General option is on) still interrupts the route.\nOff: plain Treasure Hunt only — use Stop for Magic Pots above to leave while farming, not mid-hunt.\nNeeds Treasure Hunt on a timer."
+      "tooltip": "On: a Magic Pot also interrupts the treasure hunt.\nOff: the hunt runs to the end, even when a pot appears."
     },
     "yield_to_crystal_buffs": {
       "label": "Refresh crystal buffs when low",
-      "tooltip": "On: pause to reapply knowledge-crystal buffs at or below the reapply time on the Buffs page.\nOff: keep farming without buff pauses.\nNeeds Automate buffs on the Buffs page."
+      "tooltip": "Stop farming to refresh your knowledge crystal buffs when they run low. Needs Automate buffs on the Buffs page."
     },
     "mobs": {
       "label": "Enemy list",

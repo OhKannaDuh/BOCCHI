@@ -1,4 +1,5 @@
 using Dalamud.Bindings.ImGui;
+using Ocelot.UI;
 using System.Numerics;
 
 namespace BOCCHI.Common.UI;
@@ -12,39 +13,32 @@ public static class BocchiUi
         Muted,
     }
 
-    public static readonly Vector4 Header = new(0.90f, 0.78f, 0.42f, 1f);
-    public static readonly Vector4 Muted = new(0.72f, 0.72f, 0.74f, 1f);
-    public static readonly Vector4 Warn = new(0.98f, 0.82f, 0.42f, 1f);
+    public static readonly Vector4 Header = OcelotUi.Header;
+    public static readonly Vector4 Muted = OcelotTheme.Slate;
     public static readonly Vector4 Good = new(0.55f, 0.92f, 0.62f, 1f);
     public static readonly Vector4 Bad = new(0.98f, 0.52f, 0.52f, 1f);
 
-    private static readonly Vector4 PanelBg = new(0.10f, 0.10f, 0.12f, 0.55f);
-    private static readonly Vector4 PanelBorder = new(0.40f, 0.40f, 0.45f, 0.55f);
+    private static readonly Vector4 PanelBg = OcelotTheme.PanelBg;
+    private static readonly Vector4 PanelBorder = OcelotTheme.PanelBorder;
 
     private static readonly Vector4 ChipOkBg = new(0.14f, 0.32f, 0.20f, 0.95f);
     private static readonly Vector4 ChipWarnBg = new(0.38f, 0.28f, 0.08f, 0.95f);
-    private static readonly Vector4 ChipMutedBg = new(0.20f, 0.20f, 0.23f, 0.95f);
+    private static readonly Vector4 ChipMutedBg = OcelotTheme.Control;
     private static readonly Vector4 ChipOkFg = new(0.78f, 0.96f, 0.82f, 1f);
     private static readonly Vector4 ChipWarnFg = new(1.00f, 0.92f, 0.68f, 1f);
-    private static readonly Vector4 ChipMutedFg = new(0.88f, 0.88f, 0.90f, 1f);
+    private static readonly Vector4 ChipMutedFg = OcelotTheme.Ivory;
 
     private static readonly Vector4 BarGood = new(0.22f, 0.58f, 0.34f, 1f);
     private static readonly Vector4 BarWarn = new(0.58f, 0.44f, 0.14f, 1f);
-    private static readonly Vector4 BarEmpty = new(0.22f, 0.22f, 0.25f, 1f);
+    private static readonly Vector4 BarEmpty = OcelotTheme.Control;
 
     public const float PanelPadX = 12f;
     public const float PanelPadY = 10f;
     public const float PanelRounding = 5f;
     public const float FieldFrameRounding = 4f;
 
-    private static readonly Stack<PanelScope> PanelStack = new();
+    private static readonly Stack<float> PanelStack = new();
 
-    private readonly struct PanelScope
-    {
-        public required bool UseChild { get; init; }
-
-        public float Width { get; init; }
-    }
 
     public static void SectionTitle(string text)
     {
@@ -86,28 +80,11 @@ public static class BocchiUi
         ImGui.Dummy(new Vector2(0, 6));
     }
 
-    public static bool BeginPanel(string id, float height = 0f)
+    public static bool BeginPanel(string id)
     {
-        if (height != 0f)
-        {
-            ImGui.PushStyleColor(ImGuiCol.ChildBg, PanelBg);
-            ImGui.PushStyleVar(ImGuiStyleVar.ChildRounding, PanelRounding);
-            ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, new Vector2(PanelPadX, PanelPadY));
-            if (!ImGui.BeginChild($"##bocchi_panel_{id}", new Vector2(0, height), true))
-            {
-                ImGui.EndChild();
-                ImGui.PopStyleVar(2);
-                ImGui.PopStyleColor();
-                return false;
-            }
-
-            PanelStack.Push(new PanelScope { UseChild = true });
-            return true;
-        }
-
         ImGui.PushID(id);
         float width = ImGui.GetContentRegionAvail().X;
-        PanelStack.Push(new PanelScope { UseChild = false, Width = width });
+        PanelStack.Push(width);
 
         ImDrawListPtr drawList = ImGui.GetWindowDrawList();
         drawList.ChannelsSplit(2);
@@ -126,23 +103,15 @@ public static class BocchiUi
             return;
         }
 
-        PanelScope scope = PanelStack.Pop();
-        if (scope.UseChild)
-        {
-            ImGui.EndChild();
-            ImGui.PopStyleVar(2);
-            ImGui.PopStyleColor();
-            ImGui.Dummy(new Vector2(0, 8));
-            return;
-        }
+        float width = PanelStack.Pop();
 
         ImGui.Unindent(PanelPadX);
-        ImGui.Dummy(new Vector2(scope.Width, PanelPadY));
+        ImGui.Dummy(new Vector2(width, PanelPadY));
         ImGui.EndGroup();
 
         Vector2 min = ImGui.GetItemRectMin();
         Vector2 max = ImGui.GetItemRectMax();
-        max.X = min.X + scope.Width;
+        max.X = min.X + width;
 
         ImDrawListPtr drawList = ImGui.GetWindowDrawList();
         drawList.ChannelsSetCurrent(0);

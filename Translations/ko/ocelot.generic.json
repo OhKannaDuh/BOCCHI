@@ -9,5 +9,6 @@
   "yes": "예",
   "no": "아니오",
   "state": "상태",
-  "substate": "상세"
+  "substate": "상세",
+  "search_settings": "설정 검색..."
 }

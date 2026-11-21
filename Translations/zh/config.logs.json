@@ -1,9 +1,9 @@
 {
   "label": "日志",
-  "tooltip": "BOCCHI 实时日志。详细行会自动收录，无需更改 Dalamud 日志级别。",
+  "tooltip": "逐行显示 BOCCHI 正在做什么。反馈问题时很有用。",
   "fields": {
     "viewer": {
-      "label": "查看器"
+      "label": "日志"
     }
   }
 }

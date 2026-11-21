@@ -3,10 +3,10 @@
   "fields": {
     "status": {
       "label": "Status",
-      "intro": "Travel plugins must be ready. For combat, only what you picked under General → Combat rotation needs to be ready. Auto-shop needs Knightshopper.",
+      "intro": "BOCCHI needs the travel plugins below. For combat it only needs the plugin you chose under General → Combat rotation. Shopping needs Knightshopper.",
       "required": "Travel",
       "shopping": "Shopping",
-      "shopping_intro": "Auto-shop Returns to base camp if needed, then starts Knightshopper’s Occult Crescent list when your silver/gold threshold is hit. Configure the list in Knightshopper.",
+      "shopping_intro": "When you have enough silver or gold, BOCCHI returns to camp and lets Knightshopper buy your list. Set the list up in Knightshopper.",
       "optional": "Combat",
       "optional_intro": "Wrath Combo also needs BossMod.",
       "optional_intro_bmr": "Wrath Combo also needs BossMod or BossMod Reborn.",
@@ -15,21 +15,21 @@
       "using": "Using {0}",
       "in_use": "in use",
       "ready": "Ready",
-      "map_loading": "Map still loading — wait until Status shows Ready",
+      "map_loading": "The map is still loading. Wait until this says Ready.",
       "not_working": "Not working",
       "not_enabled": "Not enabled",
       "not_installed": "Not installed",
       "add_repo": "Add repository",
-      "add_repo_tooltip": "Add {url} to Custom Plugin Repositories.",
+      "add_repo_tooltip": "Add {url} to your custom plugin repositories.",
       "install": "Install plugin",
       "installing": "Installing…",
       "install_tooltip": "Install {plugin} from its plugin repository.",
       "open_installer": "Open installer",
       "repo_added": "Added the {plugin} repository.",
       "repo_exists": "The {plugin} repository is already added.",
-      "repo_failed": "Could not add the {plugin} repository. See /xllog for details.",
+      "repo_failed": "Couldn't add the {plugin} repository. Type /xllog for details.",
       "installed": "Installed {plugin}.",
-      "install_failed": "Could not install {plugin}. Check the plugin installer or /xllog for details."
+      "install_failed": "Couldn't install {plugin}. Check the plugin installer, or type /xllog for details."
     }
   }
 }

@@ -62,7 +62,7 @@ public class GraphTraverser(ZoneGraph graph, IPathfinder pathfinder, ILogger log
         TraversalCandidate? candidate = await calculator.CalculateAsync(graph, start, goal, pathfinder);
         if (candidate != null)
         {
-            logger.Debug($"  Cost:  {candidate.TotalCost}");
+            logger.Debug("  Cost: {Cost:F0}", candidate.TotalCost);
             candidates.Add(candidate);
         }
         else

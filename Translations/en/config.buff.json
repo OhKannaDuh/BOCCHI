@@ -1,6 +1,6 @@
 {
   "label": "Buffs",
-  "tooltip": "Keep phantom job buffs up automatically.",
+  "tooltip": "Keep your knowledge crystal buffs up.",
   "sections": {
     "automation": "Automation",
     "which": "Which buffs"
@@ -8,7 +8,7 @@
   "fields": {
     "should_automate_buffs": {
       "label": "Automate buffs",
-      "tooltip": "On: refresh selected buffs at knowledge crystals during Illegal Mode, and when Mob Farmer pauses for crystal buffs.\nOff: no automatic buff refresh."
+      "tooltip": "Refresh the buffs selected below at a knowledge crystal when they are about to run out. Used by Illegal Mode and Mob Farmer."
     },
     "apply_romeos_ballad": {
       "label": "Romeo's Ballad"
@@ -24,7 +24,7 @@
     },
     "apply_buffs_using_inquiring_mind": {
       "label": "Use Inquiring Mind when you can",
-      "tooltip": "Near a knowledge crystal, Freelancer can apply all selected unlocked buffs at once."
+      "tooltip": "Near a knowledge crystal, Freelancer can apply all your selected buffs in one go."
     },
     "reapply_threshold": {
       "label": "Refresh when under (minutes left)"

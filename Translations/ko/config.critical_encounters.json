@@ -1,14 +1,14 @@
 {
   "label": "비상 조우",
-  "tooltip": "자동 모드가 해도 되는 비상 조우.",
+  "tooltip": "자동 모드가 참여할 비상 조우를 고릅니다.",
   "sections": {
     "allowlist": "허용할 비상 조우"
   },
   "fields": {
     "disabled_critical_encounter_ids": {
       "label": "허용할 비상 조우",
-      "tooltip": "켜짐: 허용.\n꺼짐: 건너뜀.",
-      "empty": "이 지역에 표시할 비상 조우가 없습니다."
+      "tooltip": "체크: 참여합니다.\n해제: 건너뜁니다.",
+      "empty": "이 지역에는 비상 조우가 없습니다."
     }
   }
 }

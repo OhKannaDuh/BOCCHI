@@ -9,5 +9,6 @@
   "yes": "是",
   "no": "否",
   "state": "状态",
-  "substate": "详情"
+  "substate": "详情",
+  "search_settings": "搜索设置..."
 }

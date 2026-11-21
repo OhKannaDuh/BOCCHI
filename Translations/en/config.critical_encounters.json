@@ -1,14 +1,14 @@
 {
   "label": "Critical Encounters",
-  "tooltip": "Which Critical Encounters Illegal Mode may do.",
+  "tooltip": "Choose which Critical Encounters Illegal Mode joins.",
   "sections": {
     "allowlist": "Allowed Critical Encounters"
   },
   "fields": {
     "disabled_critical_encounter_ids": {
       "label": "Allowed Critical Encounters",
-      "tooltip": "On: allow.\nOff: skip.",
-      "empty": "No Critical Encounters listed for this zone."
+      "tooltip": "Checked: join it.\nUnchecked: skip it.",
+      "empty": "No Critical Encounters in this zone."
     }
   }
 }

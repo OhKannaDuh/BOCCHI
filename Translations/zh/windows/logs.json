@@ -2,7 +2,7 @@
   "title": "BOCCHI — Logs",
   "search_hint": "搜索日志…",
   "copy_all": "复制全部 BOCCHI 日志",
-  "copy_all_tooltip": "复制版本、循环设置以及近期全部 BOCCHI 日志（供 Discord，不只是筛选结果）。详细行会自动收录。",
+  "copy_all_tooltip": "复制你的版本、战斗插件和最近的全部日志，可直接粘贴到 Discord。",
   "clear": "清空",
   "copied": "已复制。",
   "col_time": "时间",

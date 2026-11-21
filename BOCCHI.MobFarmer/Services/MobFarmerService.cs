@@ -5,6 +5,7 @@ using BOCCHI.Common.Services;
 using BOCCHI.MobFarmer.Data;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Plugin.Services;
+using Ocelot.Services.Logger;
 using Ocelot.Extensions;
 using Ocelot.Lifecycle;
 using Ocelot.Services.Pathfinding;
@@ -30,10 +31,13 @@ public class MobFarmerService
     ITranslator<MainWindow> translator,
     IAutomationModeGuard modeGuard,
     IFarmerCombatController combat,
-    FarmerSpotSession spots
+    FarmerSpotSession spots,
+    ILogger<MobFarmerService> logger
 ) : IMobFarmer, IOnUpdate, IOnStop
 {
     public int Order => 10;
+
+    private FarmerPhase loggedPhase;
 
     private IStateMachine<FarmerPhase>? stateMachine;
 
@@ -119,6 +123,8 @@ public class MobFarmerService
         spots.Begin();
         StartingPoint = spots.Origin;
         combat.Prepare();
+        loggedPhase = Phase;
+        logger.Info("Mob Farmer started at {Spot}", spots.Name ?? "where you are standing");
     }
 
     public void SetSuspended(bool suspended, FarmerYieldReason reason = FarmerYieldReason.None)
@@ -135,6 +141,7 @@ public class MobFarmerService
 
         Suspended = suspended;
         YieldReason = suspended ? reason : FarmerYieldReason.None;
+        logger.Info(suspended ? "Mob Farmer paused for {Reason}" : "Mob Farmer resumed", reason);
         pathfinder.Stop();
         combat.Disable();
 
@@ -174,6 +181,7 @@ public class MobFarmerService
 
         if (!zones.GetZone().IsOccultCrescentZone())
         {
+            logger.Info("Left Occult Crescent — stopping Mob Farmer");
             StopInternal();
             BocchiChat.Print(chat, uiConfig, translator.T(".automation.mob_farmer.off_left_zone"));
             return;
@@ -192,6 +200,11 @@ public class MobFarmerService
         }
         else if (aiPullRequested)
         {
+            if (!gatheringAiOn)
+            {
+                logger.Debug("Mob Farmer: rotation on to tag an enemy");
+            }
+
             gatheringAiOn = true;
             combat.EnableFighting();
             combat.Tick();
@@ -200,16 +213,23 @@ public class MobFarmerService
         {
             gatheringAiOn = false;
             combat.Disable();
+            logger.Debug("Mob Farmer: rotation off until the fight");
         }
 
         if (Phase == FarmerPhase.Waiting && spots.TickClaimed(scanner))
         {
             StartingPoint = spots.Origin;
             pathfinder.Stop();
+            logger.Info("Mob Farmer: spot claimed by other players — moving to {Spot}", spots.Name ?? "the next spot");
         }
 
         aiPullRequested = false;
         StateMachine.Update();
+        if (Phase != loggedPhase)
+        {
+            logger.Debug("Mob Farmer: {From} → {To}", loggedPhase, Phase);
+            loggedPhase = Phase;
+        }
     }
 
     public void RequestAiPull() => aiPullRequested = true;
@@ -218,6 +238,11 @@ public class MobFarmerService
 
     private void StopInternal()
     {
+        if (Running)
+        {
+            logger.Info("Mob Farmer stopped");
+        }
+
         Running = false;
         Suspended = false;
         YieldReason = FarmerYieldReason.None;
