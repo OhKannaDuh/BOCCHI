@@ -3,7 +3,8 @@
   "tooltip": "マウント、スプリント、スタック解除。不正モード・トレジャーハント・キャロットハント・モブファーマーのすべての移動に適用。",
   "sections": {
     "mount": "マウント・スプリント",
-    "unstuck": "スタック解除"
+    "unstuck": "スタック解除",
+    "travel": "ルート"
   },
   "fields": {
     "sprint_on_aetheryte_approach": {
@@ -24,6 +25,10 @@
     },
     "jump_when_stuck_seconds": {
       "label": "ジャンプまでの秒数"
+    },
+    "prefer_return_over_shard_walk": {
+      "label": "エーテライト・シャードまで歩かずリターンを使う",
+      "tooltip": "リターンが使えるときは、遠くへ移動する際にシャードまで歩かずリターンでベースキャンプに戻ります。\nオフ：最短のルートを選びます。"
     }
   }
 }

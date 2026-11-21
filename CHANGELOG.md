@@ -2,6 +2,7 @@
 
 ### New
 - Auto revive (Illegal Mode → Death): accept raises, and go back to base camp if nobody raises you in time. Both are off by default and never trigger inside Forked Tower or a critical encounter
+- New option (Movement → Routes): use Return for long trips instead of walking through mobs to an aethernet shard
 
 ### Fixes
 - If a mob attacks you while you're mounted, you now get off and fight it when it's your level or lower, and keep riding away from stronger ones (one that keeps chasing you gets fought)

@@ -3,7 +3,8 @@
   "tooltip": "上坐骑、冲刺与卡住处理。适用于违规模式、寻宝、胡萝卜狩猎、刷怪的所有赶路。",
   "sections": {
     "mount": "坐骑与冲刺",
-    "unstuck": "卡住处理"
+    "unstuck": "卡住处理",
+    "travel": "路线"
   },
   "fields": {
     "sprint_on_aetheryte_approach": {
@@ -24,6 +25,10 @@
     },
     "jump_when_stuck_seconds": {
       "label": "跳跃前等待秒数"
+    },
+    "prefer_return_over_shard_walk": {
+      "label": "使用返回代替步行到以太之晶",
+      "tooltip": "返回可用时，长距离移动会用返回回到营地，而不是步行到以太之晶。\n关闭：选择最短的路线。"
     }
   }
 }

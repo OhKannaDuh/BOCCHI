@@ -3,7 +3,8 @@
   "tooltip": "탈것, 질주, 끼임 해제. 자동 모드·보물 찾기·재물당근 찾기·몹 파머의 모든 이동에 적용.",
   "sections": {
     "mount": "탈것 및 질주",
-    "unstuck": "끼임 해제"
+    "unstuck": "끼임 해제",
+    "travel": "경로"
   },
   "fields": {
     "sprint_on_aetheryte_approach": {
@@ -24,6 +25,10 @@
     },
     "jump_when_stuck_seconds": {
       "label": "점프까지 대기 시간(초)"
+    },
+    "prefer_return_over_shard_walk": {
+      "label": "에테라이트 조각까지 걷지 않고 귀환 사용",
+      "tooltip": "귀환을 사용할 수 있으면, 먼 이동 시 조각까지 걷지 않고 귀환으로 베이스캠프에 돌아갑니다.\n끄기: 가장 짧은 경로를 고릅니다."
     }
   }
 }
