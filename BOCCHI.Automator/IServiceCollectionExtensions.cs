@@ -27,6 +27,7 @@ public static class IServiceCollectionExtensions
         services.AddSingleton<IPotsTreasureMode, PotsTreasureService>();
         services.AddSingleton<Func<IPotsTreasureMode>>(sp => () => sp.GetRequiredService<IPotsTreasureMode>());
         services.AddSingleton<IllegalModeTreasureFillerService>();
+        services.AddSingleton<HuntSelfDefenceService>();
         services.AddSingleton<IIllegalModeStartableActivityProbe, IllegalModeStartableActivityProbe>();
         services.AddSingleton<TriageLatchService>();
         services.AddSingleton<PotTreasureHintTracker>();

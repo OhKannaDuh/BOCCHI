@@ -105,7 +105,7 @@ public class CompletionistRenderer
         foreach (FieldNoteTargets.Entry entry in entries)
         {
             bool owned = fieldNotes.HasEntry(entry);
-            string source = translator.T($".completionist.sources.{entry.SourceKey}");
+            string source = ResolveSourceName(entry);
             string noteName = ResolveEntryName(entry);
             string label = $"{source} — {noteName}";
             Vector4 color = owned ? BocchiUi.Good : BocchiUi.Muted;
@@ -242,6 +242,18 @@ public class CompletionistRenderer
 
         ImGui.SameLine();
         ImGui.TextColored(color, label);
+    }
+
+    private string ResolveSourceName(FieldNoteTargets.Entry entry)
+    {
+        List<string> names = entry.CriticalEncounterIds
+            .Select(id => GoalFormatHelper.CriticalEncounterName(data, (ushort)id))
+            .Concat(entry.FateIds.Select(id => GoalFormatHelper.FateName(data, (ushort)id)))
+            .Where(name => !name.StartsWith('#'))
+            .ToList();
+        return names.Count > 0
+            ? string.Join(" / ", names)
+            : translator.T($".completionist.sources.{entry.SourceKey}");
     }
 
     private string ResolveEntryName(FieldNoteTargets.Entry entry)

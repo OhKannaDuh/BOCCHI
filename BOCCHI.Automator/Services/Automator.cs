@@ -104,6 +104,7 @@ public class Automator
         }
 
         IllegalModeActivityWork.ForgetTravelLatches(memory);
+        memory.Forget<ReturningStateMemory>();
         SoftStopPathfinding();
         autoRotation.DisableAi();
     }

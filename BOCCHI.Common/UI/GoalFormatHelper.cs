@@ -41,7 +41,7 @@ public static class GoalFormatHelper
         }
     }
 
-    private static string CriticalEncounterName(IDataManager data, ushort id)
+    public static string CriticalEncounterName(IDataManager data, ushort id)
     {
         try
         {

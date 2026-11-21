@@ -12,6 +12,12 @@
 - New option (Movement → Routes): use Return for long trips instead of walking through mobs to an aethernet shard
 
 ### Fixes
+- Treasure Hunt and Carrot Hunt now stop and fight an enemy they can't outrun (after 10 seconds), then carry on. Needs a combat rotation to be set
+- Illegal Mode's treasure hunt does the same, and hands over at once when you die
+- Mob Farmer no longer stands still forever waiting for a pull that never comes, and retries enemies it gave up on after a few minutes
+- No more extra Return to camp right after Illegal Mode pauses its treasure hunt
+- The Completionist list shows FATE and CE names in your game language
+- Typing an unknown /bocchi option now tells you so
 - If a mob attacks you while you're mounted, you now get off and fight it when it's your level or lower, and keep riding away from stronger ones (one that keeps chasing you gets fought)
 - A mob that follows you to a pot or CE waiting spot gets fought instead of killing you while you wait
 - The second pot chest search no longer goes back to the first pot's spots
