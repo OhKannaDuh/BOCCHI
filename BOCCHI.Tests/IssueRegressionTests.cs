@@ -1,0 +1,288 @@
+using System.Numerics;
+using BOCCHI.Automator.Services.Paths;
+using BOCCHI.Common.Data.Aethernet;
+using BOCCHI.Common.Data.Zones;
+using BOCCHI.Common.Services;
+using BOCCHI.MobFarmer.Services;
+using BOCCHI.Treasure.Hunt;
+using Ocelot.Chain.Middleware.Step;
+using Ocelot.Rotation.Services;
+using Ocelot.Services.Gate;
+using Ocelot.Services.Logger;
+using Xunit;
+
+namespace BOCCHI.Tests;
+
+// One test per problem that reached players or was found in review, named after what went wrong.
+public class IssueRegressionTests
+{
+    private static readonly DateTimeOffset Start = new(2026, 11, 21, 12, 0, 0, TimeSpan.Zero);
+
+    private static readonly AutoReviveState Dead = new(
+        AcceptRaises: true,
+        ReturnToCamp: true,
+        ReturnDelaySeconds: 60,
+        PromptOpen: true,
+        RaisePending: false,
+        PromptIsReturn: false,
+        ProtectedContent: false,
+        SawAlive: true,
+        DeadFor: TimeSpan.FromSeconds(90));
+
+    // Discord: sat on the mount and died when a mob attacked (Ziik, Ryuzo).
+    [Theory]
+    [InlineData(15, 12, true)]
+    [InlineData(15, 15, true)]
+    [InlineData(15, 16, false)]
+    [InlineData(null, 30, true)]
+    [InlineData(15, null, true)]
+    public void AnAttackerIsFoughtOnlyWhenItIsNotAboveYourLevel(int? yours, int? attacker, bool fight)
+    {
+        Assert.Equal(fight, CombatRules.CanFight(yours, attacker));
+    }
+
+    // Discord: a stronger mob that keeps chasing has to be fought in the end (pot chests, hunts).
+    [Fact]
+    public void AMobYouCannotOutrunIsFoughtAfterTenSeconds()
+    {
+        OutrunTimer timer = new();
+
+        Assert.False(timer.Update(true, Start));
+        Assert.False(timer.Update(true, Start.AddSeconds(9)));
+        Assert.True(timer.Update(true, Start.AddSeconds(10)));
+    }
+
+    [Fact]
+    public void LeavingCombatRestartsTheOutrunCountdown()
+    {
+        OutrunTimer timer = new();
+        timer.Update(true, Start);
+        timer.Update(false, Start.AddSeconds(8));
+
+        Assert.False(timer.Update(true, Start.AddSeconds(12)));
+        Assert.True(timer.Update(true, Start.AddSeconds(22)));
+    }
+
+    // Discord (croizat): a raise was not accepted.
+    [Fact]
+    public void APendingRaiseIsAccepted()
+    {
+        (AutoReviveAction action, _) = AutoReviveRule.Decide(Dead with { RaisePending = true, DeadFor = TimeSpan.FromSeconds(3) });
+
+        Assert.Equal(AutoReviveAction.AcceptRaise, action);
+    }
+
+    [Fact]
+    public void ARaiseIsNotAcceptedWhenThatSettingIsOff()
+    {
+        (AutoReviveAction action, _) = AutoReviveRule.Decide(Dead with { RaisePending = true, AcceptRaises = false });
+
+        Assert.Equal(AutoReviveAction.Nothing, action);
+    }
+
+    // Discord (Ziik): an automatic return throws you out of Forked Tower or a CE.
+    [Fact]
+    public void YouAreNeverReturnedToCampFromForkedTowerOrACriticalEncounter()
+    {
+        (AutoReviveAction action, _) = AutoReviveRule.Decide(Dead with { ProtectedContent = true });
+
+        Assert.Equal(AutoReviveAction.Nothing, action);
+    }
+
+    // Second opinion: the guard was off when the plugin loaded while you were already dead.
+    [Fact]
+    public void YouAreNotReturnedIfThePluginNeverSawYouAlive()
+    {
+        (AutoReviveAction action, _) = AutoReviveRule.Decide(Dead with { SawAlive = false });
+
+        Assert.Equal(AutoReviveAction.Nothing, action);
+    }
+
+    [Fact]
+    public void ReturnWaitsForTheDelayThenHappens()
+    {
+        Assert.Equal(AutoReviveAction.Nothing, AutoReviveRule.Decide(Dead with { DeadFor = TimeSpan.FromSeconds(59) }).Action);
+        Assert.Equal(AutoReviveAction.ReturnToCamp, AutoReviveRule.Decide(Dead with { DeadFor = TimeSpan.FromSeconds(60) }).Action);
+    }
+
+    // Second opinion: with a raise pending, a return prompt must not be answered as if it were the raise.
+    [Fact]
+    public void AReturnPromptIsNotTreatedAsARaise()
+    {
+        (AutoReviveAction action, _) = AutoReviveRule.Decide(
+            Dead with { RaisePending = true, PromptIsReturn = true, ProtectedContent = true });
+
+        Assert.Equal(AutoReviveAction.Nothing, action);
+    }
+
+    [Fact]
+    public void NothingIsClickedWithoutAPrompt()
+    {
+        Assert.Equal(AutoReviveAction.Nothing, AutoReviveRule.Decide(Dead with { PromptOpen = false }).Action);
+    }
+
+    // YesAlready would answer the revive prompt first; and must only be switched back on if we switched it off.
+    [Fact]
+    public void YesAlreadyIsPausedWhileDeadAndRestoredAfterwards()
+    {
+        Assert.Equal((false, true), YesAlreadyPause.Decide(wantPause: true, isEnabledNow: true, pausedByBocchi: false));
+        Assert.Equal((true, false), YesAlreadyPause.Decide(wantPause: false, isEnabledNow: false, pausedByBocchi: true));
+    }
+
+    [Fact]
+    public void YesAlreadyTheUserSwitchedOffStaysOff()
+    {
+        Assert.Equal((null, false), YesAlreadyPause.Decide(wantPause: true, isEnabledNow: false, pausedByBocchi: false));
+        Assert.Equal((null, false), YesAlreadyPause.Decide(wantPause: false, isEnabledNow: false, pausedByBocchi: false));
+    }
+
+    // The party-invite box must never be mistaken for the return box.
+    [Fact]
+    public void APromptOnlyMatchesItsOwnTemplate()
+    {
+        const string invite = "Join <string(lstr1)>'s party?";
+
+        Assert.True(ReturnYesNo.MatchesTemplate("Join Some Player's party?", invite));
+        Assert.False(ReturnYesNo.MatchesTemplate("Return to the base camp?", invite));
+        Assert.True(ReturnYesNo.MatchesTemplate("Return to the base camp?", "Return to the base camp?"));
+    }
+
+    // Discord (Godfrey): mounted up again just to walk the last few yalms to a pot.
+    [Fact]
+    public void NoMountForAShortHopNextToAPot()
+    {
+        Vector3 pot = new(100f, 0f, 100f);
+
+        Assert.True(PathMounting.IsShortHopNearPot(new(110f, 0f, 100f), new(95f, 0f, 100f), [pot], 30f));
+        Assert.False(PathMounting.IsShortHopNearPot(new(300f, 0f, 100f), new(95f, 0f, 100f), [pot], 30f));
+        Assert.False(PathMounting.IsShortHopNearPot(new(110f, 0f, 100f), new(95f, 0f, 100f), [], 30f));
+    }
+
+    // Discord (Godfrey): the pot waiting spots were too far from the pot.
+    [Fact]
+    public void ThePotWaitingRingStaysCloseToThePot()
+    {
+        Assert.True(NavigationConstants.PotPrepositionMaxRadius <= 20f);
+    }
+
+    // Discord (Ziik): Mob Farmer waited 20-30 seconds between pulls with fewer enemies than the minimum.
+    [Theory]
+    [InlineData(0, 3, 60, false)]
+    [InlineData(3, 3, 0, true)]
+    [InlineData(1, 3, 14, false)]
+    [InlineData(1, 3, 15, true)]
+    public void MobFarmerStartsAPullAtTheMinimumOrAfterTheTimeout(int free, int minimum, int waitedSeconds, bool start)
+    {
+        Assert.Equal(
+            start,
+            MobFarmerRules.ShouldStartPull(free, minimum, TimeSpan.FromSeconds(waitedSeconds), TimeSpan.FromSeconds(15)));
+    }
+
+    // Audit: an enemy Mob Farmer gave up on was ignored for the rest of the session.
+    [Fact]
+    public void AnEnemyMobFarmerGaveUpOnIsTriedAgainLater()
+    {
+        SkipList skips = new(TimeSpan.FromMinutes(5));
+        DateTime now = Start.UtcDateTime;
+        skips.Skip(42, now);
+
+        Assert.True(skips.IsSkipped(42, now.AddMinutes(4)));
+        Assert.False(skips.IsSkipped(42, now.AddMinutes(5)));
+        Assert.False(skips.IsSkipped(7, now));
+    }
+
+    // Discord (Ziik): the hunt kept getting stuck on the Wanderer's Haven ledge coffer.
+    [Fact]
+    public void TheLedgeCofferInSouthHornIsSkipped()
+    {
+        Assert.True(TreasureHuntPathOverrides.IsUnreachable(ZoneId.SouthHorn, 1842));
+    }
+
+    // Discord (Dead): with combat set to None, Rotation Solver was left switched on.
+    [Fact]
+    public void TearingDownTheRotationSwitchesItOffAndForgetsIt()
+    {
+        RecordingRotation rotation = new();
+        CombatRotationSession session = new([rotation], [], null!, new QuietLogger<CombatRotationSession>());
+        session.Prepare(new CombatRotationRecipe(JobRotationBackendKind.RotationSolverReborn, CombatAiKind.None));
+        session.Enable(CombatActivity.Fate);
+
+        session.Teardown();
+        session.Enable(CombatActivity.Fate);
+
+        Assert.False(session.ActiveRecipe.IsActive);
+        Assert.Equal(["prepare", "enable", "teardown"], rotation.Calls);
+    }
+
+    // Audit: a frame longer than a second lost its whole seconds, so timed jobs ran late.
+    [Fact]
+    public void ALongFrameCountsInFull()
+    {
+        long left = GateService.Advance(0, TimeSpan.FromMilliseconds(1500), 1000, out bool due);
+
+        Assert.True(due);
+        Assert.Equal(500, left);
+    }
+
+    // Audit: retry defaults of "no delay, forever" would freeze the game on a failing step.
+    [Fact]
+    public void RetryHasSafeDefaults()
+    {
+        RetryStepMiddleware retry = new();
+
+        Assert.True(retry.DelayMs > 0);
+        Assert.InRange(retry.MaxAttempts, 1, 1000);
+    }
+
+    private sealed class RecordingRotation : IJobRotationBackend
+    {
+        public List<string> Calls { get; } = [];
+
+        public JobRotationBackendKind Kind => JobRotationBackendKind.RotationSolverReborn;
+
+        public void Prepare(JobRotationSessionOptions options) => Calls.Add("prepare");
+
+        public void Enable(CombatActivity activity) => Calls.Add("enable");
+
+        public void Disable() => Calls.Add("disable");
+
+        public void Refresh()
+        {
+        }
+
+        public void Teardown() => Calls.Add("teardown");
+    }
+
+    private sealed class QuietLogger<T> : ILogger<T>
+    {
+        public void Log(string format, params object[] args) { }
+
+        public void Info(string format, params object[] args) { }
+
+        public void Warn(string format, params object[] args) { }
+
+        public void Warning(string format, params object[] args) { }
+
+        public void Error(string format, params object[] args) { }
+
+        public void Debug(string format, params object[] args) { }
+
+        public void Fatal(string format, params object[] args) { }
+
+        public void Verbose(string format, params object[] args) { }
+
+        public void Fatal(Exception? exception, string messageTemplate, params object[] values) { }
+
+        public void Error(Exception? exception, string messageTemplate, params object[] values) { }
+
+        public void Warn(Exception? exception, string messageTemplate, params object[] values) { }
+
+        public void Warning(Exception? exception, string messageTemplate, params object[] values) { }
+
+        public void Info(Exception? exception, string messageTemplate, params object[] values) { }
+
+        public void Debug(Exception? exception, string messageTemplate, params object[] values) { }
+
+        public void Verbose(Exception? exception, string messageTemplate, params object[] values) { }
+    }
+}

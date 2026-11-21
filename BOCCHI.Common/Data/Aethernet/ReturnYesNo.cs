@@ -100,6 +100,8 @@ public static class ReturnYesNo
         return string.Empty;
     }
 
+    public static bool MatchesTemplate(string prompt, string template) => MatchesLocalizedPrompt(prompt, template);
+
     private static bool LooksLikeReturnPrompt(string prompt)
     {
         string n = NormalizePrompt(prompt);

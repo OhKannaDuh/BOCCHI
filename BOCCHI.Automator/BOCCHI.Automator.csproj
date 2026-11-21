@@ -1,4 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <InternalsVisibleTo Include="BOCCHI.Tests"/>
+    </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\BOCCHI.Common\BOCCHI.Common.csproj"/>
         <ProjectReference Include="..\BOCCHI.Buff\BOCCHI.Buff.csproj"/>

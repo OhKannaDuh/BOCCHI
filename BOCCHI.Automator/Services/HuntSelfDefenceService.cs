@@ -1,6 +1,6 @@
 using BOCCHI.Common.Config;
-using BOCCHI.Common.Services;
 using BOCCHI.Common.Data.Zones;
+using BOCCHI.Common.Services;
 using BOCCHI.Treasure.Services;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Plugin.Services;
@@ -22,32 +22,30 @@ public sealed class HuntSelfDefenceService
     ILogger<HuntSelfDefenceService> logger
 ) : IOnUpdate
 {
-    private static readonly TimeSpan OutrunGrace = TimeSpan.FromSeconds(10);
-
-    private DateTimeOffset? combatSince;
-
-    private bool defending;
+    private readonly OutrunTimer outrun = new();
 
     private bool pausedTreasureHunt;
 
+    private bool ownsRotation;
+
+    public bool Defending { get; private set; }
+
     public void Update()
     {
-        bool treasure = hunter.Running
-                        && !hunter.ManagedByPotsTreasure
-                        && !hunter.ManagedByIllegalModeFiller
-                        && !hunter.ManagedByMobFarmer;
+        // Illegal Mode's own hunt hands the fight to Illegal Mode instead (IllegalModeTreasureFillerService).
+        bool treasure = hunter.Running && !hunter.ManagedByIllegalModeFiller;
         bool carrot = carrots.Running;
         if (!treasure && !carrot)
         {
-            combatSince = null;
+            outrun.Reset();
             Stop(resume: false);
             return;
         }
 
         bool inCombat = conditions[ConditionFlag.InCombat] && !conditions[ConditionFlag.Unconscious];
-        combatSince = inCombat ? combatSince ?? DateTimeOffset.UtcNow : null;
+        bool chased = outrun.Update(inCombat, DateTimeOffset.UtcNow);
 
-        if (defending)
+        if (Defending)
         {
             if (!inCombat)
             {
@@ -65,15 +63,14 @@ public sealed class HuntSelfDefenceService
             return;
         }
 
-        if (!inCombat
+        if (!chased
             || !config.CombatAutorotation.UsesCombatAutomation()
-            || DateTimeOffset.UtcNow - combatSince < OutrunGrace
             || (treasure ? hunter.Paused : carrots.Paused))
         {
             return;
         }
 
-        defending = true;
+        Defending = true;
         pausedTreasureHunt = treasure;
         if (treasure)
         {
@@ -84,25 +81,35 @@ public sealed class HuntSelfDefenceService
             carrots.Pause();
         }
 
-        rotation.PrepareForIllegalMode();
+        // Pots & Treasure keeps its own rotation session prepared; tearing that down would leave its FATEs without one.
+        ownsRotation = !rotation.IsPrepared;
+        if (ownsRotation)
+        {
+            rotation.PrepareForIllegalMode();
+        }
+
         logger.Info(
             "{Hunt}: pausing to fight — still attacked after {Seconds}s (attacker level {Enemy}, your Knowledge Level {Mine})",
             treasure ? "Treasure hunt" : "Carrot hunt",
-            (int)OutrunGrace.TotalSeconds,
+            (int)CombatRules.OutrunGrace.TotalSeconds,
             KnowledgeThreat.HighestAttackerLevel(objects)?.ToString() ?? "?",
             KnowledgeThreat.TryGetPlayerForayLevel(objects)?.ToString() ?? "?");
     }
 
     private void Stop(bool resume)
     {
-        if (!defending)
+        if (!Defending)
         {
             return;
         }
 
-        defending = false;
+        Defending = false;
         rotation.DisableAi();
-        rotation.TeardownForIllegalMode();
+        if (ownsRotation)
+        {
+            rotation.TeardownForIllegalMode();
+        }
+
         if (!resume)
         {
             return;

@@ -34,12 +34,9 @@ public class GatheringHandler
 
     private readonly FarmerWalkStuckAssist stuckAssist = new();
 
-    private static readonly TimeSpan SkipDuration = TimeSpan.FromMinutes(5);
-
     private static readonly TimeSpan AiPullPatience = TimeSpan.FromSeconds(8);
 
-    // Object ids are reused by the game, so a skip must expire or a fresh enemy gets ignored.
-    private readonly Dictionary<ulong, DateTime> skippedMobIds = [];
+    private readonly SkipList skippedMobs = new(TimeSpan.FromMinutes(5));
 
     private ulong aiPullMobId;
 
@@ -56,7 +53,7 @@ public class GatheringHandler
     {
         List<IBattleNpc> inCombat = scanner.InCombat.ToList();
         List<IBattleNpc> notInCombat = scanner.NotInCombat
-            .Where(o => !skippedMobIds.TryGetValue(o.GameObjectId, out DateTime until) || DateTime.UtcNow >= until)
+            .Where(o => !skippedMobs.IsSkipped(o.GameObjectId, DateTime.UtcNow))
             .ToList();
 
         if (MobFarmerPack.CountTowardMinimum(inCombat, config.CountSpecialMobsTowardMinimum)
@@ -190,7 +187,7 @@ public class GatheringHandler
                     "Mob Farmer: giving up on {Name} after stuck recoveries — trying another mob",
                     current.Name.TextValue);
                 pathfinder.Stop();
-                skippedMobIds[current.GameObjectId] = DateTime.UtcNow + SkipDuration;
+                skippedMobs.Skip(current.GameObjectId, DateTime.UtcNow);
                 return true;
 
             default:

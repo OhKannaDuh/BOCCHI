@@ -33,6 +33,7 @@ public class PotsTreasureService
     UIConfig uiConfig,
     PotsConfig potsConfig,
     ITranslator<MainWindow> translator,
+    HuntSelfDefenceService selfDefence,
     ILogger<PotsTreasureService> logger
 ) : IPotsTreasureMode, IOnUpdate, IOnStop
 {
@@ -260,6 +261,12 @@ public class PotsTreasureService
                 ManagedByMobFarmer = false;
             }
 
+            return;
+        }
+
+        // The hunt is paused for a fight; resuming it here would walk away from the mob mid-fight.
+        if (selfDefence.Defending)
+        {
             return;
         }
 

@@ -109,15 +109,18 @@ public class TriagingHandler
             return;
         }
 
-        TimeSpan delay = TimeSpan.FromSeconds(config.TriageDelaySeconds);
-        if (DateTimeOffset.UtcNow - sessionStartedUtc >= SessionTimeout + delay)
+        TriageStage stage = TriageRules.Stage(
+            DateTimeOffset.UtcNow - sessionStartedUtc,
+            TimeSpan.FromSeconds(config.TriageDelaySeconds),
+            SessionTimeout);
+        if (stage == TriageStage.TimedOut)
         {
             logger.Info("Triage Mode: session timeout");
             FinishTriage();
             return;
         }
 
-        if (DateTimeOffset.UtcNow - sessionStartedUtc < delay)
+        if (stage == TriageStage.Waiting)
         {
             return;
         }

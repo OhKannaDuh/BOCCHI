@@ -130,12 +130,7 @@ public static class KnowledgeThreat
             return false;
         }
 
-        if (TryGetPlayerForayLevel(objects) is not int playerLevel)
-        {
-            return true;
-        }
-
-        return HighestAttackerLevel(objects) is not { } enemy || enemy <= playerLevel;
+        return CombatRules.CanFight(TryGetPlayerForayLevel(objects), HighestAttackerLevel(objects));
     }
 
     public static bool TryFindIsleblazer(IObjectTable objects, Vector3 origin, float radius, out float distance)

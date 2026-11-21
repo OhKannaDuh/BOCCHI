@@ -103,8 +103,7 @@ public class Automator
             return;
         }
 
-        IllegalModeActivityWork.ForgetTravelLatches(memory);
-        memory.Forget<ReturningStateMemory>();
+        IllegalModeActivityWork.ForgetLatchesForHunt(memory);
         SoftStopPathfinding();
         autoRotation.DisableAi();
     }

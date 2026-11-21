@@ -264,6 +264,15 @@ public sealed class PotChestFarmMemory
 
     public bool HasOpenedChest { get; set; }
 
+    // After the first chest the leftover spots belong to the first pot; the second-chance spots are a different list.
+    public void DropFirstPotCandidates()
+    {
+        if (HasOpenedChest && !OnRerollPool)
+        {
+            Candidates.Clear();
+        }
+    }
+
     public DateTimeOffset WaitingForSpawnSince { get; set; } = DateTimeOffset.MinValue;
 
     public int RemainingChests => Mode == PotChestFarmMode.Smart

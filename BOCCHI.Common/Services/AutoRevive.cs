@@ -66,18 +66,27 @@ public sealed class AutoRevive(
         // A YesAlready rule would click the revive prompt first, also inside Forked Tower.
         yesAlready.Hold();
 
-        if (!AddonHelpers.TryGetSelectYesno(out AddonSelectYesno* yesno) || ReturnYesNo.IsPartyInvite(&yesno->AtkUnitBase))
-        {
-            Note("you are down; no revive prompt yet");
-            return;
-        }
+        bool promptOpen = AddonHelpers.TryGetSelectYesno(out AddonSelectYesno* yesno)
+                          && !ReturnYesNo.IsPartyInvite(&yesno->AtkUnitBase);
+        (AutoReviveAction action, string note) = AutoReviveRule.Decide(new AutoReviveState(
+            config.AutoAcceptRaise,
+            config.ReturnToBaseCampAfterDeath,
+            config.ReturnAfterDeathDelaySeconds,
+            promptOpen,
+            objects.LocalPlayer?.StatusList.Any(s => s.StatusId == RaisePendingStatusId) == true,
+            promptOpen && ReturnYesNo.IsReturnConfirmation(&yesno->AtkUnitBase),
+            protectedContent,
+            sawAlive,
+            DateTime.UtcNow - deadSinceUtc.Value));
 
-        bool raisePending = objects.LocalPlayer?.StatusList.Any(s => s.StatusId == RaisePendingStatusId) == true;
-        bool raiseOffered = raisePending && !ReturnYesNo.IsReturnConfirmation(&yesno->AtkUnitBase);
-        string? reason = raiseOffered ? AcceptRaiseReason() : ReturnReason();
-        if (reason == null)
+        if (action == AutoReviveAction.Nothing)
         {
-            Note(raiseOffered ? "a raise is offered, but Accept raises is off" : WhyNotReturning(raisePending));
+            if (note != lastNote)
+            {
+                lastNote = note;
+                logger.Info("Auto revive: {Note}", note);
+            }
+
             return;
         }
 
@@ -87,56 +96,9 @@ public sealed class AutoRevive(
         }
 
         lastNote = null;
-        logger.Info("Auto revive: {Reason}", reason);
+        logger.Info("Auto revive: {Reason}", note);
         new AddonMaster.SelectYesno((nint)yesno).Yes();
     }
 
     public void OnStop() => yesAlready.Release();
-
-    private void Note(string note)
-    {
-        if (note == lastNote)
-        {
-            return;
-        }
-
-        lastNote = note;
-        logger.Info("Auto revive: {Note}", note);
-    }
-
-    private string WhyNotReturning(bool raisePending)
-    {
-        string prompt = raisePending ? "a raise is pending but the prompt looks like a return prompt" : "no raise pending";
-        if (!config.ReturnToBaseCampAfterDeath)
-        {
-            return $"{prompt}; Return to camp is off";
-        }
-
-        if (protectedContent)
-        {
-            return $"{prompt}; inside Forked Tower or a critical encounter, so not returning";
-        }
-
-        if (!sawAlive)
-        {
-            return $"{prompt}; BOCCHI did not see you alive first, so not returning";
-        }
-
-        return $"{prompt}; returning to camp after {config.ReturnAfterDeathDelaySeconds}s without a raise";
-    }
-
-    private string? AcceptRaiseReason() => config.AutoAcceptRaise ? "accepting raise" : null;
-
-    private string? ReturnReason()
-    {
-        if (!config.ReturnToBaseCampAfterDeath
-            || DateTime.UtcNow - deadSinceUtc < TimeSpan.FromSeconds(config.ReturnAfterDeathDelaySeconds)
-            || protectedContent
-            || !sawAlive)
-        {
-            return null;
-        }
-
-        return $"no raise after {config.ReturnAfterDeathDelaySeconds}s — returning to base camp";
-    }
 }

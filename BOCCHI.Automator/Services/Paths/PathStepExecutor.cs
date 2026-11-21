@@ -87,7 +87,10 @@ public class PathStepExecutor
     {
         const float reach = NavigationConstants.PotPrepositionMaxRadius * 1.5f;
         return objects.LocalPlayer is { } player
-               && player.Position.Distance2D(destination) <= reach
-               && zone.GetPotFateData().Any(p => p.Position.Distance2D(destination) <= reach);
+               && PathMounting.IsShortHopNearPot(
+                   player.Position,
+                   destination,
+                   zone.GetPotFateData().Select(p => p.Position),
+                   reach);
     }
 }

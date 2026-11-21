@@ -10,52 +10,48 @@ public sealed class YesAlreadyPause(IDalamudPluginInterface plugin, ILogger<YesA
 
     private readonly ICallGateSubscriber<bool, object> setEnabled = plugin.GetIpcSubscriber<bool, object>("YesAlready.SetPluginEnabled");
 
-    // Only true while YesAlready is off because BOCCHI turned it off; the user's own choice is never restored over.
     private bool pausedByBocchi;
 
-    public void Hold()
+    public void Hold() => Apply(wantPause: true);
+
+    public void Release() => Apply(wantPause: false);
+
+    // Only turn YesAlready back on if BOCCHI turned it off; a user who switches it themselves is left alone.
+    public static (bool? SetEnabled, bool PausedByBocchi) Decide(bool wantPause, bool isEnabledNow, bool pausedByBocchi)
     {
-        if (pausedByBocchi)
+        if (wantPause)
+        {
+            return isEnabledNow && !pausedByBocchi ? (false, true) : (null, pausedByBocchi);
+        }
+
+        return pausedByBocchi && !isEnabledNow ? (true, false) : (null, false);
+    }
+
+    private void Apply(bool wantPause)
+    {
+        if (wantPause == pausedByBocchi)
         {
             return;
         }
 
         try
         {
-            if (!isEnabled.HasFunction || !isEnabled.InvokeFunc())
+            if (!isEnabled.HasFunction)
             {
+                pausedByBocchi = false;
                 return;
             }
 
-            setEnabled.InvokeAction(false);
-            pausedByBocchi = true;
-            logger.Info("Auto revive: paused YesAlready until you are back up");
-        }
-        catch (Exception ex)
-        {
-            logger.Warning(ex, "Could not pause YesAlready");
-        }
-    }
-
-    public void Release()
-    {
-        if (!pausedByBocchi)
-        {
-            return;
-        }
-
-        pausedByBocchi = false;
-        try
-        {
-            if (isEnabled.HasFunction && !isEnabled.InvokeFunc())
+            (bool? set, pausedByBocchi) = Decide(wantPause, isEnabled.InvokeFunc(), pausedByBocchi);
+            if (set is { } enabled)
             {
-                setEnabled.InvokeAction(true);
-                logger.Info("Auto revive: YesAlready is back on");
+                setEnabled.InvokeAction(enabled);
+                logger.Info(enabled ? "Auto revive: YesAlready is back on" : "Auto revive: paused YesAlready until you are back up");
             }
         }
         catch (Exception ex)
         {
-            logger.Warning(ex, "Could not turn YesAlready back on");
+            logger.Warning(ex, "Could not switch YesAlready");
         }
     }
 }

@@ -56,6 +56,8 @@ public class AutoRotationController(
 
     public void TeardownForIllegalMode() => session.Teardown();
 
+    public bool IsPrepared => session.ActiveRecipe.IsActive;
+
     public void OnRevived()
     {
         session.ClearJobAppliedCache();

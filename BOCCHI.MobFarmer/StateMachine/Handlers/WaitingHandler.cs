@@ -85,13 +85,11 @@ public class WaitingHandler
 
         readySinceUtc ??= DateTime.UtcNow;
         int free = MobFarmerPack.CountTowardMinimum(scanner.NotInCombat, config.CountSpecialMobsTowardMinimum);
-        if (free == 0)
-        {
-            return null;
-        }
-
-        return free >= config.MinimumMobsToStartLoop
-               || DateTime.UtcNow - readySinceUtc >= TimeSpan.FromSeconds(config.StackingTimeoutSeconds)
+        return MobFarmerRules.ShouldStartPull(
+            free,
+            config.MinimumMobsToStartLoop,
+            DateTime.UtcNow - readySinceUtc.Value,
+            TimeSpan.FromSeconds(config.StackingTimeoutSeconds))
             ? FarmerPhase.Buffing
             : null;
     }

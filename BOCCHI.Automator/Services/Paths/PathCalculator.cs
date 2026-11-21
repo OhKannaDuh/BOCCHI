@@ -414,15 +414,9 @@ public class PathCalculator
         bool preferReturn)
     {
         GraphTraverser traverser = new(graph, pathfinder, logger);
-        if (!addReturnCalculator || !preferReturn)
+        foreach (IGraphCandidateCalculator calculator in RouteOptions.Calculators(addReturnCalculator, preferReturn))
         {
-            traverser.AddCalculator(new WalkTeleportWalkCalculator());
-        }
-
-        traverser.AddCalculator(new DirectWalkCalculator());
-        if (addReturnCalculator)
-        {
-            traverser.AddCalculator(new ReturnTeleportWalkCalculator());
+            traverser.AddCalculator(calculator);
         }
 
         List<PathStep> steps = await traverser.FindPath(from, goal);

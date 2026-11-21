@@ -39,9 +39,7 @@ public class IllegalModeTreasureFillerService
 {
     public int Order => 0;
 
-    private static readonly TimeSpan OutrunGrace = TimeSpan.FromSeconds(10);
-
-    private DateTimeOffset? combatSince;
+    private readonly OutrunTimer outrun = new();
 
     private bool defendingHunt;
 
@@ -314,6 +312,7 @@ public class IllegalModeTreasureFillerService
     {
         if (conditions[ConditionFlag.Unconscious])
         {
+            outrun.Reset();
             StopDefendingHunt();
             if (!hunter.Paused)
             {
@@ -324,11 +323,8 @@ public class IllegalModeTreasureFillerService
             return true;
         }
 
-        bool inCombat = conditions[ConditionFlag.InCombat];
-        combatSince = inCombat ? combatSince ?? DateTimeOffset.UtcNow : null;
-        bool stillChased = inCombat
+        bool stillChased = outrun.Update(conditions[ConditionFlag.InCombat], DateTimeOffset.UtcNow)
                            && automatorConfig.CombatAutorotation.UsesCombatAutomation()
-                           && DateTimeOffset.UtcNow - combatSince >= OutrunGrace
                            && (defendingHunt || !hunter.Paused);
         if (!stillChased)
         {
@@ -342,7 +338,7 @@ public class IllegalModeTreasureFillerService
             memory.TryAdd<TreasureHuntSelfDefenceMemory>();
             logger.Info(
                 "Illegal Mode: pausing treasure hunt to fight — still attacked after {Seconds}s (attacker level {Enemy}, your Knowledge Level {Mine})",
-                (int)OutrunGrace.TotalSeconds,
+                (int)CombatRules.OutrunGrace.TotalSeconds,
                 KnowledgeThreat.HighestAttackerLevel(objects)?.ToString() ?? "?",
                 KnowledgeThreat.TryGetPlayerForayLevel(objects)?.ToString() ?? "?");
         }

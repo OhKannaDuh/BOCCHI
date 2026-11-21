@@ -92,6 +92,13 @@ internal static class IllegalModeActivityWork
         return memory.TryAdd(new BuffSupportJobMemory(current.Id));
     }
 
+    // A hunt takes over travel completely; a Return queued before it would fire the moment the hunt pauses.
+    public static void ForgetLatchesForHunt(IAutomatorMemory memory)
+    {
+        ForgetTravelLatches(memory);
+        memory.Forget<ReturningStateMemory>();
+    }
+
     public static void ForgetTravelLatches(IAutomatorMemory memory, bool includePotChests = false)
     {
         memory.Forget<GoalPathStepMemory>();
