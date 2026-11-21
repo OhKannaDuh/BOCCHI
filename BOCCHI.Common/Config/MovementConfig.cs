@@ -22,4 +22,7 @@ public class MovementConfig : IAutoConfig
 
     [IntRange(1, 15, Order = 4, Section = "unstuck")]
     public int JumpWhenStuckSeconds { get; set; } = 3;
+
+    [Checkbox(Order = 5, Section = "travel")]
+    public bool PreferReturnOverShardWalk { get; set; } = false;
 }
