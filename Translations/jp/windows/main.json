@@ -16,8 +16,7 @@
     "mobfarmer": "モブファーム",
     "world": "ワールド",
     "treasure": "トレジャーハンター",
-    "automation_normal": "通常",
-    "open_settings": "このタブの設定を開く"
+    "automation_normal": "通常"
   },
   "status": {
     "automator": "不正モード",

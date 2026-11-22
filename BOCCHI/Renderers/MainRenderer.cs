@@ -4,7 +4,6 @@ using BOCCHI.Common.Data.Zones;
 using BOCCHI.Common.UI;
 using BOCCHI.UI;
 using Dalamud.Bindings.ImGui;
-using Dalamud.Interface;
 using Dalamud.Interface.Utility.Raii;
 using Microsoft.Extensions.DependencyInjection;
 using Ocelot.Ipc.Lifestream;
@@ -50,6 +49,8 @@ public class MainRenderer
 
     private bool showCompletionist;
 
+    public string? ConfigGroup { get; private set; }
+
     private List<IDynamicRenderer> OrderedRenderers =>
         (renderers ??= services.GetServices<IDynamicRenderer>())
         .Where(r => r.ShouldRender())
@@ -59,6 +60,8 @@ public class MainRenderer
 
     public void Render()
     {
+        ConfigGroup = null;
+
         if (!zones.GetZone().IsOccultCrescentZone())
         {
             BocchiUi.DrawStatusChip(translator.T(".unsupported_zone"), BocchiUi.StatusChipKind.Warn);
@@ -105,7 +108,8 @@ public class MainRenderer
                 continue;
             }
 
-            DrawTabBody(tab, tabRenderers, configGroup);
+            ConfigGroup = configGroup;
+            DrawTabBody(tab, tabRenderers);
         }
 
         // A hidden tab can't be selected; don't keep the request for a later frame.
@@ -124,7 +128,12 @@ public class MainRenderer
         Follow(MainWindowSection.Automation, statusBar.IllegalModeActive && !statusBar.CompletionistActive);
         Follow(MainWindowSection.PotsTreasure, statusBar.PotsTreasureActive);
         Follow(MainWindowSection.MobFarmer, statusBar.MobFarmerActive);
-        Follow(MainWindowSection.Treasure, statusBar.StandaloneTreasureHuntActive || statusBar.CarrotHuntActive);
+        bool wasHunting = activeSections.Contains(MainWindowSection.Treasure);
+        Follow(MainWindowSection.Treasure, statusBar.HuntMoving);
+        if (wasHunting && !statusBar.HuntMoving && statusBar.IllegalModeActive)
+        {
+            Select(statusBar.CompletionistActive ? MainWindowSection.Completionist : MainWindowSection.Automation);
+        }
     }
 
     private void Follow(MainWindowSection section, bool active)
@@ -153,7 +162,7 @@ public class MainRenderer
         pendingTab = section;
     }
 
-    private void DrawTabBody(MainWindowSection tab, List<IDynamicRenderer> tabRenderers, string configGroup)
+    private void DrawTabBody(MainWindowSection tab, List<IDynamicRenderer> tabRenderers)
     {
         ImGui.Spacing();
 
@@ -173,8 +182,6 @@ public class MainRenderer
                 {
                     showCompletionist = true;
                 }
-
-                ImGui.SameLine();
             }
 
             MainWindowSection shown = hasCompletionist && (showCompletionist || !hasNormal)
@@ -183,7 +190,6 @@ public class MainRenderer
             tabRenderers = tabRenderers.Where(r => r.Section == shown).ToList();
         }
 
-        DrawSettingsButton(configGroup);
         ImGui.Spacing();
         DrawMissingPlugin(tab);
 
@@ -246,26 +252,6 @@ public class MainRenderer
             CombatAutorotation.BossModReborn when !pluginStatus.IsLoaded(JobRotationBackendKeys.BossModReborn) => "BossMod Reborn",
             _ => null,
         };
-    }
-
-    private void DrawSettingsButton(string configGroup)
-    {
-        string icon = FontAwesomeIcon.Cog.ToIconString();
-        float width;
-        using (ImRaii.PushFont(UiBuilder.IconFont))
-        {
-            width = ImGui.CalcTextSize(icon).X + ImGui.GetStyle().FramePadding.X * 2f;
-            ImGui.SetCursorPosX(ImGui.GetCursorPosX() + Math.Max(0f, ImGui.GetContentRegionAvail().X - width));
-            if (ImGui.Button($"{icon}##settings_{configGroup}"))
-            {
-                configWindow.OpenGroup(configGroup);
-            }
-        }
-
-        if (ImGui.IsItemHovered())
-        {
-            ImGui.SetTooltip(translator.T(".sections.open_settings"));
-        }
     }
 
     private void DrawTrackerLine(List<IDynamicRenderer> trackers)

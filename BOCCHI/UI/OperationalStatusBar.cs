@@ -65,6 +65,8 @@ public class OperationalStatusBar
 
     public bool CarrotHuntActive => carrotHunter.Running;
 
+    public bool HuntMoving => (StandaloneTreasureHuntActive && !hunter.Paused) || (CarrotHuntActive && !carrotHunter.Paused);
+
     public void Render()
     {
         bool shopping =

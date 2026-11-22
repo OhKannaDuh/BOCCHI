@@ -16,8 +16,7 @@
     "mobfarmer": "刷怪",
     "world": "世界",
     "treasure": "寻宝",
-    "automation_normal": "普通",
-    "open_settings": "打开此标签页的设置"
+    "automation_normal": "普通"
   },
   "status": {
     "automator": "违规模式",

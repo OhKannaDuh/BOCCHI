@@ -16,8 +16,7 @@
     "mobfarmer": "몹 사냥",
     "world": "월드",
     "treasure": "보물 찾기",
-    "automation_normal": "일반",
-    "open_settings": "이 탭의 설정 열기"
+    "automation_normal": "일반"
   },
   "status": {
     "automator": "자동 모드",

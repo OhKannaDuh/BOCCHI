@@ -16,8 +16,7 @@
     "mobfarmer": "Mob Farmer",
     "world": "World",
     "treasure": "Treasure Hunter",
-    "automation_normal": "Normal",
-    "open_settings": "Open the settings for this tab"
+    "automation_normal": "Normal"
   },
   "status": {
     "automator": "Illegal Mode",
