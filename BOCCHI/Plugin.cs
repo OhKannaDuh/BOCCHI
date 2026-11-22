@@ -101,8 +101,6 @@ public sealed class Plugin(IDalamudPluginInterface plugin, IPluginLog logger) : 
         services.AddSingleton<MobFarmerYieldService>();
 
         services.AddSingleton<MessageOfTheDayService>();
-        services.AddSingleton<IOnStart>(sp => sp.GetRequiredService<MessageOfTheDayService>());
-        services.AddSingleton<IOnStop>(sp => sp.GetRequiredService<MessageOfTheDayService>());
 
         services.AddSingleton<ChangelogWindow>();
         services.AddSingleton<IChangelogWindow>(sp => sp.GetRequiredService<ChangelogWindow>());

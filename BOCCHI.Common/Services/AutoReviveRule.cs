@@ -14,6 +14,7 @@ public readonly record struct AutoReviveState(
     bool PromptOpen,
     bool RaisePending,
     bool PromptIsReturn,
+    bool InForkedTower,
     bool ProtectedContent,
     bool SawAlive,
     TimeSpan DeadFor);
@@ -25,6 +26,11 @@ public static class AutoReviveRule
         if (!state.PromptOpen)
         {
             return (AutoReviveAction.Nothing, "you are down; no revive prompt yet");
+        }
+
+        if (state.InForkedTower)
+        {
+            return (AutoReviveAction.Nothing, "inside Forked Tower, so not reviving");
         }
 
         if (state.RaisePending && !state.PromptIsReturn)
@@ -44,7 +50,7 @@ public static class AutoReviveRule
 
         if (state.ProtectedContent)
         {
-            return (AutoReviveAction.Nothing, $"{prompt}; inside Forked Tower or a critical encounter, so not returning");
+            return (AutoReviveAction.Nothing, $"{prompt}; your critical encounter is still running, so not returning");
         }
 
         if (!state.SawAlive)

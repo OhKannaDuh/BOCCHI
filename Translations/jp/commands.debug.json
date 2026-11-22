@@ -1,3 +1,3 @@
 {
-  "help": "デバッグ用。/bocchi debug ce [id]：CE への移動や待機がおかしい理由を表示（止まった場所で実行）。/bocchi debug pos：現在位置をコピー。/bocchi debug shop [status|cancel]：キャンプに戻って Knightshopper のリストを開始。/bocchi debug ai-preset：BossMod に BOCCHI AI プリセットが無ければ作成。"
+  "help": "デバッグ用。/bocchi debug ce [id]：CE への移動や待機がおかしい理由を表示（止まった場所で実行）。/bocchi debug pos：現在位置をコピー。/bocchi debug shop [start|status|cancel]：キャンプに戻って Knightshopper のリストを開始。/bocchi debug ai-preset：BossMod に BOCCHI AI プリセットが無ければ作成。"
 }

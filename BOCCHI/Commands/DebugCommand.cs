@@ -92,20 +92,20 @@ public unsafe class DebugCommand
                 break;
             default:
                 chat.PrintError(
-                    "Usage: /bocchi debug [open|close|toggle|ai-preset|pos|chests|instance|currency|ce [id]|shop [status|cancel]]");
+                    "Usage: /bocchi debug [open|close|toggle|ai-preset|pos|chests|instance|currency|ce [id]|shop [start|status|cancel]]");
                 break;
         }
     }
 
     private void DebugShopping(string? sub)
     {
-        string action = (sub ?? "start").ToLowerInvariant();
+        string action = (sub ?? "status").ToLowerInvariant();
         if (action is "help" or "?")
         {
             BocchiChat.Print(
                 chat,
                 uiConfig,
-                "Usage: /bocchi debug shop [status|cancel] — Return to base camp, then Knightshopper Occult Crescent list.");
+                "Usage: /bocchi debug shop [start|status|cancel] — start: Return to base camp, then Knightshopper Occult Crescent list.");
             return;
         }
 
@@ -133,7 +133,7 @@ public unsafe class DebugCommand
             BocchiChat.PrintError(
                 chat,
                 uiConfig,
-                "Usage: /bocchi debug shop [status|cancel]");
+                "Usage: /bocchi debug shop [start|status|cancel]");
             return;
         }
 

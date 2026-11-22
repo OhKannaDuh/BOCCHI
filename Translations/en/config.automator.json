@@ -191,11 +191,11 @@
     },
     "auto_accept_raise": {
       "label": "Accept raises",
-      "tooltip": "Accept a raise as soon as someone gives you one. Works anywhere in Occult Crescent, also when Illegal Mode is off.\nYesAlready is paused while you are dead, so it cannot answer the prompt first."
+      "tooltip": "Accept a raise as soon as someone gives you one. Works anywhere in Occult Crescent except Forked Tower, also in FATEs and Critical Encounters and when Illegal Mode is off.\nYesAlready is paused while you are dead, so it cannot answer the prompt first."
     },
     "return_to_base_camp_after_death": {
       "label": "Return to camp if not raised",
-      "tooltip": "If nobody raises you in time, go back to base camp. Never happens inside Forked Tower or a Critical Encounter.\nYesAlready is paused while you are dead, so it cannot answer the prompt first."
+      "tooltip": "If nobody raises you in time, go back to base camp. Never happens inside Forked Tower, or while the Critical Encounter you died in is still running.\nYesAlready is paused while you are dead, so it cannot answer the prompt first."
     },
     "return_after_death_delay_seconds": {
       "label": "Wait before returning (seconds)",

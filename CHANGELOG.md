@@ -8,7 +8,7 @@
 - Each tab says in one line what the mode does, and warns you when a plugin it needs isn't running
 - Triage Mode: optional wait before raising, so nearby healers get a chance first
 - Hover texts rewritten in plainer words, in all four languages. Spotted odd wording in Japanese, Korean or Chinese? Let us know
-- Auto revive (Illegal Mode → General → When you die): accept raises, and go back to base camp if nobody raises you in time. Both are off by default and never trigger inside Forked Tower or a critical encounter. While you are dead, YesAlready is paused so it can't answer the prompt first
+- Auto revive (Illegal Mode → General → When you die): accept raises, and go back to base camp if nobody raises you in time. Both are off by default. Nothing happens inside Forked Tower; in FATEs and critical encounters raises are accepted, and the return to camp waits until the encounter you died in is over. While you are dead, YesAlready is paused so it can't answer the prompt first
 - New option (Movement → Routes): use Return for long trips instead of walking through mobs to an aethernet shard
 
 ### Fixes
@@ -41,3 +41,7 @@
 - Clearer warning when Rotation Solver or Wrath runs without BossMod: nothing picks targets for you then
 - The treasure hunt skips the Wanderer's Haven coffer that kept getting stuck on its ledge
 - Shared chest spots can no longer be faked, and shared pot timers are more reliable
+- Settings sliders no longer keep a typed value outside their range
+- Time limits no longer fire early or late when the clock changes for daylight saving
+- `/bocchi debug shop` now only shows the shopping status; add `start` to begin a run
+- Errors now reach the log with their details, which makes reports easier to act on

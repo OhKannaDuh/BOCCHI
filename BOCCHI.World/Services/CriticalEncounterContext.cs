@@ -20,6 +20,9 @@ public class CriticalEncounterContext
 
     public bool IsRegisteredOrInCriticalEncounter() => TryGetParticipatingCriticalEncounterId(out _);
 
+    public CriticalEncounterId? GetRegisteredOrActiveCriticalEncounterId() =>
+        TryGetParticipatingCriticalEncounterId(out CriticalEncounterId id) ? id : null;
+
     public unsafe CriticalEncounterId? GetCriticalEncounterId()
     {
         if (!TryGetParticipatingCriticalEncounterId(out CriticalEncounterId id, battleOnly: true))

@@ -11,6 +11,8 @@ public interface ICriticalEncounterContext
 
     bool IsRegisteredOrInCriticalEncounter();
 
+    CriticalEncounterId? GetRegisteredOrActiveCriticalEncounterId();
+
     CriticalEncounterId? GetCriticalEncounterId();
 
     IEnumerable<IBattleNpc> GetTargets();

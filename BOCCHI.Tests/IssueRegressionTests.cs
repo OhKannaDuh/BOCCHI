@@ -24,6 +24,7 @@ public class IssueRegressionTests
         PromptOpen: true,
         RaisePending: false,
         PromptIsReturn: false,
+        InForkedTower: false,
         ProtectedContent: false,
         SawAlive: true,
         DeadFor: TimeSpan.FromSeconds(90));
@@ -86,6 +87,22 @@ public class IssueRegressionTests
         (AutoReviveAction action, _) = AutoReviveRule.Decide(Dead with { ProtectedContent = true });
 
         Assert.Equal(AutoReviveAction.Nothing, action);
+    }
+
+    // Owner decision 2026-11-22: no reviving at all in Forked Tower; raises are accepted in FATEs and CEs.
+    [Fact]
+    public void NothingIsClickedInsideForkedTower()
+    {
+        Assert.Equal(AutoReviveAction.Nothing, AutoReviveRule.Decide(Dead with { InForkedTower = true, RaisePending = true }).Action);
+        Assert.Equal(AutoReviveAction.Nothing, AutoReviveRule.Decide(Dead with { InForkedTower = true }).Action);
+    }
+
+    [Fact]
+    public void ARaiseIsAcceptedInsideACriticalEncounter()
+    {
+        (AutoReviveAction action, _) = AutoReviveRule.Decide(Dead with { RaisePending = true, ProtectedContent = true });
+
+        Assert.Equal(AutoReviveAction.AcceptRaise, action);
     }
 
     // Second opinion: the guard was off when the plugin loaded while you were already dead.

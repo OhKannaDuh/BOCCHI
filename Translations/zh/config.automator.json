@@ -191,11 +191,11 @@
     },
     "auto_accept_raise": {
       "label": "接受复活",
-      "tooltip": "有人给你复活时立即接受。在神秘新月的任何地方都有效，违规模式关闭时也有效。\n倒地期间会暂停 YesAlready，避免它抢先应答。"
+      "tooltip": "有人给你复活时立即接受。在两歧塔以外的神秘新月任何地方都有效（包括 FATE 和紧急遭遇战），违规模式关闭时也有效。\n倒地期间会暂停 YesAlready，避免它抢先应答。"
     },
     "return_to_base_camp_after_death": {
       "label": "未被复活时返回营地",
-      "tooltip": "如果没有人及时复活你，就返回大本营。在两歧塔或紧急遭遇战内绝不会这样做。\n倒地期间会暂停 YesAlready，避免它抢先应答。"
+      "tooltip": "如果没有人及时复活你，就返回大本营。在两歧塔内，或你倒下的紧急遭遇战仍在进行时，绝不会这样做。\n倒地期间会暂停 YesAlready，避免它抢先应答。"
     },
     "return_after_death_delay_seconds": {
       "label": "返回前等待（秒）",

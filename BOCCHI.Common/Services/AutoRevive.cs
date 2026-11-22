@@ -1,5 +1,6 @@
 using BOCCHI.Common.Config;
 using BOCCHI.Common.Data.Aethernet;
+using BOCCHI.Common.Data.CriticalEncounters;
 using BOCCHI.Common.Data.Zones;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Plugin.Services;
@@ -17,6 +18,7 @@ public sealed class AutoRevive(
     IObjectTable objects,
     IZoneProvider zones,
     ICriticalEncounterContext criticalEncounters,
+    ICriticalEncounterRepository encounters,
     YesAlreadyPause yesAlready,
     ILogger<AutoRevive> logger
 ) : IOnUpdate, IOnStop
@@ -25,7 +27,9 @@ public sealed class AutoRevive(
 
     private DateTime? deadSinceUtc;
 
-    private bool protectedContent;
+    private bool diedInTower;
+
+    private CriticalEncounterId? encounterAtDeath;
 
     private bool sawAlive;
 
@@ -42,19 +46,22 @@ public sealed class AutoRevive(
             return;
         }
 
-        bool inProtectedContent = zones.GetZone().IsInForkedTower() || criticalEncounters.IsRegisteredOrInCriticalEncounter();
+        bool inTower = zones.GetZone().IsInForkedTower();
+        CriticalEncounterId? encounter = criticalEncounters.GetRegisteredOrActiveCriticalEncounterId();
         if (!conditions[ConditionFlag.Unconscious])
         {
             deadSinceUtc = null;
             sawAlive = true;
             lastNote = null;
-            protectedContent = inProtectedContent;
+            diedInTower = inTower;
+            encounterAtDeath = encounter;
             yesAlready.Release();
             return;
         }
 
         // Event state may not survive death, so keep what was true while alive; a wrong release out of Forked Tower can't be undone.
-        protectedContent |= inProtectedContent;
+        diedInTower |= inTower;
+        encounterAtDeath ??= encounter;
         deadSinceUtc ??= DateTime.UtcNow;
 
         if (!config.AutoAcceptRaise && !config.ReturnToBaseCampAfterDeath)
@@ -75,7 +82,8 @@ public sealed class AutoRevive(
             promptOpen,
             objects.LocalPlayer?.StatusList.Any(s => s.StatusId == RaisePendingStatusId) == true,
             promptOpen && ReturnYesNo.IsReturnConfirmation(&yesno->AtkUnitBase),
-            protectedContent,
+            diedInTower,
+            diedInTower || EncounterStillRunning(),
             sawAlive,
             DateTime.UtcNow - deadSinceUtc.Value));
 
@@ -99,6 +107,10 @@ public sealed class AutoRevive(
         logger.Info("Auto revive: {Reason}", note);
         new AddonMaster.SelectYesno((nint)yesno).Yes();
     }
+
+    private bool EncounterStillRunning() =>
+        encounterAtDeath is { } id
+        && encounters.SnapshotWithoutForkedTower().Any(ce => ce.Id == id && (ce.IsPreparing() || ce.IsActive()));
 
     public void OnStop() => yesAlready.Release();
 }
