@@ -141,7 +141,6 @@
       "path_map_ready_built": "준비됨 (이 지역용으로 만듦)",
       "path_map_rebuilding": "[BOCCHI] 이 지역의 경로 맵을 다시 만드는 중…",
       "path_map_rebuild_wrong_zone": "[BOCCHI] 경로 맵 다시 만들기는 초승달 섬에서만 됩니다.",
-      "details": "상세",
       "illegal_mode_on": "[BOCCHI] 자동 모드 켜짐",
       "illegal_mode_off": "[BOCCHI] 자동 모드 꺼짐",
       "illegal_mode_off_left_zone": "[BOCCHI] 초승달 섬를 떠나 자동 모드 꺼짐",

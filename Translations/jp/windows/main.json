@@ -141,7 +141,6 @@
       "path_map_ready_built": "準備完了（このゾーン用に構築）",
       "path_map_rebuilding": "[BOCCHI] このゾーンの経路マップを再構築しています…",
       "path_map_rebuild_wrong_zone": "[BOCCHI] 経路マップの再構築はオカルトクレセント内でのみ使えます。",
-      "details": "詳細",
       "illegal_mode_on": "[BOCCHI] 不正モード オン",
       "illegal_mode_off": "[BOCCHI] 不正モード オフ",
       "illegal_mode_off_left_zone": "[BOCCHI] オカルトクレセントを離れたため不正モード オフ",

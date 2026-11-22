@@ -51,19 +51,6 @@ public class AutomatorRenderer
 
         ImGui.Spacing();
 
-        ImGui.PushStyleColor(ImGuiCol.Text, BocchiUi.Header);
-        bool detailsOpen = ImGui.CollapsingHeader(
-            translator.T(".automation.automator.details"),
-            HasDetails() ? ImGuiTreeNodeFlags.DefaultOpen : ImGuiTreeNodeFlags.None);
-        ImGui.PopStyleColor();
-
-        if (!detailsOpen)
-        {
-            return;
-        }
-
-        ImGui.Indent();
-
         PotTimerUi.Draw(potCycle, zones, data, translator);
         ImGui.Spacing();
 
@@ -107,8 +94,6 @@ public class AutomatorRenderer
                     PathStepFormatHelper.Describe(step, translator, data));
             }
         }
-
-        ImGui.Unindent();
     }
 
     public bool ShouldRender() => uiConfig.ShowAutomationSection;
