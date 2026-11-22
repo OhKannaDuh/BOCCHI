@@ -10,6 +10,7 @@ using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using Ocelot.Actions;
 using Ocelot.Extensions;
+using Ocelot.Services.Logger;
 using Ocelot.States.Flow;
 using Action = Ocelot.Actions.Action;
 
@@ -21,9 +22,13 @@ public class BuffingHandler
     ICondition conditions,
     IObjectTable objects,
     ISupportJobFactory supportJobs,
-    ISupportJobChanger changer
+    ISupportJobChanger changer,
+    ILogger<BuffingHandler> logger
 ) : FlowStateHandler<FarmerPhase>(FarmerPhase.Buffing)
 {
+    // A phantom job change that never completes would otherwise hold Mob Farmer on "Buffing" forever.
+    private static readonly TimeSpan BuffingGiveUp = TimeSpan.FromSeconds(30);
+
     private static Action BattleBell => new(ActionType.Action, PhantomActions.BattleBell);
 
     private static Action RingingRespite => new(ActionType.Action, PhantomActions.RingingRespite);
@@ -77,6 +82,12 @@ public class BuffingHandler
         if (conditions[ConditionFlag.InCombat])
         {
             return FarmerPhase.Fighting;
+        }
+
+        if (TimeInState >= BuffingGiveUp)
+        {
+            logger.Info("Mob Farmer: pull buffs took over {Seconds}s — pulling without the rest", (int)BuffingGiveUp.TotalSeconds);
+            return FarmerPhase.Gathering;
         }
 
         if (DismountAssist.TryDismount(conditions))

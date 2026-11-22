@@ -158,6 +158,10 @@ public class ActivityNavigation
             IZone zone = zones.GetZone();
             bool inCamp = zone.IsInBasecamp();
 
+            // Read on the framework thread; after the awaits below this runs on a worker thread.
+            bool canReturn = CanOfferSurveyReturn();
+            bool hasAethernet = TryValidateOccultAethernet(out _);
+
             (AethernetData? best, float walkFromBest) = await SelectBestAetheryteWithDistanceAsync(destination, treatAsActivity: false)
                 .ConfigureAwait(false);
             if (generation != navigationGeneration)
@@ -203,7 +207,7 @@ public class ActivityNavigation
             if (!inCamp
                 && best != null
                 && !float.IsPositiveInfinity(walkFromBest)
-                && CanOfferSurveyReturn())
+                && canReturn)
             {
                 float teleportLeg = bestIsMain ? 0f : NavigationConstants.AethernetHopCost;
                 returnScore = NavigationConstants.ReturnCost + teleportLeg + walkFromBest;
@@ -225,7 +229,7 @@ public class ActivityNavigation
 
             if (float.IsPositiveInfinity(bestScore))
             {
-                route = TryValidateOccultAethernet(out _) ? SurveyRoute.FieldAethernet : SurveyRoute.Direct;
+                route = hasAethernet ? SurveyRoute.FieldAethernet : SurveyRoute.Direct;
             }
 
             logger.Debug(

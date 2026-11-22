@@ -44,6 +44,9 @@ public class PathCalculator
             return PathCalculationResult.NoTravelNeeded();
         }
 
+        // After an await this may run off the framework thread, where the player object must not be read.
+        Vector3 from = player.Position;
+
         IZone zone = zones.GetZone();
         if (!zone.IsOccultCrescentZone())
         {
@@ -51,7 +54,7 @@ public class PathCalculator
         }
 
         bool preferReturn = IsReturnPreferredNow();
-        float distance = player.Position.Distance2D(destination);
+        float distance = from.Distance2D(destination);
         if (distance <= arrivalRange)
         {
             return PathCalculationResult.NoTravelNeeded();
@@ -68,7 +71,7 @@ public class PathCalculator
         List<PathStep> steps = await FindResolvedPathSteps(
             graph,
             zone,
-            player.Position,
+            from,
             goalNode,
             distance > NavigationConstants.MaxDirectWalkDistance,
             preferReturn);
@@ -109,6 +112,9 @@ public class PathCalculator
             return PathCalculationResult.NoTravelNeeded();
         }
 
+        // After an await this may run off the framework thread, where the player object must not be read.
+        Vector3 from = player.Position;
+
         IZone zone = zones.GetZone();
         if (!zone.IsOccultCrescentZone())
         {
@@ -120,7 +126,7 @@ public class PathCalculator
             && fateContext.GetFateId() == fateGoal.id
             && (!config.CombatAutorotation.UsesCombatAutomation()
                 || fateContext.IsInCombatWith(fateGoal.id)
-                || IsWithinFateAiHandoff(player.Position, fateGoal.id)))
+                || IsWithinFateAiHandoff(from, fateGoal.id)))
         {
             logger.Debug("Already inside target FATE.");
             return PathCalculationResult.NoTravelNeeded();
@@ -156,7 +162,7 @@ public class PathCalculator
         else if (goal.GoalType is FateGoal potPreposition
                  && zone.IsPotFate(potPreposition.id.Value))
         {
-            potPrepositionStandOff = NavigationApproach.GetPotPrepositionPosition(goalNode.Position, player.Position);
+            potPrepositionStandOff = NavigationApproach.GetPotPrepositionPosition(goalNode.Position, from);
         }
 
         float ceCombatRadius = 0f;
@@ -207,19 +213,19 @@ public class PathCalculator
         }
 
         Vector3 arrivalCheck = potPrepositionStandOff ?? pathGoal.Position;
-        float distanceToGoal = player.Position.Distance2D(arrivalCheck);
+        float distanceToGoal = from.Distance2D(arrivalCheck);
         bool insideCeWait = ceCombatRadius > 0f && (
             (ceWaitCenter is { } waitCenter
              && NavigationConstants.IsInsideCriticalEncounterWaitArea(
                  waitCenter,
                  ceCombatRadius,
                  ceShape,
-                 player.Position))
+                 from))
             || NavigationConstants.IsInsideCriticalEncounterWaitArea(
                 pathGoal.Position,
                 ceCombatRadius,
                 ceShape,
-                player.Position));
+                from));
 
         if (insideCeWait)
         {
@@ -236,7 +242,7 @@ public class PathCalculator
         List<PathStep> resolvedSteps = await FindResolvedPathSteps(
             graph,
             zone,
-            player.Position,
+            from,
             pathGoal,
             !insideCeWait && distanceToGoal > NavigationConstants.MaxDirectWalkDistance,
             preferReturn);
@@ -258,13 +264,13 @@ public class PathCalculator
                         approach,
                         waitAt,
                         pathGoal.Position,
-                        player.Position,
+                        from,
                         out Vector3 pathTarget))
                 {
                     if (CriticalEncounterPathOverrides.TryGetApproachVias(
                             zone.ZoneId,
                             ceId,
-                            player.Position,
+                            from,
                             ceStaging,
                             out IReadOnlyList<Vector3> vias))
                     {

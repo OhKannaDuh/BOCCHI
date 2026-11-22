@@ -1,5 +1,6 @@
 using BOCCHI.Automator.Data;
 using BOCCHI.Automator.Services;
+using BOCCHI.Common.Config;
 using BOCCHI.Common.Data.Aethernet;
 using BOCCHI.Common.Data.CriticalEncounters;
 using BOCCHI.Common.Data.Fates;
@@ -45,6 +46,8 @@ public class ReturningHandler
     IPathfinder pathfinder,
     IVNavmeshIpc vnav,
     ILifestreamIpc lifestream,
+    IObjectTable objects,
+    AutomatorConfig config,
     ILogger<ReturningHandler> logger
 ) : ScoreStateHandler<AutomatorState, StatePriority>(AutomatorState.Returning)
 {
@@ -59,7 +62,12 @@ public class ReturningHandler
 
         if (memory.TryRemember<ReturningStateMemory>(out ReturningStateMemory _))
         {
-            return StatePriority.VeryHigh;
+            // Return cannot be cast in combat; holding this priority left you standing still while being hit.
+            return conditions[ConditionFlag.InCombat]
+                   && config.CombatAutorotation.UsesCombatAutomation()
+                   && KnowledgeThreat.CanFightAggro(objects)
+                ? StatePriority.AboveNormal
+                : StatePriority.VeryHigh;
         }
 
         if (memory.TryRemember<NavigationInterruptedMemory>(out NavigationInterruptedMemory _))

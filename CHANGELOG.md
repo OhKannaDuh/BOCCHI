@@ -1,7 +1,7 @@
-# 4.2.0.20
+# 4.3.0.0
 
 ### New
-- New look
+- New look. Prefer your own Dalamud colours? Turn off "Use BOCCHI theme" under Settings → UI
 - The main window now has a tab per mode (Illegal Mode, Pots & Treasure, Mob Farmer, Treasure Hunter, World). Status, coffers left and gold / silver / XP per hour stay visible on top, and the window jumps to a mode's tab when it starts
 - Completionist is now a switch inside the Illegal Mode tab
 - Search box in the settings, and a cog on each tab that opens that tab's settings
@@ -12,6 +12,18 @@
 - New option (Movement → Routes): use Return for long trips instead of walking through mobs to an aethernet shard
 
 ### Fixes
+- Illegal Mode now fights back when a mob your level or lower attacks while it waits to Return, instead of standing still
+- The pot chest search no longer starts over (and uses another Magical Elixir) while Cache Me If You Can is still active after it finished
+- If you die during Treasure Hunt or Carrot Hunt, it plans the route again once you are back up (aethernet included) instead of riding straight from base camp
+- Treasure Hunt no longer hangs when an aethernet teleport or Return keeps failing; after three tries it carries on on foot
+- Ninja Hide: a gearset number that is empty or not a Ninja set no longer freezes the hunt next to a strong enemy; it carries on without Hide
+- With combat set to None, the pot chest search keeps moving when a mob attacks instead of standing still
+- Mob Farmer gives up on a crystal buff trip after 5 minutes instead of staying paused
+- Carrot Hunt no longer gets stuck on a carrot or bunny coffer it can't reach or open; it moves on to the next spot after 90 seconds
+- Stopping Carrot Hunt while it is using Return or an aethernet shard now cancels that trip too
+- Carrot Hunt no longer shuffles sideways when it carries on after a pause
+- Mob Farmer no longer gets stuck on "Buffing" when a phantom job change doesn't go through; after 30 seconds it pulls anyway
+- Shopping gives up after 10 minutes if the trip to camp or the purchase never finishes, so the rest of BOCCHI isn't left paused
 - Treasure Hunt and Carrot Hunt now stop and fight an enemy they can't outrun (after 10 seconds), then carry on. Needs a combat rotation to be set
 - Illegal Mode's treasure hunt does the same, and hands over at once when you die
 - Mob Farmer no longer stands still forever waiting for a pull that never comes, and retries enemies it gave up on after a few minutes

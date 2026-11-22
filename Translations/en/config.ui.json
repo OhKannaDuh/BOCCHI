@@ -15,6 +15,10 @@
     "open_on_occult_crescent_entry": {
       "label": "Open BOCCHI on Occult Crescent entry"
     },
+    "use_bocchi_theme": {
+      "label": "Use BOCCHI theme",
+      "tooltip": "Draw BOCCHI's windows in its navy and gold colours. Turn off to use your Dalamud colours."
+    },
     "show_experience_tracker": {
       "label": "Show experience tracker"
     },
@@ -64,7 +68,7 @@
     },
     "show_bocchi_chat_prefix": {
       "label": "Show BOCCHI chat messages",
-      "tooltip": "Print BOCCHI's messages in your chat, marked [BOCCHI]."
+      "tooltip": "Print BOCCHI's messages in your chat, marked [BOCCHI]. The message of the day always shows."
     }
   }
 }

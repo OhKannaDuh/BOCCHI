@@ -78,6 +78,23 @@ public sealed class NinjaHideAssist(
         return false;
     }
 
+    public unsafe bool CanBecomeNinja(int gearsetNumber)
+    {
+        if (IsNinja)
+        {
+            return true;
+        }
+
+        RaptureGearsetModule* module = RaptureGearsetModule.Instance();
+        if (gearsetNumber <= 0 || module == null || !module->IsValidGearset(gearsetNumber - 1))
+        {
+            return false;
+        }
+
+        RaptureGearsetModule.GearsetEntry* entry = module->GetGearset(gearsetNumber - 1);
+        return entry != null && entry->ClassJob == NinjaClassJobId;
+    }
+
     public void TryOccultSprintWhileHidden()
     {
         if (!IsStealthed

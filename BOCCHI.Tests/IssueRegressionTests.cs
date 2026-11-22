@@ -8,7 +8,6 @@ using BOCCHI.Treasure.Hunt;
 using Ocelot.Chain.Middleware.Step;
 using Ocelot.Rotation.Services;
 using Ocelot.Services.Gate;
-using Ocelot.Services.Logger;
 using Xunit;
 
 namespace BOCCHI.Tests;
@@ -203,7 +202,7 @@ public class IssueRegressionTests
     public void TearingDownTheRotationSwitchesItOffAndForgetsIt()
     {
         RecordingRotation rotation = new();
-        CombatRotationSession session = new([rotation], [], null!, new QuietLogger<CombatRotationSession>());
+        CombatRotationSession session = new([rotation], [], null!, new QuietLog<CombatRotationSession>());
         session.Prepare(new CombatRotationRecipe(JobRotationBackendKind.RotationSolverReborn, CombatAiKind.None));
         session.Enable(CombatActivity.Fate);
 
@@ -251,38 +250,5 @@ public class IssueRegressionTests
         }
 
         public void Teardown() => Calls.Add("teardown");
-    }
-
-    private sealed class QuietLogger<T> : ILogger<T>
-    {
-        public void Log(string format, params object[] args) { }
-
-        public void Info(string format, params object[] args) { }
-
-        public void Warn(string format, params object[] args) { }
-
-        public void Warning(string format, params object[] args) { }
-
-        public void Error(string format, params object[] args) { }
-
-        public void Debug(string format, params object[] args) { }
-
-        public void Fatal(string format, params object[] args) { }
-
-        public void Verbose(string format, params object[] args) { }
-
-        public void Fatal(Exception? exception, string messageTemplate, params object[] values) { }
-
-        public void Error(Exception? exception, string messageTemplate, params object[] values) { }
-
-        public void Warn(Exception? exception, string messageTemplate, params object[] values) { }
-
-        public void Warning(Exception? exception, string messageTemplate, params object[] values) { }
-
-        public void Info(Exception? exception, string messageTemplate, params object[] values) { }
-
-        public void Debug(Exception? exception, string messageTemplate, params object[] values) { }
-
-        public void Verbose(Exception? exception, string messageTemplate, params object[] values) { }
     }
 }

@@ -15,6 +15,10 @@
     "open_on_occult_crescent_entry": {
       "label": "Occult Crescent 입장 시 BOCCHI 열기"
     },
+    "use_bocchi_theme": {
+      "label": "BOCCHI 테마 사용",
+      "tooltip": "BOCCHI 창을 네이비와 골드 색상으로 표시합니다. 끄면 Dalamud 색상을 사용합니다."
+    },
     "show_experience_tracker": {
       "label": "경험치 추적기 표시"
     },
@@ -64,7 +68,7 @@
     },
     "show_bocchi_chat_prefix": {
       "label": "BOCCHI 채팅 메시지 표시",
-      "tooltip": "BOCCHI의 메시지를 [BOCCHI] 표시와 함께 채팅에 출력합니다."
+      "tooltip": "BOCCHI의 메시지를 [BOCCHI] 표시와 함께 채팅에 출력합니다. 오늘의 메시지는 항상 표시됩니다."
     }
   }
 }

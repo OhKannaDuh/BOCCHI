@@ -234,6 +234,12 @@ public class Automator
         if (objects.LocalPlayer is not { } player
             || !player.StatusList.Has(PotTreasureIds.TreasureBuffStatusId))
         {
+            memory.Forget<PotChestFarmDoneMemory>();
+            return;
+        }
+
+        if (memory.TryRemember<PotChestFarmDoneMemory>(out PotChestFarmDoneMemory _))
+        {
             return;
         }
 

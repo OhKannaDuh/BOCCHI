@@ -67,6 +67,11 @@ public sealed class MobFarmerYieldService
 
     private DateTimeOffset nextBuffAt = DateTimeOffset.MinValue;
 
+    // The farm is suspended for the whole trip, so a Return or buff run that never ends must give up.
+    private static readonly TimeSpan BuffYieldLimit = TimeSpan.FromMinutes(5);
+
+    private DateTimeOffset buffYieldStartedAt;
+
     private readonly CampReturnSession campReturn = new("MobFarmer::BuffReturn");
 
     private bool sawRunning;
@@ -139,6 +144,7 @@ public sealed class MobFarmerYieldService
             farmer.SetSuspended(true, FarmerYieldReason.CrystalBuffs);
             startedBuffs = true;
             buffRunBegun = false;
+            buffYieldStartedAt = DateTimeOffset.UtcNow;
             logger.Info("Mob Farmer: crystal buffs low — heading to a knowledge crystal");
             return;
         }
@@ -247,6 +253,19 @@ public sealed class MobFarmerYieldService
     {
         if (!startedBuffs)
         {
+            return;
+        }
+
+        if (DateTimeOffset.UtcNow - buffYieldStartedAt >= BuffYieldLimit)
+        {
+            logger.Warning("Mob Farmer: crystal buffs took over {Minutes} minutes — resuming farm", (int)BuffYieldLimit.TotalMinutes);
+            campReturn.Cancel(chainManager, pathfinder, vnav);
+            if (buffRunner.IsRunning)
+            {
+                buffRunner.Stop();
+            }
+
+            FinishCrystalBuffs();
             return;
         }
 

@@ -12,6 +12,8 @@ public sealed class YesAlreadyPause(IDalamudPluginInterface plugin, ILogger<YesA
 
     private bool pausedByBocchi;
 
+    private DateTime nextAskUtc;
+
     public void Hold() => Apply(wantPause: true);
 
     public void Release() => Apply(wantPause: false);
@@ -33,6 +35,14 @@ public sealed class YesAlreadyPause(IDalamudPluginInterface plugin, ILogger<YesA
         {
             return;
         }
+
+        // With YesAlready switched off by the user there is nothing to pause; don't ask it every frame.
+        if (wantPause && DateTime.UtcNow < nextAskUtc)
+        {
+            return;
+        }
+
+        nextAskUtc = DateTime.UtcNow.AddSeconds(1);
 
         try
         {

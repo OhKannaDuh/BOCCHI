@@ -104,7 +104,6 @@ public class TreasureHunterService
     private readonly List<HuntPathfinderStep> steps = [];
     private readonly HashSet<uint> checkedNodeIds = [];
     private readonly HashSet<uint> stuckSkippedNodeIds = [];
-    private readonly HashSet<uint> cliffReroutedNodeIds = [];
     private readonly HashSet<uint> lastCompletedRunNodeIds = [];
 
     private readonly Stopwatch stopwatch = new();
@@ -168,6 +167,12 @@ public class TreasureHunterService
 
     private bool wasInCombat;
 
+    private bool wasDown;
+
+    private const int MaxHopFailures = 3;
+
+    private int hopFailures;
+
     public void Update()
     {
         if (!Running)
@@ -210,6 +215,7 @@ public class TreasureHunterService
         if (conditions[ConditionFlag.Unconscious])
         {
             SoftStopMovement();
+            wasDown = true;
             if (EzThrottler.Throttle("TreasureHunt::IdleUnconscious", 60000))
             {
                 log.Debug("Treasure hunt idle: Unconscious");
@@ -236,6 +242,13 @@ public class TreasureHunterService
             }
 
             return;
+        }
+
+        // You may be back at base camp now; walking straight to the old coffer from there is the long way.
+        if (wasDown)
+        {
+            wasDown = false;
+            RepathIfResumeCofferIsFar();
         }
 
         RefreshTickTreasures();
@@ -479,7 +492,11 @@ public class TreasureHunterService
             return;
         }
 
-        RecalculateRoute();
+        // A failed re-plan would otherwise repeat this same step forever.
+        if (!RecalculateRoute())
+        {
+            StepIndex++;
+        }
     }
 
     public bool Running { get; private set; }
@@ -598,6 +615,8 @@ public class TreasureHunterService
         StepIndex = 0;
         LastCheckedNodeId = null;
         Paused = false;
+        wasDown = false;
+        hopFailures = 0;
         steps.Clear();
         layoutTreasure.Clear();
         layoutById.Clear();
@@ -615,7 +634,6 @@ public class TreasureHunterService
         authoredNodeOrder.Clear();
         checkedNodeIds.Clear();
         stuckSkippedNodeIds.Clear();
-        cliffReroutedNodeIds.Clear();
         ClearEmptyPadCandidate();
         ClearWalkLiveBind();
         ClearNavigateClosingLatch();
@@ -736,7 +754,11 @@ public class TreasureHunterService
         }
 
         log.Debug("Treasure hunt ResumeNearPlayer step={Step}", DescribeCurrentStep());
+        RepathIfResumeCofferIsFar();
+    }
 
+    private void RepathIfResumeCofferIsFar()
+    {
         if (!TryGetResumeCoffer(out uint resumeId, out Vector3 resumePos))
         {
             return;
@@ -844,7 +866,9 @@ public class TreasureHunterService
 
     private bool TryRecoverFromStuckWalk(HuntPathfinderStep step, float distance)
     {
-        if (distance <= StuckDetectionMinDistance)
+        // Standing right above or below the coffer on another floor is stuck too; without this it waits there forever.
+        if (distance <= StuckDetectionMinDistance
+            && (!TryGetLayout(step.NodeId, out TreasureLayoutDatum pad) || IsSameFloor(pad.Position)))
         {
             padStuckWatch.Reset();
             return false;
@@ -853,19 +877,9 @@ public class TreasureHunterService
         switch (padStuckWatch.Tick(step.NodeId, distance, pathfinding: vnav.IsPathfinding()))
         {
             case WalkStuckWatch.Action.Nudge:
-                if (TryRerouteSeparatedShelf(step.NodeId))
-                {
-                    return true;
-                }
-
                 TryIssueStuckNudge(step);
                 return true;
             case WalkStuckWatch.Action.GiveUp:
-                if (TryRerouteSeparatedShelf(step.NodeId))
-                {
-                    return true;
-                }
-
                 log.Warning(
                     "Treasure hunt appears stuck reaching coffer {NodeId}; excluding it and recalculating the route",
                     step.NodeId);
@@ -998,11 +1012,6 @@ public class TreasureHunterService
 
         if (distance > StuckViaSkipRadius)
         {
-            if (TryRerouteSeparatedShelf(nodeId))
-            {
-                return true;
-            }
-
             return false;
         }
 
@@ -1015,54 +1024,6 @@ public class TreasureHunterService
         ResetViaStuckWatch();
         vnav.Stop();
         pathfinder.Stop();
-        return true;
-    }
-
-    private bool CurrentApproachIsCampEntry()
-    {
-        if (StepIndex <= 0)
-        {
-            return false;
-        }
-
-        return steps[StepIndex - 1].Type is HuntPathfinderStepType.ReturnToBaseCamp
-            or HuntPathfinderStepType.TeleportToAethernet
-            or HuntPathfinderStepType.WalkToAethernet;
-    }
-
-    private bool TryRerouteSeparatedShelf(uint nodeId)
-    {
-        if (pathPlanner == null || planningRoute || CurrentApproachIsCampEntry())
-        {
-            return false;
-        }
-
-        if (!TryGetLayout(nodeId, out TreasureLayoutDatum layout)
-            || !HuntDistances.IsSeparatedShelf(player.Position, layout.Position))
-        {
-            return false;
-        }
-
-        bool inCamp = zones.GetZone().IsInBasecamp();
-        List<HuntPathfinderStep> entry = pathPlanner.BuildEntryLeg(nodeId, alreadyInCamp: inCamp);
-        if (entry.Count == 0
-            || (entry.Count == 1 && entry[0].Type == HuntPathfinderStepType.WalkToNode))
-        {
-            return false;
-        }
-
-        cliffReroutedNodeIds.Add(nodeId);
-        steps.RemoveAt(StepIndex);
-        steps.InsertRange(StepIndex, entry);
-        walkViaStepIndex = -1;
-        walkViaIndex = 0;
-        walkVias.Clear();
-        ResetViaStuckWatch();
-        ResetStuckWatch();
-        SoftStopMovement();
-        log.Debug(
-            "Treasure hunt: {NodeId} is on another shelf — Returning / shard to drop down",
-            nodeId);
         return true;
     }
 
@@ -1638,13 +1599,6 @@ public class TreasureHunterService
 
         EnsureWalkVias(step);
 
-        if (cliffReroutedNodeIds.Contains(step.NodeId)
-            && HuntDistances.IsSeparatedShelf(player.Position, layoutDestination)
-            && TryRerouteSeparatedShelf(step.NodeId))
-        {
-            return false;
-        }
-
         SkipPassedWalkVias(layoutDestination);
         if (walkViaIndex < walkVias.Count)
         {
@@ -1899,6 +1853,18 @@ public class TreasureHunterService
                 log.Debug("Treasure hunt: in combat after last coffer — walking toward camp until Return is usable");
             });
 
+        if (result == CampReturnSession.TickResult.Failed && ++hopFailures >= MaxHopFailures)
+        {
+            hopFailures = 0;
+            log.Warning("Treasure hunt: Return failed {Count} times — carrying on without it", MaxHopFailures);
+            return true;
+        }
+
+        if (result == CampReturnSession.TickResult.Arrived)
+        {
+            hopFailures = 0;
+        }
+
         return result == CampReturnSession.TickResult.Arrived;
     }
 
@@ -1928,6 +1894,14 @@ public class TreasureHunterService
             return false;
         }
 
+        // Nothing else gives up on an aetheryte it cannot walk to.
+        if (padStuckWatch.Tick(-1 - (long)step.Aethernet, StepDistance, vnav.IsPathfinding()) == WalkStuckWatch.Action.GiveUp)
+        {
+            log.Warning("Treasure hunt: could not reach aethernet {Id} — skipping it", (uint)step.Aethernet);
+            vnav.Stop();
+            return true;
+        }
+
         return false;
     }
 
@@ -1945,7 +1919,18 @@ public class TreasureHunterService
             bool teleported = activeChain.IsCompletedSuccessfully
                               && (activeChain.Result?.IsSuccess ?? false);
             activeChain = null;
-            return teleported;
+            if (!teleported && ++hopFailures < MaxHopFailures)
+            {
+                return false;
+            }
+
+            if (!teleported)
+            {
+                log.Warning("Treasure hunt: aethernet teleport failed {Count} times — walking instead", MaxHopFailures);
+            }
+
+            hopFailures = 0;
+            return true;
         }
 
         uint placeNameId = (uint)step.Aethernet;
@@ -2151,10 +2136,10 @@ public class TreasureHunterService
             return true;
         }
 
-        if (config.NinjaGearsetNumber <= 0 && !ninjaHide.IsNinja)
+        if (!ninjaHide.CanBecomeNinja(config.NinjaGearsetNumber))
         {
             log.Warning(
-                "Ninja Hide is on but gearset is 0 and you are not on Ninja — skipping Hide for this threat");
+                "Ninja Hide is on but the gearset is not a Ninja set and you are not on Ninja — skipping Hide for this threat");
             ClearNinjaHideRequirement();
             return true;
         }
@@ -2958,7 +2943,6 @@ public class TreasureHunterService
         tickTreasures.Clear();
         pathPlanner = null;
         stuckSkippedNodeIds.Clear();
-        cliffReroutedNodeIds.Clear();
         pandoraAutoOpen.Release();
 
         if (wasStandalone || wasIllegalFiller || wasMobFarmer)

@@ -15,6 +15,10 @@
     "open_on_occult_crescent_entry": {
       "label": "进入 Occult Crescent 时打开 BOCCHI"
     },
+    "use_bocchi_theme": {
+      "label": "使用 BOCCHI 主题",
+      "tooltip": "以深蓝和金色显示 BOCCHI 的窗口。关闭后使用 Dalamud 的配色。"
+    },
     "show_experience_tracker": {
       "label": "显示经验值统计"
     },
@@ -64,7 +68,7 @@
     },
     "show_bocchi_chat_prefix": {
       "label": "显示 BOCCHI 聊天消息",
-      "tooltip": "在聊天栏中输出 BOCCHI 的消息，并标注 [BOCCHI]。"
+      "tooltip": "在聊天栏中输出 BOCCHI 的消息，并标注 [BOCCHI]。每日消息始终显示。"
     }
   }
 }

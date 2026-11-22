@@ -506,7 +506,8 @@ public class PotsTreasureService
             return true;
         }
 
-        if (objects.LocalPlayer?.StatusList.Has(PotTreasureIds.TreasureBuffStatusId) == true)
+        if (objects.LocalPlayer?.StatusList.Has(PotTreasureIds.TreasureBuffStatusId) == true
+            && !memory.TryRemember<PotChestFarmDoneMemory>(out PotChestFarmDoneMemory _))
         {
             return true;
         }

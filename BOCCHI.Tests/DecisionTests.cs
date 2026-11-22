@@ -6,8 +6,9 @@ using BOCCHI.Common.Data.Zones.Graph.Traversal;
 using BOCCHI.Common.Services.Logging;
 using Ocelot.Chain;
 using Ocelot.Chain.Middleware.Step;
-using Ocelot.Services.Logger;
+using Newtonsoft.Json;
 using Ocelot.Services.Pathfinding;
+using Ocelot.UI;
 using Xunit;
 
 namespace BOCCHI.Tests;
@@ -60,9 +61,27 @@ public class DecisionTests
     }
 
     [Fact]
+    public void TheThemeSettingSurvivesSaveAndLoad()
+    {
+        try
+        {
+            string saved = JsonConvert.SerializeObject(new UIConfig { UseBocchiTheme = false });
+            OcelotTheme.Enabled = true;
+
+            JsonConvert.DeserializeObject<UIConfig>(saved);
+
+            Assert.False(OcelotTheme.Enabled);
+        }
+        finally
+        {
+            OcelotTheme.Enabled = true;
+        }
+    }
+
+    [Fact]
     public async Task TheCheapestRouteWins()
     {
-        GraphTraverser traverser = new(null!, null!, new QuietLogger());
+        GraphTraverser traverser = new(null!, null!, new QuietLog<DecisionTests>());
         traverser.AddCalculator(new FixedRoute("walk", 300f, PathStep.Pathfind(Vector3.One)));
         traverser.AddCalculator(new FixedRoute("return", 120f, PathStep.Return()));
 
@@ -76,7 +95,7 @@ public class DecisionTests
     {
         FixedRoute expensive = new("direct", 500f, PathStep.Pathfind(Vector3.One), lowerBound: 400f);
         FixedRoute needed = new("shortcut", 80f, PathStep.Pathfind(Vector3.One), lowerBound: 50f);
-        GraphTraverser traverser = new(null!, null!, new QuietLogger());
+        GraphTraverser traverser = new(null!, null!, new QuietLog<DecisionTests>());
         traverser.AddCalculator(expensive);
         traverser.AddCalculator(needed);
         traverser.AddCalculator(new FixedRoute("return", 120f, PathStep.Return()));
@@ -91,7 +110,7 @@ public class DecisionTests
     [Fact]
     public async Task NoRouteGivesNoSteps()
     {
-        GraphTraverser traverser = new(null!, null!, new QuietLogger());
+        GraphTraverser traverser = new(null!, null!, new QuietLog<DecisionTests>());
         traverser.AddCalculator(new FixedRoute("none", null));
 
         Assert.Empty(await traverser.FindPath(Vector3.Zero, new Node()));
@@ -183,38 +202,5 @@ public class DecisionTests
     private sealed class NoServices : IServiceProvider
     {
         public object? GetService(Type serviceType) => null;
-    }
-
-    private sealed class QuietLogger : ILogger
-    {
-        public void Log(string format, params object[] args) { }
-
-        public void Info(string format, params object[] args) { }
-
-        public void Warn(string format, params object[] args) { }
-
-        public void Warning(string format, params object[] args) { }
-
-        public void Error(string format, params object[] args) { }
-
-        public void Debug(string format, params object[] args) { }
-
-        public void Fatal(string format, params object[] args) { }
-
-        public void Verbose(string format, params object[] args) { }
-
-        public void Fatal(Exception? exception, string messageTemplate, params object[] values) { }
-
-        public void Error(Exception? exception, string messageTemplate, params object[] values) { }
-
-        public void Warn(Exception? exception, string messageTemplate, params object[] values) { }
-
-        public void Warning(Exception? exception, string messageTemplate, params object[] values) { }
-
-        public void Info(Exception? exception, string messageTemplate, params object[] values) { }
-
-        public void Debug(Exception? exception, string messageTemplate, params object[] values) { }
-
-        public void Verbose(Exception? exception, string messageTemplate, params object[] values) { }
     }
 }

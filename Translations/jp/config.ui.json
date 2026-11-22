@@ -15,6 +15,10 @@
     "open_on_occult_crescent_entry": {
       "label": "クレセントアイル入場時に BOCCHI を開く"
     },
+    "use_bocchi_theme": {
+      "label": "BOCCHI テーマを使用",
+      "tooltip": "BOCCHI のウィンドウをネイビーとゴールドの配色で表示します。オフにすると Dalamud の配色を使います。"
+    },
     "show_experience_tracker": {
       "label": "経験値トラッカーを表示"
     },
@@ -64,7 +68,7 @@
     },
     "show_bocchi_chat_prefix": {
       "label": "BOCCHI チャットメッセージを表示",
-      "tooltip": "BOCCHI のメッセージを [BOCCHI] 付きでチャットに表示します。"
+      "tooltip": "BOCCHI のメッセージを [BOCCHI] 付きでチャットに表示します。今日のメッセージは常に表示されます。"
     }
   }
 }

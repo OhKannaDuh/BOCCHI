@@ -45,6 +45,7 @@ public class FarmingPotChestsHandler
     AutoRotationController autoRotation,
     MovementConfig movement,
     PotsConfig potsConfig,
+    AutomatorConfig automatorConfig,
     TreasureConfig treasureConfig,
     NinjaHideAssist ninjaHide,
     IAutomatorContext context,
@@ -203,7 +204,10 @@ public class FarmingPotChestsHandler
 
         bool inCombat = conditions[ConditionFlag.InCombat];
         bool chased = outrun.Update(inCombat, DateTimeOffset.UtcNow);
-        bool fightAggro = inCombat && (KnowledgeThreat.CanFightAggro(objects) || chased);
+        // With combat set to None nothing would fight; standing still only gets you killed.
+        bool fightAggro = inCombat
+                          && automatorConfig.CombatAutorotation.UsesCombatAutomation()
+                          && (KnowledgeThreat.CanFightAggro(objects) || chased);
         if (activeChain is { IsCompleted: false })
         {
             // Open/travel chains used to return before self-defence — aggro mid-open left AI off.
@@ -1412,12 +1416,12 @@ public class FarmingPotChestsHandler
             return true;
         }
 
-        if (treasureConfig.NinjaGearsetNumber <= 0 && !ninjaHide.IsNinja)
+        if (!ninjaHide.CanBecomeNinja(treasureConfig.NinjaGearsetNumber))
         {
             if (EzThrottler.Throttle("PotChestFarm::NinjaHideNoGearset", 10000))
             {
                 logger.Warning(
-                    "Ninja Hide is on but gearset is 0 and you are not on Ninja — skipping Hide for this threat");
+                    "Ninja Hide is on but the gearset is not a Ninja set and you are not on Ninja — skipping Hide for this threat");
             }
 
             ClearNinjaHideRequirement();
@@ -1699,6 +1703,12 @@ public class FarmingPotChestsHandler
     {
         hints.Disarm();
         memory.Forget<PotChestFarmMemory>();
+
+        // Without this the farm is started again on the next frame for as long as the buff lasts.
+        if (HasTreasureBuff())
+        {
+            memory.TryAdd<PotChestFarmDoneMemory>();
+        }
     }
 
     private bool HasTreasureBuff() =>

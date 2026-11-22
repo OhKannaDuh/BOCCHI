@@ -65,6 +65,17 @@ public sealed class CarrotHunterService
 
     private const int FortuneCarrotUseMaxAttempts = 3;
 
+    // A carrot or bunny chest that can never be reached or used would otherwise hold the hunt on one spot forever.
+    private static readonly TimeSpan PadWorkLimit = TimeSpan.FromSeconds(90);
+
+    private static readonly TimeSpan AetheryteApproachLimit = TimeSpan.FromMinutes(2);
+
+    private TimeSpan? padWorkSince;
+
+    private TimeSpan? aetheryteApproachSince;
+
+    private bool wasDown;
+
     private readonly WalkStuckWatch farStuckWatch = new(new WalkStuckWatch.Options(
         NudgeAfter: TimeSpan.FromSeconds(10),
         EscalateAfter: TimeSpan.FromSeconds(18),
@@ -83,6 +94,9 @@ public sealed class CarrotHunterService
     private readonly HashSet<int> finishedAuthoredIds = [];
 
     private readonly HashSet<ulong> usedLiveCarrotIdsAtPad = [];
+
+    // Without this a carrot the hunt gave up on is picked again through every neighbouring spot.
+    private readonly HashSet<ulong> gaveUpLiveCarrotIds = [];
 
     private readonly List<CarrotData> tour = [];
 
@@ -225,6 +239,8 @@ public sealed class CarrotHunterService
         }
 
         Paused = false;
+        ResetFarStuckWatch();
+        ResetApproachProgress();
         if (!stopwatch.IsRunning)
         {
             stopwatch.Start();
@@ -258,6 +274,33 @@ public sealed class CarrotHunterService
         if (conditions[ConditionFlag.Unconscious])
         {
             SoftStopWhileUnconscious();
+            padWorkSince = null;
+            wasDown = true;
+            return;
+        }
+
+        // You may be back at base camp now; the old walk and the half-done spot no longer apply.
+        if (wasDown)
+        {
+            wasDown = false;
+            log.Information("Carrot hunt: back up — planning the route again");
+            RecalculateAndAdvance();
+            return;
+        }
+
+        if (Phase is CarrotHuntPhase.UsingItem or CarrotHuntPhase.WaitingForBunny or CarrotHuntPhase.OpeningBunny
+            && stopwatch.Elapsed - (padWorkSince ??= stopwatch.Elapsed) >= PadWorkLimit)
+        {
+            log.Warning(
+                "Carrot hunt: {Seconds}s at {Pos:F0} without finishing — skipping this spot",
+                (int)PadWorkLimit.TotalSeconds,
+                currentTargetPosition);
+            if (currentLiveCarrotId is { } stuckId)
+            {
+                gaveUpLiveCarrotIds.Add(stuckId);
+            }
+
+            SkipCurrentAuthored();
             return;
         }
 
@@ -492,6 +535,15 @@ public sealed class CarrotHunterService
 
         if (hopDeparture is not { } departure)
         {
+            Phase = CarrotHuntPhase.Pathing;
+            return;
+        }
+
+        if (stopwatch.Elapsed - (aetheryteApproachSince ??= stopwatch.Elapsed) >= AetheryteApproachLimit)
+        {
+            log.Warning("Carrot hunt: could not reach the aetheryte — walking instead");
+            vnav.Stop();
+            ClearHop();
             Phase = CarrotHuntPhase.Pathing;
             return;
         }
@@ -733,6 +785,11 @@ public sealed class CarrotHunterService
                 "Carrot hunt: Fortune Carrot use failed {Max} times at {Pos} — skipping",
                 FortuneCarrotUseMaxAttempts,
                 currentTargetPosition);
+            if (currentLiveCarrotId is { } refusedId)
+            {
+                gaveUpLiveCarrotIds.Add(refusedId);
+            }
+
             SkipCurrentAuthored();
             return;
         }
@@ -961,6 +1018,7 @@ public sealed class CarrotHunterService
         fortuneCarrotCountAtIssue = -1;
         fortuneCarrotUseAttempts = 0;
         waitingForBunnySince = DateTime.MinValue;
+        padWorkSince = null;
         ClearEmptyPadCandidate();
         ResetApproachProgress();
         ResetFarStuckWatch();
@@ -1062,7 +1120,7 @@ public sealed class CarrotHunterService
 
         foreach (Carrot live in carrots.Carrots)
         {
-            if (!live.IsValid() || usedLiveCarrotIdsAtPad.Contains(live.GameObjectId))
+            if (!live.IsValid() || usedLiveCarrotIdsAtPad.Contains(live.GameObjectId) || gaveUpLiveCarrotIds.Contains(live.GameObjectId))
             {
                 continue;
             }
@@ -1404,7 +1462,7 @@ public sealed class CarrotHunterService
 
         foreach (Carrot live in carrots.Carrots)
         {
-            if (!live.IsValid() || usedLiveCarrotIdsAtPad.Contains(live.GameObjectId))
+            if (!live.IsValid() || usedLiveCarrotIdsAtPad.Contains(live.GameObjectId) || gaveUpLiveCarrotIds.Contains(live.GameObjectId))
             {
                 continue;
             }
@@ -1560,7 +1618,7 @@ public sealed class CarrotHunterService
     {
         return carrots.Carrots
             .Where(c => c.IsValid())
-            .Where(c => !usedLiveCarrotIdsAtPad.Contains(c.GameObjectId))
+            .Where(c => !usedLiveCarrotIdsAtPad.Contains(c.GameObjectId) && !gaveUpLiveCarrotIds.Contains(c.GameObjectId))
             .Where(c => Vector3.DistanceSquared(authored.Position, c.GetPosition()) <= matchRadiusSq)
             .OrderBy(c => Vector3.DistanceSquared(authored.Position, c.GetPosition()))
             .FirstOrDefault();
@@ -1579,6 +1637,7 @@ public sealed class CarrotHunterService
         fortuneCarrotUseAttempts = 0;
         currentLiveCarrotId = null;
         waitingForBunnySince = DateTime.MinValue;
+        padWorkSince = null;
         ResetApproachProgress();
 
         if (currentAuthored is { } authored)
@@ -1675,6 +1734,7 @@ public sealed class CarrotHunterService
         hopDeparture = null;
         hopArrival = null;
         activeTeleportChain = null;
+        aetheryteApproachSince = null;
     }
 
     private void MaybeMount(Vector3 destination)
@@ -1747,10 +1807,10 @@ public sealed class CarrotHunterService
             return true;
         }
 
-        if (treasureConfig.NinjaGearsetNumber <= 0 && !ninjaHide.IsNinja)
+        if (!ninjaHide.CanBecomeNinja(treasureConfig.NinjaGearsetNumber))
         {
             log.Warning(
-                "Ninja Hide is on but gearset is 0 and you are not on Ninja — skipping Hide for this threat");
+                "Ninja Hide is on but the gearset is not a Ninja set and you are not on Ninja — skipping Hide for this threat");
             ClearNinjaHideRequirement();
             return true;
         }
@@ -1927,7 +1987,9 @@ public sealed class CarrotHunterService
         fortuneCarrotCountAtIssue = -1;
         fortuneCarrotUseAttempts = 0;
         waitingForBunnySince = DateTime.MinValue;
+        padWorkSince = null;
         usedLiveCarrotIdsAtPad.Clear();
+        gaveUpLiveCarrotIds.Clear();
         ClearEmptyPadCandidate();
         ResetApproachProgress();
         ResetFarStuckWatch();
@@ -1979,6 +2041,7 @@ public sealed class CarrotHunterService
 
         Running = false;
         Paused = false;
+        wasDown = false;
         Phase = CarrotHuntPhase.Idle;
         finishedAuthoredIds.Clear();
         tour.Clear();
@@ -1986,8 +2049,8 @@ public sealed class CarrotHunterService
         ClearNinjaHideRequirement();
         ClearCurrent();
         stopwatch.Reset();
-        vnav.Stop();
-        pathfinder.Stop();
+        // Stopping mid-Return or mid-teleport must cancel that chain, or it still carries you off afterwards.
+        SoftStopMovementForPause();
         ninjaHide.RestorePreviousGearsetIfNeeded();
         pandoraAutoOpen.Release();
         log.Information("Carrot hunt stopped");
