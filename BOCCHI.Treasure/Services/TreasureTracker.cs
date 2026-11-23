@@ -110,7 +110,8 @@ public class TreasureTracker : ITreasureTracker, IOnUpdate, IDisposable
 
         foreach (TreasureCoffer treasure in treasures)
         {
-            if (!treasure.CheckOpened())
+            // A coffer that despawned may point at reused memory; reading its flags could report a made-up opening.
+            if (!worldTreasures.ContainsKey(treasure.GameObjectId) || !treasure.IsValid() || !treasure.CheckOpened())
             {
                 continue;
             }

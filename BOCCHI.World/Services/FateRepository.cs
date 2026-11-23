@@ -66,7 +66,7 @@ public class FateRepository
 
             if (fate.State is not (FateState.Preparing or FateState.Running)
                 || fate.Position == Vector3.Zero
-                || fate.Position == Vector3.NaN)
+                || float.IsNaN(fate.Position.X))
             {
                 continue;
             }

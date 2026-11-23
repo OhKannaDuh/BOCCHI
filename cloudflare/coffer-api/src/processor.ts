@@ -1,4 +1,4 @@
-import { isUnloadAltitude } from "./worldBounds.ts";
+import { isInsideZoneBox } from "./worldBounds.ts";
 
 const MAX_OBSERVATIONS_PER_RUN = 500;
 const CLUSTER_RADIUS = 1.5;
@@ -123,7 +123,7 @@ async function processOne(
 ): Promise<ProcessorResult> {
   const tables = CLUSTER_KINDS[kind];
   try {
-    if (isUnloadAltitude(observation.world_y)) {
+    if (!isInsideZoneBox(observation.world_x, observation.world_y, observation.world_z)) {
       await db.prepare(`UPDATE ${tables.observations} SET processed = 1 WHERE id = ?`)
         .bind(observation.id)
         .run();

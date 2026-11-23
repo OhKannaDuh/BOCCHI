@@ -39,7 +39,8 @@ public class RepairStep
                 unsafe
                 {
                     AddonRepair* repair = gui.GetAddonByName<AddonRepair>("Repair");
-                    if (repair == null || !repair->AtkUnitBase.IsVisible || !repair->RepairAllButton->IsEnabled)
+                    // Repair toggles the window, so casting again while it is open would close it.
+                    if (repair == null || !repair->AtkUnitBase.IsVisible)
                     {
                         Actions.Repair.Cast();
                     }

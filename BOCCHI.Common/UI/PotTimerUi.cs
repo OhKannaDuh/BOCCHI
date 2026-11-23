@@ -16,7 +16,7 @@ public static class PotTimerUi
         ITranslator<MainWindow> translator)
     {
         ExcelSheet<XIVFate> sheet = data.GetExcelSheet<XIVFate>();
-        IReadOnlyList<PotCycleSnapshot> known = potCycle.KnownCycles;
+        IReadOnlyList<PotCycleSnapshot> known = InThisZone(potCycle, zones);
 
         if (known.Count == 0)
         {
@@ -35,13 +35,19 @@ public static class PotTimerUi
         }
     }
 
+    // The tracker only refreshes the zone you are in; another zone's entry would stay frozen at 00:00.
+    private static IReadOnlyList<PotCycleSnapshot> InThisZone(IPotCycleTracker potCycle, IZoneProvider zones)
+    {
+        ushort territory = zones.GetZone().TerritoryType;
+        return potCycle.KnownCycles.Where(c => c.TerritoryTypeId == territory).ToList();
+    }
+
     public static string? FormatCompact(
         IPotCycleTracker potCycle,
-        IDataManager data,
+        IZoneProvider zones,
         ITranslator<MainWindow> translator)
     {
-        ExcelSheet<XIVFate> sheet = data.GetExcelSheet<XIVFate>();
-        IReadOnlyList<PotCycleSnapshot> known = potCycle.KnownCycles;
+        IReadOnlyList<PotCycleSnapshot> known = InThisZone(potCycle, zones);
         if (known.Count == 0)
         {
             return null;

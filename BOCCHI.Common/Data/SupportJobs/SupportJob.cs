@@ -18,7 +18,7 @@ public class SupportJob
         get
         {
             OccultCrescentState* state = PublicContentOccultCrescent.GetState();
-            if (state == null || state->SupportJobLevels.Length < Id.Index())
+            if (state == null || state->SupportJobLevels.Length <= Id.Index())
             {
                 return 0;
             }
@@ -32,7 +32,7 @@ public class SupportJob
         get
         {
             OccultCrescentState* state = PublicContentOccultCrescent.GetState();
-            if (state == null || state->SupportJobExperience.Length < Id.Index())
+            if (state == null || state->SupportJobExperience.Length <= Id.Index())
             {
                 return 0;
             }

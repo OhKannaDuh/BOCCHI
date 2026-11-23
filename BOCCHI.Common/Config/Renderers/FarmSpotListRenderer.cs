@@ -1,3 +1,4 @@
+using Dalamud.Plugin.Services;
 using BOCCHI.Common.Config.Fields;
 using BOCCHI.Common.Data.MobFarmer;
 using BOCCHI.Common.UI;
@@ -11,7 +12,7 @@ using System.Reflection;
 
 namespace BOCCHI.Common.Config.Renderers;
 
-public sealed class FarmSpotListRenderer(IPlayer player) : IFieldRenderer<FarmSpotListAttribute>
+public sealed class FarmSpotListRenderer(IPlayer player, IClientState client) : IFieldRenderer<FarmSpotListAttribute>
 {
     public bool Render(object target, PropertyInfo prop, FarmSpotListAttribute attr, Type owner, ITranslator translator)
     {
@@ -69,7 +70,7 @@ public sealed class FarmSpotListRenderer(IPlayer player) : IFieldRenderer<FarmSp
                     Name = $"Spot {spots.Count + 1}",
                     Priority = spots.Count == 0 ? 0 : spots.Max(s => s.Priority) + 1,
                 };
-                spot.SetOrigin(player.Position);
+                spot.SetOrigin(player.Position, client.TerritoryType);
                 spots.Add(spot);
                 changed = true;
             }
@@ -114,7 +115,7 @@ public sealed class FarmSpotListRenderer(IPlayer player) : IFieldRenderer<FarmSp
         BocchiUi.MutedText($"{T(translator, fieldKey, "origin")}: {FormatRelative(spot.Origin, player.Position)}");
         if (ImGui.Button(T(translator, fieldKey, "set_origin")))
         {
-            spot.SetOrigin(player.Position);
+            spot.SetOrigin(player.Position, client.TerritoryType);
             changed = true;
         }
 

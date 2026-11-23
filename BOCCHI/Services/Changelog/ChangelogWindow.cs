@@ -31,7 +31,7 @@ public sealed class ChangelogWindow : OcelotWindow, IChangelogWindow
         Configuration config,
         IConfigSaver saver,
         ITranslator<ChangelogWindow> translator)
-        : base("BOCCHI — What’s new")
+        : base("BOCCHI — What’s new###bocchi.changelog")
     {
         this.config = config;
         this.saver = saver;
@@ -53,7 +53,7 @@ public sealed class ChangelogWindow : OcelotWindow, IChangelogWindow
             ? ChangelogText.ParseLines(body)
             : [];
 
-        WindowName = translator.T(".title", ("version", version));
+        WindowName = translator.T(".title", ("version", version)) + "###bocchi.changelog";
         markSeenOnClose = true;
         IsOpen = true;
     }

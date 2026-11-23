@@ -6,6 +6,7 @@ using BOCCHI.Common.Data.StateMemory;
 using BOCCHI.Common.Data.SupportJobs;
 using BOCCHI.Common.Data.Zones;
 using BOCCHI.Common.Services;
+using BOCCHI.Treasure.Services;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
@@ -132,6 +133,12 @@ public class TriagingHandler
 
         if (conditions[ConditionFlag.InCombat])
         {
+            if (KnowledgeThreat.CanFightAggro(objects))
+            {
+                logger.Info("Triage Mode: attacked by an enemy you can fight — stopping to fight first");
+                FinishTriage();
+            }
+
             return;
         }
 

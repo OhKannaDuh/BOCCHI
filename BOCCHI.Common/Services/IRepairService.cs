@@ -6,4 +6,6 @@ public interface IRepairService
     bool ShouldRepair();
 
     IChain Repair();
+
+    void CleanUpAfterFailure();
 }

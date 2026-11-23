@@ -144,7 +144,7 @@ public static class ChangelogText
         return false;
     }
 
-    private static string StripMarkdown(string text) => Bold.Replace(text, "$1");
+    private static string StripMarkdown(string text) => Bold.Replace(text, "$1").Replace("`", "");
 }
 
 public enum ChangelogLineKind

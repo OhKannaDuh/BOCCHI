@@ -45,6 +45,8 @@ public class MobFarmerService
 
     private bool gatheringAiOn;
 
+    private bool wasDown;
+
     private IStateMachine<FarmerPhase> StateMachine => stateMachine ??= stateMachineFactory();
 
     public bool Running { get; private set; }
@@ -190,6 +192,32 @@ public class MobFarmerService
         if (Suspended)
         {
             return;
+        }
+
+        if (conditions[ConditionFlag.Unconscious])
+        {
+            if (!wasDown)
+            {
+                wasDown = true;
+                pathfinder.Stop();
+                combat.Disable();
+                gatheringAiOn = false;
+                logger.Info("Mob Farmer: you are down, waiting");
+            }
+
+            return;
+        }
+
+        if (wasDown)
+        {
+            wasDown = false;
+            if (StateMachine is FlowStateMachine<FarmerPhase> flow)
+            {
+                flow.Reset();
+            }
+
+            spots.RequireApproachIfAway();
+            logger.Info("Mob Farmer: back up, heading to {Spot}", spots.Name ?? "the spot");
         }
 
         // Outside the fight the rotation only runs to tag a mob, or it spends cooldowns before the pack is stacked.

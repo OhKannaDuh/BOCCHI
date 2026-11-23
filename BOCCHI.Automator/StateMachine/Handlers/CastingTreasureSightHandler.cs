@@ -9,6 +9,7 @@ using BOCCHI.Treasure.Services;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Plugin.Services;
 using Ocelot.Actions;
+using Ocelot.Services.Logger;
 using Ocelot.States.Score;
 
 namespace BOCCHI.Automator.StateMachine.Handlers;
@@ -23,9 +24,12 @@ public class CastingTreasureSightHandler
     IAutomator automator,
     ITreasureHunter hunter,
     AutomatorConfig automatorConfig,
-    ITreasureTracker tracker
+    ITreasureTracker tracker,
+    ILogger<CastingTreasureSightHandler> logger
 ) : ScoreStateHandler<AutomatorState, StatePriority>(AutomatorState.CastingTreasureSight)
 {
+    private static readonly TimeSpan GiveUpAfter = TimeSpan.FromSeconds(20);
+
     private DateTime lastCast = DateTime.MinValue;
 
     public override StatePriority GetScore()
@@ -83,6 +87,19 @@ public class CastingTreasureSightHandler
 
     public override void Handle()
     {
+        if (TimeInState >= GiveUpAfter)
+        {
+            logger.Warning("Treasure Sight: could not cast within {Seconds}s; skipping it this time", GiveUpAfter.TotalSeconds);
+            lastCast = DateTime.UtcNow;
+            memory.Forget<CastingTreasureSightMemory>();
+            if (memory.TryRemember<AutomaticTreasureSurveyMemory>(out AutomaticTreasureSurveyMemory pending))
+            {
+                pending.PendingSurvey = false;
+            }
+
+            return;
+        }
+
         if (!supportJobs.TryGetCurrent(out SupportJob current))
         {
             return;
@@ -107,7 +124,7 @@ public class CastingTreasureSightHandler
         {
             if (Actions.PhantomActionII.Cast())
             {
-                lastCast = DateTime.Now;
+                lastCast = DateTime.UtcNow;
                 memory.Forget<CastingTreasureSightMemory>();
 
                 if (!memory.TryRemember<AutomaticTreasureSurveyMemory>(out AutomaticTreasureSurveyMemory survey))
@@ -172,6 +189,6 @@ public class CastingTreasureSightHandler
             return int.MaxValue;
         }
 
-        return (int)(DateTime.Now - lastCast).TotalSeconds;
+        return (int)(DateTime.UtcNow - lastCast).TotalSeconds;
     }
 }

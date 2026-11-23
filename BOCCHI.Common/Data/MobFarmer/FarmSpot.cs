@@ -28,14 +28,17 @@ public class FarmSpot
 
     public int MinimumMobsToStartFight { get; set; }
 
+    public uint Territory { get; set; }
+
     [JsonIgnore]
     public Vector3 Origin => new(X, Y, Z);
 
     [JsonIgnore]
     public Vector3? StackPoint => UseStackPoint ? new Vector3(StackX, StackY, StackZ) : null;
 
-    public void SetOrigin(Vector3 position)
+    public void SetOrigin(Vector3 position, uint territory)
     {
+        Territory = territory;
         X = position.X;
         Y = position.Y;
         Z = position.Z;

@@ -12,7 +12,7 @@
     },
     "should_auto_mount": {
       "label": "Mount while traveling",
-      "tooltip": "On: mount for long trips, and get back on if you are knocked off.\nOff: stay on foot."
+      "tooltip": "Mounts for long trips, and gets back on if you are knocked off."
     },
     "preferred_mount_id": {
       "label": "Preferred mount",
@@ -28,7 +28,7 @@
     },
     "prefer_return_over_shard_walk": {
       "label": "Use Return instead of walking to a shard",
-      "tooltip": "On: for long trips, use Return to camp when it is ready, so you don't walk past enemies to reach a shard.\nOff: take whichever route is shortest."
+      "tooltip": "For long trips, uses Return to camp when it is ready, so you don't walk past enemies to reach a shard."
     }
   }
 }

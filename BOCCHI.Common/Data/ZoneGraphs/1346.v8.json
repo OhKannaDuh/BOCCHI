@@ -1,0 +1,1705 @@
+{
+  "Nodes": {
+    "ef95160d-a0b8-4a4c-8508-e91b43d7b11b": {
+      "Id": "ef95160d-a0b8-4a4c-8508-e91b43d7b11b",
+      "Type": 0,
+      "Position": {
+        "X": 882.18,
+        "Y": 258.5,
+        "Z": 882.263
+      },
+      "Metadata": {
+        "MetadataType": "TeleportNodeMetadata",
+        "AetheryteId": 0,
+        "Destination": {
+          "X": 0,
+          "Y": 0,
+          "Z": 0
+        },
+        "DeadRadius": 3.2
+      }
+    },
+    "2148f604-4c90-402f-b068-64231c9c7b82": {
+      "Id": "2148f604-4c90-402f-b068-64231c9c7b82",
+      "Type": 1,
+      "Position": {
+        "X": 880.002,
+        "Y": 259.74,
+        "Z": 880.059
+      },
+      "Metadata": {
+        "MetadataType": "TeleportNodeMetadata",
+        "AetheryteId": 5571,
+        "Destination": {
+          "X": 882.18,
+          "Y": 258.5,
+          "Z": 882.263
+        },
+        "DeadRadius": 3.34
+      }
+    },
+    "e79f1a90-aa9b-4503-b08a-868b3ab0da3e": {
+      "Id": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+      "Type": 2,
+      "Position": {
+        "X": 451.684,
+        "Y": 70.927,
+        "Z": 528.839
+      },
+      "Metadata": {
+        "MetadataType": "TeleportNodeMetadata",
+        "AetheryteId": 5576,
+        "Destination": {
+          "X": 453.897,
+          "Y": 70,
+          "Z": 530.314
+        },
+        "DeadRadius": 3
+      }
+    },
+    "18c6b227-10a5-498e-b615-805fefc62f5a": {
+      "Id": "18c6b227-10a5-498e-b615-805fefc62f5a",
+      "Type": 2,
+      "Position": {
+        "X": 357.669,
+        "Y": 45.766,
+        "Z": -554.308
+      },
+      "Metadata": {
+        "MetadataType": "TeleportNodeMetadata",
+        "AetheryteId": 5572,
+        "Destination": {
+          "X": 357.311,
+          "Y": 45.094,
+          "Z": -556.975
+        },
+        "DeadRadius": 3
+      }
+    },
+    "fd8b0d59-b026-4aa9-8a92-69ca2b82131c": {
+      "Id": "fd8b0d59-b026-4aa9-8a92-69ca2b82131c",
+      "Type": 2,
+      "Position": {
+        "X": -547.247,
+        "Y": 67.998,
+        "Z": 594.404
+      },
+      "Metadata": {
+        "MetadataType": "TeleportNodeMetadata",
+        "AetheryteId": 5573,
+        "Destination": {
+          "X": -549.244,
+          "Y": 67.178,
+          "Z": 596.183
+        },
+        "DeadRadius": 3
+      }
+    },
+    "8050d475-e969-474c-aa95-757c553df685": {
+      "Id": "8050d475-e969-474c-aa95-757c553df685",
+      "Type": 2,
+      "Position": {
+        "X": -388.573,
+        "Y": 41.221,
+        "Z": -440.52
+      },
+      "Metadata": {
+        "MetadataType": "TeleportNodeMetadata",
+        "AetheryteId": 5574,
+        "Destination": {
+          "X": -386.639,
+          "Y": 39.293,
+          "Z": -438.26
+        },
+        "DeadRadius": 3.55
+      }
+    },
+    "57739f04-5baf-4b40-8ced-9dd82bf04ddc": {
+      "Id": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+      "Type": 2,
+      "Position": {
+        "X": -13.364,
+        "Y": 3.145,
+        "Z": -40.512
+      },
+      "Metadata": {
+        "MetadataType": "TeleportNodeMetadata",
+        "AetheryteId": 5575,
+        "Destination": {
+          "X": -15.738,
+          "Y": 2.065,
+          "Z": -44.486
+        },
+        "DeadRadius": 4.75
+      }
+    },
+    "1fde5e4a-3f29-498b-a518-3bfe142d5772": {
+      "Id": "1fde5e4a-3f29-498b-a518-3bfe142d5772",
+      "Type": 3,
+      "Position": {
+        "X": -440,
+        "Y": 47.02659,
+        "Z": -790
+      },
+      "Metadata": {
+        "MetadataType": "ActivityNodeMetadata",
+        "Id": 2081,
+        "PreferredAethernetId": 5574,
+        "CombatRadius": 0,
+        "AreaShape": 0,
+        "StandRadius": 0
+      }
+    },
+    "5bed6977-5d00-4c91-a521-ed316e758b34": {
+      "Id": "5bed6977-5d00-4c91-a521-ed316e758b34",
+      "Type": 3,
+      "Position": {
+        "X": -402.0002,
+        "Y": 29.76808,
+        "Z": -252.9997
+      },
+      "Metadata": {
+        "MetadataType": "ActivityNodeMetadata",
+        "Id": 2078,
+        "PreferredAethernetId": null,
+        "CombatRadius": 0,
+        "AreaShape": 0,
+        "StandRadius": 0
+      }
+    },
+    "d899bb1a-0a0f-4369-a67e-cb1aa55ca72e": {
+      "Id": "d899bb1a-0a0f-4369-a67e-cb1aa55ca72e",
+      "Type": 3,
+      "Position": {
+        "X": 510,
+        "Y": 16.76658,
+        "Z": -29.99999
+      },
+      "Metadata": {
+        "MetadataType": "ActivityNodeMetadata",
+        "Id": 2075,
+        "PreferredAethernetId": 5576,
+        "CombatRadius": 0,
+        "AreaShape": 0,
+        "StandRadius": 0
+      }
+    },
+    "3b1a2122-e8bc-4718-b6e8-72bf8c7f98fb": {
+      "Id": "3b1a2122-e8bc-4718-b6e8-72bf8c7f98fb",
+      "Type": 3,
+      "Position": {
+        "X": -855.7433,
+        "Y": 70.67716,
+        "Z": 482.1518
+      },
+      "Metadata": {
+        "MetadataType": "ActivityNodeMetadata",
+        "Id": 2082,
+        "PreferredAethernetId": null,
+        "CombatRadius": 0,
+        "AreaShape": 0,
+        "StandRadius": 0
+      }
+    },
+    "e9392ee3-4070-4875-9525-a3aac56ca8d8": {
+      "Id": "e9392ee3-4070-4875-9525-a3aac56ca8d8",
+      "Type": 3,
+      "Position": {
+        "X": -170,
+        "Y": 30,
+        "Z": -500
+      },
+      "Metadata": {
+        "MetadataType": "ActivityNodeMetadata",
+        "Id": 2079,
+        "PreferredAethernetId": null,
+        "CombatRadius": 0,
+        "AreaShape": 0,
+        "StandRadius": 0
+      }
+    },
+    "558e38a0-46ff-40e1-9afc-1807c5c27d1e": {
+      "Id": "558e38a0-46ff-40e1-9afc-1807c5c27d1e",
+      "Type": 3,
+      "Position": {
+        "X": 724,
+        "Y": 70,
+        "Z": 220
+      },
+      "Metadata": {
+        "MetadataType": "ActivityNodeMetadata",
+        "Id": 2074,
+        "PreferredAethernetId": null,
+        "CombatRadius": 0,
+        "AreaShape": 0,
+        "StandRadius": 0
+      }
+    },
+    "7895f394-d28c-4f1a-841f-f254b5db2f5e": {
+      "Id": "7895f394-d28c-4f1a-841f-f254b5db2f5e",
+      "Type": 3,
+      "Position": {
+        "X": -661.0049,
+        "Y": 87,
+        "Z": -54.00021
+      },
+      "Metadata": {
+        "MetadataType": "ActivityNodeMetadata",
+        "Id": 2083,
+        "PreferredAethernetId": 5574,
+        "CombatRadius": 0,
+        "AreaShape": 0,
+        "StandRadius": 0
+      }
+    },
+    "164c8795-f1a6-498a-a987-e3e7837ac4bd": {
+      "Id": "164c8795-f1a6-498a-a987-e3e7837ac4bd",
+      "Type": 3,
+      "Position": {
+        "X": 95,
+        "Y": 10,
+        "Z": 470
+      },
+      "Metadata": {
+        "MetadataType": "ActivityNodeMetadata",
+        "Id": 2076,
+        "PreferredAethernetId": null,
+        "CombatRadius": 0,
+        "AreaShape": 0,
+        "StandRadius": 0
+      }
+    },
+    "f395b43b-d395-49a8-a3db-5b26460b7d3b": {
+      "Id": "f395b43b-d395-49a8-a3db-5b26460b7d3b",
+      "Type": 3,
+      "Position": {
+        "X": -90,
+        "Y": 67.47852,
+        "Z": 865.9999
+      },
+      "Metadata": {
+        "MetadataType": "ActivityNodeMetadata",
+        "Id": 2080,
+        "PreferredAethernetId": null,
+        "CombatRadius": 0,
+        "AreaShape": 0,
+        "StandRadius": 0
+      }
+    },
+    "1ad55727-ea1f-466a-8bd0-b536241e1281": {
+      "Id": "1ad55727-ea1f-466a-8bd0-b536241e1281",
+      "Type": 3,
+      "Position": {
+        "X": 140,
+        "Y": 37,
+        "Z": -708
+      },
+      "Metadata": {
+        "MetadataType": "ActivityNodeMetadata",
+        "Id": 2084,
+        "PreferredAethernetId": null,
+        "CombatRadius": 0,
+        "AreaShape": 0,
+        "StandRadius": 0
+      }
+    },
+    "fcf9a732-65f8-4f05-aa4c-7f9f59b14c1b": {
+      "Id": "fcf9a732-65f8-4f05-aa4c-7f9f59b14c1b",
+      "Type": 3,
+      "Position": {
+        "X": 330,
+        "Y": 0,
+        "Z": -250
+      },
+      "Metadata": {
+        "MetadataType": "ActivityNodeMetadata",
+        "Id": 2077,
+        "PreferredAethernetId": 5572,
+        "CombatRadius": 0,
+        "AreaShape": 0,
+        "StandRadius": 0
+      }
+    },
+    "4e742f28-4c5e-421b-9c3a-2fe85eae98a9": {
+      "Id": "4e742f28-4c5e-421b-9c3a-2fe85eae98a9",
+      "Type": 4,
+      "Position": {
+        "X": 233,
+        "Y": 7.729229,
+        "Z": -470
+      },
+      "Metadata": {
+        "MetadataType": "ActivityNodeMetadata",
+        "Id": 2072,
+        "PreferredAethernetId": 5572,
+        "CombatRadius": 0,
+        "AreaShape": 0,
+        "StandRadius": 0
+      }
+    },
+    "779c2c41-629e-4a50-bd54-befaf89dc1d5": {
+      "Id": "779c2c41-629e-4a50-bd54-befaf89dc1d5",
+      "Type": 4,
+      "Position": {
+        "X": -505.2822,
+        "Y": 53.14409,
+        "Z": 244.041
+      },
+      "Metadata": {
+        "MetadataType": "ActivityNodeMetadata",
+        "Id": 2073,
+        "PreferredAethernetId": 5573,
+        "CombatRadius": 0,
+        "AreaShape": 0,
+        "StandRadius": 0
+      }
+    },
+    "e35df5c3-b249-4787-95ac-09d3e7b1cb15": {
+      "Id": "e35df5c3-b249-4787-95ac-09d3e7b1cb15",
+      "Type": 5,
+      "Position": {
+        "X": 237.91,
+        "Y": 15,
+        "Z": 351.69
+      },
+      "Metadata": {
+        "MetadataType": "ActivityNodeMetadata",
+        "Id": 56,
+        "PreferredAethernetId": null,
+        "CombatRadius": 0,
+        "AreaShape": 1,
+        "StandRadius": 0
+      }
+    },
+    "402a0e79-d725-4ac8-aeca-ca2712000577": {
+      "Id": "402a0e79-d725-4ac8-aeca-ca2712000577",
+      "Type": 5,
+      "Position": {
+        "X": 500,
+        "Y": 56,
+        "Z": -310
+      },
+      "Metadata": {
+        "MetadataType": "ActivityNodeMetadata",
+        "Id": 63,
+        "PreferredAethernetId": null,
+        "CombatRadius": 0,
+        "AreaShape": 0,
+        "StandRadius": 0
+      }
+    },
+    "a918821a-236f-41be-82c9-c7d49aa2323f": {
+      "Id": "a918821a-236f-41be-82c9-c7d49aa2323f",
+      "Type": 5,
+      "Position": {
+        "X": -82,
+        "Y": 12,
+        "Z": 485
+      },
+      "Metadata": {
+        "MetadataType": "ActivityNodeMetadata",
+        "Id": 62,
+        "PreferredAethernetId": null,
+        "CombatRadius": 0,
+        "AreaShape": 0,
+        "StandRadius": 0
+      }
+    },
+    "d895241b-159a-4ccf-aa7d-1d9478cc238c": {
+      "Id": "d895241b-159a-4ccf-aa7d-1d9478cc238c",
+      "Type": 5,
+      "Position": {
+        "X": 807,
+        "Y": 61,
+        "Z": -562
+      },
+      "Metadata": {
+        "MetadataType": "ActivityNodeMetadata",
+        "Id": 59,
+        "PreferredAethernetId": null,
+        "CombatRadius": 0,
+        "AreaShape": 0,
+        "StandRadius": 0
+      }
+    },
+    "bd3da5ad-90b7-4af9-b672-16d19cec7248": {
+      "Id": "bd3da5ad-90b7-4af9-b672-16d19cec7248",
+      "Type": 5,
+      "Position": {
+        "X": -688,
+        "Y": 90,
+        "Z": 150
+      },
+      "Metadata": {
+        "MetadataType": "ActivityNodeMetadata",
+        "Id": 53,
+        "PreferredAethernetId": null,
+        "CombatRadius": 0,
+        "AreaShape": 1,
+        "StandRadius": 0
+      }
+    },
+    "d45f7ef7-e39f-4a6c-b957-5c6df74a2282": {
+      "Id": "d45f7ef7-e39f-4a6c-b957-5c6df74a2282",
+      "Type": 5,
+      "Position": {
+        "X": 224,
+        "Y": 52,
+        "Z": -860
+      },
+      "Metadata": {
+        "MetadataType": "ActivityNodeMetadata",
+        "Id": 57,
+        "PreferredAethernetId": null,
+        "CombatRadius": 0,
+        "AreaShape": 1,
+        "StandRadius": 0
+      }
+    },
+    "4c1ddc78-d5f8-41b5-9042-c2e3f28dc3ed": {
+      "Id": "4c1ddc78-d5f8-41b5-9042-c2e3f28dc3ed",
+      "Type": 5,
+      "Position": {
+        "X": -215,
+        "Y": 18,
+        "Z": -65
+      },
+      "Metadata": {
+        "MetadataType": "ActivityNodeMetadata",
+        "Id": 50,
+        "PreferredAethernetId": null,
+        "CombatRadius": 0,
+        "AreaShape": 0,
+        "StandRadius": 0
+      }
+    },
+    "9f81e740-adcd-425b-be88-ebd25e2ef8dc": {
+      "Id": "9f81e740-adcd-425b-be88-ebd25e2ef8dc",
+      "Type": 5,
+      "Position": {
+        "X": -390,
+        "Y": 68,
+        "Z": 700
+      },
+      "Metadata": {
+        "MetadataType": "ActivityNodeMetadata",
+        "Id": 58,
+        "PreferredAethernetId": null,
+        "CombatRadius": 0,
+        "AreaShape": 0,
+        "StandRadius": 0
+      }
+    },
+    "08a54d58-cac4-4f86-a8ec-dbdcb8de85d5": {
+      "Id": "08a54d58-cac4-4f86-a8ec-dbdcb8de85d5",
+      "Type": 5,
+      "Position": {
+        "X": 659,
+        "Y": 132,
+        "Z": 659
+      },
+      "Metadata": {
+        "MetadataType": "ActivityNodeMetadata",
+        "Id": 52,
+        "PreferredAethernetId": 5576,
+        "CombatRadius": 0,
+        "AreaShape": 0,
+        "StandRadius": 0
+      }
+    },
+    "73fb41e4-abf9-4e83-8bdc-0a5749041ee8": {
+      "Id": "73fb41e4-abf9-4e83-8bdc-0a5749041ee8",
+      "Type": 5,
+      "Position": {
+        "X": 765,
+        "Y": 70,
+        "Z": 0
+      },
+      "Metadata": {
+        "MetadataType": "ActivityNodeMetadata",
+        "Id": 54,
+        "PreferredAethernetId": null,
+        "CombatRadius": 0,
+        "AreaShape": 0,
+        "StandRadius": 0
+      }
+    },
+    "ac49c247-55a8-4860-9ea5-5b520d7eacf3": {
+      "Id": "ac49c247-55a8-4860-9ea5-5b520d7eacf3",
+      "Type": 5,
+      "Position": {
+        "X": -150,
+        "Y": 70,
+        "Z": -860
+      },
+      "Metadata": {
+        "MetadataType": "ActivityNodeMetadata",
+        "Id": 61,
+        "PreferredAethernetId": 5574,
+        "CombatRadius": 0,
+        "AreaShape": 0,
+        "StandRadius": 0
+      }
+    },
+    "4193bf17-c79e-4ab5-93cc-396521973f51": {
+      "Id": "4193bf17-c79e-4ab5-93cc-396521973f51",
+      "Type": 5,
+      "Position": {
+        "X": -870,
+        "Y": 20,
+        "Z": -560
+      },
+      "Metadata": {
+        "MetadataType": "ActivityNodeMetadata",
+        "Id": 49,
+        "PreferredAethernetId": null,
+        "CombatRadius": 0,
+        "AreaShape": 0,
+        "StandRadius": 0
+      }
+    },
+    "8880336f-98ec-4bed-af56-e3e54f77c6d9": {
+      "Id": "8880336f-98ec-4bed-af56-e3e54f77c6d9",
+      "Type": 5,
+      "Position": {
+        "X": -519,
+        "Y": 48,
+        "Z": -641
+      },
+      "Metadata": {
+        "MetadataType": "ActivityNodeMetadata",
+        "Id": 51,
+        "PreferredAethernetId": null,
+        "CombatRadius": 0,
+        "AreaShape": 0,
+        "StandRadius": 0
+      }
+    },
+    "f2818385-42c0-444b-90ee-09667899778e": {
+      "Id": "f2818385-42c0-444b-90ee-09667899778e",
+      "Type": 5,
+      "Position": {
+        "X": 152,
+        "Y": 70,
+        "Z": 716
+      },
+      "Metadata": {
+        "MetadataType": "ActivityNodeMetadata",
+        "Id": 60,
+        "PreferredAethernetId": null,
+        "CombatRadius": 0,
+        "AreaShape": 0,
+        "StandRadius": 0
+      }
+    },
+    "0b540e6f-6f78-4558-a978-c5e58f76e2ce": {
+      "Id": "0b540e6f-6f78-4558-a978-c5e58f76e2ce",
+      "Type": 5,
+      "Position": {
+        "X": 170,
+        "Y": 4,
+        "Z": -136
+      },
+      "Metadata": {
+        "MetadataType": "ActivityNodeMetadata",
+        "Id": 55,
+        "PreferredAethernetId": null,
+        "CombatRadius": 0,
+        "AreaShape": 0,
+        "StandRadius": 0
+      }
+    }
+  },
+  "Edges": {
+    "ef95160d-a0b8-4a4c-8508-e91b43d7b11b": [
+      {
+        "From": "ef95160d-a0b8-4a4c-8508-e91b43d7b11b",
+        "Type": 1,
+        "To": "2148f604-4c90-402f-b068-64231c9c7b82",
+        "Cost": 0
+      },
+      {
+        "From": "ef95160d-a0b8-4a4c-8508-e91b43d7b11b",
+        "Type": 1,
+        "To": "558e38a0-46ff-40e1-9afc-1807c5c27d1e",
+        "Cost": 889.51166
+      },
+      {
+        "From": "ef95160d-a0b8-4a4c-8508-e91b43d7b11b",
+        "Type": 1,
+        "To": "08a54d58-cac4-4f86-a8ec-dbdcb8de85d5",
+        "Cost": 475.5646
+      },
+      {
+        "From": "ef95160d-a0b8-4a4c-8508-e91b43d7b11b",
+        "Type": 1,
+        "To": "f2818385-42c0-444b-90ee-09667899778e",
+        "Cost": 960.1366
+      }
+    ],
+    "2148f604-4c90-402f-b068-64231c9c7b82": [
+      {
+        "From": "2148f604-4c90-402f-b068-64231c9c7b82",
+        "Type": 0,
+        "To": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+        "Cost": 10
+      },
+      {
+        "From": "2148f604-4c90-402f-b068-64231c9c7b82",
+        "Type": 0,
+        "To": "18c6b227-10a5-498e-b615-805fefc62f5a",
+        "Cost": 10
+      },
+      {
+        "From": "2148f604-4c90-402f-b068-64231c9c7b82",
+        "Type": 0,
+        "To": "fd8b0d59-b026-4aa9-8a92-69ca2b82131c",
+        "Cost": 10
+      },
+      {
+        "From": "2148f604-4c90-402f-b068-64231c9c7b82",
+        "Type": 0,
+        "To": "8050d475-e969-474c-aa95-757c553df685",
+        "Cost": 10
+      },
+      {
+        "From": "2148f604-4c90-402f-b068-64231c9c7b82",
+        "Type": 0,
+        "To": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Cost": 10
+      },
+      {
+        "From": "2148f604-4c90-402f-b068-64231c9c7b82",
+        "Type": 1,
+        "To": "558e38a0-46ff-40e1-9afc-1807c5c27d1e",
+        "Cost": 889.51166
+      },
+      {
+        "From": "2148f604-4c90-402f-b068-64231c9c7b82",
+        "Type": 1,
+        "To": "f2818385-42c0-444b-90ee-09667899778e",
+        "Cost": 960.1366
+      }
+    ],
+    "e79f1a90-aa9b-4503-b08a-868b3ab0da3e": [
+      {
+        "From": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+        "Type": 0,
+        "To": "2148f604-4c90-402f-b068-64231c9c7b82",
+        "Cost": 10
+      },
+      {
+        "From": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+        "Type": 0,
+        "To": "18c6b227-10a5-498e-b615-805fefc62f5a",
+        "Cost": 10
+      },
+      {
+        "From": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+        "Type": 0,
+        "To": "fd8b0d59-b026-4aa9-8a92-69ca2b82131c",
+        "Cost": 10
+      },
+      {
+        "From": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+        "Type": 0,
+        "To": "8050d475-e969-474c-aa95-757c553df685",
+        "Cost": 10
+      },
+      {
+        "From": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+        "Type": 0,
+        "To": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Cost": 10
+      },
+      {
+        "From": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+        "Type": 1,
+        "To": "d899bb1a-0a0f-4369-a67e-cb1aa55ca72e",
+        "Cost": 572.4096
+      },
+      {
+        "From": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+        "Type": 1,
+        "To": "558e38a0-46ff-40e1-9afc-1807c5c27d1e",
+        "Cost": 413.48303
+      },
+      {
+        "From": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+        "Type": 1,
+        "To": "164c8795-f1a6-498a-a987-e3e7837ac4bd",
+        "Cost": 373.5118
+      },
+      {
+        "From": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+        "Type": 1,
+        "To": "f395b43b-d395-49a8-a3db-5b26460b7d3b",
+        "Cost": 647.3458
+      },
+      {
+        "From": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+        "Type": 1,
+        "To": "e35df5c3-b249-4787-95ac-09d3e7b1cb15",
+        "Cost": 300.4931
+      },
+      {
+        "From": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+        "Type": 1,
+        "To": "402a0e79-d725-4ac8-aeca-ca2712000577",
+        "Cost": 981.94916
+      },
+      {
+        "From": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+        "Type": 1,
+        "To": "a918821a-236f-41be-82c9-c7d49aa2323f",
+        "Cost": 553.4146
+      },
+      {
+        "From": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+        "Type": 1,
+        "To": "d895241b-159a-4ccf-aa7d-1d9478cc238c",
+        "Cost": 1168.3662
+      },
+      {
+        "From": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+        "Type": 1,
+        "To": "9f81e740-adcd-425b-be88-ebd25e2ef8dc",
+        "Cost": 897.76025
+      },
+      {
+        "From": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+        "Type": 1,
+        "To": "08a54d58-cac4-4f86-a8ec-dbdcb8de85d5",
+        "Cost": 419.5999
+      },
+      {
+        "From": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+        "Type": 1,
+        "To": "73fb41e4-abf9-4e83-8bdc-0a5749041ee8",
+        "Cost": 623.19305
+      },
+      {
+        "From": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+        "Type": 1,
+        "To": "f2818385-42c0-444b-90ee-09667899778e",
+        "Cost": 358.4547
+      }
+    ],
+    "18c6b227-10a5-498e-b615-805fefc62f5a": [
+      {
+        "From": "18c6b227-10a5-498e-b615-805fefc62f5a",
+        "Type": 0,
+        "To": "2148f604-4c90-402f-b068-64231c9c7b82",
+        "Cost": 10
+      },
+      {
+        "From": "18c6b227-10a5-498e-b615-805fefc62f5a",
+        "Type": 0,
+        "To": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+        "Cost": 10
+      },
+      {
+        "From": "18c6b227-10a5-498e-b615-805fefc62f5a",
+        "Type": 0,
+        "To": "fd8b0d59-b026-4aa9-8a92-69ca2b82131c",
+        "Cost": 10
+      },
+      {
+        "From": "18c6b227-10a5-498e-b615-805fefc62f5a",
+        "Type": 0,
+        "To": "8050d475-e969-474c-aa95-757c553df685",
+        "Cost": 10
+      },
+      {
+        "From": "18c6b227-10a5-498e-b615-805fefc62f5a",
+        "Type": 0,
+        "To": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Cost": 10
+      },
+      {
+        "From": "18c6b227-10a5-498e-b615-805fefc62f5a",
+        "Type": 1,
+        "To": "5bed6977-5d00-4c91-a521-ed316e758b34",
+        "Cost": 877.8443
+      },
+      {
+        "From": "18c6b227-10a5-498e-b615-805fefc62f5a",
+        "Type": 1,
+        "To": "e9392ee3-4070-4875-9525-a3aac56ca8d8",
+        "Cost": 550.5453
+      },
+      {
+        "From": "18c6b227-10a5-498e-b615-805fefc62f5a",
+        "Type": 1,
+        "To": "1ad55727-ea1f-466a-8bd0-b536241e1281",
+        "Cost": 274.9039
+      },
+      {
+        "From": "18c6b227-10a5-498e-b615-805fefc62f5a",
+        "Type": 1,
+        "To": "fcf9a732-65f8-4f05-aa4c-7f9f59b14c1b",
+        "Cost": 342.2235
+      },
+      {
+        "From": "18c6b227-10a5-498e-b615-805fefc62f5a",
+        "Type": 1,
+        "To": "4e742f28-4c5e-421b-9c3a-2fe85eae98a9",
+        "Cost": 185.94647
+      },
+      {
+        "From": "18c6b227-10a5-498e-b615-805fefc62f5a",
+        "Type": 1,
+        "To": "402a0e79-d725-4ac8-aeca-ca2712000577",
+        "Cost": 428.99448
+      },
+      {
+        "From": "18c6b227-10a5-498e-b615-805fefc62f5a",
+        "Type": 1,
+        "To": "d895241b-159a-4ccf-aa7d-1d9478cc238c",
+        "Cost": 450.00073
+      },
+      {
+        "From": "18c6b227-10a5-498e-b615-805fefc62f5a",
+        "Type": 1,
+        "To": "d45f7ef7-e39f-4a6c-b957-5c6df74a2282",
+        "Cost": 423.7797
+      },
+      {
+        "From": "18c6b227-10a5-498e-b615-805fefc62f5a",
+        "Type": 1,
+        "To": "73fb41e4-abf9-4e83-8bdc-0a5749041ee8",
+        "Cost": 714.9291
+      },
+      {
+        "From": "18c6b227-10a5-498e-b615-805fefc62f5a",
+        "Type": 1,
+        "To": "8880336f-98ec-4bed-af56-e3e54f77c6d9",
+        "Cost": 931.55273
+      },
+      {
+        "From": "18c6b227-10a5-498e-b615-805fefc62f5a",
+        "Type": 1,
+        "To": "0b540e6f-6f78-4558-a978-c5e58f76e2ce",
+        "Cost": 774.8789
+      }
+    ],
+    "fd8b0d59-b026-4aa9-8a92-69ca2b82131c": [
+      {
+        "From": "fd8b0d59-b026-4aa9-8a92-69ca2b82131c",
+        "Type": 0,
+        "To": "2148f604-4c90-402f-b068-64231c9c7b82",
+        "Cost": 10
+      },
+      {
+        "From": "fd8b0d59-b026-4aa9-8a92-69ca2b82131c",
+        "Type": 0,
+        "To": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+        "Cost": 10
+      },
+      {
+        "From": "fd8b0d59-b026-4aa9-8a92-69ca2b82131c",
+        "Type": 0,
+        "To": "18c6b227-10a5-498e-b615-805fefc62f5a",
+        "Cost": 10
+      },
+      {
+        "From": "fd8b0d59-b026-4aa9-8a92-69ca2b82131c",
+        "Type": 0,
+        "To": "8050d475-e969-474c-aa95-757c553df685",
+        "Cost": 10
+      },
+      {
+        "From": "fd8b0d59-b026-4aa9-8a92-69ca2b82131c",
+        "Type": 0,
+        "To": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Cost": 10
+      },
+      {
+        "From": "fd8b0d59-b026-4aa9-8a92-69ca2b82131c",
+        "Type": 1,
+        "To": "3b1a2122-e8bc-4718-b6e8-72bf8c7f98fb",
+        "Cost": 335.5678
+      },
+      {
+        "From": "fd8b0d59-b026-4aa9-8a92-69ca2b82131c",
+        "Type": 1,
+        "To": "164c8795-f1a6-498a-a987-e3e7837ac4bd",
+        "Cost": 759.73413
+      },
+      {
+        "From": "fd8b0d59-b026-4aa9-8a92-69ca2b82131c",
+        "Type": 1,
+        "To": "f395b43b-d395-49a8-a3db-5b26460b7d3b",
+        "Cost": 561.3818
+      },
+      {
+        "From": "fd8b0d59-b026-4aa9-8a92-69ca2b82131c",
+        "Type": 1,
+        "To": "779c2c41-629e-4a50-bd54-befaf89dc1d5",
+        "Cost": 584.91986
+      },
+      {
+        "From": "fd8b0d59-b026-4aa9-8a92-69ca2b82131c",
+        "Type": 1,
+        "To": "e35df5c3-b249-4787-95ac-09d3e7b1cb15",
+        "Cost": 960.68134
+      },
+      {
+        "From": "fd8b0d59-b026-4aa9-8a92-69ca2b82131c",
+        "Type": 1,
+        "To": "a918821a-236f-41be-82c9-c7d49aa2323f",
+        "Cost": 599.22766
+      },
+      {
+        "From": "fd8b0d59-b026-4aa9-8a92-69ca2b82131c",
+        "Type": 1,
+        "To": "bd3da5ad-90b7-4af9-b672-16d19cec7248",
+        "Cost": 575.3376
+      },
+      {
+        "From": "fd8b0d59-b026-4aa9-8a92-69ca2b82131c",
+        "Type": 1,
+        "To": "4c1ddc78-d5f8-41b5-9042-c2e3f28dc3ed",
+        "Cost": 2099.6638
+      },
+      {
+        "From": "fd8b0d59-b026-4aa9-8a92-69ca2b82131c",
+        "Type": 1,
+        "To": "9f81e740-adcd-425b-be88-ebd25e2ef8dc",
+        "Cost": 193.62364
+      },
+      {
+        "From": "fd8b0d59-b026-4aa9-8a92-69ca2b82131c",
+        "Type": 1,
+        "To": "4193bf17-c79e-4ab5-93cc-396521973f51",
+        "Cost": 1420.3658
+      },
+      {
+        "From": "fd8b0d59-b026-4aa9-8a92-69ca2b82131c",
+        "Type": 1,
+        "To": "f2818385-42c0-444b-90ee-09667899778e",
+        "Cost": 751.77246
+      }
+    ],
+    "8050d475-e969-474c-aa95-757c553df685": [
+      {
+        "From": "8050d475-e969-474c-aa95-757c553df685",
+        "Type": 0,
+        "To": "2148f604-4c90-402f-b068-64231c9c7b82",
+        "Cost": 10
+      },
+      {
+        "From": "8050d475-e969-474c-aa95-757c553df685",
+        "Type": 0,
+        "To": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+        "Cost": 10
+      },
+      {
+        "From": "8050d475-e969-474c-aa95-757c553df685",
+        "Type": 0,
+        "To": "18c6b227-10a5-498e-b615-805fefc62f5a",
+        "Cost": 10
+      },
+      {
+        "From": "8050d475-e969-474c-aa95-757c553df685",
+        "Type": 0,
+        "To": "fd8b0d59-b026-4aa9-8a92-69ca2b82131c",
+        "Cost": 10
+      },
+      {
+        "From": "8050d475-e969-474c-aa95-757c553df685",
+        "Type": 0,
+        "To": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Cost": 10
+      },
+      {
+        "From": "8050d475-e969-474c-aa95-757c553df685",
+        "Type": 1,
+        "To": "1fde5e4a-3f29-498b-a518-3bfe142d5772",
+        "Cost": 421.3208
+      },
+      {
+        "From": "8050d475-e969-474c-aa95-757c553df685",
+        "Type": 1,
+        "To": "5bed6977-5d00-4c91-a521-ed316e758b34",
+        "Cost": 185.87285
+      },
+      {
+        "From": "8050d475-e969-474c-aa95-757c553df685",
+        "Type": 1,
+        "To": "3b1a2122-e8bc-4718-b6e8-72bf8c7f98fb",
+        "Cost": 1189.6967
+      },
+      {
+        "From": "8050d475-e969-474c-aa95-757c553df685",
+        "Type": 1,
+        "To": "e9392ee3-4070-4875-9525-a3aac56ca8d8",
+        "Cost": 225.48596
+      },
+      {
+        "From": "8050d475-e969-474c-aa95-757c553df685",
+        "Type": 1,
+        "To": "7895f394-d28c-4f1a-841f-f254b5db2f5e",
+        "Cost": 638.25946
+      },
+      {
+        "From": "8050d475-e969-474c-aa95-757c553df685",
+        "Type": 1,
+        "To": "1ad55727-ea1f-466a-8bd0-b536241e1281",
+        "Cost": 592.3349
+      },
+      {
+        "From": "8050d475-e969-474c-aa95-757c553df685",
+        "Type": 1,
+        "To": "bd3da5ad-90b7-4af9-b672-16d19cec7248",
+        "Cost": 832.73914
+      },
+      {
+        "From": "8050d475-e969-474c-aa95-757c553df685",
+        "Type": 1,
+        "To": "d45f7ef7-e39f-4a6c-b957-5c6df74a2282",
+        "Cost": 774.5581
+      },
+      {
+        "From": "8050d475-e969-474c-aa95-757c553df685",
+        "Type": 1,
+        "To": "4c1ddc78-d5f8-41b5-9042-c2e3f28dc3ed",
+        "Cost": 976.997
+      },
+      {
+        "From": "8050d475-e969-474c-aa95-757c553df685",
+        "Type": 1,
+        "To": "ac49c247-55a8-4860-9ea5-5b520d7eacf3",
+        "Cost": 505.2667
+      },
+      {
+        "From": "8050d475-e969-474c-aa95-757c553df685",
+        "Type": 1,
+        "To": "4193bf17-c79e-4ab5-93cc-396521973f51",
+        "Cost": 539.36804
+      },
+      {
+        "From": "8050d475-e969-474c-aa95-757c553df685",
+        "Type": 1,
+        "To": "8880336f-98ec-4bed-af56-e3e54f77c6d9",
+        "Cost": 289.92896
+      },
+      {
+        "From": "8050d475-e969-474c-aa95-757c553df685",
+        "Type": 1,
+        "To": "0b540e6f-6f78-4558-a978-c5e58f76e2ce",
+        "Cost": 793.9966
+      }
+    ],
+    "57739f04-5baf-4b40-8ced-9dd82bf04ddc": [
+      {
+        "From": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Type": 0,
+        "To": "2148f604-4c90-402f-b068-64231c9c7b82",
+        "Cost": 10
+      },
+      {
+        "From": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Type": 0,
+        "To": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+        "Cost": 10
+      },
+      {
+        "From": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Type": 0,
+        "To": "18c6b227-10a5-498e-b615-805fefc62f5a",
+        "Cost": 10
+      },
+      {
+        "From": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Type": 0,
+        "To": "fd8b0d59-b026-4aa9-8a92-69ca2b82131c",
+        "Cost": 10
+      },
+      {
+        "From": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Type": 0,
+        "To": "8050d475-e969-474c-aa95-757c553df685",
+        "Cost": 10
+      },
+      {
+        "From": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Type": 1,
+        "To": "5bed6977-5d00-4c91-a521-ed316e758b34",
+        "Cost": 948.83234
+      },
+      {
+        "From": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Type": 1,
+        "To": "3b1a2122-e8bc-4718-b6e8-72bf8c7f98fb",
+        "Cost": 1891.0537
+      },
+      {
+        "From": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Type": 1,
+        "To": "e9392ee3-4070-4875-9525-a3aac56ca8d8",
+        "Cost": 611.8277
+      },
+      {
+        "From": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Type": 1,
+        "To": "558e38a0-46ff-40e1-9afc-1807c5c27d1e",
+        "Cost": 1475.1757
+      },
+      {
+        "From": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Type": 1,
+        "To": "164c8795-f1a6-498a-a987-e3e7837ac4bd",
+        "Cost": 1769.1248
+      },
+      {
+        "From": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Type": 1,
+        "To": "f395b43b-d395-49a8-a3db-5b26460b7d3b",
+        "Cost": 2055.8123
+      },
+      {
+        "From": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Type": 1,
+        "To": "1ad55727-ea1f-466a-8bd0-b536241e1281",
+        "Cost": 712.8913
+      },
+      {
+        "From": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Type": 1,
+        "To": "e35df5c3-b249-4787-95ac-09d3e7b1cb15",
+        "Cost": 1592.9404
+      },
+      {
+        "From": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Type": 1,
+        "To": "402a0e79-d725-4ac8-aeca-ca2712000577",
+        "Cost": 1034.5283
+      },
+      {
+        "From": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Type": 1,
+        "To": "a918821a-236f-41be-82c9-c7d49aa2323f",
+        "Cost": 1749.974
+      },
+      {
+        "From": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Type": 1,
+        "To": "d895241b-159a-4ccf-aa7d-1d9478cc238c",
+        "Cost": 1266.8713
+      },
+      {
+        "From": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Type": 1,
+        "To": "bd3da5ad-90b7-4af9-b672-16d19cec7248",
+        "Cost": 1640.0901
+      },
+      {
+        "From": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Type": 1,
+        "To": "d45f7ef7-e39f-4a6c-b957-5c6df74a2282",
+        "Cost": 972.49414
+      },
+      {
+        "From": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Type": 1,
+        "To": "4c1ddc78-d5f8-41b5-9042-c2e3f28dc3ed",
+        "Cost": 243.77081
+      },
+      {
+        "From": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Type": 1,
+        "To": "9f81e740-adcd-425b-be88-ebd25e2ef8dc",
+        "Cost": 1857.0775
+      },
+      {
+        "From": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Type": 1,
+        "To": "73fb41e4-abf9-4e83-8bdc-0a5749041ee8",
+        "Cost": 1365.2527
+      },
+      {
+        "From": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Type": 1,
+        "To": "4193bf17-c79e-4ab5-93cc-396521973f51",
+        "Cost": 1376.5404
+      },
+      {
+        "From": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Type": 1,
+        "To": "8880336f-98ec-4bed-af56-e3e54f77c6d9",
+        "Cost": 1044.4756
+      },
+      {
+        "From": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Type": 1,
+        "To": "0b540e6f-6f78-4558-a978-c5e58f76e2ce",
+        "Cost": 245.91626
+      }
+    ],
+    "1fde5e4a-3f29-498b-a518-3bfe142d5772": [
+      {
+        "From": "1fde5e4a-3f29-498b-a518-3bfe142d5772",
+        "Type": 1,
+        "To": "8050d475-e969-474c-aa95-757c553df685",
+        "Cost": 421.61383
+      }
+    ],
+    "5bed6977-5d00-4c91-a521-ed316e758b34": [
+      {
+        "From": "5bed6977-5d00-4c91-a521-ed316e758b34",
+        "Type": 1,
+        "To": "8050d475-e969-474c-aa95-757c553df685",
+        "Cost": 186.1659
+      },
+      {
+        "From": "5bed6977-5d00-4c91-a521-ed316e758b34",
+        "Type": 1,
+        "To": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Cost": 952.1145
+      },
+      {
+        "From": "5bed6977-5d00-4c91-a521-ed316e758b34",
+        "Type": 1,
+        "To": "18c6b227-10a5-498e-b615-805fefc62f5a",
+        "Cost": 885.2272
+      }
+    ],
+    "d899bb1a-0a0f-4369-a67e-cb1aa55ca72e": [
+      {
+        "From": "d899bb1a-0a0f-4369-a67e-cb1aa55ca72e",
+        "Type": 1,
+        "To": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+        "Cost": 584.7622
+      }
+    ],
+    "3b1a2122-e8bc-4718-b6e8-72bf8c7f98fb": [
+      {
+        "From": "3b1a2122-e8bc-4718-b6e8-72bf8c7f98fb",
+        "Type": 1,
+        "To": "fd8b0d59-b026-4aa9-8a92-69ca2b82131c",
+        "Cost": 340.5247
+      },
+      {
+        "From": "3b1a2122-e8bc-4718-b6e8-72bf8c7f98fb",
+        "Type": 1,
+        "To": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Cost": 1896.0643
+      },
+      {
+        "From": "3b1a2122-e8bc-4718-b6e8-72bf8c7f98fb",
+        "Type": 1,
+        "To": "8050d475-e969-474c-aa95-757c553df685",
+        "Cost": 1173.3444
+      }
+    ],
+    "e9392ee3-4070-4875-9525-a3aac56ca8d8": [
+      {
+        "From": "e9392ee3-4070-4875-9525-a3aac56ca8d8",
+        "Type": 1,
+        "To": "8050d475-e969-474c-aa95-757c553df685",
+        "Cost": 240.51906
+      },
+      {
+        "From": "e9392ee3-4070-4875-9525-a3aac56ca8d8",
+        "Type": 1,
+        "To": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Cost": 619.6187
+      },
+      {
+        "From": "e9392ee3-4070-4875-9525-a3aac56ca8d8",
+        "Type": 1,
+        "To": "18c6b227-10a5-498e-b615-805fefc62f5a",
+        "Cost": 554.671
+      }
+    ],
+    "558e38a0-46ff-40e1-9afc-1807c5c27d1e": [
+      {
+        "From": "558e38a0-46ff-40e1-9afc-1807c5c27d1e",
+        "Type": 1,
+        "To": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+        "Cost": 411.62323
+      },
+      {
+        "From": "558e38a0-46ff-40e1-9afc-1807c5c27d1e",
+        "Type": 1,
+        "To": "2148f604-4c90-402f-b068-64231c9c7b82",
+        "Cost": 892.81976
+      },
+      {
+        "From": "558e38a0-46ff-40e1-9afc-1807c5c27d1e",
+        "Type": 1,
+        "To": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Cost": 1499.8619
+      }
+    ],
+    "7895f394-d28c-4f1a-841f-f254b5db2f5e": [
+      {
+        "From": "7895f394-d28c-4f1a-841f-f254b5db2f5e",
+        "Type": 1,
+        "To": "8050d475-e969-474c-aa95-757c553df685",
+        "Cost": 619.129
+      }
+    ],
+    "164c8795-f1a6-498a-a987-e3e7837ac4bd": [
+      {
+        "From": "164c8795-f1a6-498a-a987-e3e7837ac4bd",
+        "Type": 1,
+        "To": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+        "Cost": 370.42877
+      },
+      {
+        "From": "164c8795-f1a6-498a-a987-e3e7837ac4bd",
+        "Type": 1,
+        "To": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Cost": 1765.6681
+      },
+      {
+        "From": "164c8795-f1a6-498a-a987-e3e7837ac4bd",
+        "Type": 1,
+        "To": "fd8b0d59-b026-4aa9-8a92-69ca2b82131c",
+        "Cost": 763.2687
+      }
+    ],
+    "f395b43b-d395-49a8-a3db-5b26460b7d3b": [
+      {
+        "From": "f395b43b-d395-49a8-a3db-5b26460b7d3b",
+        "Type": 1,
+        "To": "fd8b0d59-b026-4aa9-8a92-69ca2b82131c",
+        "Cost": 572.6353
+      },
+      {
+        "From": "f395b43b-d395-49a8-a3db-5b26460b7d3b",
+        "Type": 1,
+        "To": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+        "Cost": 660.3482
+      },
+      {
+        "From": "f395b43b-d395-49a8-a3db-5b26460b7d3b",
+        "Type": 1,
+        "To": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Cost": 2094.961
+      }
+    ],
+    "1ad55727-ea1f-466a-8bd0-b536241e1281": [
+      {
+        "From": "1ad55727-ea1f-466a-8bd0-b536241e1281",
+        "Type": 1,
+        "To": "18c6b227-10a5-498e-b615-805fefc62f5a",
+        "Cost": 266.34894
+      },
+      {
+        "From": "1ad55727-ea1f-466a-8bd0-b536241e1281",
+        "Type": 1,
+        "To": "8050d475-e969-474c-aa95-757c553df685",
+        "Cost": 594.62244
+      },
+      {
+        "From": "1ad55727-ea1f-466a-8bd0-b536241e1281",
+        "Type": 1,
+        "To": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Cost": 716.4402
+      }
+    ],
+    "fcf9a732-65f8-4f05-aa4c-7f9f59b14c1b": [
+      {
+        "From": "fcf9a732-65f8-4f05-aa4c-7f9f59b14c1b",
+        "Type": 1,
+        "To": "18c6b227-10a5-498e-b615-805fefc62f5a",
+        "Cost": 339.28818
+      }
+    ],
+    "4e742f28-4c5e-421b-9c3a-2fe85eae98a9": [
+      {
+        "From": "4e742f28-4c5e-421b-9c3a-2fe85eae98a9",
+        "Type": 1,
+        "To": "18c6b227-10a5-498e-b615-805fefc62f5a",
+        "Cost": 186.10498
+      }
+    ],
+    "779c2c41-629e-4a50-bd54-befaf89dc1d5": [
+      {
+        "From": "779c2c41-629e-4a50-bd54-befaf89dc1d5",
+        "Type": 1,
+        "To": "fd8b0d59-b026-4aa9-8a92-69ca2b82131c",
+        "Cost": 611.0368
+      }
+    ],
+    "e35df5c3-b249-4787-95ac-09d3e7b1cb15": [
+      {
+        "From": "e35df5c3-b249-4787-95ac-09d3e7b1cb15",
+        "Type": 1,
+        "To": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+        "Cost": 297.8538
+      },
+      {
+        "From": "e35df5c3-b249-4787-95ac-09d3e7b1cb15",
+        "Type": 1,
+        "To": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Cost": 1592.0938
+      },
+      {
+        "From": "e35df5c3-b249-4787-95ac-09d3e7b1cb15",
+        "Type": 1,
+        "To": "fd8b0d59-b026-4aa9-8a92-69ca2b82131c",
+        "Cost": 966.64014
+      }
+    ],
+    "402a0e79-d725-4ac8-aeca-ca2712000577": [
+      {
+        "From": "402a0e79-d725-4ac8-aeca-ca2712000577",
+        "Type": 1,
+        "To": "18c6b227-10a5-498e-b615-805fefc62f5a",
+        "Cost": 412.79428
+      },
+      {
+        "From": "402a0e79-d725-4ac8-aeca-ca2712000577",
+        "Type": 1,
+        "To": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Cost": 1034.7842
+      },
+      {
+        "From": "402a0e79-d725-4ac8-aeca-ca2712000577",
+        "Type": 1,
+        "To": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+        "Cost": 998.72656
+      }
+    ],
+    "a918821a-236f-41be-82c9-c7d49aa2323f": [
+      {
+        "From": "a918821a-236f-41be-82c9-c7d49aa2323f",
+        "Type": 1,
+        "To": "fd8b0d59-b026-4aa9-8a92-69ca2b82131c",
+        "Cost": 602.7338
+      },
+      {
+        "From": "a918821a-236f-41be-82c9-c7d49aa2323f",
+        "Type": 1,
+        "To": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Cost": 1761.0453
+      },
+      {
+        "From": "a918821a-236f-41be-82c9-c7d49aa2323f",
+        "Type": 1,
+        "To": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+        "Cost": 547.57056
+      }
+    ],
+    "d895241b-159a-4ccf-aa7d-1d9478cc238c": [
+      {
+        "From": "d895241b-159a-4ccf-aa7d-1d9478cc238c",
+        "Type": 1,
+        "To": "18c6b227-10a5-498e-b615-805fefc62f5a",
+        "Cost": 458.3151
+      },
+      {
+        "From": "d895241b-159a-4ccf-aa7d-1d9478cc238c",
+        "Type": 1,
+        "To": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Cost": 1306.0667
+      },
+      {
+        "From": "d895241b-159a-4ccf-aa7d-1d9478cc238c",
+        "Type": 1,
+        "To": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+        "Cost": 1172.8682
+      }
+    ],
+    "bd3da5ad-90b7-4af9-b672-16d19cec7248": [
+      {
+        "From": "bd3da5ad-90b7-4af9-b672-16d19cec7248",
+        "Type": 1,
+        "To": "fd8b0d59-b026-4aa9-8a92-69ca2b82131c",
+        "Cost": 612.6242
+      },
+      {
+        "From": "bd3da5ad-90b7-4af9-b672-16d19cec7248",
+        "Type": 1,
+        "To": "8050d475-e969-474c-aa95-757c553df685",
+        "Cost": 809.60565
+      },
+      {
+        "From": "bd3da5ad-90b7-4af9-b672-16d19cec7248",
+        "Type": 1,
+        "To": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Cost": 1639.2421
+      }
+    ],
+    "d45f7ef7-e39f-4a6c-b957-5c6df74a2282": [
+      {
+        "From": "d45f7ef7-e39f-4a6c-b957-5c6df74a2282",
+        "Type": 1,
+        "To": "18c6b227-10a5-498e-b615-805fefc62f5a",
+        "Cost": 404.18094
+      },
+      {
+        "From": "d45f7ef7-e39f-4a6c-b957-5c6df74a2282",
+        "Type": 1,
+        "To": "8050d475-e969-474c-aa95-757c553df685",
+        "Cost": 788.3162
+      },
+      {
+        "From": "d45f7ef7-e39f-4a6c-b957-5c6df74a2282",
+        "Type": 1,
+        "To": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Cost": 973.5586
+      }
+    ],
+    "4c1ddc78-d5f8-41b5-9042-c2e3f28dc3ed": [
+      {
+        "From": "4c1ddc78-d5f8-41b5-9042-c2e3f28dc3ed",
+        "Type": 1,
+        "To": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Cost": 243.77083
+      },
+      {
+        "From": "4c1ddc78-d5f8-41b5-9042-c2e3f28dc3ed",
+        "Type": 1,
+        "To": "8050d475-e969-474c-aa95-757c553df685",
+        "Cost": 956.686
+      },
+      {
+        "From": "4c1ddc78-d5f8-41b5-9042-c2e3f28dc3ed",
+        "Type": 1,
+        "To": "fd8b0d59-b026-4aa9-8a92-69ca2b82131c",
+        "Cost": 2129.3306
+      }
+    ],
+    "9f81e740-adcd-425b-be88-ebd25e2ef8dc": [
+      {
+        "From": "9f81e740-adcd-425b-be88-ebd25e2ef8dc",
+        "Type": 1,
+        "To": "fd8b0d59-b026-4aa9-8a92-69ca2b82131c",
+        "Cost": 200.8006
+      },
+      {
+        "From": "9f81e740-adcd-425b-be88-ebd25e2ef8dc",
+        "Type": 1,
+        "To": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Cost": 1841.766
+      },
+      {
+        "From": "9f81e740-adcd-425b-be88-ebd25e2ef8dc",
+        "Type": 1,
+        "To": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+        "Cost": 898.0403
+      }
+    ],
+    "08a54d58-cac4-4f86-a8ec-dbdcb8de85d5": [
+      {
+        "From": "08a54d58-cac4-4f86-a8ec-dbdcb8de85d5",
+        "Type": 1,
+        "To": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+        "Cost": 419.80417
+      }
+    ],
+    "73fb41e4-abf9-4e83-8bdc-0a5749041ee8": [
+      {
+        "From": "73fb41e4-abf9-4e83-8bdc-0a5749041ee8",
+        "Type": 1,
+        "To": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+        "Cost": 625.7902
+      },
+      {
+        "From": "73fb41e4-abf9-4e83-8bdc-0a5749041ee8",
+        "Type": 1,
+        "To": "18c6b227-10a5-498e-b615-805fefc62f5a",
+        "Cost": 765.03
+      },
+      {
+        "From": "73fb41e4-abf9-4e83-8bdc-0a5749041ee8",
+        "Type": 1,
+        "To": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Cost": 1379.2533
+      }
+    ],
+    "ac49c247-55a8-4860-9ea5-5b520d7eacf3": [
+      {
+        "From": "ac49c247-55a8-4860-9ea5-5b520d7eacf3",
+        "Type": 1,
+        "To": "8050d475-e969-474c-aa95-757c553df685",
+        "Cost": 510.82153
+      }
+    ],
+    "4193bf17-c79e-4ab5-93cc-396521973f51": [
+      {
+        "From": "4193bf17-c79e-4ab5-93cc-396521973f51",
+        "Type": 1,
+        "To": "8050d475-e969-474c-aa95-757c553df685",
+        "Cost": 534.84875
+      },
+      {
+        "From": "4193bf17-c79e-4ab5-93cc-396521973f51",
+        "Type": 1,
+        "To": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Cost": 1380.4972
+      },
+      {
+        "From": "4193bf17-c79e-4ab5-93cc-396521973f51",
+        "Type": 1,
+        "To": "fd8b0d59-b026-4aa9-8a92-69ca2b82131c",
+        "Cost": 1443.2065
+      }
+    ],
+    "8880336f-98ec-4bed-af56-e3e54f77c6d9": [
+      {
+        "From": "8880336f-98ec-4bed-af56-e3e54f77c6d9",
+        "Type": 1,
+        "To": "8050d475-e969-474c-aa95-757c553df685",
+        "Cost": 293.8827
+      },
+      {
+        "From": "8880336f-98ec-4bed-af56-e3e54f77c6d9",
+        "Type": 1,
+        "To": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Cost": 1052.7445
+      },
+      {
+        "From": "8880336f-98ec-4bed-af56-e3e54f77c6d9",
+        "Type": 1,
+        "To": "18c6b227-10a5-498e-b615-805fefc62f5a",
+        "Cost": 953.4954
+      }
+    ],
+    "f2818385-42c0-444b-90ee-09667899778e": [
+      {
+        "From": "f2818385-42c0-444b-90ee-09667899778e",
+        "Type": 1,
+        "To": "e79f1a90-aa9b-4503-b08a-868b3ab0da3e",
+        "Cost": 370.65347
+      },
+      {
+        "From": "f2818385-42c0-444b-90ee-09667899778e",
+        "Type": 1,
+        "To": "fd8b0d59-b026-4aa9-8a92-69ca2b82131c",
+        "Cost": 758.737
+      },
+      {
+        "From": "f2818385-42c0-444b-90ee-09667899778e",
+        "Type": 1,
+        "To": "2148f604-4c90-402f-b068-64231c9c7b82",
+        "Cost": 964.46704
+      }
+    ],
+    "0b540e6f-6f78-4558-a978-c5e58f76e2ce": [
+      {
+        "From": "0b540e6f-6f78-4558-a978-c5e58f76e2ce",
+        "Type": 1,
+        "To": "57739f04-5baf-4b40-8ced-9dd82bf04ddc",
+        "Cost": 236.70517
+      },
+      {
+        "From": "0b540e6f-6f78-4558-a978-c5e58f76e2ce",
+        "Type": 1,
+        "To": "18c6b227-10a5-498e-b615-805fefc62f5a",
+        "Cost": 779.3743
+      },
+      {
+        "From": "0b540e6f-6f78-4558-a978-c5e58f76e2ce",
+        "Type": 1,
+        "To": "8050d475-e969-474c-aa95-757c553df685",
+        "Cost": 807.87933
+      }
+    ]
+  }
+}

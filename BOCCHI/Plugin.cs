@@ -169,14 +169,11 @@ public sealed class Plugin(IDalamudPluginInterface plugin, IPluginLog logger) : 
     private static void BootstrapConfiguration(IServiceCollection services, IDalamudPluginInterface plugin, IPluginLog logger)
     {
         ConfigMigrator migrator = new(plugin, logger);
-        if (migrator.ShouldMigrate())
-        {
-            migrator.Migrate();
-        }
+        bool migrated = !migrator.ShouldMigrate() || migrator.Migrate();
 
         migrator.PruneBackups();
 
-        Configuration cfg = plugin.GetPluginConfig() as Configuration ?? new Configuration();
+        Configuration cfg = LoadConfiguration(plugin, logger, migrated);
         EnsureAutoConfigInstances(cfg);
         EnsureConfigDefaults(cfg);
         SanitizeCombatAutorotation(cfg.AutomatorConfig, plugin, logger);
@@ -239,6 +236,26 @@ public sealed class Plugin(IDalamudPluginInterface plugin, IPluginLog logger) : 
         SanitizeShoppingConfig(cfg.ShoppingConfig);
     }
 
+    private static Configuration LoadConfiguration(IDalamudPluginInterface plugin, IPluginLog logger, bool migrated)
+    {
+        // A file that could not be migrated would load as a half-filled new config; start clean, the old one is backed up.
+        if (!migrated)
+        {
+            logger.Error("Settings could not be updated to this version; starting from defaults (your old settings are in the backup)");
+            return new Configuration();
+        }
+
+        try
+        {
+            return plugin.GetPluginConfig() as Configuration ?? new Configuration();
+        }
+        catch (Exception ex)
+        {
+            logger.Error(ex, "Settings file could not be read; starting from defaults");
+            return new Configuration();
+        }
+    }
+
     private static void SanitizeCombatAutorotation(
         AutomatorConfig automator,
         IDalamudPluginInterface plugin,
@@ -258,11 +275,11 @@ public sealed class Plugin(IDalamudPluginInterface plugin, IPluginLog logger) : 
             return;
         }
 
+        // Plugins may still be loading at game start; keep the choice, a mode checks the plugin again when it starts.
         logger.Info(
-            "Illegal Mode combat was set to {Backend}, but {Plugin} is not installed — falling back to None.",
+            "Illegal Mode combat is set to {Backend}, but {Plugin} is not loaded yet",
             automator.CombatAutorotation,
             required);
-        automator.CombatAutorotation = CombatAutorotation.None;
     }
 
     private static void SanitizeAutomatorConfig(AutomatorConfig automator)

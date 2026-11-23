@@ -20,12 +20,12 @@ public class ConfigMigrator(IDalamudPluginInterface plugin, IPluginLog logger)
         return version < Configuration.CurrentVersion;
     }
 
-    public void Migrate()
+    public bool Migrate()
     {
         if (GetCurrentConfigJObject() is not { } config)
         {
             logger.Warning("No config file found");
-            return;
+            return true;
         }
 
         ConfigurationMigrationResolver resolver = new([
@@ -58,26 +58,36 @@ public class ConfigMigrator(IDalamudPluginInterface plugin, IPluginLog logger)
         if (!resolver.CanMigrateTo(version, Configuration.CurrentVersion))
         {
             FailMigration(version);
-            return;
+            return false;
         }
 
-        JObject? latest = Migrate(config, version, resolver);
-        if (latest == null)
+        Configuration? output;
+        try
         {
-            FailMigration(version);
-            return;
+            output = Migrate(config, version, resolver)?.ToObject<Configuration>();
+        }
+        catch (Exception ex)
+        {
+            logger.Error(ex, "Config migration from {0} threw", version);
+            output = null;
         }
 
-        Configuration? output = latest.ToObject<Configuration>();
         if (output == null)
         {
             FailMigration(version);
-            return;
+            return false;
+        }
+
+        // Never overwrite the user's settings without a copy of what they had.
+        if (!BackupConfig(version))
+        {
+            logger.Error("Config backup failed; leaving the settings file untouched");
+            return false;
         }
 
         logger.Info("Successfully migrated config from {0} to {1}.", version, Configuration.CurrentVersion);
-        BackupConfig(version);
         File.WriteAllText(GetConfigFilePath(), JsonConvert.SerializeObject(output, Formatting.Indented));
+        return true;
     }
 
     private void FailMigration(int version)
@@ -108,13 +118,13 @@ public class ConfigMigrator(IDalamudPluginInterface plugin, IPluginLog logger)
         return config;
     }
 
-    private void BackupConfig(int version)
+    private bool BackupConfig(int version)
     {
         string path = GetConfigFilePath();
         if (!File.Exists(path))
         {
             logger.Warning("Tried backing up config of version {0} but could not read config from path {1}.", version, path);
-            return;
+            return false;
         }
 
         string backupPath = GetConfigFileBackupPath(version);
@@ -127,18 +137,14 @@ public class ConfigMigrator(IDalamudPluginInterface plugin, IPluginLog logger)
                 Directory.CreateDirectory(dir);
             }
 
-            if (File.Exists(backupPath))
-            {
-                logger.Warning("Config backup already exists: {Path}", backupPath);
-                return;
-            }
-
-            File.Copy(path, backupPath);
+            File.Copy(path, backupPath, overwrite: true);
             logger.Info("Backed up config file to {Path}", backupPath);
+            return true;
         }
         catch (Exception ex)
         {
             logger.Error(ex, "Failed to back up config file");
+            return false;
         }
     }
 
@@ -150,7 +156,7 @@ public class ConfigMigrator(IDalamudPluginInterface plugin, IPluginLog logger)
                 .EnumerateFiles(GetPluginConfigsDirectory(), $"{BackupPrefix}*.json")
                 .Select(path => (Path: path, Version: TryParseBackupVersion(path)))
                 .Where(b => b.Version != null)
-                .OrderByDescending(b => b.Version);
+                .OrderByDescending(b => File.GetLastWriteTimeUtc(b.Path));
 
             foreach ((string path, int? version) in backups.Skip(1))
             {

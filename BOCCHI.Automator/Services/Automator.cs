@@ -96,7 +96,7 @@ public class Automator
             "Illegal Mode suspend for treasure hunt: {Was} → {Now} (state was {State})",
             SuspendedForTreasure,
             suspended,
-            CurrentState?.ToString() ?? "null");
+            CurrentState?.ToString() ?? "none");
         SuspendedForTreasure = suspended;
         if (!suspended)
         {
@@ -119,7 +119,7 @@ public class Automator
             "Illegal Mode suspend for shopping: {Was} → {Now} (state was {State})",
             SuspendedForShopping,
             suspended,
-            CurrentState?.ToString() ?? "null");
+            CurrentState?.ToString() ?? "none");
         SuspendedForShopping = suspended;
         if (!suspended)
         {

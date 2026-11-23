@@ -4,9 +4,7 @@ using BOCCHI.Common.Services;
 using Dalamud.Plugin;
 using Ocelot.Lifecycle;
 using Ocelot.Services.Logger;
-using System.Net.Http;
 using System.Numerics;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -24,7 +22,7 @@ public sealed class CofferLocationSyncService
     IZoneProvider zones,
     IDalamudPluginInterface plugin,
     ILogger<CofferLocationSyncService> logger
-) : IOnUpdate
+) : CrowdsourceLocationSync<CrowdsourcedCofferCandidate>, IOnUpdate
 {
     public const string ApiBaseUrl = PotCycleSyncService.ApiBaseUrl;
 
@@ -35,28 +33,6 @@ public sealed class CofferLocationSyncService
     public const float MatchRadius = 3.5f;
 
     public const float MatchRadiusSq = MatchRadius * MatchRadius;
-
-    private readonly Queue<PendingSubmit> queue = new();
-
-    private readonly HashSet<string> queuedKeys = new(StringComparer.Ordinal);
-
-    private readonly HashSet<string> submittedKeys = new(StringComparer.Ordinal);
-
-    private DateTime nextUploadAttemptUtc = DateTime.MinValue;
-
-    private DateTime nextCatalogFetchUtc = DateTime.MinValue;
-
-    private ushort catalogTerritory;
-
-    private bool uploadInFlight;
-
-    private bool catalogInFlight;
-
-    private UploadOutcome? completedUpload;
-
-    private CatalogOutcome? completedCatalog;
-
-    private IReadOnlyList<CrowdsourcedCofferCandidate> accepted = [];
 
     public UpdateLimit UpdateLimit =>
         new()
@@ -83,8 +59,18 @@ public sealed class CofferLocationSyncService
             return;
         }
 
-        StartCatalogRefresh(zones.GetZone().TerritoryType, force: true);
+        // Route planning calls this after every coffer; a forced download each time floods the server.
+        ushort territory = zones.GetZone().TerritoryType;
+        bool stale = catalogTerritory != territory || DateTime.UtcNow - lastForcedRefreshUtc > TimeSpan.FromMinutes(2);
+        if (stale)
+        {
+            lastForcedRefreshUtc = DateTime.UtcNow;
+        }
+
+        StartCatalogRefresh(territory, force: stale);
     }
+
+    private DateTime lastForcedRefreshUtc;
 
     public void Submit(uint dataId, float x, float y, float z, string cofferType)
     {
@@ -106,7 +92,7 @@ public sealed class CofferLocationSyncService
             return;
         }
 
-        queue.Enqueue(new PendingSubmit(territory, dataId, position, cofferType, key));
+        queue.Enqueue(new PendingSubmit(territory, position, key, DataId: dataId, CofferType: cofferType));
         queuedKeys.Add(key);
     }
 
@@ -135,288 +121,66 @@ public sealed class CofferLocationSyncService
         StartCatalogRefresh(zone.TerritoryType, force: false);
     }
 
-    private void ApplyCompletedWork()
+    protected override string UploadUrl => ObservationsUrl;
+    protected override string CatalogUrl => CandidatesUrl;
+
+    protected override string BuildPayload(PendingSubmit pending) => JsonSerializer.Serialize(new
     {
-        UploadOutcome? upload = Interlocked.Exchange(ref completedUpload, null);
-        if (upload != null)
+        territoryId = (int)pending.TerritoryId,
+        dataId = pending.DataId,
+        worldX = pending.Position.X,
+        worldY = pending.Position.Y,
+        worldZ = pending.Position.Z,
+        cofferType = pending.CofferType,
+        installationHash = InstallationId.GetHash(plugin),
+        pluginVersion = typeof(CofferLocationSyncService).Assembly.GetName().Version?.ToString() ?? "0",
+        observedAtUtc = DateTime.UtcNow.ToString("O"),
+    });
+
+    protected override IReadOnlyList<CrowdsourcedCofferCandidate> ParseCatalog(string body, ushort territory)
+    {
+        CatalogResponse? parsed = JsonSerializer.Deserialize<CatalogResponse>(body, CrowdsourceSyncHttp.JsonOptions);
+        List<CrowdsourcedCofferCandidate> locations = [];
+        if (parsed?.Candidates != null)
         {
-            uploadInFlight = false;
-            if (upload.Success)
+            foreach (CatalogCandidate entry in parsed.Candidates)
             {
-                if (queue.Count > 0 && queue.Peek().Key == upload.Key)
+                if (entry.Position == null || entry.TerritoryId != territory)
                 {
-                    PendingSubmit done = queue.Dequeue();
-                    queuedKeys.Remove(done.Key);
-                    submittedKeys.Add(done.Key);
+                    continue;
                 }
 
-                nextUploadAttemptUtc = DateTime.UtcNow;
-                logger.Info(
-                    "[CofferLocationSync] uploaded dataId={DataId} pos=({X:F2},{Y:F2},{Z:F2})",
-                    upload.DataId,
-                    upload.X,
-                    upload.Y,
-                    upload.Z);
-            }
-            else
-            {
-                nextUploadAttemptUtc = DateTime.UtcNow + CrowdsourceSyncHttp.RetryDelay;
-                if (upload.Error is { } uploadError)
+                Vector3 position = new(entry.Position.X, entry.Position.Y, entry.Position.Z);
+                if (TreasurePathing.IsUnloadAltitude(position))
                 {
-                    logger.Warn("[CofferLocationSync] upload failed: {Message}", uploadError);
+                    continue;
                 }
-                else
-                {
-                    logger.Warn("[CofferLocationSync] upload rejected: {Status}", upload.Status ?? "?");
-                }
+
+                locations.Add(new CrowdsourcedCofferCandidate(
+                    entry.CandidateId,
+                    (ushort)entry.TerritoryId,
+                    (uint)entry.DataId,
+                    position));
             }
         }
 
-        CatalogOutcome? catalog = Interlocked.Exchange(ref completedCatalog, null);
-        if (catalog == null)
-        {
-            return;
-        }
-
-        catalogInFlight = false;
-        if (catalog.Success)
-        {
-            accepted = catalog.Locations;
-            catalogTerritory = catalog.TerritoryId;
-            nextCatalogFetchUtc = DateTime.UtcNow + CrowdsourceSyncHttp.CatalogRefreshInterval;
-            logger.Info(
-                "[CofferLocationSync] catalog territory={Territory} candidates={Count}",
-                catalog.TerritoryId,
-                accepted.Count);
-        }
-        else
-        {
-            nextCatalogFetchUtc = DateTime.UtcNow + CrowdsourceSyncHttp.RetryDelay;
-            if (catalog.Error is { } catalogError)
-            {
-                logger.Warn("[CofferLocationSync] catalog failed: {Message}", catalogError);
-            }
-            else
-            {
-                logger.Warn("[CofferLocationSync] catalog rejected: {Status}", catalog.Status ?? "?");
-            }
-        }
+        return locations;
     }
 
-    private void StartNextUpload()
+    protected override void LogUploaded(PendingSubmit pending)
     {
-        if (uploadInFlight || queue.Count == 0 || DateTime.UtcNow < nextUploadAttemptUtc)
-        {
-            return;
-        }
-
-        PendingSubmit pending = queue.Peek();
-        string json = JsonSerializer.Serialize(new
-        {
-            territoryId = (int)pending.TerritoryId,
-            dataId = pending.DataId,
-            worldX = pending.Position.X,
-            worldY = pending.Position.Y,
-            worldZ = pending.Position.Z,
-            cofferType = pending.CofferType,
-            installationHash = InstallationId.GetHash(plugin),
-            pluginVersion = typeof(CofferLocationSyncService).Assembly.GetName().Version?.ToString() ?? "0",
-            observedAtUtc = DateTime.UtcNow.ToString("O"),
-        });
-
-        uploadInFlight = true;
-        _ = UploadAsync(pending, json);
+        logger.Info(
+            "uploaded dataId={DataId} pos=({X:F2},{Y:F2},{Z:F2})",
+            pending.DataId,
+            pending.Position.X,
+            pending.Position.Y,
+            pending.Position.Z);
     }
 
-    private async Task UploadAsync(PendingSubmit pending, string json)
-    {
-        try
-        {
-            using HttpRequestMessage request = new(HttpMethod.Post, ObservationsUrl)
-            {
-                Content = new StringContent(json, Encoding.UTF8, "application/json"),
-            };
+    protected override void LogCatalog(ushort territory, int count) =>
+        logger.Info("catalog territory={Territory} candidates={Count}", territory, count);
 
-            using HttpResponseMessage response = await CrowdsourceSyncHttp.Http.SendAsync(request).ConfigureAwait(false);
-            Interlocked.Exchange(
-                ref completedUpload,
-                response.IsSuccessStatusCode
-                    ? UploadOutcome.Ok(pending)
-                    : UploadOutcome.Rejected(pending, response.StatusCode.ToString()));
-        }
-        catch (Exception ex)
-        {
-            Interlocked.Exchange(ref completedUpload, UploadOutcome.Failed(pending, ex.Message));
-        }
-    }
-
-    private void StartCatalogRefresh(ushort territory, bool force)
-    {
-        if (catalogInFlight)
-        {
-            return;
-        }
-
-        if (!force
-            && catalogTerritory == territory
-            && DateTime.UtcNow < nextCatalogFetchUtc
-            && accepted.Count > 0)
-        {
-            return;
-        }
-
-        if (!force && DateTime.UtcNow < nextCatalogFetchUtc && catalogTerritory == territory)
-        {
-            return;
-        }
-
-        catalogInFlight = true;
-        _ = FetchCatalogAsync(territory);
-    }
-
-    private async Task FetchCatalogAsync(ushort territory)
-    {
-        try
-        {
-            string url = $"{CandidatesUrl}?territoryId={territory}";
-            using HttpRequestMessage request = new(HttpMethod.Get, url);
-            using HttpResponseMessage response = await CrowdsourceSyncHttp.Http.SendAsync(request).ConfigureAwait(false);
-            string body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                Interlocked.Exchange(
-                    ref completedCatalog,
-                    CatalogOutcome.Rejected(territory, response.StatusCode.ToString()));
-                return;
-            }
-
-            CatalogResponse? parsed = JsonSerializer.Deserialize<CatalogResponse>(body, CrowdsourceSyncHttp.JsonOptions);
-            List<CrowdsourcedCofferCandidate> locations = [];
-            if (parsed?.Candidates != null)
-            {
-                foreach (CatalogCandidate entry in parsed.Candidates)
-                {
-                    if (entry.Position == null || entry.TerritoryId != territory)
-                    {
-                        continue;
-                    }
-
-                    Vector3 position = new(entry.Position.X, entry.Position.Y, entry.Position.Z);
-                    if (TreasurePathing.IsUnloadAltitude(position))
-                    {
-                        continue;
-                    }
-
-                    locations.Add(new CrowdsourcedCofferCandidate(
-                        entry.CandidateId,
-                        (ushort)entry.TerritoryId,
-                        (uint)entry.DataId,
-                        position));
-                }
-            }
-
-            Interlocked.Exchange(ref completedCatalog, CatalogOutcome.Ok(territory, locations));
-        }
-        catch (Exception ex)
-        {
-            Interlocked.Exchange(ref completedCatalog, CatalogOutcome.Failed(territory, ex.Message));
-        }
-    }
-
-    private readonly record struct PendingSubmit(
-        ushort TerritoryId,
-        uint DataId,
-        Vector3 Position,
-        string CofferType,
-        string Key);
-
-    private sealed class UploadOutcome
-    {
-        public required string Key { get; init; }
-
-        public required uint DataId { get; init; }
-
-        public required float X { get; init; }
-
-        public required float Y { get; init; }
-
-        public required float Z { get; init; }
-
-        public required bool Success { get; init; }
-
-        public string? Status { get; init; }
-
-        public string? Error { get; init; }
-
-        public static UploadOutcome Ok(PendingSubmit pending) => new()
-        {
-            Key = pending.Key,
-            DataId = pending.DataId,
-            X = pending.Position.X,
-            Y = pending.Position.Y,
-            Z = pending.Position.Z,
-            Success = true,
-        };
-
-        public static UploadOutcome Rejected(PendingSubmit pending, string status) => new()
-        {
-            Key = pending.Key,
-            DataId = pending.DataId,
-            X = pending.Position.X,
-            Y = pending.Position.Y,
-            Z = pending.Position.Z,
-            Success = false,
-            Status = status,
-        };
-
-        public static UploadOutcome Failed(PendingSubmit pending, string error) => new()
-        {
-            Key = pending.Key,
-            DataId = pending.DataId,
-            X = pending.Position.X,
-            Y = pending.Position.Y,
-            Z = pending.Position.Z,
-            Success = false,
-            Error = error,
-        };
-    }
-
-    private sealed class CatalogOutcome
-    {
-        public required ushort TerritoryId { get; init; }
-
-        public required bool Success { get; init; }
-
-        public IReadOnlyList<CrowdsourcedCofferCandidate> Locations { get; init; } = [];
-
-        public string? Status { get; init; }
-
-        public string? Error { get; init; }
-
-        public static CatalogOutcome Ok(
-            ushort territory,
-            IReadOnlyList<CrowdsourcedCofferCandidate> locations) => new()
-        {
-            TerritoryId = territory,
-            Success = true,
-            Locations = locations,
-        };
-
-        public static CatalogOutcome Rejected(ushort territory, string status) => new()
-        {
-            TerritoryId = territory,
-            Success = false,
-            Status = status,
-        };
-
-        public static CatalogOutcome Failed(ushort territory, string error) => new()
-        {
-            TerritoryId = territory,
-            Success = false,
-            Error = error,
-        };
-    }
+    protected override void LogWarning(string message, string value) => logger.Warn(message, value);
 
     private sealed class CatalogResponse
     {

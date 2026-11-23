@@ -89,28 +89,43 @@ public class CurrencyTracker(IZoneProvider zones, IChatGui chat)
         int gold = OccultCrescentHelper.GetGoldTotal();
         int silver = OccultCrescentHelper.GetSilverTotal();
 
-        // Inventory can read 0 while bags are still loading — don't treat that as a spend.
-        if ((gold == 0 && goldTracker.HasValue && goldTracker.LastValue > 0)
-            || (silver == 0 && silverTracker.HasValue && silverTracker.LastValue > 0))
-        {
-            goldTracker.SetCounting(false);
-            silverTracker.SetCounting(false);
-            return;
-        }
-
-        goldTracker.SetCounting(true);
-        silverTracker.SetCounting(true);
-
         if (AddonHelpers.IsShopExchangeOpen())
         {
+            goldTracker.SetCounting(true);
+            silverTracker.SetCounting(true);
             goldTracker.SyncBaseline(gold);
             silverTracker.SyncBaseline(silver);
             return;
         }
 
-        goldTracker.RecordPositiveDelta(gold);
-        silverTracker.RecordPositiveDelta(silver);
+        Track(goldTracker, gold, ref goldZeroSinceUtc);
+        Track(silverTracker, silver, ref silverZeroSinceUtc);
     }
+
+    // Inventory can read 0 while bags are still loading; a 0 only counts once it has lasted a few seconds.
+    private static void Track(DeltaRateTracker tracker, int value, ref DateTime? zeroSinceUtc)
+    {
+        if (value != 0)
+        {
+            zeroSinceUtc = null;
+        }
+        else
+        {
+            zeroSinceUtc ??= DateTime.UtcNow;
+            if (DateTime.UtcNow - zeroSinceUtc.Value < TimeSpan.FromSeconds(3))
+            {
+                tracker.SetCounting(false);
+                return;
+            }
+        }
+
+        tracker.SetCounting(true);
+        tracker.RecordPositiveDelta(value);
+    }
+
+    private DateTime? goldZeroSinceUtc;
+
+    private DateTime? silverZeroSinceUtc;
 
     private void ApplyZone(bool inOc)
     {

@@ -46,6 +46,7 @@ public class PathCalculator
 
         // After an await this may run off the framework thread, where the player object must not be read.
         Vector3 from = player.Position;
+        OccultCrescentHelper.SnapshotAethernetUnlocks();
 
         IZone zone = zones.GetZone();
         if (!zone.IsOccultCrescentZone())
@@ -114,12 +115,22 @@ public class PathCalculator
 
         // After an await this may run off the framework thread, where the player object must not be read.
         Vector3 from = player.Position;
+        OccultCrescentHelper.SnapshotAethernetUnlocks();
 
         IZone zone = zones.GetZone();
         if (!zone.IsOccultCrescentZone())
         {
             logger.Debug("Path for {Goal}: not in Occult Crescent", goal.GoalType);
             return PathCalculationResult.NoTravelNeeded();
+        }
+
+        // The CE area reads game memory and shared caches, so resolve it here, before the first await.
+        CriticalEncounterArea? resolvedCeArea = null;
+        string resolvedCeDetail = "";
+        if (goal.GoalType is CriticalEncounterGoal ceGoalEarly
+            && zone.GetCriticalEncounterData().FirstOrDefault(a => a.Id == ceGoalEarly.id.Value) is { } authoredEarly)
+        {
+            resolvedCeArea = geometry.TryResolveForAuthored(ceGoalEarly.id.Value, authoredEarly.Position, out resolvedCeDetail);
         }
 
         if (goal.GoalType is FateGoal fateGoal
@@ -178,10 +189,13 @@ public class PathCalculator
                 .FirstOrDefault(a => a.Id == ceId);
             Vector3 authoredStaging = authoredCe?.Position ?? pathGoal.Position;
             ceStaging = authoredStaging;
-            if (geometry.TryResolveForAuthored(
-                    ceGoalForRadius.id.Value,
-                    authoredStaging,
-                    out string resolveDetail) is { Radius: > 0 } area)
+            string resolveDetail = resolvedCeDetail;
+            if (authoredCe == null)
+            {
+                resolvedCeArea = geometry.TryResolveForAuthored(ceGoalForRadius.id.Value, authoredStaging, out resolveDetail);
+            }
+
+            if (resolvedCeArea is { Radius: > 0 } area)
             {
                 ceShape = NavigationConstants.ResolveCriticalEncounterShape(
                     zone,

@@ -22,7 +22,23 @@ public sealed class Mp3SoundPlayer(IDalamudPluginInterface plugin, IPluginLog lo
         }
     }
 
+    private IReadOnlyList<string>? cachedSounds;
+
+    private DateTime cachedSoundsUtc;
+
+    // Drawn every frame while the setting is visible; the folder only changes when you drop a file in.
     public IReadOnlyList<string> ListSounds()
+    {
+        if (cachedSounds != null && DateTime.UtcNow - cachedSoundsUtc < TimeSpan.FromSeconds(2))
+        {
+            return cachedSounds;
+        }
+
+        cachedSoundsUtc = DateTime.UtcNow;
+        return cachedSounds = ReadSounds();
+    }
+
+    private IReadOnlyList<string> ReadSounds()
     {
         string dir = SoundsDirectory;
         if (!Directory.Exists(dir))

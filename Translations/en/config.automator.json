@@ -18,7 +18,7 @@
     },
     "prefer_pot_fates": {
       "label": "Prefer pot FATEs",
-      "tooltip": "On: Magic Pot FATEs always come first, then Critical Encounters, then other FATEs. Pots can't be turned off on the FATEs page while this is on.\nOff: Critical Encounters come first, then pots, then other FATEs."
+      "tooltip": "Puts Magic Pot FATEs first, ahead of Critical Encounters and other FATEs. While this is on, pots can't be turned off on the FATEs page."
     },
     "should_farm_pot_chests": {
       "label": "Farm pot chests after pot FATEs",
@@ -37,7 +37,7 @@
     },
     "leave_engaged_fate_for_critical_encounter": {
       "label": "Leave mid-FATE for a CE",
-      "tooltip": "On: also leave a FATE you are fighting in when a Critical Encounter's registration is about to close (same seconds as above). Pot FATEs are never left while Prefer pot FATEs is on.\nOff: finish the FATE first."
+      "tooltip": "Also leaves a FATE you are fighting in when a Critical Encounter's registration is about to close (same seconds as above). Pot FATEs are never left while Prefer pot FATEs is on."
     },
     "combat_autorotation": {
       "label": "Combat rotation",
@@ -77,7 +77,7 @@
     },
     "update_boss_mod_presets_automatically": {
       "label": "Update presets automatically",
-      "tooltip": "On: BOCCHI rewrites its BossMod presets whenever you change the settings below, start Illegal Mode or change job.\nOff: your presets are left alone. Press Update presets to apply the settings below.",
+      "tooltip": "BOCCHI rewrites its BossMod presets whenever you change the settings below, start Illegal Mode or change job. To apply the settings below only when you choose, untick this and press Update presets.",
       "button": "Update presets",
       "button_tooltip": "Rebuild BOCCHI's BossMod presets from the settings below. Changes you made to those presets in BossMod are lost.",
       "button_tooltip_auto_on": "Not needed while Update presets automatically is on."
@@ -85,11 +85,11 @@
     "boss_mod_movement": {
       "max_distance_by_role": {
         "label": "Set max distance to target based on role",
-        "tooltip": "On: melee jobs and ranged jobs each get their own distance to the target.\nOff: every job uses the same distance."
+        "tooltip": "Gives melee jobs and ranged jobs each their own distance to the target."
       },
       "melee_on_hitbox": {
         "label": "Melee stay on hitbox",
-        "tooltip": "On: melee jobs stand at the edge of the enemy's hitbox.\nOff: melee jobs use the melee distance below.\nSage always stays at 5 yalms and Dancer at 10."
+        "tooltip": "Melee jobs stand at the edge of the enemy's hitbox instead of using the melee distance below.\nSage always stays at 5 yalms and Dancer at 10."
       },
       "max_distance": {
         "label": "Max distance to target"
@@ -118,7 +118,7 @@
       },
       "separate_dodge_delay": {
         "label": "Separate dodge delay",
-        "tooltip": "On: use Dodge delay movement for AoE dodges instead of Delay movement.\nOff: use Delay movement for AoE dodges too."
+        "tooltip": "Uses Dodge delay movement for AoE dodges instead of Delay movement."
       },
       "dodge_delay": {
         "label": "Dodge delay movement",
@@ -134,7 +134,7 @@
     },
     "stop_after_return": {
       "label": "Stop after return and teleport",
-      "tooltip": "On: after a FATE or CE, BOCCHI uses Return, teleports towards the next one, mounts up and then stops. Start Illegal Mode again to continue.\nOff: keep going."
+      "tooltip": "Semi-automatic: BOCCHI only gets you close to the next FATE or CE (Return and aethernet), then stops so you walk and fight yourself. If walking is quickest, it stops right away. Start Illegal Mode again for the next one.\nLeave it unticked for full automation, including the fighting."
     },
     "phantom_jobs_leveling_mode": {
       "label": "Level phantom jobs automatically",
@@ -179,15 +179,15 @@
     },
     "pause_auto_treasure_hunt_for_fate": {
       "label": "Pause auto treasure hunt for FATEs",
-      "tooltip": "On: when a FATE appears, pause the hunt, do the FATE, then continue the hunt.\nOff: keep hunting and ignore FATEs. Without Treasure Sight the hunt always pauses."
+      "tooltip": "When a FATE appears, pauses the hunt, does the FATE, then continues the hunt. Without Treasure Sight the hunt always pauses."
     },
     "pause_auto_treasure_hunt_for_pots": {
       "label": "Pause auto treasure hunt for pots",
-      "tooltip": "On: pause the hunt when it is time to leave for the next pot, or a pot is already up, then continue afterwards.\nOff: keep hunting until the pot FATE actually starts.\nNeeds Farm pot chests or Wait near pots to be on."
+      "tooltip": "Pauses the hunt when it is time to leave for the next pot, or a pot is already up, then continues afterwards. Otherwise the hunt keeps going until the pot FATE actually starts.\nNeeds Farm pot chests or Wait near pots to be on."
     },
     "pause_auto_treasure_hunt_for_critical_encounter": {
       "label": "Pause auto treasure hunt for CEs",
-      "tooltip": "On: when a Critical Encounter appears, pause the hunt, do the CE, then continue the hunt. If you are in a fight, BOCCHI finishes it first.\nOff: keep hunting and ignore CEs. Without Treasure Sight the hunt always pauses."
+      "tooltip": "When a Critical Encounter appears, pauses the hunt, does the CE, then continues the hunt. If you are in a fight, BOCCHI finishes it first. Without Treasure Sight the hunt always pauses."
     },
     "auto_accept_raise": {
       "label": "Accept raises",

@@ -5,9 +5,7 @@ using BOCCHI.Common.Services;
 using Dalamud.Plugin;
 using Ocelot.Lifecycle;
 using Ocelot.Services.Logger;
-using System.Net.Http;
 using System.Numerics;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -19,33 +17,11 @@ public sealed class PotChestLocationSyncService
     IZoneProvider zones,
     IDalamudPluginInterface plugin,
     ILogger<PotChestLocationSyncService> logger
-) : IOnUpdate
+) : CrowdsourceLocationSync<AcceptedPotChestLocation>, IOnUpdate
 {
     public const string ApiBaseUrl = PotCycleSyncService.ApiBaseUrl;
 
     public const string ApiUrl = ApiBaseUrl + "/api/v1/pot-chest-locations";
-
-    private readonly Queue<PendingSubmit> queue = new();
-
-    private readonly HashSet<string> queuedKeys = new(StringComparer.Ordinal);
-
-    private readonly HashSet<string> submittedKeys = new(StringComparer.Ordinal);
-
-    private DateTime nextUploadAttemptUtc = DateTime.MinValue;
-
-    private DateTime nextCatalogFetchUtc = DateTime.MinValue;
-
-    private ushort catalogTerritory;
-
-    private bool uploadInFlight;
-
-    private bool catalogInFlight;
-
-    private UploadOutcome? completedUpload;
-
-    private CatalogOutcome? completedCatalog;
-
-    private IReadOnlyList<AcceptedPotChestLocation> accepted = [];
 
     public UpdateLimit UpdateLimit =>
         new()
@@ -102,7 +78,7 @@ public sealed class PotChestLocationSyncService
             return;
         }
 
-        queue.Enqueue(new PendingSubmit(territory, potFateId, isReroll, position, key));
+        queue.Enqueue(new PendingSubmit(territory, position, key, PotFateId: potFateId, IsReroll: isReroll));
         queuedKeys.Add(key);
     }
 
@@ -163,295 +139,68 @@ public sealed class PotChestLocationSyncService
         return remotes.Count == 0 ? baked.ToList() : PotChestPadCatalog.Merge(baked, remotes);
     }
 
-    private void ApplyCompletedWork()
+    protected override string UploadUrl => ApiUrl;
+    protected override string CatalogUrl => ApiUrl;
+
+    protected override string BuildPayload(PendingSubmit pending) => JsonSerializer.Serialize(new
     {
-        UploadOutcome? upload = Interlocked.Exchange(ref completedUpload, null);
-        if (upload != null)
+        territoryId = (int)pending.TerritoryId,
+        potFateId = pending.PotFateId,
+        isReroll = pending.IsReroll,
+        worldX = pending.Position.X,
+        worldY = pending.Position.Y,
+        worldZ = pending.Position.Z,
+        installationHash = InstallationId.GetHash(plugin),
+        pluginVersion = typeof(PotChestLocationSyncService).Assembly.GetName().Version?.ToString() ?? "0",
+        observedAtUtc = DateTime.UtcNow.ToString("O"),
+    });
+
+    protected override IReadOnlyList<AcceptedPotChestLocation> ParseCatalog(string body, ushort territory)
+    {
+        CatalogResponse? parsed = JsonSerializer.Deserialize<CatalogResponse>(body, CrowdsourceSyncHttp.JsonOptions);
+        List<AcceptedPotChestLocation> locations = [];
+        if (parsed?.Locations != null)
         {
-            uploadInFlight = false;
-            if (upload.Success)
+            foreach (CatalogEntry entry in parsed.Locations)
             {
-                if (queue.Count > 0 && queue.Peek().Key == upload.Key)
+                if (entry.Position == null || entry.TerritoryId != territory)
                 {
-                    PendingSubmit done = queue.Dequeue();
-                    queuedKeys.Remove(done.Key);
-                    submittedKeys.Add(done.Key);
+                    continue;
                 }
 
-                nextUploadAttemptUtc = DateTime.UtcNow;
-                logger.Info(
-                    "[PotChestLocationSync] uploaded fate={Fate} reroll={Reroll} pos=({X:F2},{Y:F2},{Z:F2})",
-                    upload.PotFateId,
-                    upload.IsReroll,
-                    upload.X,
-                    upload.Y,
-                    upload.Z);
-            }
-            else
-            {
-                nextUploadAttemptUtc = DateTime.UtcNow + CrowdsourceSyncHttp.RetryDelay;
-                if (upload.Error is { } uploadError)
+                Vector3 position = new(entry.Position.X, entry.Position.Y, entry.Position.Z);
+                if (TreasurePathing.IsUnloadAltitude(position))
                 {
-                    logger.Warn("[PotChestLocationSync] upload failed: {Message}", uploadError);
+                    continue;
                 }
-                else
-                {
-                    logger.Warn("[PotChestLocationSync] upload rejected: {Status}", upload.Status ?? "?");
-                }
+
+                locations.Add(new AcceptedPotChestLocation(
+                    entry.CandidateId,
+                    (ushort)entry.TerritoryId,
+                    entry.PotFateId,
+                    entry.IsReroll,
+                    position));
             }
         }
 
-        CatalogOutcome? catalog = Interlocked.Exchange(ref completedCatalog, null);
-        if (catalog == null)
-        {
-            return;
-        }
-
-        catalogInFlight = false;
-        if (catalog.Success)
-        {
-            accepted = catalog.Locations;
-            catalogTerritory = catalog.TerritoryId;
-            nextCatalogFetchUtc = DateTime.UtcNow + CrowdsourceSyncHttp.CatalogRefreshInterval;
-            logger.Info(
-                "[PotChestLocationSync] catalog territory={Territory} locations={Count}",
-                catalog.TerritoryId,
-                accepted.Count);
-        }
-        else
-        {
-            nextCatalogFetchUtc = DateTime.UtcNow + CrowdsourceSyncHttp.RetryDelay;
-            if (catalog.Error is { } catalogError)
-            {
-                logger.Warn("[PotChestLocationSync] catalog failed: {Message}", catalogError);
-            }
-            else
-            {
-                logger.Warn("[PotChestLocationSync] catalog rejected: {Status}", catalog.Status ?? "?");
-            }
-        }
+        return locations;
     }
 
-    private void StartNextUpload()
+    protected override void LogUploaded(PendingSubmit pending)
     {
-        if (uploadInFlight || queue.Count == 0 || DateTime.UtcNow < nextUploadAttemptUtc)
-        {
-            return;
-        }
-
-        PendingSubmit pending = queue.Peek();
-        string json = JsonSerializer.Serialize(new
-        {
-            territoryId = (int)pending.TerritoryId,
-            potFateId = pending.PotFateId,
-            isReroll = pending.IsReroll,
-            worldX = pending.Position.X,
-            worldY = pending.Position.Y,
-            worldZ = pending.Position.Z,
-            installationHash = InstallationId.GetHash(plugin),
-            pluginVersion = typeof(PotChestLocationSyncService).Assembly.GetName().Version?.ToString() ?? "0",
-            observedAtUtc = DateTime.UtcNow.ToString("O"),
-        });
-
-        uploadInFlight = true;
-        _ = UploadAsync(pending, json);
+        logger.Info(
+            "uploaded fate={Fate} reroll={Reroll} pos=({X:F2},{Y:F2},{Z:F2})",
+            pending.PotFateId,
+            pending.IsReroll,
+            pending.Position.X,
+            pending.Position.Y,
+            pending.Position.Z);
     }
 
-    private async Task UploadAsync(PendingSubmit pending, string json)
-    {
-        try
-        {
-            using HttpRequestMessage request = new(HttpMethod.Post, ApiUrl)
-            {
-                Content = new StringContent(json, Encoding.UTF8, "application/json"),
-            };
+    protected override void LogCatalog(ushort territory, int count) =>
+        logger.Info("catalog territory={Territory} locations={Count}", territory, count);
 
-            using HttpResponseMessage response = await CrowdsourceSyncHttp.Http.SendAsync(request).ConfigureAwait(false);
-            Interlocked.Exchange(
-                ref completedUpload,
-                response.IsSuccessStatusCode
-                    ? UploadOutcome.Ok(pending)
-                    : UploadOutcome.Rejected(pending, response.StatusCode.ToString()));
-        }
-        catch (Exception ex)
-        {
-            Interlocked.Exchange(ref completedUpload, UploadOutcome.Failed(pending, ex.Message));
-        }
-    }
-
-    private void StartCatalogRefresh(ushort territory, bool force)
-    {
-        if (catalogInFlight)
-        {
-            return;
-        }
-
-        if (!force
-            && catalogTerritory == territory
-            && DateTime.UtcNow < nextCatalogFetchUtc
-            && accepted.Count > 0)
-        {
-            return;
-        }
-
-        if (!force && DateTime.UtcNow < nextCatalogFetchUtc && catalogTerritory == territory)
-        {
-            return;
-        }
-
-        catalogInFlight = true;
-        _ = FetchCatalogAsync(territory);
-    }
-
-    private async Task FetchCatalogAsync(ushort territory)
-    {
-        try
-        {
-            string url = $"{ApiUrl}?territoryId={territory}";
-            using HttpRequestMessage request = new(HttpMethod.Get, url);
-            using HttpResponseMessage response = await CrowdsourceSyncHttp.Http.SendAsync(request).ConfigureAwait(false);
-            string body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                Interlocked.Exchange(
-                    ref completedCatalog,
-                    CatalogOutcome.Rejected(territory, response.StatusCode.ToString()));
-                return;
-            }
-
-            CatalogResponse? parsed = JsonSerializer.Deserialize<CatalogResponse>(body, CrowdsourceSyncHttp.JsonOptions);
-            List<AcceptedPotChestLocation> locations = [];
-            if (parsed?.Locations != null)
-            {
-                foreach (CatalogEntry entry in parsed.Locations)
-                {
-                    if (entry.Position == null || entry.TerritoryId != territory)
-                    {
-                        continue;
-                    }
-
-                    Vector3 position = new(entry.Position.X, entry.Position.Y, entry.Position.Z);
-                    if (TreasurePathing.IsUnloadAltitude(position))
-                    {
-                        continue;
-                    }
-
-                    locations.Add(new AcceptedPotChestLocation(
-                        entry.CandidateId,
-                        (ushort)entry.TerritoryId,
-                        entry.PotFateId,
-                        entry.IsReroll,
-                        position));
-                }
-            }
-
-            Interlocked.Exchange(ref completedCatalog, CatalogOutcome.Ok(territory, locations));
-        }
-        catch (Exception ex)
-        {
-            Interlocked.Exchange(ref completedCatalog, CatalogOutcome.Failed(territory, ex.Message));
-        }
-    }
-
-    private readonly record struct PendingSubmit(
-        ushort TerritoryId,
-        int PotFateId,
-        bool IsReroll,
-        Vector3 Position,
-        string Key);
-
-    private sealed class UploadOutcome
-    {
-        public required string Key { get; init; }
-
-        public required int PotFateId { get; init; }
-
-        public required bool IsReroll { get; init; }
-
-        public required float X { get; init; }
-
-        public required float Y { get; init; }
-
-        public required float Z { get; init; }
-
-        public required bool Success { get; init; }
-
-        public string? Status { get; init; }
-
-        public string? Error { get; init; }
-
-        public static UploadOutcome Ok(PendingSubmit pending) => new()
-        {
-            Key = pending.Key,
-            PotFateId = pending.PotFateId,
-            IsReroll = pending.IsReroll,
-            X = pending.Position.X,
-            Y = pending.Position.Y,
-            Z = pending.Position.Z,
-            Success = true,
-        };
-
-        public static UploadOutcome Rejected(PendingSubmit pending, string status) => new()
-        {
-            Key = pending.Key,
-            PotFateId = pending.PotFateId,
-            IsReroll = pending.IsReroll,
-            X = pending.Position.X,
-            Y = pending.Position.Y,
-            Z = pending.Position.Z,
-            Success = false,
-            Status = status,
-        };
-
-        public static UploadOutcome Failed(PendingSubmit pending, string error) => new()
-        {
-            Key = pending.Key,
-            PotFateId = pending.PotFateId,
-            IsReroll = pending.IsReroll,
-            X = pending.Position.X,
-            Y = pending.Position.Y,
-            Z = pending.Position.Z,
-            Success = false,
-            Error = error,
-        };
-    }
-
-    private sealed class CatalogOutcome
-    {
-        public required ushort TerritoryId { get; init; }
-
-        public required bool Success { get; init; }
-
-        public IReadOnlyList<AcceptedPotChestLocation> Locations { get; init; } = [];
-
-        public string? Status { get; init; }
-
-        public string? Error { get; init; }
-
-        public static CatalogOutcome Ok(
-            ushort territory,
-            IReadOnlyList<AcceptedPotChestLocation> locations) => new()
-        {
-            TerritoryId = territory,
-            Success = true,
-            Locations = locations,
-        };
-
-        public static CatalogOutcome Rejected(ushort territory, string status) => new()
-        {
-            TerritoryId = territory,
-            Success = false,
-            Status = status,
-        };
-
-        public static CatalogOutcome Failed(ushort territory, string error) => new()
-        {
-            TerritoryId = territory,
-            Success = false,
-            Error = error,
-        };
-    }
+    protected override void LogWarning(string message, string value) => logger.Warn(message, value);
 
     private sealed class CatalogResponse
     {

@@ -25,10 +25,7 @@
     },
     "count_special_mobs_toward_minimum": {
       "label": "특수를 최소 수에 포함",
-      "tooltip": "켜짐: 특수 적도 아래의 최소 수에 포함합니다.\n꺼짐: 끌어오기는 하지만 수에는 넣지 않습니다."
-    },
-    "only_start_out_of_combat": {
-      "label": "전투가 완전히 끝날 때까지 대기"
+      "tooltip": "특수 적도 아래의 최소 수에 포함합니다. 포함하지 않아도 끌어오기는 합니다."
     },
     "max_mob_level": {
       "label": "최대 적 레벨"
@@ -138,7 +135,7 @@
     },
     "treasure_hunt_prefer_pots": {
       "label": "타이머 찾기 중 항아리 우선",
-      "tooltip": "켜짐: 매직 팟이 나오면 보물 찾기도 멈춥니다.\n꺼짐: 항아리가 나와도 보물 찾기를 끝까지 합니다."
+      "tooltip": "매직 팟이 나오면 보물 찾기도 멈춥니다."
     },
     "yield_to_crystal_buffs": {
       "label": "크리스탈 버프가 떨어지기 전에 재적용",

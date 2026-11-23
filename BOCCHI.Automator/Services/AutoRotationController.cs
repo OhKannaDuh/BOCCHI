@@ -54,7 +54,13 @@ public class AutoRotationController(
         SyncActivityCombat();
     }
 
-    public void TeardownForIllegalMode() => session.Teardown();
+    public void TeardownForIllegalMode()
+    {
+        session.Teardown();
+        lastEnabledActivity = null;
+    }
+
+    public int SessionGeneration => session.Generation;
 
     public bool IsPrepared => session.ActiveRecipe.IsActive;
 

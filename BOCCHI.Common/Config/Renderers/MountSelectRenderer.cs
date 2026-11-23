@@ -32,19 +32,11 @@ public sealed class MountSelectRenderer(IDataManager data) : IFieldRenderer<Moun
         uint current = Convert.ToUInt32(prop.GetValue(target) ?? 0u);
         (uint[] ids, string[] names) = cache.Value;
 
+        // A mount this character has not unlocked (or before login) only shows as the first entry; the saved choice stays.
         int index = Array.IndexOf(ids, current);
         if (index < 0)
         {
             index = 0;
-            current = 0;
-            if (prop.PropertyType == typeof(int))
-            {
-                prop.SetValue(target, 0);
-            }
-            else
-            {
-                prop.SetValue(target, 0u);
-            }
         }
 
         string label = prop.Label(owner, translator);

@@ -1,47 +1,46 @@
 # 4.3.0.0
 
 ### New
-- New look. Prefer your own Dalamud colours? Turn off "Use BOCCHI theme" under Settings → UI
-- The main window now has a tab per mode (Illegal Mode, Pots & Treasure, Mob Farmer, Treasure Hunter, World). Status, coffers left and gold / silver / XP per hour stay visible on top, and the window jumps to a mode's tab when it starts (and back to Illegal Mode when its treasure hunt pauses for a FATE or CE)
-- Completionist is now a switch inside the Illegal Mode tab
-- Search box in the settings, and the settings cog opens on the page of the tab you are on
-- Each tab says in one line what the mode does, and warns you when a plugin it needs isn't running
-- Triage Mode: optional wait before raising, so nearby healers get a chance first
-- Hover texts rewritten in plainer words, in all four languages. Spotted odd wording in Japanese, Korean or Chinese? Let us know
-- Auto revive (Illegal Mode → General → When you die): accept raises, and go back to base camp if nobody raises you in time. Both are off by default. Nothing happens inside Forked Tower; in FATEs and critical encounters raises are accepted, and the wait before returning to camp only starts once the FATE or encounter you died in is over, so you keep its reward. While you are dead, YesAlready is paused so it can't answer the prompt first
-- New option (Movement → Routes): use Return for long trips instead of walking through mobs to an aethernet shard
+- New look with a tab per mode. Your status and gold / silver / XP per hour stay on top, and the window switches to the mode that is running. Prefer Dalamud's own colours? Turn off "Use BOCCHI theme" under Settings → UI
+- Each tab explains its mode in one line and warns you when a plugin it needs isn't running
+- Search box in the settings; the cog in the title bar opens the settings for the tab you are on
+- Completionist is now a switch in the Illegal Mode tab
+- Auto revive (off by default): accept raises, and go back to camp if nobody raises you. Never inside Forked Tower, and in a FATE or CE it waits until that is over so you keep the reward
+- Triage Mode can wait a moment before raising, so nearby healers get the first chance
+- New option: use Return for long trips instead of walking past mobs to an aethernet shard
+- Plainer hover texts in all four languages. Spotted odd Japanese, Korean or Chinese? Let us know
+- Travel maps now come with BOCCHI, so the first start is quicker
 
-### Fixes
-- Illegal Mode now fights back when a mob your level or lower attacks while it waits to Return, instead of standing still
-- The pot chest search no longer starts over (and uses another Magical Elixir) while Cache Me If You Can is still active after it finished
-- If you die during Treasure Hunt or Carrot Hunt, it plans the route again once you are back up (aethernet included) instead of riding straight from base camp
-- Treasure Hunt no longer hangs when an aethernet teleport or Return keeps failing; after three tries it carries on on foot
-- Ninja Hide: a gearset number that is empty or not a Ninja set no longer freezes the hunt next to a strong enemy; it carries on without Hide
-- With combat set to None, the pot chest search keeps moving when a mob attacks instead of standing still
-- Mob Farmer gives up on a crystal buff trip after 5 minutes instead of staying paused
-- Carrot Hunt no longer gets stuck on a carrot or bunny coffer it can't reach or open; it moves on to the next spot after 90 seconds
-- Stopping Carrot Hunt while it is using Return or an aethernet shard now cancels that trip too
-- Carrot Hunt no longer shuffles sideways when it carries on after a pause
-- Mob Farmer no longer gets stuck on "Buffing" when a phantom job change doesn't go through; after 30 seconds it pulls anyway
-- Shopping gives up after 10 minutes if the trip to camp or the purchase never finishes, so the rest of BOCCHI isn't left paused
-- Treasure Hunt and Carrot Hunt now stop and fight an enemy they can't outrun (after 10 seconds), then carry on. Needs a combat rotation to be set
-- Illegal Mode's treasure hunt does the same, and hands over at once when you die
-- Mob Farmer no longer stands still forever waiting for a pull that never comes, and retries enemies it gave up on after a few minutes
-- No more extra Return to camp right after Illegal Mode pauses its treasure hunt
-- The Completionist list shows FATE and CE names in your game language
-- Typing an unknown /bocchi option now tells you so
-- If a mob attacks you while you're mounted, you now get off and fight it when it's your level or lower, and keep riding away from stronger ones (one that keeps chasing you gets fought)
-- A mob that follows you to a pot or CE waiting spot gets fought instead of killing you while you wait
-- The second pot chest search no longer goes back to the first pot's spots
-- No more mounting up again just to reach a pot FATE from its waiting spot
-- Pot settings now work with "Do FATEs" turned off, so Illegal Mode goes to pots instead of waiting at a CE
-- Mob Farmer no longer spends cooldowns and phantom actions before the pack is gathered, and stands still while it pulls so the pull isn't cancelled
-- Mob Farmer no longer waits ages between pulls when fewer enemies than your minimum are nearby
-- With combat set to None, BOCCHI fully lets go of Rotation Solver
-- Clearer warning when Rotation Solver or Wrath runs without BossMod: nothing picks targets for you then
-- The treasure hunt skips the Wanderer's Haven coffer that kept getting stuck on its ledge
-- Shared chest spots can no longer be faked, and shared pot timers are more reliable
-- Settings sliders no longer keep a typed value outside their range
-- Time limits no longer fire early or late when the clock changes for daylight saving
-- `/bocchi debug shop` now only shows the shopping status; add `start` to begin a run
-- Errors now reach the log with their details, which makes reports easier to act on
+### Fighting
+- BOCCHI now fights back when attacked: while riding (mobs your level or lower), while waiting for a pot, CE or Return, and during Treasure Hunt, Carrot Hunt and Triage Mode
+- With combat set to None, BOCCHI keeps moving when attacked and fully lets go of Rotation Solver
+- Wrath Combo, Rotation Solver and BossMod presets are switched on and off more reliably
+
+### Pots and treasure
+- Pots now work with "Do FATEs" turned off
+- The second pot chest search no longer goes back to the first pot's spots, and no Magical Elixir is wasted while Cache Me If You Can is still up
+- No more mounting up again just to reach a pot from its waiting spot
+- Treasure Hunt and Carrot Hunt no longer get stuck on failed teleports, coffers or carrots they can't reach, or the Wanderer's Haven ledge coffer
+- After you die, Treasure Hunt and Carrot Hunt plan a fresh route instead of riding straight from camp
+
+### Mob Farmer
+- No more waiting forever for a pull, getting stuck on "Buffing", or spending cooldowns before the pack is gathered
+- Walks back to its spot after you die, ignores your own party on a spot, and only uses spots saved in the zone you are in
+- Removed the setting "Wait until combat fully ends"; it never did anything
+
+### Fewer stalls
+- Buffs, Treasure Sight, phantom job leveling, repairs and shopping no longer hold BOCCHI up forever; they give up after a while and carry on
+- Emergency Stop now also stops a walk that is still being planned
+- The jump when stuck gives up after five tries instead of jumping forever
+
+### Settings
+- Safer updates: a backup is made before your settings change, and a broken settings file no longer stops BOCCHI from loading
+- `/bocchi config set` now saves your change
+- Your chosen mount and combat plugin are no longer reset by themselves
+
+### Other fixes
+- Gold and silver per hour stay correct when you spend down to 0 or move a stack
+- The pot timer only shows the zone you are in
+- Shared chest spots and pot timers are more reliable and harder to fake
+- FATE and CE names in your game language, shorter times (01:30 instead of 00:01:30), and clearer warnings
+- Easier-to-read logs when you report a problem

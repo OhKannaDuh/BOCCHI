@@ -24,7 +24,15 @@ public class BuffRunner
     ILogger<BuffRunner> logger
 ) : IBuffRunner, IOnUpdate
 {
+    private static readonly TimeSpan GiveUpAfter = TimeSpan.FromMinutes(2);
+
+    private static readonly TimeSpan RestoreGiveUpAfter = TimeSpan.FromSeconds(20);
+
     private IStateMachine<BuffState>? stateMachine;
+
+    private DateTime startedUtc;
+
+    private DateTime? restoreSinceUtc;
 
     public bool IsRunning { get; private set; }
 
@@ -79,6 +87,8 @@ public class BuffRunner
         }
 
         IsRunning = true;
+        startedUtc = DateTime.UtcNow;
+        restoreSinceUtc = null;
         logger.Info(manual ? "Manual buff run started" : "Buff run started (walking to crystal)");
     }
 
@@ -95,7 +105,7 @@ public class BuffRunner
         memory.Forget<InquiringMindAttemptedMemory>();
         RestoreJobIfNeeded();
         CompleteIfJobRestored();
-        logger.Info("Manual buff run stopped");
+        logger.Info("Buff run stopped");
     }
 
     public void Update()
@@ -107,11 +117,24 @@ public class BuffRunner
 
         if (stateMachine != null)
         {
+            if (DateTime.UtcNow - startedUtc >= GiveUpAfter)
+            {
+                logger.Warning("Buff run gave up after {Minutes} minutes (stuck in {State})", GiveUpAfter.TotalMinutes, stateMachine.State);
+                pathfinder.Stop();
+                memory.Forget<ApplyingBuffsMemory>();
+                memory.Forget<ManualBuffRunMemory>();
+                memory.Forget<InquiringMindAttemptedMemory>();
+                stateMachine = null;
+                RestoreJobIfNeeded();
+                CompleteIfJobRestored();
+                return;
+            }
+
             stateMachine.Update();
 
             if (stateMachine.State == BuffState.NoCrystalsFound)
             {
-                logger.Warning("Manual buff run aborted — no knowledge crystals nearby");
+                logger.Warning("Buff run aborted — no knowledge crystals nearby");
                 pathfinder.Stop();
                 memory.Forget<ApplyingBuffsMemory>();
                 memory.Forget<ManualBuffRunMemory>();
@@ -174,6 +197,14 @@ public class BuffRunner
 
         if (jobs.TryGetCurrent(out SupportJob current) && current.Id == saved.Job)
         {
+            memory.Forget<BuffSupportJobMemory>();
+            return;
+        }
+
+        restoreSinceUtc ??= DateTime.UtcNow;
+        if (DateTime.UtcNow - restoreSinceUtc.Value >= RestoreGiveUpAfter)
+        {
+            logger.Warning("Buff run: could not switch back to {Job} within {Seconds}s; leaving the job as it is", saved.Job, RestoreGiveUpAfter.TotalSeconds);
             memory.Forget<BuffSupportJobMemory>();
             return;
         }

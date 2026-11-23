@@ -1,5 +1,6 @@
 using BOCCHI.Common.Data.OccultCrescent;
 using BOCCHI.Common.Data.Zones;
+using ECommons.DalamudServices;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.InstanceContent;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
@@ -42,11 +43,39 @@ public static unsafe class OccultCrescentHelper
     public static int GetGoldTotal() =>
         GetCurrencyCount(OccultCurrencies.GoldPieceItemId) + GetCurrencyCount(OccultCurrencies.GoldObolItemId);
 
+    private static (Dictionary<uint, bool> Unlocked, bool HasEntries)? unlockSnapshot;
+
+    // Route planning continues after awaits off the framework thread, where the teleport agent must not be read.
+    public static void SnapshotAethernetUnlocks()
+    {
+        Dictionary<uint, bool> unlocked = [];
+        AgentTelepotTown* agent = GetTelepotAgent();
+        if (agent == null || agent->Data == null)
+        {
+            unlockSnapshot = null;
+            return;
+        }
+
+        ref AgentTelepotTownData data = ref *agent->Data;
+        int count = Math.Min((int)data.AetheryteCount, data.Entries.Length);
+        for (var i = 0; i < count; i++)
+        {
+            AgentTelepotTownData.AetheryteEntry entry = data.Entries[i];
+            unlocked[entry.PlaceNameId] = !entry.IsLocked && !entry.IsUnusable;
+        }
+
+        unlockSnapshot = (unlocked, count > 0);
+    }
+
     public static bool IsAethernetUnlocked(uint placeNameId)
     {
-        AgentTelepotTown* agent = AgentModule.Instance() == null
-            ? null
-            : (AgentTelepotTown*)AgentModule.Instance()->GetAgentByInternalId(AgentId.TelepotTown);
+        if (!Svc.Framework.IsInFrameworkUpdateThread)
+        {
+            return unlockSnapshot is not { } snapshot
+                   || (snapshot.Unlocked.TryGetValue(placeNameId, out bool known) ? known : !snapshot.HasEntries);
+        }
+
+        AgentTelepotTown* agent = GetTelepotAgent();
 
         if (agent == null || agent->Data == null)
         {
@@ -66,4 +95,9 @@ public static unsafe class OccultCrescentHelper
 
         return count == 0;
     }
+
+    private static AgentTelepotTown* GetTelepotAgent() =>
+        AgentModule.Instance() == null
+            ? null
+            : (AgentTelepotTown*)AgentModule.Instance()->GetAgentByInternalId(AgentId.TelepotTown);
 }

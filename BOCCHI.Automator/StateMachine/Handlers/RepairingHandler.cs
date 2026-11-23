@@ -16,6 +16,12 @@ public class RepairingHandler(
 {
     private static readonly TimeSpan FailureBackoff = TimeSpan.FromSeconds(90);
 
+    private static readonly TimeSpan RepeatedFailureBackoff = TimeSpan.FromMinutes(30);
+
+    private const int MaxFailuresInARow = 3;
+
+    private int failuresInARow;
+
     private static readonly TimeSpan AttemptTimeout = TimeSpan.FromSeconds(75);
 
     private const string ChainName = "Repairs";
@@ -130,7 +136,17 @@ public class RepairingHandler(
 
         if (succeeded)
         {
+            failuresInARow = 0;
             suppressUntilUtc = null;
+            return;
+        }
+
+        repair.CleanUpAfterFailure();
+        if (++failuresInARow >= MaxFailuresInARow)
+        {
+            failuresInARow = 0;
+            suppressUntilUtc = DateTime.UtcNow + RepeatedFailureBackoff;
+            log.Warning("Repair failed {Count} times in a row — not trying again for {Minutes} minutes", MaxFailuresInARow, (int)RepeatedFailureBackoff.TotalMinutes);
             return;
         }
 

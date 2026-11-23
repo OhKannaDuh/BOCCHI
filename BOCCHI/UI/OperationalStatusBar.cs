@@ -195,7 +195,7 @@ public class OperationalStatusBar
             }
         }
 
-        string? potChip = PotTimerUi.FormatCompact(potCycle, data, translator);
+        string? potChip = PotTimerUi.FormatCompact(potCycle, zones, translator);
         if (potChip != null)
         {
             ImGui.SameLine(0f, 10f);

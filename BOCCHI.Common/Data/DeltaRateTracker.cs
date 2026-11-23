@@ -102,8 +102,13 @@ public sealed class DeltaRateTracker(Func<TimeSpan> getTrackedWindow)
 
         if (delta < 0)
         {
-            valueBeforeDrop = lastValue;
-            dropAt = DateTime.UtcNow;
+            // Keep the value from before the first drop, so a dip over several reads is not counted as income when it comes back.
+            if (valueBeforeDrop == null || DateTime.UtcNow - dropAt > RecoveryWindow)
+            {
+                valueBeforeDrop = lastValue;
+                dropAt = DateTime.UtcNow;
+            }
+
             lastValue = current;
             return;
         }
@@ -111,12 +116,12 @@ public sealed class DeltaRateTracker(Func<TimeSpan> getTrackedWindow)
         if (valueBeforeDrop is { } before && DateTime.UtcNow - dropAt <= RecoveryWindow)
         {
             lastValue = current;
-            valueBeforeDrop = null;
             if (current <= before)
             {
                 return;
             }
 
+            valueBeforeDrop = null;
             delta = current - before;
         }
         else

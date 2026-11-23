@@ -21,9 +21,17 @@ public class LevelingPhantomJobHandler
     ILogger<LevelingPhantomJobHandler> logger
 ) : ScoreStateHandler<AutomatorState, StatePriority>(AutomatorState.LevelingPhantomJob)
 {
+    private const int MaxAttempts = 3;
+
+    private static readonly TimeSpan BackOff = TimeSpan.FromMinutes(2);
+
+    private int attempts;
+
+    private DateTime backOffUntilUtc;
+
     public override StatePriority GetScore()
     {
-        if (!config.PhantomJobsLevelingMode)
+        if (!config.PhantomJobsLevelingMode || DateTime.UtcNow < backOffUntilUtc)
         {
             return StatePriority.Never;
         }
@@ -82,7 +90,21 @@ public class LevelingPhantomJobHandler
             logger.Info("Phantom job {Current} is maxed — switching to {Next}", current.Id, next);
         }
 
+        if (++attempts > MaxAttempts)
+        {
+            attempts = 0;
+            backOffUntilUtc = DateTime.UtcNow + BackOff;
+            logger.Warning("Phantom job switch to {Next} failed {Count} times; carrying on and trying again in {Minutes} minutes", next, MaxAttempts, BackOff.TotalMinutes);
+            return;
+        }
+
         changer.Change(next);
+    }
+
+    public override void Exit(AutomatorState next)
+    {
+        base.Exit(next);
+        attempts = 0;
     }
 
     private bool TryFindNextJob(SupportJob current, out SupportJobId next)

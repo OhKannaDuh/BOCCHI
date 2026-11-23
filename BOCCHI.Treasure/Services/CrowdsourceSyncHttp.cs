@@ -7,6 +7,12 @@ namespace BOCCHI.Treasure.Services;
 
 internal static class CrowdsourceSyncHttp
 {
+    // A refused report (bad data) would otherwise be retried every minute forever and block every report behind it.
+    public static bool IsPermanentRejection(string? status) =>
+        Enum.TryParse(status, out System.Net.HttpStatusCode code)
+        && (int)code is >= 400 and < 500
+        && code is not System.Net.HttpStatusCode.RequestTimeout and not System.Net.HttpStatusCode.TooManyRequests;
+
     public static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(15) };
 
     public static readonly JsonSerializerOptions JsonOptions = new()

@@ -25,10 +25,7 @@
     },
     "count_special_mobs_toward_minimum": {
       "label": "特殊モブを必要数に数える",
-      "tooltip": "オン：特殊な敵も下の最低数に数えます。\nオフ：釣りはしますが、数には入れません。"
-    },
-    "only_start_out_of_combat": {
-      "label": "戦闘が完全に終わるまで待つ"
+      "tooltip": "特殊な敵も下の最低数に数えます。数えなくても釣りはします。"
     },
     "max_mob_level": {
       "label": "対象の最大レベル"
@@ -138,7 +135,7 @@
     },
     "treasure_hunt_prefer_pots": {
       "label": "タイマーハント中はポット優先",
-      "tooltip": "オン：マジックポットが出たらトレジャーハントも中断します。\nオフ：ポットが出てもハントを最後まで続けます。"
+      "tooltip": "マジックポットが出たらトレジャーハントも中断します。"
     },
     "yield_to_crystal_buffs": {
       "label": "クリスタルバフが切れる前にかけ直す",

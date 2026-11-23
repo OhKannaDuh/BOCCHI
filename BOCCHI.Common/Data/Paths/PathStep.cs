@@ -12,7 +12,6 @@ public interface IPathStep
 
     string Describe();
 
-    bool TryExecute(IPathStepExecutor executor);
 }
 
 public abstract record PathStepType;
@@ -29,7 +28,6 @@ public enum PathStepKind
 
 public class PathStep : IPathStep
 {
-    private Task<ChainResult>? task;
 
     public required PathStepType PathStepData { get; init; }
 
@@ -44,23 +42,6 @@ public class PathStep : IPathStep
             Return _ => "Return to Basecamp",
             var _ => throw new ArgumentOutOfRangeException(nameof(PathStepData))
         };
-    }
-
-    public bool TryExecute(IPathStepExecutor executor)
-    {
-        if (task != null)
-        {
-            if (task.IsCompleted)
-            {
-                task = null;
-                return true;
-            }
-
-            return false;
-        }
-
-        task = executor.Execute(this);
-        return false;
     }
 
     public static PathStep Teleport(uint id) =>

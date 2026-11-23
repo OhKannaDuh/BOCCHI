@@ -66,10 +66,15 @@ public sealed class StuckJumpAssist(
             || conditions[ConditionFlag.BetweenAreas]
             || conditions[ConditionFlag.Occupied]
             || conditions[ConditionFlag.OccupiedInQuestEvent]
-            || conditions[ConditionFlag.Unconscious]
-            || ECommonsPlayer.IsJumping)
+            || conditions[ConditionFlag.Unconscious])
         {
             movedAtUtc = DateTime.MinValue;
+            return;
+        }
+
+        // Our own jump must not count as progress, or the jump counter never reaches its limit.
+        if (ECommonsPlayer.IsJumping)
+        {
             return;
         }
 
@@ -80,11 +85,16 @@ public sealed class StuckJumpAssist(
             return;
         }
 
-        if (movedAtUtc == DateTime.MinValue || position.Distance2D(lastPosition) > ProgressThreshold)
+        bool moved = position.Distance2D(lastPosition) > ProgressThreshold;
+        if (movedAtUtc == DateTime.MinValue || moved)
         {
+            if (moved)
+            {
+                jumpsAtSnag = 0;
+            }
+
             lastPosition = position;
             movedAtUtc = DateTime.UtcNow;
-            jumpsAtSnag = 0;
             return;
         }
 

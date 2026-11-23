@@ -238,13 +238,7 @@ public sealed class PluginDependencyStatusRenderer(
             return (T(translator, "ready"), true, false);
         }
 
-        var (label, ok, pending) = ipc.Invoke(internalName, translator);
-        if (!ok && loaded)
-        {
-            return (T(translator, "ready"), true, false);
-        }
-
-        return (label, ok, pending);
+        return ipc.Invoke(internalName, translator);
     }
 
     private static BocchiUi.StatusChipKind StatusKind(bool ok, bool pending) =>

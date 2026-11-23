@@ -778,14 +778,14 @@ public class IllegalModeTreasureFillerService
             hadFillerHunt = true;
             if (fromSurvey && tracker.CountInitialised)
             {
-                logger.Info(
+                logger.Debug(
                     "Illegal Mode: started automatic treasure hunt (survey {Silver} silver, {Bronze} bronze)",
                     tracker.SilverChests,
                     tracker.BronzeChests);
             }
             else
             {
-                logger.Info("Illegal Mode: started automatic treasure hunt from built-in map (no Treasure Sight)");
+                logger.Debug("Illegal Mode: started automatic treasure hunt from built-in map (no Treasure Sight)");
             }
 
             return;

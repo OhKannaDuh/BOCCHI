@@ -1,3 +1,4 @@
+using BOCCHI.Common.Data;
 using System.Numerics;
 using BOCCHI.Automator.Services.Paths;
 using BOCCHI.Common.Data.Aethernet;
@@ -135,6 +136,24 @@ public class IssueRegressionTests
     public void NothingIsClickedWithoutAPrompt()
     {
         Assert.Equal(AutoReviveAction.Nothing, AutoReviveRule.Decide(Dead with { PromptOpen = false }).Action);
+    }
+
+    // Audit 76: a dip that lasted two reads (stack moved, inventory re-sync) was counted as income when it came back.
+    [Fact]
+    public void ACurrencyDipOverSeveralReadsIsNotCountedAsIncome()
+    {
+        DeltaRateTracker tracker = new(() => TimeSpan.FromMinutes(5));
+        tracker.SetCounting(true);
+        foreach (long read in new long[] { 5000, 3000, 3000, 5000 })
+        {
+            tracker.RecordPositiveDelta(read);
+        }
+
+        Assert.Equal(0, tracker.GetHistory(TimeSpan.FromSeconds(15)).Sum());
+
+        tracker.RecordPositiveDelta(5100);
+        // History holds per-hour rates per 15 s bucket: 100 in one bucket is 100 / 15 s * 3600.
+        Assert.Equal(100f / 15 * 3600, tracker.GetHistory(TimeSpan.FromSeconds(15)).Sum(), 1);
     }
 
     // The party-invite box must never be mistaken for the return box.

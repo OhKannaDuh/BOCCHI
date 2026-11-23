@@ -142,7 +142,7 @@ public sealed class PotCycleSyncService
         if (potCycles.TryApplyRemoteAnchor((int)pick.FateId, spawnAt, territory, overwriteExisting: true))
         {
             logger.Debug(
-                "[PotCycleSync] linker applied pot={PotId} spawn={Spawn} alive={Alive}",
+                "linker applied pot={PotId} spawn={Spawn} alive={Alive}",
                 pick.FateId,
                 pick.SpawnUnix,
                 pick.Alive);
@@ -206,7 +206,7 @@ public sealed class PotCycleSyncService
                 lastUploadedSpawnUnix = upload.SpawnUnix;
                 nextUploadAttemptUtc = DateTime.UtcNow;
                 logger.Debug(
-                    "[PotCycleSync] uploaded pot={PotId} spawn={Spawn} key={KeyPrefix}…",
+                    "uploaded pot={PotId} spawn={Spawn} key={KeyPrefix}…",
                     upload.PotFateId,
                     upload.SpawnUnix,
                     upload.KeyPrefix);
@@ -216,11 +216,11 @@ public sealed class PotCycleSyncService
                 nextUploadAttemptUtc = DateTime.UtcNow + RetryDelay;
                 if (upload.Error is { } uploadError)
                 {
-                    logger.Warn("[PotCycleSync] upload failed: {Message}", uploadError);
+                    logger.Warn("upload failed: {Message}", uploadError);
                 }
                 else
                 {
-                    logger.Warn("[PotCycleSync] upload rejected: {Status}", upload.Status ?? "?");
+                    logger.Warn("upload rejected: {Status}", upload.Status ?? "?");
                 }
             }
         }
@@ -242,13 +242,13 @@ public sealed class PotCycleSyncService
                 {
                     loggedFetchRateLimit = true;
                     logger.Warn(
-                        "[PotCycleSync] fetch rate-limited — retrying in {Minutes:0}m",
+                        "fetch rate-limited — retrying in {Minutes:0}m",
                         fetchRateLimitDelay.TotalMinutes);
                 }
                 else
                 {
                     logger.Debug(
-                        "[PotCycleSync] fetch rejected: {Status} — next try in {Minutes:0}m",
+                        "fetch rejected: {Status} — next try in {Minutes:0}m",
                         fetch.Status ?? "?",
                         fetchRateLimitDelay.TotalMinutes);
                 }
@@ -261,11 +261,11 @@ public sealed class PotCycleSyncService
                 nextFetchAttemptUtc = DateTime.UtcNow + FetchRetryDelay;
                 if (fetch.Error is { } fetchError)
                 {
-                    logger.Warn("[PotCycleSync] fetch failed: {Message}", fetchError);
+                    logger.Warn("fetch failed: {Message}", fetchError);
                 }
                 else
                 {
-                    logger.Warn("[PotCycleSync] fetch rejected: {Status}", fetch.Status ?? "?");
+                    logger.Warn("fetch rejected: {Status}", fetch.Status ?? "?");
                 }
             }
 
@@ -286,14 +286,14 @@ public sealed class PotCycleSyncService
             {
                 lastFetchedInstanceKey = fetch.InstanceKey;
                 logger.Debug(
-                    "[PotCycleSync] fetch miss — no cycle for key {Key}… (stopped retrying)",
+                    "fetch miss — no cycle for key {Key}… (stopped retrying)",
                     Shorten(fetch.InstanceKey));
                 return;
             }
 
             nextFetchAttemptUtc = DateTime.UtcNow + FetchRetryDelay;
             logger.Debug(
-                "[PotCycleSync] fetch miss — no cycle for key {Key}… retrying",
+                "fetch miss — no cycle for key {Key}… retrying",
                 Shorten(fetch.InstanceKey));
             return;
         }
@@ -305,7 +305,7 @@ public sealed class PotCycleSyncService
         if (fetch.ResponseTerritoryId != 0 && fetch.ResponseTerritoryId != fetch.RequestTerritoryId)
         {
             logger.Warn(
-                "[PotCycleSync] fetch hit discarded — territory {Response} does not match {Request}",
+                "fetch hit discarded — territory {Response} does not match {Request}",
                 fetch.ResponseTerritoryId,
                 fetch.RequestTerritoryId);
             return;
@@ -315,14 +315,14 @@ public sealed class PotCycleSyncService
         if (potCycles.TryApplyRemoteAnchor(fetch.PotFateId, spawnAt, fetch.RequestTerritoryId))
         {
             logger.Debug(
-                "[PotCycleSync] fetch hit — applied remote pot={PotId} spawn={Spawn}",
+                "fetch hit — applied remote pot={PotId} spawn={Spawn}",
                 fetch.PotFateId,
                 fetch.SpawnUnix);
             return;
         }
 
         logger.Debug(
-            "[PotCycleSync] fetch hit but not applied — pot={PotId} spawn={Spawn} rejected by the "
+            "fetch hit but not applied — pot={PotId} spawn={Spawn} rejected by the "
             + "local tracker (usually a local anchor arrived first)",
             fetch.PotFateId,
             fetch.SpawnUnix);
@@ -513,8 +513,8 @@ public sealed class PotCycleSyncService
         // when the next pot is seen; wiping here caused "next pot → unknown".
         logger.Debug(
             firstKey
-                ? "[PotCycleSync] instance key from fate={FateId} epoch={Epoch} key={KeyPrefix}…"
-                : "[PotCycleSync] fingerprint fate ended — new key from fate={FateId} epoch={Epoch} key={KeyPrefix}… (pot timer kept)",
+                ? "instance key from fate={FateId} epoch={Epoch} key={KeyPrefix}…"
+                : "fingerprint fate ended — new key from fate={FateId} epoch={Epoch} key={KeyPrefix}… (pot timer kept)",
             fingerprintFateId,
             fingerprintStartEpoch,
             instanceKey[..8]);

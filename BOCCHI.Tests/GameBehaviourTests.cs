@@ -4,6 +4,7 @@ using BOCCHI.Automator.Services.Paths;
 using BOCCHI.Automator.StateMachine.Handlers;
 using BOCCHI.Common.Config;
 using BOCCHI.Common.Data.Fates;
+using BOCCHI.Common.Data.MobFarmer;
 using BOCCHI.Common.Data.StateMemory;
 using BOCCHI.Common.Data.Zones;
 using BOCCHI.Common.Data.Zones.Graph.Traversal;
@@ -180,6 +181,25 @@ public class GameBehaviourTests
             null!,
             new QuietLog<InCombatHandler>());
 
+    // Audit 127: a spot saved in South Horn was picked in North Horn.
+    [Fact]
+    public void MobFarmerSkipsSpotsSavedInTheOtherZone()
+    {
+        FarmSpot south = new() { Name = "south", Priority = 5, Territory = 1252 };
+        FarmSpot north = new() { Name = "north", Priority = 1, Territory = 1346 };
+        MobFarmerConfig config = new() { Spots = [south, north] };
+        FarmerSpotSession session = new(
+            config,
+            StandIn.For<IPlayer>(),
+            StandIn.For<IObjectTable>(),
+            StandIn.For<IPartyList>(),
+            StandIn.For<IClientState>(c => c.Answers("TerritoryType", 1346u)));
+
+        session.Begin();
+
+        Assert.Same(north, session.Current);
+    }
+
     private static MobFarmerService Farmer(RecordingCombat combat, Func<FarmerPhase> phase)
     {
         IStateMachine<FarmerPhase> machine = StandIn.For<IStateMachine<FarmerPhase>>(m => m.Answers("State", _ => phase()));
@@ -196,7 +216,7 @@ public class GameBehaviourTests
             StandIn.For<ITranslator<MainWindow>>(),
             StandIn.For<IAutomationModeGuard>(),
             combat,
-            new FarmerSpotSession(new MobFarmerConfig(), player, StandIn.For<IObjectTable>()),
+            new FarmerSpotSession(new MobFarmerConfig(), player, StandIn.For<IObjectTable>(), StandIn.For<IPartyList>(), StandIn.For<IClientState>()),
             new QuietLog<MobFarmerService>());
     }
 

@@ -9,9 +9,16 @@ using System.Numerics;
 
 namespace BOCCHI.MobFarmer.Services;
 
-public sealed class FarmerSpotSession(MobFarmerConfig config, IPlayer player, IObjectTable objects)
+public sealed class FarmerSpotSession(
+    MobFarmerConfig config,
+    IPlayer player,
+    IObjectTable objects,
+    IPartyList party,
+    IClientState client)
 {
-    private readonly HashSet<int> claimedIndices = [];
+    private static readonly TimeSpan ClaimExpiry = TimeSpan.FromMinutes(5);
+
+    private readonly Dictionary<FarmSpot, DateTimeOffset> claimedUntil = [];
 
     private DateTimeOffset? contestedSinceUtc;
 
@@ -32,7 +39,7 @@ public sealed class FarmerSpotSession(MobFarmerConfig config, IPlayer player, IO
 
     public void Begin()
     {
-        claimedIndices.Clear();
+        claimedUntil.Clear();
         contestedSinceUtc = null;
         Current = SelectBest(player.Position);
         Origin = Current?.Origin ?? player.Position;
@@ -41,7 +48,7 @@ public sealed class FarmerSpotSession(MobFarmerConfig config, IPlayer player, IO
 
     public void Reset()
     {
-        claimedIndices.Clear();
+        claimedUntil.Clear();
         contestedSinceUtc = null;
         Current = null;
         Origin = Vector3.Zero;
@@ -78,11 +85,7 @@ public sealed class FarmerSpotSession(MobFarmerConfig config, IPlayer player, IO
             return false;
         }
 
-        int index = config.Spots.IndexOf(Current);
-        if (index >= 0)
-        {
-            claimedIndices.Add(index);
-        }
+        claimedUntil[Current] = DateTimeOffset.UtcNow + ClaimExpiry;
 
         contestedSinceUtc = null;
         FarmSpot? next = SelectBest(player.Position);
@@ -109,32 +112,23 @@ public sealed class FarmerSpotSession(MobFarmerConfig config, IPlayer player, IO
         Vector3 watch = StackPoint ?? Origin;
         float radius = config.ClaimedPlayerRadius;
         ulong localId = objects.LocalPlayer?.GameObjectId ?? 0;
+        HashSet<uint> partyIds = party.Select(m => m.EntityId).ToHashSet();
         return objects.OfType<IPlayerCharacter>()
             .Any(p => p.GameObjectId != localId
+                      && !partyIds.Contains(p.EntityId)
                       && p.Position.Distance2D(watch) <= radius);
     }
 
     private FarmSpot? SelectBest(Vector3 from)
     {
-        List<(int Index, FarmSpot Spot)> enabled = [];
-        for (int i = 0; i < config.Spots.Count; i++)
-        {
-            FarmSpot spot = config.Spots[i];
-            if (spot.Enabled && !claimedIndices.Contains(i))
-            {
-                enabled.Add((i, spot));
-            }
-        }
-
-        if (enabled.Count == 0)
-        {
-            return null;
-        }
-
-        return enabled
-            .OrderByDescending(e => e.Spot.Priority)
-            .ThenBy(e => from.Distance2D(e.Spot.Origin))
-            .Select(e => e.Spot)
-            .First();
+        DateTimeOffset now = DateTimeOffset.UtcNow;
+        uint territory = client.TerritoryType;
+        return config.Spots
+            .Where(spot => spot.Enabled
+                           && (spot.Territory == 0 || spot.Territory == territory)
+                           && !(claimedUntil.TryGetValue(spot, out DateTimeOffset until) && until > now))
+            .OrderByDescending(spot => spot.Priority)
+            .ThenBy(spot => from.Distance2D(spot.Origin))
+            .FirstOrDefault();
     }
 }

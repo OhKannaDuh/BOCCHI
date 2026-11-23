@@ -6,5 +6,4 @@ public interface IFateScorer
 {
     FateScore Score(Fate fate);
 
-    Fate? SelectBest(IReadOnlyList<Fate> fates);
 }

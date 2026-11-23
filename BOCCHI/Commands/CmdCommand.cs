@@ -39,8 +39,6 @@ public class CmdCommand
             return;
         }
 
-        map->FlagMarkerCount = 0;
-
         switch (context.Args[0].ToLowerInvariant())
         {
             case "flag-active-ce":
@@ -67,6 +65,7 @@ public class CmdCommand
                 continue;
             }
 
+            map->FlagMarkerCount = 0;
             map->SetFlagMapMarker(client.TerritoryType, client.MapId, encounter.Position);
             chat.Print($"Flagged CE: {encounter.Name}");
             return;
@@ -85,6 +84,7 @@ public class CmdCommand
                 continue;
             }
 
+            map->FlagMarkerCount = 0;
             map->SetFlagMapMarker(client.TerritoryType, client.MapId, fate.Position);
             chat.Print($"Flagged fate: {fate.Name}");
             return;

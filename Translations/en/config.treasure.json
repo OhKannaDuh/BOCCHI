@@ -12,7 +12,7 @@
   "fields": {
     "enable_shared_maps": {
       "label": "Share chest locations",
-      "tooltip": "On: download coffer, carrot and pot chest locations and pot timers found by other BOCCHI players, and send in the ones you find. Nothing about you or your character is sent, only where the chest was.\nOff: use only the locations that come with BOCCHI."
+      "tooltip": "Downloads coffer, carrot and pot chest locations and pot timers found by other BOCCHI players, and sends in the ones you find. Nothing about you or your character is sent, only where the chest was. Without it, BOCCHI uses only the locations it comes with."
     },
     "draw_line_to_bronze_chests": {
       "label": "Lines to bronze coffers",
@@ -35,11 +35,11 @@
     },
     "loop_carrot_hunt": {
       "label": "Loop Carrot Hunt",
-      "tooltip": "On: keep going round the carrot spots until you press Stop or run out of Fortune Carrots.\nOff: go round once, then finish."
+      "tooltip": "Keeps going round the carrot spots until you press Stop or run out of Fortune Carrots, instead of going round once."
     },
     "carrot_hunt_scout_without_item": {
       "label": "Scout without Fortune Carrots",
-      "tooltip": "On: the Carrot Hunt can start with no Fortune Carrots. It walks the route to see which carrots are there.\nOff: you need at least one Fortune Carrot, and the hunt stops when you run out."
+      "tooltip": "Lets the Carrot Hunt start with no Fortune Carrots: it walks the route to see which carrots are there. Without it, you need at least one Fortune Carrot, and the hunt stops when you run out."
     },
     "play_sound_on_hunt_complete": {
       "label": "Play sound when Treasure Hunt finishes"

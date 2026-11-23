@@ -6,6 +6,7 @@ using Ocelot.Chain;
 using Ocelot.Chain.Extensions;
 using Ocelot.Extensions;
 using Ocelot.Lifecycle;
+using Ocelot.Services.Logger;
 
 namespace BOCCHI.Services;
 
@@ -14,17 +15,27 @@ public class SupportJobChanger
     IChainManager chainManager,
     ISupportJobFactory supportJobs,
     IObjectTable objects,
-    ICondition conditions
+    ICondition conditions,
+    ILogger<SupportJobChanger> logger
 ) : ISupportJobChanger, IOnUpdate
 {
     private Task<ChainResult>? task;
 
+    private SupportJobId target;
+
     public void Update()
     {
-        if (task?.IsCompleted == true)
+        if (task?.IsCompleted != true)
         {
-            task = null;
+            return;
         }
+
+        if (task.IsCompletedSuccessfully && task.Result is { IsSuccess: false, IsCanceled: false } result)
+        {
+            logger.Warning("Phantom job change to {Job} did not go through: {Reason}", target, result.ErrorMessage ?? "unknown");
+        }
+
+        task = null;
     }
 
     public void Change(SupportJobId id)
@@ -45,6 +56,7 @@ public class SupportJobChanger
         }
 
         SupportJob job = supportJobs.Create(id);
+        target = id;
 
         task = chainManager.ExecuteAsync(chains =>
         {

@@ -188,6 +188,8 @@ public abstract class BaseZone
 
     private ZoneGraph? cachedGraph;
     private Task<ZoneGraph>? graphLoadTask;
+
+    private DateTime graphRetryAfterUtc;
     private readonly object graphGate = new();
 
     private ZoneGraphLoadState graphLoadState = ZoneGraphLoadState.Idle;
@@ -214,7 +216,12 @@ public abstract class BaseZone
                 return Task.FromResult(cachedGraph);
             }
 
-            return graphLoadTask ??= LoadOrBuildGraphAsync();
+            if (graphLoadTask is { IsFaulted: true } or { IsCanceled: true } && DateTime.UtcNow >= graphRetryAfterUtc)
+            {
+                graphLoadTask = null;
+            }
+
+            return graphLoadTask ??= LoadOrBuildGraphGuardedAsync();
         }
     }
 
@@ -277,6 +284,22 @@ public abstract class BaseZone
         }
     }
 
+    private async Task<ZoneGraph> LoadOrBuildGraphGuardedAsync()
+    {
+        try
+        {
+            return await LoadOrBuildGraphAsync();
+        }
+        catch (Exception ex)
+        {
+            graphRetryAfterUtc = DateTime.UtcNow.AddSeconds(30);
+            graphLoadState = ZoneGraphLoadState.Idle;
+            graphSource = ZoneGraphSource.None;
+            logger.Warning(ex, "Path map for territory {Territory} could not be loaded or built; trying again in 30s", TerritoryType);
+            throw;
+        }
+    }
+
     private async Task<ZoneGraph> LoadOrBuildGraphAsync()
     {
         graphLoadState = ZoneGraphLoadState.Loading;
@@ -325,7 +348,7 @@ public abstract class BaseZone
         if (shipped != null && shipped.CoversZoneActivities(this))
         {
             logger.Info($"Using shipped zone graph for territory {TerritoryType}");
-            await File.WriteAllTextAsync(path, shipped.ToJson());
+            await TryWriteGraphAsync(path, shipped);
             cachedGraph = shipped;
             graphSource = ZoneGraphSource.Shipped;
             graphLoadState = ZoneGraphLoadState.Ready;
@@ -342,13 +365,30 @@ public abstract class BaseZone
         GraphConfig config = new(pathfinder, logger);
         ZoneGraph built = await graphs.BuildAsync(config, this);
         built.ClearCriticalEncounterCombatRadii();
+        if (!built.IsUsableForRouting())
+        {
+            throw new InvalidOperationException("Built path map has no usable routes (navmesh not ready?)");
+        }
+
         logger.Debug("Writing zone graph to: " + path);
-        await File.WriteAllTextAsync(path, built.ToJson());
+        await TryWriteGraphAsync(path, built);
 
         cachedGraph = built;
         graphSource = ZoneGraphSource.Built;
         graphLoadState = ZoneGraphLoadState.Ready;
         return built;
+    }
+
+    private async Task TryWriteGraphAsync(string path, ZoneGraph graph)
+    {
+        try
+        {
+            await File.WriteAllTextAsync(path, graph.ToJson());
+        }
+        catch (Exception ex)
+        {
+            logger.Warning(ex, "Could not save the path map to {Path}; using it for this session only", path);
+        }
     }
 
     private async Task<ZoneGraph?> TryLoadShippedGraphAsync(string fileName)

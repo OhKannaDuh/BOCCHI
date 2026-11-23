@@ -2,6 +2,9 @@
 using BOCCHI.Common.Services;
 using BOCCHI.Common.Steps;
 using Dalamud.Plugin.Services;
+using ECommons;
+using FFXIVClientStructs.FFXIV.Component.GUI;
+using Ocelot.Ipc.VNavmesh;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using Ocelot.Chain;
 using Ocelot.Services.PlayerState;
@@ -14,9 +17,24 @@ public class RepairService(
     IObjectTable objects,
     IDataManager data,
     IPlayer player,
+    IVNavmeshIpc vnav,
     IPluginLog log
 ) : IRepairService
 {
+    private static readonly string[] RepairWindows = ["SelectYesno", "Repair", "SelectIconString"];
+
+    public unsafe void CleanUpAfterFailure()
+    {
+        vnav.Stop();
+        foreach (string name in RepairWindows)
+        {
+            if (GenericHelpers.TryGetAddonByName(name, out AtkUnitBase* addon) && addon->IsVisible)
+            {
+                addon->Close(true);
+            }
+        }
+    }
+
     public unsafe bool ShouldRepair()
     {
         if (!TryGetEquipped(out InventoryContainer* equipped))

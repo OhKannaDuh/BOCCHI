@@ -26,7 +26,13 @@ public class ApplyingBuffsHandler
     ILogger<ApplyingBuffsHandler> logger
 ) : ScoreStateHandler<AutomatorState, StatePriority>(AutomatorState.ApplyingBuffs)
 {
+    private static readonly TimeSpan GiveUpAfter = TimeSpan.FromMinutes(2);
+
+    private static readonly TimeSpan RetryAfter = TimeSpan.FromMinutes(5);
+
     private IStateMachine<BuffState>? stateMachine;
+
+    private DateTime retryAfterUtc;
 
     public override StatePriority GetScore()
     {
@@ -42,7 +48,7 @@ public class ApplyingBuffsHandler
             return StatePriority.Never;
         }
 
-        if (!config.ShouldAutomateBuffs || !buffs.ShouldRefreshAny())
+        if (!config.ShouldAutomateBuffs || !buffs.ShouldRefreshAny() || DateTime.UtcNow < retryAfterUtc)
         {
             return StatePriority.Never;
         }
@@ -105,6 +111,20 @@ public class ApplyingBuffsHandler
     {
         if (stateMachine == null)
         {
+            return;
+        }
+
+        if (TimeInState >= GiveUpAfter)
+        {
+            logger.Warning(
+                "Illegal Mode buff run gave up after {Minutes} minutes (stuck in {State}); trying again in {Retry} minutes",
+                GiveUpAfter.TotalMinutes,
+                stateMachine.State,
+                RetryAfter.TotalMinutes);
+            pathfinder.Stop();
+            ClearBuffLatch();
+            stateMachine = null;
+            retryAfterUtc = DateTime.UtcNow + RetryAfter;
             return;
         }
 

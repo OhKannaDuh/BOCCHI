@@ -52,41 +52,6 @@ public class FateScorer
         return score;
     }
 
-    public Fate? SelectBest(IReadOnlyList<Fate> fates)
-    {
-        if (!automatorConfig.ShouldDoFates || fates.Count == 0)
-        {
-            return null;
-        }
-
-        Fate? best = null;
-        float bestScore = float.MinValue;
-
-        foreach (Fate fate in fates)
-        {
-            if (!config.IsFateEnabledForIllegalMode(
-                    fate.Id.Value,
-                    zones.GetZone().IsPotFate(fate.Id.Value),
-                    automatorConfig.PreferPotFates))
-            {
-                continue;
-            }
-
-            if (ShouldSkip(fate))
-            {
-                continue;
-            }
-
-            FateScore score = Score(fate);
-            if (score.Value > bestScore)
-            {
-                bestScore = score.Value;
-                best = fate;
-            }
-        }
-
-        return best;
-    }
 
     private bool ShouldSkip(Fate fate) =>
         config.ShouldSkipByProgress(fate.Progress)

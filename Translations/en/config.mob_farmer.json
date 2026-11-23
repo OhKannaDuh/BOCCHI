@@ -25,10 +25,7 @@
     },
     "count_special_mobs_toward_minimum": {
       "label": "Count specials toward minimums",
-      "tooltip": "On: special enemies count towards the minimums below.\nOff: they are still pulled, but don't count."
-    },
-    "only_start_out_of_combat": {
-      "label": "Wait until combat fully ends"
+      "tooltip": "Special enemies count towards the minimums below. They are pulled either way."
     },
     "max_mob_level": {
       "label": "Max enemy level"
@@ -138,7 +135,7 @@
     },
     "treasure_hunt_prefer_pots": {
       "label": "Prioritize pots during timed hunt",
-      "tooltip": "On: a Magic Pot also interrupts the treasure hunt.\nOff: the hunt runs to the end, even when a pot appears."
+      "tooltip": "A Magic Pot also interrupts the treasure hunt."
     },
     "yield_to_crystal_buffs": {
       "label": "Refresh crystal buffs when low",

@@ -77,7 +77,7 @@ public class FatesRenderer
     {
         string state = fate.State.ToString() switch
         {
-            "Preparation" => translator.T(".world.fates.state_preparation"),
+            "Preparing" => translator.T(".world.fates.state_preparation"),
             "Running" => translator.T(".world.fates.state_running"),
             "Ending" => translator.T(".world.fates.state_ending"),
             _ => fate.State.ToString(),

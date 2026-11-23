@@ -27,29 +27,26 @@ public static class MobData
     ///     will pull these even if they are not in the selected list.
     ///     NH weather quartet (Mousse / Dhruva / Bomb / Mimic) still needs distinct NameIds.
     /// </summary>
-    public static IReadOnlyList<Mob> MobsWithSpawnCondition
+    public static readonly IReadOnlySet<Mob> MobsWithSpawnCondition = new HashSet<Mob>
     {
-        get =>
-        [
-            // South Horn
-            Mob.Armor,
-            Mob.Bomb,
-            Mob.Caoineag,
-            Mob.Dhruva,
-            Mob.Dullahan,
-            Mob.Fool,
-            Mob.Geshunpest,
-            Mob.Ghost,
-            Mob.Gourmand,
-            Mob.Mimic,
-            Mob.Mousse,
-            Mob.Troubadour,
-            // North Horn (night)
-            Mob.Bicephalus,
-            Mob.Glutton,
-            Mob.Ankou
-        ];
-    }
+        // South Horn
+        Mob.Armor,
+        Mob.Bomb,
+        Mob.Caoineag,
+        Mob.Dhruva,
+        Mob.Dullahan,
+        Mob.Fool,
+        Mob.Geshunpest,
+        Mob.Ghost,
+        Mob.Gourmand,
+        Mob.Mimic,
+        Mob.Mousse,
+        Mob.Troubadour,
+        // North Horn (night)
+        Mob.Bicephalus,
+        Mob.Glutton,
+        Mob.Ankou
+    };
 
     public static ZoneId GetZone(Mob mob) =>
         (uint)mob >= NorthHornMinNameId ? ZoneId.NorthHorn : ZoneId.SouthHorn;

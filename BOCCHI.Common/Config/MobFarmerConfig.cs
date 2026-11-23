@@ -40,9 +40,6 @@ public class MobFarmerConfig : IAutoConfig
     [Checkbox(Order = 9, Section = "pulls")]
     public bool CountSpecialMobsTowardMinimum { get; set; } = false;
 
-    [Checkbox(Order = 10, Section = "pulls")]
-    public bool OnlyStartOutOfCombat { get; set; } = false;
-
     [IntRange(0, 20, Order = 11, Section = "pulls")]
     public int MinimumMobsToStartLoop { get; set; } = 0;
 

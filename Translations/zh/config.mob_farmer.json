@@ -25,10 +25,7 @@
     },
     "count_special_mobs_toward_minimum": {
       "label": "特殊敌人计入最少数量",
-      "tooltip": "开启：特殊敌人计入下面的最少数量。\n关闭：仍会拉它们，但不计数。"
-    },
-    "only_start_out_of_combat": {
-      "label": "等完全脱离战斗后再开始"
+      "tooltip": "特殊敌人计入下面的最少数量。不计入时也照样会拉。"
     },
     "max_mob_level": {
       "label": "敌人最高等级"
@@ -138,7 +135,7 @@
     },
     "treasure_hunt_prefer_pots": {
       "label": "定时寻宝时优先魔法罐",
-      "tooltip": "开启：魔法罐也会打断寻宝。\n关闭：即使出现魔法罐，寻宝也会进行到底。"
+      "tooltip": "魔法罐也会打断寻宝。"
     },
     "yield_to_crystal_buffs": {
       "label": "水晶增益将尽时重施",

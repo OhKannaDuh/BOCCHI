@@ -144,7 +144,7 @@ public sealed class PotCycleTracker
         knownCyclesDirty = true;
 
         logger.Debug(
-            "[PotCycleTracker] cleared schedule for territory {Territory} ({Reason})",
+            "cleared schedule for territory {Territory} ({Reason})",
             territoryTypeId,
             string.IsNullOrEmpty(reason) ? "unspecified" : reason);
     }
@@ -212,8 +212,8 @@ public sealed class PotCycleTracker
         knownCyclesDirty = true;
         logger.Debug(
             overwriteExisting && previous.HasKnownAnchor
-                ? $"[PotCycleTracker] linker overwrite zone={territoryTypeId} pot={potFateId} spawnAt={spawnAt:O} (was pot={previous.AnchorPotFateId} spawnAt={previous.AnchorSpawnAt:O})"
-                : $"[PotCycleTracker] remote anchor zone={territoryTypeId} pot={potFateId} spawnAt={spawnAt:O} next={opposite?.Id ?? 0} nextSpawnAt={nextSpawn:O}");
+                ? $"linker overwrite zone={territoryTypeId} pot={potFateId} spawnAt={spawnAt:O} (was pot={previous.AnchorPotFateId} spawnAt={previous.AnchorSpawnAt:O})"
+                : $"remote anchor zone={territoryTypeId} pot={potFateId} spawnAt={spawnAt:O} next={opposite?.Id ?? 0} nextSpawnAt={nextSpawn:O}");
         return true;
     }
 
@@ -244,7 +244,7 @@ public sealed class PotCycleTracker
         DateTimeOffset nextSpawn = spawnAt + PotCycleInterval;
 
         logger.Debug(
-            $"[PotCycleTracker] zone={territoryType} local anchor pot={activeId} next={opposite?.Id ?? 0} nextSpawnAt={(opposite == null ? "none" : nextSpawn.ToString("O"))}");
+            $"zone={territoryType} local anchor pot={activeId} next={opposite?.Id ?? 0} nextSpawnAt={(opposite == null ? "none" : nextSpawn.ToString("O"))}");
 
         return new PotCycleSnapshot
         {
@@ -302,7 +302,7 @@ public sealed class PotCycleTracker
         if (rolled > 0)
         {
             logger.Debug(
-                "[PotCycleTracker] zone={Territory} rolled stale prediction x{Rolled} → next={NextId} at {NextSpawn:O}",
+                "zone={Territory} rolled stale prediction x{Rolled} → next={NextId} at {NextSpawn:O}",
                 territoryType,
                 rolled,
                 nextPotId,

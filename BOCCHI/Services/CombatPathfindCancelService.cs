@@ -122,6 +122,12 @@ public sealed unsafe class CombatPathfindCancelService
             return false;
         }
 
+        // Only BOCCHI's own trip to a goal is cancelled; other walks (yours, other plugins', the pot chest search) are left alone.
+        if (!memory.TryRemember<GoalMemory>(out GoalMemory _) && !memory.TryRemember<GoalPathStepMemory>(out GoalPathStepMemory _))
+        {
+            return false;
+        }
+
         PathfindingState state = pathfinder.GetState();
         return state is PathfindingState.Moving or PathfindingState.Pathfinding
                || vnav.IsRunning()
@@ -142,6 +148,7 @@ public sealed unsafe class CombatPathfindCancelService
     private bool ActivityOwnsMovement() =>
         memory.TryRemember<SuspendTravelForActivityMemory>(out SuspendTravelForActivityMemory _)
         || memory.TryRemember<CommittedFateMemory>(out CommittedFateMemory _)
+        || memory.TryRemember<PotChestFarmMemory>(out PotChestFarmMemory _)
         || fates.IsInFate()
         || criticalEncounters.IsInCriticalEncounter()
         || farmerFactory().Running

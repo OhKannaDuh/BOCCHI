@@ -28,6 +28,8 @@ public sealed class HuntSelfDefenceService
 
     private bool ownsRotation;
 
+    private int ownedGeneration;
+
     public bool Defending { get; private set; }
 
     public void Update()
@@ -86,6 +88,7 @@ public sealed class HuntSelfDefenceService
         if (ownsRotation)
         {
             rotation.PrepareForIllegalMode();
+            ownedGeneration = rotation.SessionGeneration;
         }
 
         logger.Info(
@@ -105,7 +108,8 @@ public sealed class HuntSelfDefenceService
 
         Defending = false;
         rotation.DisableAi();
-        if (ownsRotation)
+        // Another mode may have prepared the shared session since; tearing it down would leave that mode without a rotation.
+        if (ownsRotation && rotation.SessionGeneration == ownedGeneration)
         {
             rotation.TeardownForIllegalMode();
         }
