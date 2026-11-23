@@ -1,3 +1,3 @@
 {
-  "help": "디버그 도구. /bocchi debug ce [id]: 비상 조우 이동이나 대기가 잘못된 이유 표시(멈춘 곳에서 실행). /bocchi debug pos: 현재 위치 복사. /bocchi debug shop [start|status|cancel]: 캠프로 돌아가 Knightshopper 목록 시작. /bocchi debug ai-preset: BossMod에 BOCCHI AI 프리셋이 없으면 생성."
+  "help": "버그 신고용 도구: ce [id], pos, shop [start|status|cancel], ai-preset"
 }

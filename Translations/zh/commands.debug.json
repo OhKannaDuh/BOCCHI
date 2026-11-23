@@ -1,3 +1,3 @@
 {
-  "help": "调试工具。/bocchi debug ce [id]：显示前往或等待紧急遭遇战出错的原因（在卡住的地方执行）。/bocchi debug pos：复制当前位置。/bocchi debug shop [start|status|cancel]：返回营地并启动 Knightshopper 清单。/bocchi debug ai-preset：BossMod 中缺少 BOCCHI AI 预设时创建。"
+  "help": "用于报告问题的工具：ce [id]、pos、shop [start|status|cancel]、ai-preset"
 }
