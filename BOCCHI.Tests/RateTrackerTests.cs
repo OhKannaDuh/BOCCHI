@@ -5,6 +5,26 @@ namespace BOCCHI.Tests;
 
 public class RateTrackerTests
 {
+    // Audit 83: a break outside Occult Crescent used to pull the rate down until a full hour had passed.
+    [Fact]
+    public void ABreakOutsideTheZoneDoesNotLowerTheRate()
+    {
+        DateTime now = new(2026, 11, 23, 12, 0, 0, DateTimeKind.Utc);
+        DeltaRateTracker tracker = new(() => DeltaRateTracker.DefaultWindow, () => now);
+        tracker.SetCounting(true);
+        tracker.RecordPositiveDelta(0);
+        now = now.AddMinutes(30);
+        tracker.RecordPositiveDelta(500);
+        tracker.SetCounting(false);
+
+        now = now.AddHours(2);
+        tracker.SetCounting(true);
+        now = now.AddMinutes(30);
+        tracker.RecordPositiveDelta(1000);
+
+        Assert.Equal(1000, tracker.PerHour);
+    }
+
     // Audit: rate uses active elapsed time and sums multiple readings.
     [Fact]
     public void PerHourUsesKnownReadingsAndExcludesPausedTime()

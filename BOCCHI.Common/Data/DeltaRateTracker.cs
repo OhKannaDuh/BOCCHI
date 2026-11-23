@@ -1,6 +1,6 @@
 namespace BOCCHI.Common.Data;
 
-public readonly record struct DeltaSnapshot(long Delta, DateTime Time);
+public readonly record struct DeltaSnapshot(long Delta, DateTime Time, TimeSpan Active);
 
 public sealed class DeltaRateTracker(Func<TimeSpan> getTrackedWindow, Func<DateTime>? clock = null)
 {
@@ -41,7 +41,8 @@ public sealed class DeltaRateTracker(Func<TimeSpan> getTrackedWindow, Func<DateT
                 return 0;
             }
 
-            long windowGained = SumSince((clock?.Invoke() ?? DateTime.UtcNow) - RateHour);
+            // The hour is counted in time spent in Occult Crescent; a wall-clock hour let a break pull the rate down.
+            long windowGained = SumSince(elapsed - RateHour);
             if (elapsed < RateHour)
             {
                 return windowGained / elapsed.TotalHours;
@@ -135,7 +136,7 @@ public sealed class DeltaRateTracker(Func<TimeSpan> getTrackedWindow, Func<DateT
             return;
         }
 
-        snapshots.Add(new(delta, (clock?.Invoke() ?? DateTime.UtcNow)));
+        snapshots.Add(new(delta, (clock?.Invoke() ?? DateTime.UtcNow), ActiveElapsed()));
     }
 
     public float[] GetHistory(TimeSpan sampleDuration)
@@ -196,12 +197,12 @@ public sealed class DeltaRateTracker(Func<TimeSpan> getTrackedWindow, Func<DateT
         return accumulatedActive + extra;
     }
 
-    private long SumSince(DateTime cutoff)
+    private long SumSince(TimeSpan activeCutoff)
     {
         long sum = 0;
         foreach (DeltaSnapshot snapshot in snapshots)
         {
-            if (snapshot.Time >= cutoff)
+            if (snapshot.Active >= activeCutoff)
             {
                 sum += snapshot.Delta;
             }
@@ -217,10 +218,10 @@ public sealed class DeltaRateTracker(Func<TimeSpan> getTrackedWindow, Func<DateT
             return;
         }
 
-        DateTime cutoff = (clock?.Invoke() ?? DateTime.UtcNow) - RateHour;
+        TimeSpan cutoff = ActiveElapsed() - RateHour;
 
         int index = 0;
-        while (index < snapshots.Count && snapshots[index].Time < cutoff)
+        while (index < snapshots.Count && snapshots[index].Active < cutoff)
         {
             index++;
         }

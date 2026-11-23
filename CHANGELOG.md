@@ -51,7 +51,7 @@
 - "Rebuild path map" moved to Movement → Routes; "Replan route" is gone (Stop and Start does the same)
 
 ### Other fixes
-- Gold and silver per hour stay correct when you spend down to 0 or move a stack
+- Gold, silver and XP per hour stay correct when you spend down to 0, move a stack or take a break outside Occult Crescent
 - The pot timer only shows the zone you are in
 - Shared chest spots and pot timers are more reliable and harder to fake
 - FATE and CE names in your game language, shorter times (01:30 instead of 00:01:30), and clearer warnings
