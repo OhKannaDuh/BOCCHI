@@ -45,8 +45,24 @@ public sealed class NinjaHideAssist(
     public bool IsMounted =>
         conditions[ConditionFlag.Mounted] || conditions[ConditionFlag.Mounting];
 
+    private static readonly TimeSpan QuietBeforeSwapBack = TimeSpan.FromSeconds(10);
+
+    private DateTime? quietSinceUtc;
+
+    // The threat check flips often (a mob steps out of range, a gap between legs); swapping back at once
+    // dropped Hide, then swapped to Ninja again and waited out the 20 s recast.
+    public void RestorePreviousGearsetWhenQuiet()
+    {
+        quietSinceUtc ??= DateTime.UtcNow;
+        if (DateTime.UtcNow - quietSinceUtc.Value >= QuietBeforeSwapBack)
+        {
+            RestorePreviousGearsetIfNeeded();
+        }
+    }
+
     public bool EnsureReady(int ninjaGearsetNumber)
     {
+        quietSinceUtc = null;
         if (conditions[ConditionFlag.InCombat])
         {
             return false;
@@ -77,6 +93,9 @@ public sealed class NinjaHideAssist(
         TryCastHide();
         return false;
     }
+
+    // Hide has a 20 s recast; opening a chest drops it, so the next leg often starts while it recharges.
+    public bool IsHideRecharging => IsNinja && !IsStealthed && Hide.GetRecastTime() > 0f;
 
     public unsafe bool CanBecomeNinja(int gearsetNumber)
     {

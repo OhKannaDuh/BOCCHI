@@ -69,6 +69,33 @@ public class ConfigMigrationTests
     }
 
     [Fact]
+    public void OldSettingsKeepTheirValuesThroughEveryMigration()
+    {
+        JObject config = JObject.Parse("""
+            { "Version": 1, "ExpConfig": { "Enabled": false }, "CurrencyConfig": { "Enabled": false },
+              "BuffConfig": { "Enabled": true, "ApplyRomeosBallad": true,
+                "ApplyEnduringFortitude": true, "ReapplyThreshold": 37 } }
+            """);
+        ConfigurationMigrationResolver resolver = new(Migrators);
+        int newest = Migrators.Max(m => m.ToVersion);
+        while (config["Version"]!.Value<int>() < newest)
+        {
+            IMigrator? migrator = resolver.Resolve(config["Version"]!.Value<int>());
+            Assert.NotNull(migrator);
+            config = migrator.Migrate(config);
+            Assert.Equal(migrator.ToVersion, config["Version"]!.Value<int>());
+        }
+
+        Assert.Equal(newest, config["Version"]!.Value<int>());
+        Assert.False(config.SelectToken("UIConfig.ShowExperienceTracker")!.Value<bool>());
+        Assert.False(config.SelectToken("UIConfig.ShowCurrencyTracker")!.Value<bool>());
+        Assert.True(config.SelectToken("BuffConfig.ShouldAutomateBuffs")!.Value<bool>());
+        Assert.True(config.SelectToken("BuffConfig.ApplyRomeosBallad")!.Value<bool>());
+        Assert.True(config.SelectToken("BuffConfig.ApplyEnduringFortitude")!.Value<bool>());
+        Assert.Equal(37, config.SelectToken("BuffConfig.ReapplyThreshold")!.Value<int>());
+    }
+
+    [Fact]
     public void MergedUiSwitchesKeepWhatYouHadOn()
     {
         JObject old = JObject.Parse("""

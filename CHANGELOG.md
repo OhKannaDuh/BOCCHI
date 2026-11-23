@@ -17,12 +17,13 @@
 ### Fighting
 - BOCCHI now fights back when attacked: while riding (mobs your level or lower), while waiting for a pot, CE or Return, and during Treasure Hunt, Carrot Hunt and Triage Mode
 - With combat set to None, BOCCHI keeps moving when attacked and fully lets go of your rotation plugin
-- Rotation plugins and BossMod presets are switched on and off more reliably
+- Rotation plugins and BossMod presets are switched on and off more reliably, and your BossMod movement settings come back after BossMod reloads
 - Warrior with the BossMod rotation no longer uses AoE skills on a single enemy
 
 ### Pots and treasure
 - Pots now work with "Do FATEs" turned off
-- The second pot chest search no longer goes back to the first pot's spots, and no Magical Elixir is wasted while Cache Me If You Can is still up
+- The second pot chest search uses a Magical Elixir right away instead of guessing, no longer goes back to the first pot's spots, still uses Return and teleports for long trips, and no elixir is wasted once the search is done
+- With Ninja Hide on, BOCCHI keeps moving while Hide recharges instead of standing still for 20 seconds, and no longer swaps off Ninja (dropping Hide) the moment a mob steps out of range
 - No more mounting up again just to reach a pot from its waiting spot
 - Treasure Hunt and Carrot Hunt no longer get stuck on failed teleports, coffers or carrots they can't reach, or the Wanderer's Haven ledge coffer
 - After you die, Treasure Hunt and Carrot Hunt plan a fresh route instead of riding straight from camp
@@ -44,7 +45,7 @@
 
 ### Settings
 - Safer updates: a backup is made before your settings change, and a broken settings file no longer stops BOCCHI from loading
-- Changes made with the chat command `/bocchi config set` are now kept after a restart
+- Changes made with the chat command `/bocchi config set` are now kept after a restart, and `""` clears a text setting
 - Your chosen mount and combat plugin are no longer reset by themselves
 - Removed the settings that hid tabs; every tab is always shown
 - "Rebuild path map" moved to Movement → Routes; "Replan route" is gone (Stop and Start does the same)
@@ -54,6 +55,7 @@
 - The pot timer only shows the zone you are in
 - Shared chest spots and pot timers are more reliable and harder to fake
 - FATE and CE names in your game language, shorter times (01:30 instead of 00:01:30), and clearer warnings
+- BOCCHI no longer thinks you are in a Critical Encounter that is far away
 - Easier-to-read logs when you report a problem
 - Sounds you add for "hunt finished" now survive plugin updates ("Open sounds folder" opens their new place; sounds already there are copied over)
 - The settings window opens at a usable size the first time, and text not yet translated shows in English instead of a key name

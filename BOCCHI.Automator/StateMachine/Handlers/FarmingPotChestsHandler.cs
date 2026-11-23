@@ -52,6 +52,7 @@ public class FarmingPotChestsHandler
     PandoraAutoOpenHold pandoraAutoOpen,
     IVNavmeshIpc vnav,
     PotChestLocationSyncService potChests,
+    IDataManager data,
     ILogger<FarmingPotChestsHandler> logger
 ) : ScoreStateHandler<AutomatorState, StatePriority>(AutomatorState.FarmingPotChests)
 {
@@ -273,13 +274,10 @@ public class FarmingPotChestsHandler
                 ClearTravelPlan();
                 lastPathIssueAt = DateTimeOffset.MinValue;
                 ResetApproachWatch();
-                if (hidePrepInterrupt)
+                // A Hide pause used to force a straight walk, so a 700y trip that needed Return + teleport was walked.
+                preferDirectApproach = false;
+                if (!hidePrepInterrupt)
                 {
-                    preferDirectApproach = true;
-                }
-                else
-                {
-                    preferDirectApproach = false;
                     lastPathDestination = null;
                 }
             }
@@ -1399,7 +1397,7 @@ public class FarmingPotChestsHandler
 
         if (!ninjaHideRequired)
         {
-            ninjaHide.RestorePreviousGearsetIfNeeded();
+            ninjaHide.RestorePreviousGearsetWhenQuiet();
             return true;
         }
 
@@ -1415,6 +1413,12 @@ public class FarmingPotChestsHandler
                 ninjaHide.TryOccultSprintWhileHidden();
             }
 
+            return true;
+        }
+
+        // Standing still for the whole recast near the threat looked like a stall; keep walking and Hide when it is back.
+        if (ninjaHide.IsHideRecharging)
+        {
             return true;
         }
 
@@ -1581,6 +1585,24 @@ public class FarmingPotChestsHandler
         logger.Info(
             "Pot treasure: second chest offered — switching to {Count} second-chance location(s)",
             farm.Pool.Count);
+        DrinkElixirForSecondChance(farm);
+    }
+
+    // The first pot's readings used up the elixir tries, so the second chest was searched blind from the nearest spot.
+    private void DrinkElixirForSecondChance(PotChestFarmMemory farm)
+    {
+        if (farm.Mode != PotChestFarmMode.Smart)
+        {
+            return;
+        }
+
+        pathfinder.Stop();
+        ClearTravelPlan();
+        farm.Phase = PotChestFarmPhase.ElixirAtCenter;
+        farm.PhaseStartedUtc = DateTimeOffset.UtcNow;
+        farm.SettledAtUtc = DateTimeOffset.MinValue;
+        farm.ElixirAttempts = 0;
+        farm.ElixirHintOrigin = null;
     }
 
     private bool EnsureSecondChancePool(PotChestFarmMemory farm)
@@ -1607,6 +1629,7 @@ public class FarmingPotChestsHandler
         logger.Info(
             "Pot treasure: first coffer opened — locking search to {Count} second-chance location(s)",
             farm.Pool.Count);
+        DrinkElixirForSecondChance(farm);
         return true;
     }
 
@@ -1755,6 +1778,13 @@ public class FarmingPotChestsHandler
             }
 
             if (obj.ObjectKind != Dalamud.Game.ClientState.Objects.Enums.ObjectKind.Treasure)
+            {
+                continue;
+            }
+
+            // A field bronze/silver coffer near a pot spot was taken for the pot chest, opened and uploaded as a pot spot.
+            if (data.GetExcelSheet<Lumina.Excel.Sheets.Treasure>().TryGetRow(obj.BaseId, out Lumina.Excel.Sheets.Treasure row)
+                && TreasureCoffer.IsBronzeOrSilverSgb(row.SGB.RowId))
             {
                 continue;
             }

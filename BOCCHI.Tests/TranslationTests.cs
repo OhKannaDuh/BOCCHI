@@ -1,7 +1,7 @@
 using System.Reflection;
 using System.Text.RegularExpressions;
 using BOCCHI.Common.Config;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
 using Ocelot.Config;
 using Ocelot.Config.Fields;
 using Ocelot.Extensions;
@@ -76,6 +76,17 @@ public class TranslationTests
         foreach (Type config in configs)
         {
             string page = "config." + config.Name.Replace("Config", "").ToSnakeCase();
+            if (!Texts.Value["en"].ContainsKey(page + ".label"))
+            {
+                missing.Add(page + ".label");
+            }
+
+            ConfigGroupAttribute? group = config.GetCustomAttribute<ConfigGroupAttribute>();
+            if (group != null && !Texts.Value["en"].ContainsKey($"config_group.{group.Key}.label"))
+            {
+                missing.Add($"config_group.{group.Key}.label");
+            }
+
             foreach (PropertyInfo property in config.GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
                 UIFieldAttribute? field = property.GetCustomAttributes().OfType<UIFieldAttribute>().SingleOrDefault();
@@ -85,9 +96,9 @@ public class TranslationTests
                 }
 
                 string prefix = $"{page}.fields.{property.Name.ToSnakeCase()}.";
-                if (!Texts.Value["en"].Keys.Any(k => k.StartsWith(prefix, StringComparison.Ordinal)))
+                if (!Texts.Value["en"].ContainsKey(prefix + "label"))
                 {
-                    missing.Add(prefix + "*");
+                    missing.Add(prefix + "label");
                 }
 
                 if (!string.IsNullOrEmpty(field.Section)
@@ -130,18 +141,20 @@ public class TranslationTests
                     prefix = prefix["ocelot.".Length..];
                 }
 
-                Flatten(JToken.Parse(File.ReadAllText(file)), prefix, texts);
+                using FileStream stream = File.OpenRead(file);
+                using JsonDocument document = JsonDocument.Parse(stream, new JsonDocumentOptions { AllowTrailingCommas = true });
+                Flatten(document.RootElement, prefix, texts);
             }
         }
 
         return texts;
     }
 
-    private static void Flatten(JToken token, string prefix, Dictionary<string, string> texts)
+    private static void Flatten(JsonElement token, string prefix, Dictionary<string, string> texts)
     {
-        if (token is JObject obj)
+        if (token.ValueKind == JsonValueKind.Object)
         {
-            foreach (JProperty property in obj.Properties())
+            foreach (JsonProperty property in token.EnumerateObject())
             {
                 Flatten(property.Value, $"{prefix}.{property.Name}", texts);
             }

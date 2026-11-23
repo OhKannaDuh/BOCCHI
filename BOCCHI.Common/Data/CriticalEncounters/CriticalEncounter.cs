@@ -180,14 +180,14 @@ public class CriticalEncounter(
         Radius = NavigationConstants.CriticalEncounterPaddedRadius(sizeOk, shape);
     }
 
-    public TimeSpan? GetTimeUntilStart()
+    public TimeSpan? GetTimeUntilStart(Func<DateTimeOffset>? clock = null)
     {
         if (StartTimestamp == 0)
         {
             return null;
         }
 
-        TimeSpan remaining = DateTimeOffset.FromUnixTimeSeconds(StartTimestamp) - DateTimeOffset.UtcNow;
+        TimeSpan remaining = DateTimeOffset.FromUnixTimeSeconds(StartTimestamp) - (clock?.Invoke() ?? DateTimeOffset.UtcNow);
         return remaining;
     }
 

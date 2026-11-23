@@ -46,13 +46,15 @@ public class ChainThreadTests
     {
         using FakeMainThread main = new();
         using CancellationTokenSource cts = new();
-        cts.Cancel();
+        bool ranAfter = false;
 
         ChainResult result = await new Chain("test", new ServiceProvider(main))
-            .Then(() => StepResult.Success(), "never")
+            .Then(() => cts.Cancel(), "cancel")
+            .Then(() => ranAfter = true, "after")
             .ExecuteAsync(cts.Token);
 
         Assert.True(result.IsCanceled);
+        Assert.False(ranAfter);
     }
 
     private sealed class ServiceProvider(IMainThread main) : IServiceProvider

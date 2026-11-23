@@ -242,6 +242,30 @@ test("pot chests cluster per FATE and reroll flag", async () => {
   assert.deepEqual(rows.map(r => [r.is_reroll, r.observation_count]), [[0, 1], [1, 1]]);
 });
 
+test("a pot chest report on an accepted field coffer is dropped", async () => {
+  db.prepare(`
+    INSERT INTO observation_candidates (
+      territory_id, data_id, centroid_x, centroid_y, centroid_z,
+      first_observed_at_utc, last_observed_at_utc, status
+    ) VALUES (1346, 42, 658.72, 60.5, -552.33, '2026-11-20T00:00:00.000Z', '2026-11-20T00:00:00.000Z', 'accepted')
+  `).run();
+  for (const [hash, x] of [["one", 658.72], ["two", 700]] as const) {
+    db.prepare(`
+      INSERT INTO pot_chest_observations (
+        territory_id, pot_fate_id, is_reroll, world_x, world_y, world_z,
+        installation_hash, reporter_hash, plugin_version, observed_at_utc
+      ) VALUES (1346, 2072, 1, ?, 60.5, -552.33, ?, ?, 'test', '2026-11-20T00:00:00.000Z')
+    `).run(x, hash, `ip-${hash}`);
+  }
+
+  await processPendingObservations(env, "pot-chests");
+
+  const candidates = db.prepare("SELECT centroid_x FROM pot_chest_candidates").all();
+  assert.deepEqual(candidates.map(c => c.centroid_x), [700]);
+  const pending = db.prepare("SELECT count(*) AS n FROM pot_chest_observations WHERE processed = 0").get() as Row;
+  assert.equal(pending.n, 0);
+});
+
 test("IPv6 reporters are grouped by /64", () => {
   assert.equal(reporterKey("2001:db8:1:2::5"), reporterKey("2001:0db8:0001:0002:ffff:0:0:9"));
   assert.notEqual(reporterKey("2001:db8:1:2::5"), reporterKey("2001:db8:1:3::5"));

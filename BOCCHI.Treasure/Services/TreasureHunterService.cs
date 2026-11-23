@@ -2117,7 +2117,7 @@ public class TreasureHunterService
 
         if (!ninjaHideRequired)
         {
-            ninjaHide.RestorePreviousGearsetIfNeeded();
+            ninjaHide.RestorePreviousGearsetWhenQuiet();
             return true;
         }
 

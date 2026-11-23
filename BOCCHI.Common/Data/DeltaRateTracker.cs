@@ -2,7 +2,7 @@ namespace BOCCHI.Common.Data;
 
 public readonly record struct DeltaSnapshot(long Delta, DateTime Time);
 
-public sealed class DeltaRateTracker(Func<TimeSpan> getTrackedWindow)
+public sealed class DeltaRateTracker(Func<TimeSpan> getTrackedWindow, Func<DateTime>? clock = null)
 {
     public static readonly TimeSpan DefaultWindow = TimeSpan.FromMinutes(5);
 
@@ -41,7 +41,7 @@ public sealed class DeltaRateTracker(Func<TimeSpan> getTrackedWindow)
                 return 0;
             }
 
-            long windowGained = SumSince(DateTime.UtcNow - RateHour);
+            long windowGained = SumSince((clock?.Invoke() ?? DateTime.UtcNow) - RateHour);
             if (elapsed < RateHour)
             {
                 return windowGained / elapsed.TotalHours;
@@ -55,7 +55,7 @@ public sealed class DeltaRateTracker(Func<TimeSpan> getTrackedWindow)
     {
         if (counting)
         {
-            activeStartedUtc ??= DateTime.UtcNow;
+            activeStartedUtc ??= (clock?.Invoke() ?? DateTime.UtcNow);
             return;
         }
 
@@ -64,7 +64,7 @@ public sealed class DeltaRateTracker(Func<TimeSpan> getTrackedWindow)
             return;
         }
 
-        accumulatedActive += DateTime.UtcNow - started;
+        accumulatedActive += (clock?.Invoke() ?? DateTime.UtcNow) - started;
         activeStartedUtc = null;
     }
 
@@ -103,17 +103,17 @@ public sealed class DeltaRateTracker(Func<TimeSpan> getTrackedWindow)
         if (delta < 0)
         {
             // Keep the value from before the first drop, so a dip over several reads is not counted as income when it comes back.
-            if (valueBeforeDrop == null || DateTime.UtcNow - dropAt > RecoveryWindow)
+            if (valueBeforeDrop == null || (clock?.Invoke() ?? DateTime.UtcNow) - dropAt > RecoveryWindow)
             {
                 valueBeforeDrop = lastValue;
-                dropAt = DateTime.UtcNow;
+                dropAt = (clock?.Invoke() ?? DateTime.UtcNow);
             }
 
             lastValue = current;
             return;
         }
 
-        if (valueBeforeDrop is { } before && DateTime.UtcNow - dropAt <= RecoveryWindow)
+        if (valueBeforeDrop is { } before && (clock?.Invoke() ?? DateTime.UtcNow) - dropAt <= RecoveryWindow)
         {
             lastValue = current;
             if (current <= before)
@@ -135,7 +135,7 @@ public sealed class DeltaRateTracker(Func<TimeSpan> getTrackedWindow)
             return;
         }
 
-        snapshots.Add(new(delta, DateTime.UtcNow));
+        snapshots.Add(new(delta, (clock?.Invoke() ?? DateTime.UtcNow)));
     }
 
     public float[] GetHistory(TimeSpan sampleDuration)
@@ -144,7 +144,7 @@ public sealed class DeltaRateTracker(Func<TimeSpan> getTrackedWindow)
         Prune();
 
         TimeSpan duration = getTrackedWindow();
-        DateTime now = DateTime.UtcNow;
+        DateTime now = (clock?.Invoke() ?? DateTime.UtcNow);
         DateTime start = now - duration;
 
         List<DeltaSnapshot> relevant = snapshots
@@ -192,7 +192,7 @@ public sealed class DeltaRateTracker(Func<TimeSpan> getTrackedWindow)
 
     private TimeSpan ActiveElapsed()
     {
-        TimeSpan extra = activeStartedUtc is { } started ? DateTime.UtcNow - started : TimeSpan.Zero;
+        TimeSpan extra = activeStartedUtc is { } started ? (clock?.Invoke() ?? DateTime.UtcNow) - started : TimeSpan.Zero;
         return accumulatedActive + extra;
     }
 
@@ -217,7 +217,7 @@ public sealed class DeltaRateTracker(Func<TimeSpan> getTrackedWindow)
             return;
         }
 
-        DateTime cutoff = DateTime.UtcNow - RateHour;
+        DateTime cutoff = (clock?.Invoke() ?? DateTime.UtcNow) - RateHour;
 
         int index = 0;
         while (index < snapshots.Count && snapshots[index].Time < cutoff)

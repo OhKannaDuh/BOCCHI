@@ -123,7 +123,8 @@ async function processOne(
 ): Promise<ProcessorResult> {
   const tables = CLUSTER_KINDS[kind];
   try {
-    if (!isInsideZoneBox(observation.world_x, observation.world_y, observation.world_z)) {
+    if (!isInsideZoneBox(observation.world_x, observation.world_y, observation.world_z)
+      || (kind === "pot-chests" && await isOnAcceptedCoffer(db, observation))) {
       await db.prepare(`UPDATE ${tables.observations} SET processed = 1 WHERE id = ?`)
         .bind(observation.id)
         .run();
@@ -142,6 +143,22 @@ async function processOne(
     console.error(`Failed to process ${tables.label} ${observation.id}`, error);
     return { scanned: 1, assigned: 0, failed: 1, newlyAccepted: 0 };
   }
+}
+
+// Older plugin versions reported field coffers next to pot spots as pot chests; 129 players got one accepted.
+async function isOnAcceptedCoffer(db: D1Database, observation: PendingObservation): Promise<boolean> {
+  const hit = await db.prepare(`
+    SELECT 1 AS hit
+    FROM observation_candidates
+    WHERE territory_id = ?
+      AND status = 'accepted'
+      AND ABS(centroid_x - ?) <= 1
+      AND ABS(centroid_y - ?) <= 2
+      AND ABS(centroid_z - ?) <= 1
+    LIMIT 1
+  `).bind(observation.territory_id, observation.world_x, observation.world_y, observation.world_z)
+    .first<{ hit: number }>();
+  return hit !== null;
 }
 
 async function findOrCreateCandidate(

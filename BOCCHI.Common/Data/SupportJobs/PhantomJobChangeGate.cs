@@ -7,18 +7,20 @@ public static class PhantomJobChangeGate
 {
     private static readonly TimeSpan PostCombatSettle = TimeSpan.FromSeconds(5);
 
+    internal static Func<DateTimeOffset> Now = () => DateTimeOffset.UtcNow;
+
     private static bool wasInCombat;
 
     private static DateTimeOffset combatClearedUtc = DateTimeOffset.MinValue;
 
-    public static void NoteCombatEnded() => combatClearedUtc = DateTimeOffset.UtcNow;
+    public static void NoteCombatEnded() => combatClearedUtc = Now();
 
     // Must run every frame (PhantomJobCombatTracker): callers that only ask after combat miss the edge.
     public static void Track(bool inCombat)
     {
         if (wasInCombat && !inCombat)
         {
-            combatClearedUtc = DateTimeOffset.UtcNow;
+            combatClearedUtc = Now();
         }
 
         wasInCombat = inCombat;
@@ -30,7 +32,7 @@ public static class PhantomJobChangeGate
         Track(inCombat);
 
         if (inCombat
-            || DateTimeOffset.UtcNow - combatClearedUtc < PostCombatSettle
+            || Now() - combatClearedUtc < PostCombatSettle
             || conditions[ConditionFlag.BetweenAreas]
             || conditions[ConditionFlag.BetweenAreas51]
             || conditions[ConditionFlag.Casting]

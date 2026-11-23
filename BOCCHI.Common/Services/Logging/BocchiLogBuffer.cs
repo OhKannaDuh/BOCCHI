@@ -56,6 +56,13 @@ public sealed class BocchiLogBuffer : IBocchiLogBuffer
 
     private readonly Dictionary<string, BocchiLogEntry> recent = new(StringComparer.Ordinal);
 
+    private readonly Func<DateTime> clock;
+
+    public BocchiLogBuffer(Func<DateTime>? now = null)
+    {
+        clock = now ?? (() => DateTime.Now);
+    }
+
     private int version;
 
     public int Version => Volatile.Read(ref version);
@@ -75,7 +82,7 @@ public sealed class BocchiLogBuffer : IBocchiLogBuffer
             return;
         }
 
-        DateTime now = DateTime.Now;
+        DateTime now = clock();
         string key = $"{(int)level}|{message}";
 
         lock (gate)

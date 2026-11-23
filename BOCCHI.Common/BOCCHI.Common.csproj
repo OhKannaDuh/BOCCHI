@@ -4,6 +4,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <InternalsVisibleTo Include="BOCCHI.Tests"/>
         <PackageReference Include="NAudio" Version="2.3.0"/>
         <ProjectReference Include="..\Ocelot\Ocelot.Rotation\Ocelot.Rotation.csproj"/>
     </ItemGroup>

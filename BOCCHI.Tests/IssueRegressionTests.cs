@@ -216,7 +216,14 @@ public class IssueRegressionTests
     [Fact]
     public void ThePotWaitingRingStaysCloseToThePot()
     {
-        Assert.True(NavigationConstants.PotPrepositionMaxRadius <= 20f);
+        Vector3 pot = new(100f, 7f, 100f);
+        foreach (Vector3 from in new Vector3[] { pot, new(150f, 7f, 100f), new(115f, 7f, 100f) })
+        {
+            Vector3 position = NavigationApproach.GetPotPrepositionPosition(pot, from);
+
+            Assert.InRange(Vector3.Distance(position, pot), NavigationConstants.PotPrepositionMinRadius - 0.01f, 20f + 0.01f);
+            Assert.Equal(pot.Y, position.Y);
+        }
     }
 
     // Discord (Ziik): Mob Farmer waited 20-30 seconds between pulls with fewer enemies than the minimum.

@@ -29,6 +29,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <InternalsVisibleTo Include="BOCCHI.Tests"/>
         <ProjectReference Include="../BOCCHI.Common/BOCCHI.Common.csproj"/>
         <ProjectReference Include="../BOCCHI.Automator/BOCCHI.Automator.csproj"/>
 

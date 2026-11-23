@@ -33,6 +33,8 @@ public class CriticalEncounterContext
         return id;
     }
 
+    private const float MaxParticipationDistance = 150f;
+
     private unsafe bool TryGetParticipatingCriticalEncounterId(
         out CriticalEncounterId id,
         bool battleOnly = false)
@@ -54,6 +56,12 @@ public class CriticalEncounterContext
         CriticalEncounterId matched = id;
         CriticalEncounter? ce = repository.SnapshotWithoutForkedTower().FirstOrDefault(c => c.Id == matched);
         if (ce == null)
+        {
+            return false;
+        }
+
+        // The event id alone once read CE 45 from about 640y away; taking part means being at the arena or sign-up.
+        if (Math.Min(player.Position.Distance2D(ce.Position), player.Position.Distance2D(ce.RegistrationCenter)) > MaxParticipationDistance)
         {
             return false;
         }

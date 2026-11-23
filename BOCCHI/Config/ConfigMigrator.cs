@@ -112,7 +112,15 @@ public class ConfigMigrator(IDalamudPluginInterface plugin, IPluginLog logger)
             }
 
             config = migrator.Migrate(config);
-            version = config["Version"]?.Value<int>() ?? 1;
+            int next = config["Version"]?.Value<int>() ?? 1;
+
+            // A migrator that does not raise the version would loop forever on every load.
+            if (next <= version)
+            {
+                throw new InvalidOperationException($"Migration from version {version} did not raise the version (got {next}).");
+            }
+
+            version = next;
         }
         while (version < Configuration.CurrentVersion);
 

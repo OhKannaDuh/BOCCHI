@@ -10,6 +10,7 @@ using BOCCHI.Common.Data.MobFarmer;
 using BOCCHI.Common.Data.StateMemory;
 using BOCCHI.Common.Data.Zones;
 using BOCCHI.Common.Data.Zones.Graph.Traversal;
+using BOCCHI.Common.Data.Zones.Graph;
 using BOCCHI.Common.Services;
 using BOCCHI.Fates.Services;
 using BOCCHI.MobFarmer.Data;
@@ -40,12 +41,23 @@ public class GameBehaviourTests
         AutomatorMemory memory = new();
         InCombatHandler handler = CombatHandler(memory, () => inCombat);
 
+        memory.TryAdd(new GoalMemory(StandIn.For<IGoal>(g => g.Answers("GoalType", new FateGoal(new FateId(2073))))));
+        WaitingForPotFateHandler waiting = new(
+            memory,
+            StandIn.For<IObjectTable>(o => o.Answers("LocalPlayer", StandIn.For<IPlayerCharacter>())),
+            StandIn.For<ICondition>(),
+            StandIn.For<IPathfinder>(),
+            null!,
+            StandIn.For<IFateRepository>(),
+            OccultCrescent(z => z.Answers("IsPotFate", true).Answers("GetPotFateData", new List<ActivityData> { new(2073, System.Numerics.Vector3.Zero) })),
+            new MovementConfig(),
+            null!);
+        Assert.Equal(StatePriority.VeryHigh, waiting.GetScore());
         memory.TryAdd<WaitingForPotFateMemory>();
-        Assert.Equal(StatePriority.VeryHigh + 1, handler.GetScore());
+        Assert.True(handler.GetScore() > waiting.GetScore());
 
-        // The pot wait forgets its memory when combat takes over; the fight must not drop back below waiting.
         memory.Forget<WaitingForPotFateMemory>();
-        Assert.Equal(StatePriority.VeryHigh + 1, handler.GetScore());
+        Assert.True(handler.GetScore() > waiting.GetScore());
 
         inCombat = false;
         Assert.Equal(StatePriority.Never, handler.GetScore());

@@ -1811,7 +1811,7 @@ public sealed class CarrotHunterService
 
         if (!ninjaHideRequired)
         {
-            ninjaHide.RestorePreviousGearsetIfNeeded();
+            ninjaHide.RestorePreviousGearsetWhenQuiet();
             return true;
         }
 
@@ -1827,6 +1827,11 @@ public sealed class CarrotHunterService
                 ninjaHide.TryOccultSprintWhileHidden();
             }
 
+            return true;
+        }
+
+        if (ninjaHide.IsHideRecharging)
+        {
             return true;
         }
 

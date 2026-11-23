@@ -97,14 +97,15 @@ public static class ChangelogText
         return reader.ReadToEnd();
     }
 
-    private static string? ExtractVersionSection(string markdown, string version)
+    // "## 4.4.0.0" or "# v4.4.0.0" used to show no popup and still mark the version as seen.
+    internal static string? ExtractVersionSection(string markdown, string version)
     {
-        string heading = $"# {version}";
         string[] lines = markdown.Replace("\r\n", "\n").Split('\n');
         int start = -1;
         for (int i = 0; i < lines.Length; i++)
         {
-            if (lines[i].Trim() == heading)
+            if (IsTopHeading(lines[i], out string title)
+                && string.Equals(title.TrimStart('v', 'V'), version, StringComparison.Ordinal))
             {
                 start = i + 1;
                 break;
@@ -119,8 +120,7 @@ public static class ChangelogText
         StringBuilder sb = new();
         for (int i = start; i < lines.Length; i++)
         {
-            string trimmed = lines[i].Trim();
-            if (trimmed.StartsWith("# ", StringComparison.Ordinal) && !trimmed.StartsWith("### ", StringComparison.Ordinal))
+            if (IsTopHeading(lines[i], out _))
             {
                 break;
             }
@@ -129,6 +129,14 @@ public static class ChangelogText
         }
 
         return sb.ToString();
+    }
+
+    private static bool IsTopHeading(string line, out string title)
+    {
+        string trimmed = line.Trim();
+        int level = trimmed.Length - trimmed.TrimStart('#').Length;
+        title = trimmed[level..].Trim();
+        return level is 1 or 2 && trimmed.Length > level && trimmed[level] == ' ';
     }
 
     private static bool HasUserFacingNotes(string section)

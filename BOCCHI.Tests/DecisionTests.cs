@@ -130,7 +130,8 @@ public class DecisionTests
     [Fact]
     public void TheSameLogLineInARowIsCountedNotRepeated()
     {
-        BocchiLogBuffer buffer = new();
+        DateTime now = new(2026, 11, 23, 12, 0, 0);
+        BocchiLogBuffer buffer = new(() => now);
 
         buffer.Append(BocchiLogLevel.Info, "Chose FATE 1");
         buffer.Append(BocchiLogLevel.Info, "Chose FATE 1");

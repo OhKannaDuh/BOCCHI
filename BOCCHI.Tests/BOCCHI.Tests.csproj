@@ -17,6 +17,7 @@
         <ProjectReference Include="../BOCCHI.MobFarmer/BOCCHI.MobFarmer.csproj"/>
         <ProjectReference Include="../BOCCHI.Treasure/BOCCHI.Treasure.csproj"/>
         <ProjectReference Include="../BOCCHI.World/BOCCHI.World.csproj"/>
+        <ProjectReference Include="../BOCCHI/BOCCHI.csproj"/>
         <ProjectReference Include="..\Ocelot\Ocelot.Chain\Ocelot.Chain.csproj"/>
     </ItemGroup>
 
