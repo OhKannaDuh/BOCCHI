@@ -62,7 +62,7 @@ public sealed class PluginDependencyStatusRenderer(
         ImGui.Spacing();
 
         Draw("Wrath Combo", DependencyPlugins.WrathCombo, translator, inUse: InUse("WrathCombo"));
-        if (IsInstalled(CombatPluginPresence.RotationSolver))
+        if (IsShown(CombatPluginPresence.RotationSolver))
         {
             Draw(
                 "Rotation Solver Reborn",
@@ -73,7 +73,7 @@ public sealed class PluginDependencyStatusRenderer(
         }
 
         Draw("BossMod", DependencyPlugins.BossMod, translator, BossModIpcIfLoaded, InUse("BossMod"));
-        if (IsInstalled("BossModReborn"))
+        if (IsShown("BossModReborn"))
         {
             Draw("BossMod Reborn", DependencyPlugins.BossModReborn, translator, BossModIpcIfLoaded, InUse("BossModReborn"));
         }
@@ -83,8 +83,8 @@ public sealed class PluginDependencyStatusRenderer(
 
     private string OptionalIntro(ITranslator translator)
     {
-        bool rsr = IsInstalled(CombatPluginPresence.RotationSolver);
-        bool bmr = IsInstalled("BossModReborn");
+        bool rsr = IsShown(CombatPluginPresence.RotationSolver);
+        bool bmr = IsShown("BossModReborn");
         string key = (rsr, bmr) switch
         {
             (true, true) => "optional_intro_rsr_bmr",
@@ -95,17 +95,23 @@ public sealed class PluginDependencyStatusRenderer(
         return T(translator, key);
     }
 
-    private bool IsInstalled(string internalName) =>
-        pluginStatus.IsInstalled(internalName)
-        || (internalName == CombatPluginPresence.RotationSolver && rsr.IsAvailable);
+    private bool IsShown(string internalName) =>
+        pluginStatus.IsLoaded(internalName)
+        || (internalName == CombatPluginPresence.RotationSolver && rsr.IsAvailable)
+        || automator.CombatAutorotation switch
+        {
+            CombatAutorotation.RotationSolverReborn => internalName == CombatPluginPresence.RotationSolver,
+            CombatAutorotation.BossModReborn => internalName == "BossModReborn",
+            _ => false,
+        };
 
     private bool InUse(string internalName) => automator.CombatAutorotation switch
     {
         CombatAutorotation.WrathCombo => internalName == "WrathCombo"
-            || ((internalName is "BossMod" or "BossModReborn") && IsInstalled(internalName)),
+            || ((internalName is "BossMod" or "BossModReborn") && IsShown(internalName)),
         CombatAutorotation.RotationSolverReborn =>
             internalName == CombatPluginPresence.RotationSolver
-            || ((internalName is "BossMod" or "BossModReborn") && IsInstalled(internalName)),
+            || ((internalName is "BossMod" or "BossModReborn") && IsShown(internalName)),
         CombatAutorotation.BossMod => internalName == "BossMod",
         CombatAutorotation.BossModReborn => internalName == "BossModReborn",
         _ => false,

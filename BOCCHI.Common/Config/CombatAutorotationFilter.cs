@@ -22,8 +22,8 @@ public class CombatAutorotationFilter(IPluginStatus plugins, AutomatorConfig con
             CombatAutorotation.WrathCombo => true,
             CombatAutorotation.BossMod => true,
             CombatAutorotation.RotationSolverReborn =>
-                plugins.IsInstalled(CombatPluginPresence.RotationSolver),
-            CombatAutorotation.BossModReborn => plugins.IsInstalled(BossModReborn),
+                plugins.IsLoaded(CombatPluginPresence.RotationSolver),
+            CombatAutorotation.BossModReborn => plugins.IsLoaded(BossModReborn),
             _ => false,
         };
     }
