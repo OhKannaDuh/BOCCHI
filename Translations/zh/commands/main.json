@@ -1,3 +1,4 @@
 {
-  "argument_not_recognized": "未知选项“{argument}”。输入 /bocchi 查看可用的命令。"
+  "argument_not_recognized": "未知选项“{argument}”。输入 /bocchi 查看可用的命令。",
+  "help": "打开主窗口（也可用 /och）"
 }

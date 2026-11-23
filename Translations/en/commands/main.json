@@ -1,3 +1,4 @@
 {
-  "argument_not_recognized": "Unknown option \"{argument}\". Type /bocchi to see what is available."
+  "argument_not_recognized": "Unknown option \"{argument}\". Type /bocchi to see what is available.",
+  "help": "Open the main window (also /och)"
 }
