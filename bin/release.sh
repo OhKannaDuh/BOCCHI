@@ -61,13 +61,18 @@ ZIP_PATH="$PROJECT/bin/x64/Release/$PROJECT/latest.zip"
 ZIP_PATH_FALLBACK="$PROJECT/bin/Release/$PROJECT/latest.zip"
 CSPROJ="$PROJECT/$PROJECT.csproj"
 
-if git rev-parse "$TAG" >/dev/null 2>&1; then
-  echo "Error: Tag '$TAG' already exists locally."
-  exit 1
+RESUME=false
+if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+  if [ "$(git rev-list -n 1 "$TAG")" != "$(git rev-parse HEAD)" ]; then
+    echo "Error: Tag '$TAG' already exists on another commit."
+    exit 1
+  fi
+  echo "Tag '$TAG' already points at HEAD; finishing the earlier release."
+  RESUME=true
 fi
 
-if git ls-remote --tags origin | grep -q "refs/tags/$TAG"; then
-  echo "Error: Tag '$TAG' already exists on remote."
+if ! tr -d '\r' < CHANGELOG.md | grep -qxF "# $TAG"; then
+  echo "Error: CHANGELOG.md does not contain entry for $TAG."
   exit 1
 fi
 
@@ -93,10 +98,8 @@ if [ "$CS_VERSION" != "$TAG" ]; then
   git commit -m "Version: $TAG"
 fi
 
-if ! grep -q "# $TAG" CHANGELOG.md; then
-  echo "Error: CHANGELOG.md does not contain entry for $TAG."
-  exit 1
-fi
+echo "Running tests..."
+dotnet test BOCCHI.Tests -c Release
 
 rm -f "$ZIP_PATH" "$ZIP_PATH_FALLBACK"
 echo "Building project..."
@@ -112,8 +115,10 @@ fi
 
 echo "Using zip: $ZIP_PATH"
 
-echo "Creating annotated tag $TAG..."
-git tag -a "$TAG" -m "$TAG"
+if [ "$RESUME" = false ]; then
+  echo "Creating annotated tag $TAG..."
+  git tag -a "$TAG" -m "$TAG"
+fi
 
 echo "Pushing '$BRANCH' and tag '$TAG' to origin..."
 git push origin "$BRANCH"
@@ -124,23 +129,26 @@ EXTRA_ARGS=()
 if [ "$IS_TESTING" = true ]; then
   EXTRA_ARGS+=(--prerelease)
 fi
-gh release create "$TAG" --title "$TAG" --notes-file CHANGELOG.md "${EXTRA_ARGS[@]}"
+if ! gh release view "$TAG" >/dev/null 2>&1; then
+  gh release create "$TAG" --title "$TAG" --notes-file CHANGELOG.md "${EXTRA_ARGS[@]}"
+fi
 gh release upload "$TAG" "$ZIP_PATH" --clobber
 
 
 echo "Updating manifest repo..."
-rm -rf plugins
-gh repo clone OhKannaDuh/plugins
-cd plugins
+WORK_DIR="$(mktemp -d)"
+trap 'rm -rf "$WORK_DIR"' EXIT
+PLUGINS_DIR="$WORK_DIR/plugins"
+gh repo clone OhKannaDuh/plugins "$PLUGINS_DIR"
 
-cd manifest-generator
+cd "$PLUGINS_DIR/manifest-generator"
 npm install
 manifest_output=$(npx tsx src/index.ts)
 commit_message=$(echo "$manifest_output" | awk '/^Suggested commit message:/{getline; print}')
 if [ -z "$commit_message" ]; then
     commit_message="Update Manifest"
 fi
-cd ..
+cd "$PLUGINS_DIR"
 
 git add manifest.json
 if ! git diff --cached --quiet; then
@@ -152,12 +160,9 @@ fi
 
 # --- Discord message ---------------------------------------------------------
 
-cd discord-message-generator
+cd "$PLUGINS_DIR/discord-message-generator"
 npm install
 echo "------------------------"
 npx tsx src/index.ts
-cd ../..
-
-rm -rf plugins
 
 echo "Release $TAG complete."
