@@ -558,7 +558,8 @@ public class ActivityNavigation
         chain.Then<PathfindToChain, PathfinderConfig>(new(destination)
         {
             DistanceThreshold = 2f,
-            ShouldSnapToFloor = true,
+            // Survey / flag points are already on the mesh; a 40y floor snap picked any same-height floor up to ~50y away.
+            ShouldSnapToFloor = treatAsActivity,
             FloorSnapExtents = 40f,
             WhileMoving = () =>
             {

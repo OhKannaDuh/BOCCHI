@@ -345,18 +345,28 @@ public sealed class CarrotHunterService
             return;
         }
 
-        if (treasureConfig.ReturnToBaseCampAfterHunt && !zones.GetZone().IsInBasecamp())
+        if (TryReturnBeforeStop("route finished"))
         {
-            log.Information("Carrot hunt: route finished — returning to base camp");
-            returnThenStop = true;
-            returnThenAethernet = false;
-            ClearHop();
-            Phase = CarrotHuntPhase.Returning;
             return;
         }
 
         BocchiChat.Print(chat, uiConfig, FinishedRouteMessage);
         Teardown();
+    }
+
+    private bool TryReturnBeforeStop(string reason)
+    {
+        if (!treasureConfig.ReturnToBaseCampAfterHunt || zones.GetZone().IsInBasecamp())
+        {
+            return false;
+        }
+
+        log.Information("Carrot hunt: {Reason} — returning to base camp", reason);
+        returnThenStop = true;
+        returnThenAethernet = false;
+        ClearHop();
+        Phase = CarrotHuntPhase.Returning;
+        return true;
     }
 
     private bool TryRestartLoop()
@@ -1686,6 +1696,19 @@ public sealed class CarrotHunterService
         }
 
         vnav.Stop();
+
+        // The last carrot was just used: stopping here skipped "Cast Return after hunt".
+        if (!treasureConfig.CarrotHuntScoutWithoutItem && !InventoryItemAssist.Has(FortuneCarrotItemId))
+        {
+            BocchiChat.PrintError(chat, uiConfig, OutOfCarrotsMessage);
+            if (!TryReturnBeforeStop("out of Fortune Carrots"))
+            {
+                Teardown();
+            }
+
+            return;
+        }
+
         RecalculateAndAdvance();
     }
 
@@ -1887,6 +1910,7 @@ public sealed class CarrotHunterService
                         authoredId);
                     pathfinder.Stop();
                     vnav.Stop();
+                    farStuckWatch.RestartProgress();
                     BeginRouteToCurrentAuthored();
                     return true;
                 }

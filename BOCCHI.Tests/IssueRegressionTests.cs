@@ -241,7 +241,24 @@ public class IssueRegressionTests
         long left = GateService.Advance(0, TimeSpan.FromMilliseconds(1500), 1000, out bool due);
 
         Assert.True(due);
-        Assert.Equal(500, left);
+        Assert.Equal(TimeSpan.FromMilliseconds(500).Ticks, left);
+    }
+
+    // Audit: frames were cut to whole milliseconds, so limits ran slow at high frame rates.
+    [Fact]
+    public void HighFrameRatesKeepTime()
+    {
+        long elapsed = 0;
+        int frames = 0;
+        bool due = false;
+        while (!due)
+        {
+            elapsed = GateService.Advance(elapsed, TimeSpan.FromSeconds(1.0 / 144), 500, out due);
+            frames++;
+        }
+
+        // 72 frames is exactly 500 ms; one more covers the tick rounding of 1/144 s. Whole milliseconds needed 84.
+        Assert.InRange(frames, 72, 73);
     }
 
     // Audit: retry defaults of "no delay, forever" would freeze the game on a failing step.

@@ -7,7 +7,7 @@
 - The Illegal Mode tab says why it is waiting or paused (for example when "Stop after return and teleport" is on)
 - Search box in the settings; the cog in the title bar opens the settings for the tab you are on
 - Fewer, simpler settings: rarely needed timing and distance options are gone, the graph and reward icon switches are one each, and BossMod movement in fights has its own page
-- Completionist is now a switch in the Illegal Mode tab
+- Completionist is now a switch in the Illegal Mode tab, and Ctrl+click on a survey point walks to the point itself instead of up to 50 yalms off
 - Auto revive (off by default): accept raises, and go back to camp if nobody raises you. Never inside Forked Tower, and in a FATE or CE it waits until that is over so you keep the reward
 - Triage Mode can wait a moment before raising, so nearby healers get the first chance
 - New option: use Return for long trips instead of walking past mobs to an aethernet shard
@@ -26,6 +26,7 @@
 - No more mounting up again just to reach a pot from its waiting spot
 - Treasure Hunt and Carrot Hunt no longer get stuck on failed teleports, coffers or carrots they can't reach, or the Wanderer's Haven ledge coffer
 - After you die, Treasure Hunt and Carrot Hunt plan a fresh route instead of riding straight from camp
+- "Cast Return after hunt" now also brings you back to camp when Carrot Hunt stops because you used your last Fortune Carrot
 
 ### Mob Farmer
 - No more waiting forever for a pull, looping when every nearby enemy was skipped, getting stuck on "Buffing", or spending cooldowns before the pack is gathered
@@ -54,3 +55,4 @@
 - Shared chest spots and pot timers are more reliable and harder to fake
 - FATE and CE names in your game language, shorter times (01:30 instead of 00:01:30), and clearer warnings
 - Easier-to-read logs when you report a problem
+- Smoother frame rate with the settings, logs or Completionist open, and during Mob Farmer, Carrot Hunt and pot chests

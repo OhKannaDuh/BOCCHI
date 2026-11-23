@@ -94,50 +94,77 @@ public sealed class BocchiLogsPanel
         ImGui.TableSetupColumn(translator.T(".col_message"), ImGuiTableColumnFlags.WidthStretch);
         ImGui.TableHeadersRow();
 
-        IEnumerable<BocchiLogEntry> rows = buffer.Snapshot()
-            .Where(e => e.Level >= minLevel)
-            .Where(e =>
-                string.IsNullOrWhiteSpace(searchFilter)
-                || e.Message.Contains(searchFilter, StringComparison.OrdinalIgnoreCase)
-                || e.Level.ToString().Contains(searchFilter, StringComparison.OrdinalIgnoreCase))
-            .OrderByDescending(e => e.LastOccurrence);
-
-        foreach (BocchiLogEntry log in rows)
+        if (rows == null || rowsVersion != buffer.Version || rowsLevel != minLevel || rowsFilter != searchFilter)
         {
-            ImGui.TableNextRow();
-
-            ImGui.TableNextColumn();
-            if (log.Count > 1)
-            {
-                ImGui.TextUnformatted($"{log.Timestamp:HH:mm:ss}");
-                ImGui.SameLine(0, 4);
-                ImGui.TextDisabled("-");
-                ImGui.SameLine(0, 4);
-                ImGui.TextUnformatted($"{log.LastOccurrence:HH:mm:ss}");
-            }
-            else
-            {
-                ImGui.TextUnformatted($"{log.Timestamp:HH:mm:ss}");
-            }
-
-            ImGui.TableNextColumn();
-            if (log.Count > 1)
-            {
-                ImGui.TextColored(new Vector4(1f, 0.55f, 0.1f, 1f), $"x{log.Count}");
-            }
-            else
-            {
-                ImGui.TextDisabled("1");
-            }
-
-            ImGui.TableNextColumn();
-            ImGui.TextColored(LevelColor(log.Level), log.Level.ToString());
-
-            ImGui.TableNextColumn();
-            ImGui.TextWrapped(log.Message);
+            rowsVersion = buffer.Version;
+            rowsLevel = minLevel;
+            rowsFilter = searchFilter;
+            rows = buffer.Snapshot()
+                .Where(e => e.Level >= minLevel)
+                .Where(e =>
+                    string.IsNullOrWhiteSpace(searchFilter)
+                    || e.Message.Contains(searchFilter, StringComparison.OrdinalIgnoreCase)
+                    || e.Level.ToString().Contains(searchFilter, StringComparison.OrdinalIgnoreCase))
+                .OrderByDescending(e => e.LastOccurrence)
+                .ToList();
         }
 
+        ImGuiListClipperPtr clipper = ImGui.ImGuiListClipper();
+        clipper.Begin(rows.Count);
+        while (clipper.Step())
+        {
+            for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
+            {
+                DrawRow(rows[i]);
+            }
+        }
+
+        clipper.End();
+        clipper.Destroy();
         ImGui.EndTable();
+    }
+
+    private List<BocchiLogEntry>? rows;
+
+    private int rowsVersion;
+
+    private BocchiLogLevel rowsLevel;
+
+    private string? rowsFilter;
+
+    private static void DrawRow(BocchiLogEntry log)
+    {
+        ImGui.TableNextRow();
+
+        ImGui.TableNextColumn();
+        if (log.Count > 1)
+        {
+            ImGui.TextUnformatted($"{log.Timestamp:HH:mm:ss}");
+            ImGui.SameLine(0, 4);
+            ImGui.TextDisabled("-");
+            ImGui.SameLine(0, 4);
+            ImGui.TextUnformatted($"{log.LastOccurrence:HH:mm:ss}");
+        }
+        else
+        {
+            ImGui.TextUnformatted($"{log.Timestamp:HH:mm:ss}");
+        }
+
+        ImGui.TableNextColumn();
+        if (log.Count > 1)
+        {
+            ImGui.TextColored(new Vector4(1f, 0.55f, 0.1f, 1f), $"x{log.Count}");
+        }
+        else
+        {
+            ImGui.TextDisabled("1");
+        }
+
+        ImGui.TableNextColumn();
+        ImGui.TextColored(LevelColor(log.Level), log.Level.ToString());
+
+        ImGui.TableNextColumn();
+        ImGui.TextWrapped(log.Message);
     }
 
     private static Vector4 LevelColor(BocchiLogLevel level) => level switch

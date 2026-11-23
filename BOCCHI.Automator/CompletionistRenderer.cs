@@ -32,6 +32,8 @@ public class CompletionistRenderer
     ITranslator<MainWindow> translator
 ) : IDynamicRenderer
 {
+    private readonly Dictionary<FieldNoteTargets.Entry, (string Label, string NoteName)> names = [];
+
     public MainWindowSection Section => MainWindowSection.Completionist;
 
     public void Render()
@@ -95,9 +97,14 @@ public class CompletionistRenderer
         foreach (FieldNoteTargets.Entry entry in entries)
         {
             bool owned = fieldNotes.HasEntry(entry);
-            string source = ResolveSourceName(entry);
-            string noteName = ResolveEntryName(entry);
-            string label = $"{source} — {noteName}";
+            if (!names.TryGetValue(entry, out (string Label, string NoteName) cached))
+            {
+                string resolved = ResolveEntryName(entry);
+                cached = ($"{ResolveSourceName(entry)} — {resolved}", resolved);
+                names[entry] = cached;
+            }
+
+            (string label, string noteName) = cached;
             Vector4 color = owned ? BocchiUi.Good : BocchiUi.Muted;
             FontAwesomeIcon icon = owned ? FontAwesomeIcon.Check : FontAwesomeIcon.Times;
 

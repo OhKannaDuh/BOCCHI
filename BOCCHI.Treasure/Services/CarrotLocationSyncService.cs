@@ -35,7 +35,31 @@ public sealed class CarrotLocationSyncService
             Limit = 1000
         };
 
+    private readonly Lock padsGate = new();
+
+    private (ushort Territory, ushort Catalog, object Accepted, bool Shared, IReadOnlyList<CarrotData> Pads)? huntPads;
+
+    // The carrot hunt asks many times per frame; merging baked and shared pads each time was the cost.
     public IReadOnlyList<CarrotData> GetHuntPads(IZone zone)
+    {
+        lock (padsGate)
+        {
+            if (huntPads is { } cached
+                && cached.Territory == zone.TerritoryType
+                && cached.Catalog == catalogTerritory
+                && ReferenceEquals(cached.Accepted, accepted)
+                && cached.Shared == config.EnableSharedMaps)
+            {
+                return cached.Pads;
+            }
+
+            IReadOnlyList<CarrotData> pads = BuildHuntPads(zone);
+            huntPads = (zone.TerritoryType, catalogTerritory, accepted, config.EnableSharedMaps, pads);
+            return pads;
+        }
+    }
+
+    private IReadOnlyList<CarrotData> BuildHuntPads(IZone zone)
     {
         List<CarrotData> baked = zone.GetCarrotData();
         if (!config.EnableSharedMaps

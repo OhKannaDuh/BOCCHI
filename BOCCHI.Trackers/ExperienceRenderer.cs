@@ -40,9 +40,9 @@ public class ExperienceRenderer
         TrackerRateRenderer.RenderPerHour(
             translator.T(".trackers.experience.per_hour"),
             tracker.ExperiencePerHour,
-            tracker.GetExperienceHistory(DeltaRateTracker.DefaultGraphBucket),
+            uiConfig.ShowTrackerGraphs ? tracker.GetExperienceHistory(DeltaRateTracker.DefaultGraphBucket) : [],
             "##xp_history",
-            uiConfig.ShowExperienceTrackerGraph
+            uiConfig.ShowTrackerGraphs
         );
     }
 

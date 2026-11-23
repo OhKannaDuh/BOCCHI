@@ -28,6 +28,8 @@ public sealed class BocchiLogEntry
 
 public interface IBocchiLogBuffer
 {
+    int Version { get; }
+
     IReadOnlyList<BocchiLogEntry> Snapshot();
 
     void Append(BocchiLogLevel level, string message);
@@ -54,6 +56,10 @@ public sealed class BocchiLogBuffer : IBocchiLogBuffer
 
     private readonly Dictionary<string, BocchiLogEntry> recent = new(StringComparer.Ordinal);
 
+    private int version;
+
+    public int Version => Volatile.Read(ref version);
+
     public IReadOnlyList<BocchiLogEntry> Snapshot()
     {
         lock (gate)
@@ -74,6 +80,7 @@ public sealed class BocchiLogBuffer : IBocchiLogBuffer
 
         lock (gate)
         {
+            version++;
             if (recent.TryGetValue(key, out BocchiLogEntry? recentEntry))
             {
                 if (now - recentEntry.LastOccurrence <= ConsolidationWindow)
@@ -122,6 +129,7 @@ public sealed class BocchiLogBuffer : IBocchiLogBuffer
     {
         lock (gate)
         {
+            version++;
             logs.Clear();
             recent.Clear();
         }

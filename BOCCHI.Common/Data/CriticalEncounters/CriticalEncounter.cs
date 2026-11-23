@@ -77,16 +77,13 @@ public class CriticalEncounter(
 
     private static Vector3 ResolvePosition(DynamicEvent ev, Vector3 fallbackPosition)
     {
-        Vector3 live = TryReadLayoutPosition(ev);
-        bool hasLive = !float.IsNaN(live.X);
-        bool hasAuthored = !float.IsNaN(fallbackPosition.X);
-
-        if (hasAuthored)
+        if (!float.IsNaN(fallbackPosition.X))
         {
             return fallbackPosition;
         }
 
-        return hasLive ? live : fallbackPosition;
+        Vector3 live = TryReadLayoutPosition(ev);
+        return float.IsNaN(live.X) ? fallbackPosition : live;
     }
 
     public void Update(DynamicEvent ev)

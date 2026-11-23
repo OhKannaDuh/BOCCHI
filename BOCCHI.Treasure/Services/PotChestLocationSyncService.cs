@@ -40,20 +40,46 @@ public sealed class PotChestLocationSyncService
         StartCatalogRefresh(zones.GetZone().TerritoryType, force: true);
     }
 
-    public IReadOnlyList<PotChestData> GetPrimaryPads(IZone zone, int fateId)
-    {
-        if (!zone.GetPotChestData().TryGetValue(fateId, out List<PotChestData>? baked))
+    private readonly Lock poolsGate = new();
+
+    private readonly Dictionary<(ushort Territory, int FateId, bool Reroll), IReadOnlyList<PotChestData>> pools = [];
+
+    private (ushort Catalog, object Accepted, bool Shared) poolsKey;
+
+    public IReadOnlyList<PotChestData> GetPrimaryPads(IZone zone, int fateId) =>
+        CachedPool(zone, fateId, isReroll: false, () =>
         {
-            baked = [];
-        }
+            if (!zone.GetPotChestData().TryGetValue(fateId, out List<PotChestData>? baked))
+            {
+                baked = [];
+            }
 
-        return MergePool(zone, fateId, isReroll: false, baked);
-    }
+            return MergePool(zone, fateId, isReroll: false, baked);
+        });
 
-    public IReadOnlyList<PotChestData> GetRerollPads(IZone zone)
+    public IReadOnlyList<PotChestData> GetRerollPads(IZone zone) =>
+        CachedPool(zone, 0, isReroll: true, () => MergeRerollPool(zone, zone.GetRerollPotChestData()));
+
+    // The pot chest farm asks every frame; the merge is only redone when the shared pad list changes.
+    private IReadOnlyList<PotChestData> CachedPool(IZone zone, int fateId, bool isReroll, Func<IReadOnlyList<PotChestData>> build)
     {
-        List<PotChestData> baked = zone.GetRerollPotChestData();
-        return MergeRerollPool(zone, baked);
+        lock (poolsGate)
+        {
+            (ushort, object, bool) key = (catalogTerritory, accepted, config.EnableSharedMaps);
+            if (poolsKey.Catalog != key.Item1 || !ReferenceEquals(poolsKey.Accepted, key.Item2) || poolsKey.Shared != key.Item3)
+            {
+                pools.Clear();
+                poolsKey = key;
+            }
+
+            if (!pools.TryGetValue((zone.TerritoryType, fateId, isReroll), out IReadOnlyList<PotChestData>? pool))
+            {
+                pool = build();
+                pools[(zone.TerritoryType, fateId, isReroll)] = pool;
+            }
+
+            return pool;
+        }
     }
 
     public bool CanRunSmart(IZone zone, int fateId) =>

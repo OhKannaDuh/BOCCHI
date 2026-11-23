@@ -86,7 +86,26 @@ public abstract class BaseZone
 
     public virtual TreasureRoutePolicy GetTreasureRoutePolicy() => new();
 
+    private List<Vector3>? crystalAnchors;
+
+    private List<KnowledgeCrystalData> nearbyCrystals = [];
+
+    private long nearbyCrystalsAtMs = long.MinValue;
+
+    // Called from several handlers' scoring every frame; the object scan is reused for 200 ms.
     public List<KnowledgeCrystalData> GetNearbyKnowledgeCrystals()
+    {
+        long now = Environment.TickCount64;
+        if (now - nearbyCrystalsAtMs >= 200)
+        {
+            nearbyCrystals = FindNearbyKnowledgeCrystals();
+            nearbyCrystalsAtMs = now;
+        }
+
+        return [.. nearbyCrystals];
+    }
+
+    private List<KnowledgeCrystalData> FindNearbyKnowledgeCrystals()
     {
         if (objects.LocalPlayer is not { } player)
         {
@@ -103,38 +122,7 @@ public abstract class BaseZone
         float playerRangeSq = playerRange * playerRange;
         float aetheryteRangeSq = aetheryteRange * aetheryteRange;
         bool inForkedTower = IsInForkedTower();
-
-        List<Vector3> anchors = [];
-        foreach (AethernetData aetheryte in GetAetherytes())
-        {
-            anchors.Add(aetheryte.Position);
-        }
-
-        foreach (AethernetData shard in GetAethernetShards())
-        {
-            if (anchors.All(a => Vector3.DistanceSquared(a, shard.Position) > 1f))
-            {
-                anchors.Add(shard.Position);
-            }
-        }
-
-        if (anchors.Count == 0)
-        {
-            anchors.Add(GetAetherytePosition());
-        }
-
-        if (GetBuffZone() is { } buffZone)
-        {
-            anchors.Add(buffZone.Center);
-        }
-
-        foreach (Vector3 authored in GetAuthoredKnowledgeCrystalCenters())
-        {
-            if (anchors.All(a => Vector3.DistanceSquared(a, authored) > 1f))
-            {
-                anchors.Add(authored);
-            }
-        }
+        List<Vector3> anchors = crystalAnchors ?? BuildCrystalAnchors();
 
         List<KnowledgeCrystalData> crystals = objects
             .Where(o => o is { ObjectKind: ObjectKind.EventObj, BaseId: KnowledgeCrystalData.BaseId })
@@ -177,6 +165,49 @@ public abstract class BaseZone
         return crystals
             .OrderBy(c => Vector3.DistanceSquared(c.Position, playerPos))
             .ToList();
+    }
+
+    private List<Vector3> BuildCrystalAnchors()
+    {
+        List<Vector3> anchors = [];
+        foreach (AethernetData aetheryte in GetAetherytes())
+        {
+            anchors.Add(aetheryte.Position);
+        }
+
+        foreach (AethernetData shard in GetAethernetShards())
+        {
+            if (anchors.All(a => Vector3.DistanceSquared(a, shard.Position) > 1f))
+            {
+                anchors.Add(shard.Position);
+            }
+        }
+
+        if (anchors.Count == 0)
+        {
+            anchors.Add(GetAetherytePosition());
+        }
+
+        if (GetBuffZone() is { } buffZone)
+        {
+            anchors.Add(buffZone.Center);
+        }
+
+        foreach (Vector3 authored in GetAuthoredKnowledgeCrystalCenters())
+        {
+            if (anchors.All(a => Vector3.DistanceSquared(a, authored) > 1f))
+            {
+                anchors.Add(authored);
+            }
+        }
+
+        // Only keep it once the zone's aetherytes are loaded; an early empty list would stick for the session.
+        if (GetAetherytes().Count > 0)
+        {
+            crystalAnchors = anchors;
+        }
+
+        return anchors;
     }
 
     public unsafe bool IsInForkedTower()

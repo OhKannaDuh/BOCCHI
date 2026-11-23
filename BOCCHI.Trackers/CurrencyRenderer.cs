@@ -31,17 +31,17 @@ public class CurrencyRenderer
         TrackerRateRenderer.RenderPerHour(
             translator.T(".trackers.currency.gold_per_hour"),
             tracker.GoldPerHour,
-            tracker.GetGoldHistory(graphBucketSize),
+            uiConfig.ShowTrackerGraphs ? tracker.GetGoldHistory(graphBucketSize) : [],
             "##gold_history",
-            uiConfig.ShowCurrencyTrackerGraph
+            uiConfig.ShowTrackerGraphs
         );
 
         TrackerRateRenderer.RenderPerHour(
             translator.T(".trackers.currency.silver_per_hour"),
             tracker.SilverPerHour,
-            tracker.GetSilverHistory(graphBucketSize),
+            uiConfig.ShowTrackerGraphs ? tracker.GetSilverHistory(graphBucketSize) : [],
             "##silver_history",
-            uiConfig.ShowCurrencyTrackerGraph
+            uiConfig.ShowTrackerGraphs
         );
     }
 

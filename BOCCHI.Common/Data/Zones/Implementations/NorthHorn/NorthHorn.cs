@@ -347,7 +347,7 @@ public class NorthHorn
         // Keep in sync with BOCCHI.Treasure/Data/NorthHorn/carrot_locations.json (worker-accepted).
         new(1, new(-258.7481f, 3.588304f, 53.59217f), 40),
         new(2, new(-254f, 54.388798f, -739f), 27),
-        new(3, new(-581f, 160f, 791f), 41),
+        new(3, new(-580.706f, 160.923f, 794.941f), 41),
         new(4, new(287.2872f, 142.99992f, -366.9024f), 26),
         new(5, new(756.858f, 68.92707f, -79.33746f), 24),
         new(6, new(-847.9f, 114f, 196.6f), 34),

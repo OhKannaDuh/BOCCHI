@@ -36,6 +36,14 @@ public sealed class WalkStuckWatch
         escalationCount = 0;
     }
 
+    // After a re-route the player starts far away again; judging that against the old best distance nudged at once.
+    public void RestartProgress()
+    {
+        bestDistance = float.MaxValue;
+        startedUtc = DateTime.UtcNow;
+        nudgeIssued = false;
+    }
+
     public void CapEscalateAfter(TimeSpan maxRemaining)
     {
         if (!nudgeIssued || key == null || maxRemaining <= TimeSpan.Zero)
