@@ -2,7 +2,7 @@
 
 **Better Occult Crescent & Chest Helper Interface**
 
-A Dalamud plugin for Occult Crescent (South Horn / North Horn). It helps you see what’s up, get there, open coffers, and — if you want — run the zone on autopilot.
+A Dalamud plugin for Occult Crescent (South Horn and North Horn): see what's up, get there, open coffers, or let it run the zone for you.
 
 Repo install URL:
 
@@ -14,88 +14,46 @@ https://raw.githubusercontent.com/OhKannaDuh/plugins/refs/heads/master/manifest.
 
 ---
 
-## What it can do
+## Modes
 
-### World overview
-- Live **FATE** and **Critical Encounter** lists with rewards
-- **Path** (aethernet + walk) or **Teleport** (aethernet hop only) to an activity
-- Flag activities on the map
+Each mode has its own tab in the main window. Only one runs at a time.
 
-### Illegal Mode (full autopilot)
-- Pick and travel to FATEs and/or Critical Encounters
-- Prefer / wait for **Magic Pot** FATEs and farm **pot chests** (Magical Elixir + compass hints)
-- Combat: Wrath Combo or Rotation Solver Reborn with BOCCHI AI, or full BossMod / BossMod Reborn autorotation (Illegal Mode → General → Combat). Only plugins you have installed are listed. Off while traveling.
-- Auto-mount, Return to camp, repair, Treasure Sight at camp
-- Optional auto treasure hunt between activities
-- Phantom job leveling helper
-- Mount, sprint, and jump-when-stuck on the **Movement** page (also used by Treasure Hunt, Carrot Hunt, and Mob Farmer)
+- **Illegal Mode** - full autopilot: picks FATEs and Critical Encounters, travels, fights, waits for Magic Pots and farms pot chests. Can hunt treasure in between, raise players afterwards (Triage Mode) and revive you when you die (off by default). Completionist is a switch here.
+- **Pots & Treasure** - waits for Magic Pots and hunts treasure in between, without the rest of Illegal Mode.
+- **Treasure Hunter** - bronze and silver coffer routes, and Carrot Hunt for Fortune Carrots.
+- **Mob Farmer** - pulls and clears packs at farm spots you save.
+- **World** - live FATE and CE lists; walk or teleport to one, or flag it on the map.
 
-### Pots & Treasure
-- Dedicated loop: pot windows ↔ treasure hunting without full Illegal Mode
+Also: knowledge crystal buffs, gold / silver / XP per hour, a pot timer, Forked Tower help, and shopping through Knightshopper.
 
-### Treasure Hunter
-- Planned coffer routes (bronze / silver) with aethernet-aware pathing
-- Treasure Sight during the hunt; pause / resume / recalculate
-- Radar lines to nearby coffers and carrots
-- **Carrot Hunt:** authored map tour with nearest-next routing and aethernet hops; Fortune Carrot → bunny gold chest
-
-### Mob Farmer
-- Pull and clear selected packs at named farm spots (optional stack points, pull buffs, tank gap-closers)
-- Can pause for Magic Pots, a timed Treasure Hunt, or knowledge-crystal buffs that are about to expire
-
-### Buffs
-- Apply knowledge-crystal style buffs (Apply / Stop from the main window)
-
-### Trackers
-- Experience / gold / silver per hour style session stats
-
-### Languages
-- English, Japanese, Korean, Simplified Chinese
-
----
+**Shared maps** (Treasure Hunter → "Share chest locations", on by default): BOCCHI shares coffer, carrot and pot chest spots and pot timers with other players. Only the spot is sent, nothing about you or your character.
 
 ## Requirements
 
-| Plugin | Needed for |
+| Plugin | For |
 |---|---|
-| **vnavmesh** | Pathfinding / walking |
-| **Lifestream** | Aethernet teleports |
-| **BossMod** or **BossMod Reborn** | BOCCHI AI preset (targeting / movement; optional) |
-| **Wrath Combo** or **Rotation Solver Reborn** | Job autorotation (optional, separate) |
-
----
+| **vnavmesh** | Walking (required) |
+| **Lifestream** | Aethernet teleports (required) |
+| **BossMod** | Targeting and movement in fights |
+| **Wrath Combo** | Your job rotation (or use BossMod's own) |
+| **Knightshopper** | Shopping (optional) |
 
 ## Quick start
 
-1. Install from the repo URL above in Dalamud.
-2. Enter South or North Horn.
-3. Open the window with `/bocchi` (alias `/och`).
-4. Use the **World** panel for manual path/teleport, or start **Illegal Mode** / **Treasure Hunt** / **Pots & Treasure** from their sections.
-5. Configure behavior under the plugin config (gear icon).
-
-Optional: enable **Open BOCCHI on Occult Crescent entry** in UI settings.
-
----
+1. Install from the repo URL above.
+2. Go to South or North Horn and type `/bocchi`.
+3. Pick a tab and press Start. The cog in the title bar opens the settings for that tab.
 
 ## Commands
 
-Prefix: `/bocchi` (aliases: `/och`, `/occultcrescenthelper`)
-
 | Command | What it does |
 |---|---|
-| `/bocchi` | Open main window |
-| `/bocchi config` | Open config (`cfg`, `c`) |
-| `/bocchi buff` | Start/stop a buff run |
-| `/bocchi tp [fate\|ce\|pot]` | Teleport toward nearest matching activity |
-| `/bocchi illegal [on\|off\|toggle]` | Control Illegal Mode (no arg opens the window) |
-| `/bocchi changelog` | Open What’s new |
-| `/bocchi cmd flag-active-ce` | Flag a registering CE |
-| `/bocchi cmd flag-active-fate` | Flag a FATE |
-| `/bocchi reload-translations` | Reload translations (`rt`) |
+| `/bocchi` | Open the window (also `/och`) |
+| `/bocchi config` | Open the settings; `config set <setting> <value>` changes one from chat |
+| `/bocchi illegal on\|off\|toggle` | Control Illegal Mode |
+| `/bocchi tp fate\|ce\|pot` | Teleport toward the nearest one |
+| `/bocchi buff` | Start or stop a buff run |
+| `/bocchi logs` | Open the logs (`logs copy` copies them for a bug report) |
+| `/bocchi changelog` | Show what's new |
 
----
-
-## Notes
-
-- Automation modes are **exclusive** — starting one stops the others (Emergency Stop is available in the UI).
-- Treasure and Carrot Hunt use the built-in authored maps.
+Languages: English, Japanese, Korean, Simplified Chinese.

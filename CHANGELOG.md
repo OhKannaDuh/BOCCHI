@@ -13,8 +13,8 @@
 
 ### Fighting
 - BOCCHI now fights back when attacked: while riding (mobs your level or lower), while waiting for a pot, CE or Return, and during Treasure Hunt, Carrot Hunt and Triage Mode
-- With combat set to None, BOCCHI keeps moving when attacked and fully lets go of Rotation Solver
-- Wrath Combo, Rotation Solver and BossMod presets are switched on and off more reliably
+- With combat set to None, BOCCHI keeps moving when attacked and fully lets go of your rotation plugin
+- Rotation plugins and BossMod presets are switched on and off more reliably
 
 ### Pots and treasure
 - Pots now work with "Do FATEs" turned off
