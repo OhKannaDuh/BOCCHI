@@ -1,6 +1,7 @@
 using BOCCHI.Common.Config;
 using BOCCHI.Common.Data.Aethernet;
 using BOCCHI.Common.Data.CriticalEncounters;
+using BOCCHI.Common.Data.Fates;
 using BOCCHI.Common.Data.Zones;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Plugin.Services;
@@ -19,6 +20,8 @@ public sealed class AutoRevive(
     IZoneProvider zones,
     ICriticalEncounterContext criticalEncounters,
     ICriticalEncounterRepository encounters,
+    IFateContext fates,
+    IFateRepository fateList,
     YesAlreadyPause yesAlready,
     ILogger<AutoRevive> logger
 ) : IOnUpdate, IOnStop
@@ -30,6 +33,14 @@ public sealed class AutoRevive(
     private bool diedInTower;
 
     private CriticalEncounterId? encounterAtDeath;
+
+    private DateTime encounterSeenUtc;
+
+    private FateId? fateAtDeath;
+
+    private DateTime fateSeenUtc;
+
+    private DateTime waitFromUtc;
 
     private bool sawAlive;
 
@@ -48,13 +59,34 @@ public sealed class AutoRevive(
 
         bool inTower = zones.GetZone().IsInForkedTower();
         CriticalEncounterId? encounter = criticalEncounters.GetRegisteredOrActiveCriticalEncounterId();
+        FateId? fate = fates.GetFateId();
         if (!conditions[ConditionFlag.Unconscious])
         {
             deadSinceUtc = null;
             sawAlive = true;
             lastNote = null;
             diedInTower = inTower;
-            encounterAtDeath = encounter;
+            if (encounter != null)
+            {
+                encounterAtDeath = encounter;
+                encounterSeenUtc = DateTime.UtcNow;
+            }
+            // The game can drop you from the CE a moment before you count as dead.
+            else if (DateTime.UtcNow - encounterSeenUtc > TimeSpan.FromSeconds(10))
+            {
+                encounterAtDeath = null;
+            }
+
+            if (fate != null)
+            {
+                fateAtDeath = fate;
+                fateSeenUtc = DateTime.UtcNow;
+            }
+            else if (DateTime.UtcNow - fateSeenUtc > TimeSpan.FromSeconds(10))
+            {
+                fateAtDeath = null;
+            }
+
             yesAlready.Release();
             return;
         }
@@ -62,7 +94,23 @@ public sealed class AutoRevive(
         // Event state may not survive death, so keep what was true while alive; a wrong release out of Forked Tower can't be undone.
         diedInTower |= inTower;
         encounterAtDeath ??= encounter;
-        deadSinceUtc ??= DateTime.UtcNow;
+        fateAtDeath ??= fate;
+        if (deadSinceUtc == null)
+        {
+            deadSinceUtc = DateTime.UtcNow;
+            logger.Info(
+                "Auto revive: down (Forked Tower: {Tower}, critical encounter: {Encounter}, FATE: {Fate})",
+                diedInTower,
+                encounterAtDeath?.ToString() ?? "none",
+                fateAtDeath?.ToString() ?? "none");
+        }
+
+        // Returning drops you out of the FATE or CE, so the wait for a raise only starts once it is over.
+        bool activityRunning = EncounterStillRunning() || FateStillRunning();
+        if (activityRunning || waitFromUtc < deadSinceUtc.Value)
+        {
+            waitFromUtc = DateTime.UtcNow;
+        }
 
         if (!config.AutoAcceptRaise && !config.ReturnToBaseCampAfterDeath)
         {
@@ -83,9 +131,9 @@ public sealed class AutoRevive(
             objects.LocalPlayer?.StatusList.Any(s => s.StatusId == RaisePendingStatusId) == true,
             promptOpen && ReturnYesNo.IsReturnConfirmation(&yesno->AtkUnitBase),
             diedInTower,
-            diedInTower || EncounterStillRunning(),
+            diedInTower || activityRunning,
             sawAlive,
-            DateTime.UtcNow - deadSinceUtc.Value));
+            DateTime.UtcNow - waitFromUtc));
 
         if (action == AutoReviveAction.Nothing)
         {
@@ -111,6 +159,8 @@ public sealed class AutoRevive(
     private bool EncounterStillRunning() =>
         encounterAtDeath is { } id
         && encounters.SnapshotWithoutForkedTower().Any(ce => ce.Id == id && (ce.IsPreparing() || ce.IsActive()));
+
+    private bool FateStillRunning() => fateAtDeath is { } id && fateList.HasFate(id);
 
     public void OnStop() => yesAlready.Release();
 }

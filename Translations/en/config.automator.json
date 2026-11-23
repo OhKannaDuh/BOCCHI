@@ -195,11 +195,11 @@
     },
     "return_to_base_camp_after_death": {
       "label": "Return to camp if not raised",
-      "tooltip": "If nobody raises you in time, go back to base camp. Never happens inside Forked Tower, or while the Critical Encounter you died in is still running.\nYesAlready is paused while you are dead, so it cannot answer the prompt first."
+      "tooltip": "If nobody raises you in time, go back to base camp. Never happens inside Forked Tower. If you die in a FATE or Critical Encounter, it waits until that is over, so you keep your reward.\nYesAlready is paused while you are dead, so it cannot answer the prompt first."
     },
     "return_after_death_delay_seconds": {
       "label": "Wait before returning (seconds)",
-      "tooltip": "How long to wait for a raise before going back to base camp."
+      "tooltip": "How long to wait for a raise before going back to base camp. After dying in a FATE or Critical Encounter, the wait starts once it is over."
     },
     "triage_delay_seconds": {
       "label": "Wait before raising (seconds)",

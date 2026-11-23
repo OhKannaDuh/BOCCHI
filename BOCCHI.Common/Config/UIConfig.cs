@@ -31,9 +31,9 @@ public class UILanguageDisplay : IEnumDisplay<UILanguage>
 {
     public string Display(UILanguage value) => value switch
     {
-        UILanguage.Japanese => "日本語",
-        UILanguage.Korean => "한국어",
-        UILanguage.ChineseSimplified => "简体中文",
+        UILanguage.Japanese => "Japanese",
+        UILanguage.Korean => "Korean",
+        UILanguage.ChineseSimplified => "Chinese (Simplified)",
         _ => "English"
     };
 }

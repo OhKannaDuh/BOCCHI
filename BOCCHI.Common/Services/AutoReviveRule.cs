@@ -50,7 +50,7 @@ public static class AutoReviveRule
 
         if (state.ProtectedContent)
         {
-            return (AutoReviveAction.Nothing, $"{prompt}; your critical encounter is still running, so not returning");
+            return (AutoReviveAction.Nothing, $"{prompt}; the FATE or critical encounter you died in is still running, so not returning yet");
         }
 
         if (!state.SawAlive)

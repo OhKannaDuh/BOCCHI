@@ -8,7 +8,7 @@
 - Each tab says in one line what the mode does, and warns you when a plugin it needs isn't running
 - Triage Mode: optional wait before raising, so nearby healers get a chance first
 - Hover texts rewritten in plainer words, in all four languages. Spotted odd wording in Japanese, Korean or Chinese? Let us know
-- Auto revive (Illegal Mode → General → When you die): accept raises, and go back to base camp if nobody raises you in time. Both are off by default. Nothing happens inside Forked Tower; in FATEs and critical encounters raises are accepted, and the return to camp waits until the encounter you died in is over. While you are dead, YesAlready is paused so it can't answer the prompt first
+- Auto revive (Illegal Mode → General → When you die): accept raises, and go back to base camp if nobody raises you in time. Both are off by default. Nothing happens inside Forked Tower; in FATEs and critical encounters raises are accepted, and the wait before returning to camp only starts once the FATE or encounter you died in is over, so you keep its reward. While you are dead, YesAlready is paused so it can't answer the prompt first
 - New option (Movement → Routes): use Return for long trips instead of walking through mobs to an aethernet shard
 
 ### Fixes
