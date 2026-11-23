@@ -6,7 +6,6 @@ public interface IFieldNoteTracker
 {
     bool HasNote(MonsterNote note);
 
-    bool NeedsNote(MonsterNote note) => !HasNote(note);
 
     bool HasEntry(FieldNoteTargets.Entry entry);
 

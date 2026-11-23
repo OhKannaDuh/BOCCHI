@@ -1,10 +1,9 @@
 using Dalamud.Plugin;
 using Dalamud.Plugin.Ipc;
-using Ocelot.Lifecycle;
 
 namespace BOCCHI.Common.Ipc.Knightshopper;
 
-public sealed class KnightshopperIpc : IKnightshopperIpc, IOnStop, IDisposable
+public sealed class KnightshopperIpc : IKnightshopperIpc
 {
     private readonly ICallGateSubscriber<int> apiVersion;
     private readonly ICallGateSubscriber<bool> isBusy;
@@ -12,8 +11,6 @@ public sealed class KnightshopperIpc : IKnightshopperIpc, IOnStop, IDisposable
     private readonly ICallGateSubscriber<Guid, (int, int, int, uint, string)> getStatus;
     private readonly ICallGateSubscriber<Guid, bool> isRunning;
     private readonly ICallGateSubscriber<Guid, bool> cancel;
-    private readonly ICallGateSubscriber<Guid, int, string, object> finished;
-    private bool disposed;
 
     public KnightshopperIpc(IDalamudPluginInterface pluginInterface)
     {
@@ -23,11 +20,7 @@ public sealed class KnightshopperIpc : IKnightshopperIpc, IOnStop, IDisposable
         getStatus = pluginInterface.GetIpcSubscriber<Guid, (int, int, int, uint, string)>("Knightshopper.Purchase.GetStatus");
         isRunning = pluginInterface.GetIpcSubscriber<Guid, bool>("Knightshopper.Purchase.IsRunning");
         cancel = pluginInterface.GetIpcSubscriber<Guid, bool>("Knightshopper.Purchase.Cancel");
-        finished = pluginInterface.GetIpcSubscriber<Guid, int, string, object>("Knightshopper.Purchase.Finished");
-        finished.Subscribe(OnFinished);
     }
-
-    public event Action<PurchaseFinished>? Finished;
 
     public bool IsAvailable
     {
@@ -111,28 +104,6 @@ public sealed class KnightshopperIpc : IKnightshopperIpc, IOnStop, IDisposable
         catch
         {
             return false;
-        }
-    }
-
-    private void OnFinished(Guid operationId, int state, string message) =>
-        Finished?.Invoke(new PurchaseFinished(operationId, (PurchaseState)state, message));
-
-    public void OnStop() => Dispose();
-
-    public void Dispose()
-    {
-        if (disposed)
-        {
-            return;
-        }
-
-        disposed = true;
-        try
-        {
-            finished.Unsubscribe(OnFinished);
-        }
-        catch
-        {
         }
     }
 }

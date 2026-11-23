@@ -51,5 +51,3 @@ public readonly record struct PurchaseStatus(
 {
     public bool IsFinished => State is PurchaseState.Succeeded or PurchaseState.Failed or PurchaseState.Cancelled;
 }
-
-public readonly record struct PurchaseFinished(Guid OperationId, PurchaseState State, string Message);

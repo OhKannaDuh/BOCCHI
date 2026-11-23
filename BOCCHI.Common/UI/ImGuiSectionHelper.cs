@@ -26,8 +26,6 @@ public static class ImGuiSectionHelper
         return new BoundedListScope(id, height);
     }
 
-    public static BoundedListScope BoundedList(string id, float maxHeight = DefaultListHeight) => new(id, maxHeight);
-
     public readonly struct BoundedListScope : IDisposable
     {
         public bool IsOpen { get; }

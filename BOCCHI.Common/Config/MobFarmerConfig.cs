@@ -107,6 +107,4 @@ public class MobFarmerConfig : IAutoConfig
     [Checkbox(Order = 31, Section = "yields")]
     public bool YieldToCrystalBuffs { get; set; } = false;
 
-    [JsonIgnore]
-    public bool RenderDebugLines => false;
 }

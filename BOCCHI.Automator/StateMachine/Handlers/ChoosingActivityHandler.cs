@@ -189,7 +189,6 @@ public class ChoosingActivityHandler
 
         if (!PotsOnly && !fatesConfig.IsPotFallbackGatingEnabled(
                 (uint)cycle.PredictedNextPotFateId,
-                automatorConfig.ShouldDoFates,
                 automatorConfig.PreferPotFates,
                 automatorConfig.ShouldFarmPotChests,
                 automatorConfig.ShouldPrepositionToPots))

@@ -33,7 +33,6 @@ public class FatesConfig : IAutoConfig
 
     public bool IsPotFallbackGatingEnabled(
         uint predictedNextPotFateId,
-        bool shouldDoFates,
         bool preferPotFates,
         bool shouldFarmPotChests,
         bool shouldPrepositionToPots)

@@ -29,11 +29,6 @@ public sealed class Mp3SoundSelectRenderer(IMp3SoundPlayer sounds) : IFieldRende
             options = ["Moogle"];
         }
 
-        if (!options.Contains(current, StringComparer.OrdinalIgnoreCase))
-        {
-            current = options[0];
-        }
-
         string label = prop.Label(owner, translator);
         bool changed = false;
 

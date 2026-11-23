@@ -110,7 +110,6 @@ internal static class LivePotPriority
         bool potFarming = potsOnly
             || fatesConfig.IsPotFallbackGatingEnabled(
                 (uint)cycle.PredictedNextPotFateId,
-                automatorConfig.ShouldDoFates,
                 automatorConfig.PreferPotFates,
                 automatorConfig.ShouldFarmPotChests,
                 automatorConfig.ShouldPrepositionToPots);

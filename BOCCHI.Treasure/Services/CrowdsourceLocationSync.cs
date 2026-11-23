@@ -149,14 +149,6 @@ public abstract class CrowdsourceLocationSync<TLocation>
             return;
         }
 
-        if (!force
-            && catalogTerritory == territory
-            && DateTime.UtcNow < nextCatalogFetchUtc
-            && accepted.Count > 0)
-        {
-            return;
-        }
-
         if (!force && DateTime.UtcNow < nextCatalogFetchUtc && catalogTerritory == territory)
         {
             return;

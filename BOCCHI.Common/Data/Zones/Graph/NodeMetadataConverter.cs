@@ -20,12 +20,8 @@ public class NodeMetadataConverter : JsonConverter<INodeMetadata>
         return typeName switch
         {
             nameof(BlankNodeMetadata) => JsonSerializer.Deserialize<BlankNodeMetadata>(root.GetRawText(), options)!,
-            nameof(CarrotNodeMetadata) or "CarrotNodeMetaData" => JsonSerializer.Deserialize<CarrotNodeMetadata>(root.GetRawText(), options)!,
-            nameof(RerollPotChestNodeMetadata) or "RerollPotChestNodeMetaData" => JsonSerializer.Deserialize<RerollPotChestNodeMetadata>(root.GetRawText(), options)!,
             nameof(TeleportNodeMetadata) => JsonSerializer.Deserialize<TeleportNodeMetadata>(root.GetRawText(), options)!,
             nameof(ActivityNodeMetadata) => JsonSerializer.Deserialize<ActivityNodeMetadata>(root.GetRawText(), options)!,
-            nameof(TreasureNodeMetadata) or "TreasureNodeMetaData" => JsonSerializer.Deserialize<TreasureNodeMetadata>(root.GetRawText(), options)!,
-            nameof(PotChestNodeMetadata) or "PotChestNodeMetaData" => JsonSerializer.Deserialize<PotChestNodeMetadata>(root.GetRawText(), options)!,
             var _ => throw new JsonException($"Unknown metadata type: {typeName}")
         };
     }

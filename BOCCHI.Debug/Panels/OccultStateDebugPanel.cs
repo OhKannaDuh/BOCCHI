@@ -62,7 +62,10 @@ public sealed unsafe class OccultStateDebugPanel(
         RenderCurrency(state);
         RenderResolvedExcel();
         RenderMkdDataCs();
+#if DEBUG
+        // Reads a pointer at a hard-coded offset; after a game patch it can crash the game, so players never get it.
         RenderUnkPairs(content);
+#endif
         RenderStrings(content);
         RenderChainTargets();
         RenderTeleportBits(state);

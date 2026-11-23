@@ -36,7 +36,6 @@ public class StartableCriticalEncounterFinder
         PotCycleSnapshot cycle = potCycle.Snapshot;
         bool potFarming = fatesConfig.IsPotFallbackGatingEnabled(
             (uint)cycle.PredictedNextPotFateId,
-            automatorConfig.ShouldDoFates,
             automatorConfig.PreferPotFates,
             automatorConfig.ShouldFarmPotChests,
             automatorConfig.ShouldPrepositionToPots);

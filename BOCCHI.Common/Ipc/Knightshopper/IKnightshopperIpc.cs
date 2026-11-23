@@ -13,6 +13,4 @@ public interface IKnightshopperIpc
     bool IsRunning(Guid operationId);
 
     bool Cancel(Guid operationId);
-
-    event Action<PurchaseFinished>? Finished;
 }

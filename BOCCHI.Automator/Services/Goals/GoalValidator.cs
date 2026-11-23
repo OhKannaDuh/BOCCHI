@@ -275,7 +275,6 @@ public class GoalValidator
         PotCycleSnapshot cycle = potCycle.Snapshot;
         bool potFarming = fatesConfig.IsPotFallbackGatingEnabled(
             (uint)cycle.PredictedNextPotFateId,
-            automatorConfig.ShouldDoFates,
             automatorConfig.PreferPotFates,
             automatorConfig.ShouldFarmPotChests,
             automatorConfig.ShouldPrepositionToPots);
@@ -432,7 +431,6 @@ public class GoalValidator
 
         if (!potsOnly && !fatesConfig.IsPotFallbackGatingEnabled(
                 (uint)cycle.PredictedNextPotFateId,
-                automatorConfig.ShouldDoFates,
                 automatorConfig.PreferPotFates,
                 automatorConfig.ShouldFarmPotChests,
                 automatorConfig.ShouldPrepositionToPots))

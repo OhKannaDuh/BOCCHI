@@ -53,10 +53,10 @@ public class DecisionTests
     {
         FatesConfig config = new();
 
-        Assert.False(config.IsPotFallbackGatingEnabled(1976, true, false, false, false));
-        Assert.False(config.IsPotFallbackGatingEnabled(0, true, false, true, true));
-        Assert.True(config.IsPotFallbackGatingEnabled(1976, false, false, true, false));
-        Assert.True(config.IsPotFallbackGatingEnabled(1976, false, false, false, true));
+        Assert.False(config.IsPotFallbackGatingEnabled(1976, false, false, false));
+        Assert.False(config.IsPotFallbackGatingEnabled(0, false, true, true));
+        Assert.True(config.IsPotFallbackGatingEnabled(1976, false, true, false));
+        Assert.True(config.IsPotFallbackGatingEnabled(1976, false, false, true));
     }
 
     [Theory]
