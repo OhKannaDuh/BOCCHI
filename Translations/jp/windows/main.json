@@ -154,7 +154,12 @@
       "pot_chest_farm": "マジックポット宝箱回収",
       "chests_remaining": "残り宝箱数",
       "time_idle": "待機時間",
-      "description": "FATE、クリティカルエンカウント、マジックポットを次々に自動でこなします。"
+      "description": "FATE、クリティカルエンカウント、マジックポットを次々に自動でこなします。",
+      "why": {
+        "stop_after_return": "一時停止中：「デジョンとテレポのあと停止」がオンのため、残りは自分で移動します。次へ進むには停止して再開してください。",
+        "nothing_allowed": "やることがありません：FATE、CE、マジックポットの設定がすべてオフです。",
+        "waiting": "許可した FATE や CE が始まるのを待っています。"
+      }
     },
     "mob_farmer": {
       "title": "モブファーム",

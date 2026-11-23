@@ -97,6 +97,10 @@
     "minimum_mobs_to_start_loop": {
       "label": "開始に必要な敵の数"
     },
+    "minimum_hp_percent_to_pull": {
+      "label": "釣り前の最低HP（%）",
+      "tooltip": "HPがこの割合以上になるまで、次の釣りを始めずに待ちます。0 = 待たない。"
+    },
     "minimum_mobs_to_start_fight": {
       "label": "戦闘前に集める敵の数",
       "tooltip": "戦闘を始める前に集める敵の数。狩り場ごとに別の数を設定できます。"

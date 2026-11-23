@@ -5,7 +5,6 @@
     "general": "常规",
     "trackers": "统计",
     "events": "奖励图标",
-    "panels": "标签页",
     "chat": "聊天"
   },
   "fields": {
@@ -35,9 +34,6 @@
       "label": "显示可采青铜 / 白银",
       "tooltip": "把鼠标移到统计行上时，显示还剩多少青铜和白银宝箱。使用魔寻宝后数字会更新。"
     },
-    "show_world_section": {
-      "label": "显示“危命与紧急遭遇战”标签页"
-    },
     "show_demiatma_drops": {
       "label": "显示魂晶掉落（南部）",
       "tooltip": "绿框：你还需要。\n红框：你已有 3 个。"
@@ -50,21 +46,6 @@
     },
     "show_buff_section": {
       "label": "显示附加增益按钮"
-    },
-    "show_automation_section": {
-      "label": "显示“违规模式”标签页"
-    },
-    "show_completionist_section": {
-      "label": "显示收集者"
-    },
-    "show_mob_farmer_section": {
-      "label": "显示“刷怪”标签页"
-    },
-    "show_pots_treasure_section": {
-      "label": "显示“魔法罐与寻宝”标签页"
-    },
-    "show_treasure_section": {
-      "label": "显示“寻宝”标签页"
     },
     "show_bocchi_chat_prefix": {
       "label": "显示 BOCCHI 聊天消息",

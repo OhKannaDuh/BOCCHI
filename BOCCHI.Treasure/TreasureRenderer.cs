@@ -19,7 +19,6 @@ public class TreasureRenderer
     ICarrotHunter carrotHunter,
     IActivityNavigation navigation,
     TreasureConfig config,
-    UIConfig uiConfig,
     IPlayer player,
     ITranslator<MainWindow> translator
 ) : IDynamicRenderer
@@ -34,7 +33,7 @@ public class TreasureRenderer
         DrawNearbyTreasures();
     }
 
-    public bool ShouldRender() => uiConfig.ShowTreasureSection;
+    public bool ShouldRender() => true;
 
     private void DrawHuntPanel()
     {

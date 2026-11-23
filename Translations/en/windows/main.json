@@ -154,7 +154,12 @@
       "pot_chest_farm": "Pot chest farm",
       "chests_remaining": "Chests remaining",
       "time_idle": "Time idle",
-      "description": "Does FATEs, Critical Encounters and Magic Pots for you, one after another."
+      "description": "Does FATEs, Critical Encounters and Magic Pots for you, one after another.",
+      "why": {
+        "stop_after_return": "Paused: \"Stop after return and teleport\" is on, so you walk the rest yourself. Press Stop and Start for the next one.",
+        "nothing_allowed": "Nothing to do: Do FATEs, Do Critical Encounters and the Magic Pot settings are all off.",
+        "waiting": "Waiting for a FATE or Critical Encounter you allowed to come up."
+      }
     },
     "mob_farmer": {
       "title": "Mob Farmer",

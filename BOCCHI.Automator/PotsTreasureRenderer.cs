@@ -177,5 +177,5 @@ public class PotsTreasureRenderer
         }
     }
 
-    public bool ShouldRender() => uiConfig.ShowPotsTreasureSection;
+    public bool ShouldRender() => true;
 }

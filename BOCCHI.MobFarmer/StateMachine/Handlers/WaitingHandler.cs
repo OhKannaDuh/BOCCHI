@@ -44,6 +44,8 @@ public class WaitingHandler
 
     private bool travelStarted;
 
+    private bool loggedLowHp;
+
     public override void Exit(FarmerPhase next)
     {
         if (travelStarted && navigation.IsBusy)
@@ -114,13 +116,29 @@ public class WaitingHandler
 
         readySinceUtc ??= DateTime.UtcNow;
         int free = MobFarmerPack.CountTowardMinimum(scanner.NotInCombat, config.CountSpecialMobsTowardMinimum);
-        return MobFarmerRules.ShouldStartPull(
-            free,
-            config.MinimumMobsToStartLoop,
-            DateTime.UtcNow - readySinceUtc.Value,
-            TimeSpan.FromSeconds(config.StackingTimeoutSeconds))
-            ? FarmerPhase.Buffing
-            : null;
+        if (!MobFarmerRules.ShouldStartPull(
+                free,
+                config.MinimumMobsToStartLoop,
+                DateTime.UtcNow - readySinceUtc.Value,
+                TimeSpan.FromSeconds(config.StackingTimeoutSeconds)))
+        {
+            return null;
+        }
+
+        // Pulling right after a fight (or a Phantom Oracle Starfall) at low HP died to the first hit.
+        if (objects.LocalPlayer is { MaxHp: > 0 } me && me.CurrentHp * 100 < me.MaxHp * (uint)config.MinimumHpPercentToPull)
+        {
+            if (!loggedLowHp)
+            {
+                loggedLowHp = true;
+                logger.Info("Mob Farmer: waiting for HP ({Hp}% of {Min}%) before the next pull", me.CurrentHp * 100 / me.MaxHp, config.MinimumHpPercentToPull);
+            }
+
+            return null;
+        }
+
+        loggedLowHp = false;
+        return FarmerPhase.Buffing;
     }
 
     private bool TryRecoverFromStuck(float distance, Vector3 goal)

@@ -97,6 +97,10 @@
     "minimum_mobs_to_start_loop": {
       "label": "시작에 필요한 적 수"
     },
+    "minimum_hp_percent_to_pull": {
+      "label": "끌어오기 전 최소 HP(%)",
+      "tooltip": "HP가 이 비율 이상이 될 때까지 다음 끌어오기를 기다립니다. 0 = 기다리지 않음."
+    },
     "minimum_mobs_to_start_fight": {
       "label": "전투 전 모을 적 수",
       "tooltip": "전투를 시작하기 전에 모을 적의 수입니다. 사냥 지점마다 따로 정할 수 있습니다."

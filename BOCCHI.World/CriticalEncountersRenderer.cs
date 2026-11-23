@@ -133,5 +133,5 @@ public class CriticalEncountersRenderer
             _ => state.ToString(),
         };
 
-    public bool ShouldRender() => uiConfig.ShowWorldSection;
+    public bool ShouldRender() => true;
 }

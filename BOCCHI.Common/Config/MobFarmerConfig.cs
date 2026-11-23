@@ -49,6 +49,9 @@ public class MobFarmerConfig : IAutoConfig
     [FloatRange(5f, 60f, Format = "%.0f", Order = 13, Section = "pulls")]
     public float StackingTimeoutSeconds { get; set; } = 15f;
 
+    [IntRange(0, 100, Order = 10, Section = "pulls")]
+    public int MinimumHpPercentToPull { get; set; } = 80;
+
     [Checkbox(Order = 14, Section = "pulls")]
     public bool UseRangedPull { get; set; } = true;
 

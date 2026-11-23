@@ -97,6 +97,10 @@
     "minimum_mobs_to_start_loop": {
       "label": "开始拉怪的最少敌人"
     },
+    "minimum_hp_percent_to_pull": {
+      "label": "拉怪前最低 HP（%）",
+      "tooltip": "HP 恢复到至少这个比例后才开始下一次拉怪。0 = 不等待。"
+    },
     "minimum_mobs_to_start_fight": {
       "label": "开战前最少敌人",
       "tooltip": "开打前要聚集多少敌人。每个刷怪点可以单独设置。"

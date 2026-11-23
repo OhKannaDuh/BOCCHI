@@ -4,6 +4,7 @@
 - New look with a tab per mode. Your status and gold / silver / XP per hour stay on top, and the window switches to the mode that is running. Prefer Dalamud's own colours? Turn off "Use BOCCHI theme" under Settings → UI
 - Each tab explains its mode in one line and warns you when a plugin it needs isn't running
 - Each tab shows its most-used settings at the bottom, and the World tab is now called FATEs & CEs
+- The Illegal Mode tab says why it is waiting or paused (for example when "Stop after return and teleport" is on)
 - Search box in the settings; the cog in the title bar opens the settings for the tab you are on
 - Completionist is now a switch in the Illegal Mode tab
 - Auto revive (off by default): accept raises, and go back to camp if nobody raises you. Never inside Forked Tower, and in a FATE or CE it waits until that is over so you keep the reward
@@ -29,6 +30,7 @@
 - No more waiting forever for a pull, getting stuck on "Buffing", or spending cooldowns before the pack is gathered
 - Walks back to its spot after you die, ignores your own party on a spot, and only uses spots saved in the zone you are in
 - Pulls stay around the farm spot instead of drifting away and losing the enemies already pulled
+- Waits for your HP to recover before the next pull (new setting, 80% by default)
 - Removed the setting "Wait until combat fully ends"; it never did anything
 
 ### Fewer stalls
@@ -39,6 +41,7 @@
 - Safer updates: a backup is made before your settings change, and a broken settings file no longer stops BOCCHI from loading
 - Changes made with the chat command `/bocchi config set` are now kept after a restart
 - Your chosen mount and combat plugin are no longer reset by themselves
+- Removed the settings that hid tabs; every tab is always shown
 
 ### Other fixes
 - Gold and silver per hour stay correct when you spend down to 0 or move a stack

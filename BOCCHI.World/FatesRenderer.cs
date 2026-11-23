@@ -88,5 +88,5 @@ public class FatesRenderer
             : state;
     }
 
-    public bool ShouldRender() => uiConfig.ShowWorldSection;
+    public bool ShouldRender() => true;
 }

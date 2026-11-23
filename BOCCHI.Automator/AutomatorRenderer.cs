@@ -1,3 +1,4 @@
+using BOCCHI.Automator.Data;
 using BOCCHI.Automator.Services;
 using BOCCHI.Common;
 using BOCCHI.Common.Config;
@@ -6,6 +7,7 @@ using BOCCHI.Common.Data.StateMemory;
 using BOCCHI.Common.Data.Zones;
 using BOCCHI.Common.Services;
 using BOCCHI.Common.UI;
+using BOCCHI.Treasure.Services;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Plugin.Services;
 using Ocelot.Services.Translation;
@@ -17,7 +19,8 @@ public class AutomatorRenderer
 (
     Func<IAutomator> automatorFactory,
     IAutomatorMemory memory,
-    UIConfig uiConfig,
+    AutomatorConfig config,
+    ITreasureHunter hunter,
     IPotCycleTracker potCycle,
     IZoneProvider zones,
     IDataManager data,
@@ -57,6 +60,10 @@ public class AutomatorRenderer
         if (Automator.Enabled)
         {
             Automator.Render();
+            if (WhyIdle() is { } why)
+            {
+                BocchiUi.DrawStatusChip(translator.T($".automation.automator.why.{why}"), BocchiUi.StatusChipKind.Warn);
+            }
         }
 
         if (memory.TryRemember<GoalMemory>(out GoalMemory goalMemory))
@@ -96,7 +103,32 @@ public class AutomatorRenderer
         }
     }
 
-    public bool ShouldRender() => uiConfig.ShowAutomationSection;
+    public bool ShouldRender() => true;
+
+    // "Illegal Mode does nothing" was the most asked question; say why on screen instead of only in the log.
+    private string? WhyIdle()
+    {
+        if (Automator.IsPotsAndTreasure)
+        {
+            return null;
+        }
+
+        if (memory.TryRemember<NavigationInterruptedMemory>(out NavigationInterruptedMemory _))
+        {
+            return "stop_after_return";
+        }
+
+        if (Automator.CurrentState != AutomatorState.Idle
+            || memory.TryRemember<GoalMemory>(out GoalMemory _)
+            || (hunter.Running && !hunter.Paused))
+        {
+            return null;
+        }
+
+        return config is { ShouldDoFates: false, ShouldDoCriticalEncounters: false, ShouldFarmPotChests: false, ShouldPrepositionToPots: false }
+            ? "nothing_allowed"
+            : "waiting";
+    }
 
     private bool HasDetails() =>
         Automator.Enabled

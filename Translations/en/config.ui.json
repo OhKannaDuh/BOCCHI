@@ -5,7 +5,6 @@
     "general": "General",
     "trackers": "Trackers",
     "events": "Reward icons",
-    "panels": "Tabs",
     "chat": "Chat"
   },
   "fields": {
@@ -35,9 +34,6 @@
       "label": "Show active bronze / silver",
       "tooltip": "Show how many bronze and silver coffers are left when you hover the tracker line. The numbers update when Treasure Sight is used."
     },
-    "show_world_section": {
-      "label": "Show the FATEs & CEs tab"
-    },
     "show_demiatma_drops": {
       "label": "Show demiatma drops (South Horn)",
       "tooltip": "Green border: you still need it.\nRed border: you already have 3."
@@ -50,21 +46,6 @@
     },
     "show_buff_section": {
       "label": "Show Apply Buffs button"
-    },
-    "show_automation_section": {
-      "label": "Show the Illegal Mode tab"
-    },
-    "show_completionist_section": {
-      "label": "Show Completionist"
-    },
-    "show_mob_farmer_section": {
-      "label": "Show the Mob Farmer tab"
-    },
-    "show_pots_treasure_section": {
-      "label": "Show the Pots & Treasure tab"
-    },
-    "show_treasure_section": {
-      "label": "Show the Treasure Hunter tab"
     },
     "show_bocchi_chat_prefix": {
       "label": "Show BOCCHI chat messages",

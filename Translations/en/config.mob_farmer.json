@@ -97,6 +97,10 @@
     "minimum_mobs_to_start_loop": {
       "label": "Minimum enemies to start"
     },
+    "minimum_hp_percent_to_pull": {
+      "label": "Minimum HP before pulling (%)",
+      "tooltip": "Wait until your HP is at least this much before starting the next pull. 0 = don't wait."
+    },
     "minimum_mobs_to_start_fight": {
       "label": "Minimum enemies before fighting",
       "tooltip": "How many enemies to gather before the fight starts. A farm spot can have its own number."

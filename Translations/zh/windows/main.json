@@ -154,7 +154,12 @@
       "pot_chest_farm": "魔法罐宝箱收取",
       "chests_remaining": "剩余宝箱",
       "time_idle": "待机时长",
-      "description": "自动依次完成危命任务、紧急遭遇战和魔法罐。"
+      "description": "自动依次完成危命任务、紧急遭遇战和魔法罐。",
+      "why": {
+        "stop_after_return": "已暂停：“返回并传送后停止”已开启，剩下的路需要你自己走。点击停止再开始即可前往下一个。",
+        "nothing_allowed": "没有可做的事：危命、紧急遭遇战和魔法罐的设置都已关闭。",
+        "waiting": "正在等待你允许的危命或紧急遭遇战出现。"
+      }
     },
     "mob_farmer": {
       "title": "刷怪",

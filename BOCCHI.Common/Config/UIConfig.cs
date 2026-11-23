@@ -79,26 +79,8 @@ public class UIConfig : IAutoConfig
     [Checkbox(Order = 10, Section = "events")]
     public bool ShowSoulShardDrops { get; set; } = true;
 
-    [Checkbox(Order = 11, Section = "panels")]
-    public bool ShowWorldSection { get; set; } = true;
-
-    [Checkbox(Order = 12, Section = "panels")]
+    [Checkbox(Order = 2, Section = "general")]
     public bool ShowBuffSection { get; set; } = true;
-
-    [Checkbox(Order = 13, Section = "panels")]
-    public bool ShowAutomationSection { get; set; } = true;
-
-    [Checkbox(Order = 14, Section = "panels")]
-    public bool ShowCompletionistSection { get; set; } = true;
-
-    [Checkbox(Order = 15, Section = "panels")]
-    public bool ShowMobFarmerSection { get; set; } = true;
-
-    [Checkbox(Order = 16, Section = "panels")]
-    public bool ShowPotsTreasureSection { get; set; } = true;
-
-    [Checkbox(Order = 17, Section = "panels")]
-    public bool ShowTreasureSection { get; set; } = true;
 
     [Checkbox(Order = 18, Section = "chat")]
     public bool ShowBocchiChatPrefix { get; set; } = true;

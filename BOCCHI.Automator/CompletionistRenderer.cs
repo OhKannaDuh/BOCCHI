@@ -24,7 +24,6 @@ public class CompletionistRenderer
     IAutomator automator,
     IAutomatorMemory memory,
     IActivityNavigation navigation,
-    UIConfig uiConfig,
     IFieldNoteTracker fieldNotes,
     ISupportJobFactory supportJobs,
     IZoneProvider zones,
@@ -90,7 +89,7 @@ public class CompletionistRenderer
         }
     }
 
-    public bool ShouldRender() => uiConfig.ShowCompletionistSection;
+    public bool ShouldRender() => true;
 
     private void RenderNotes()
     {

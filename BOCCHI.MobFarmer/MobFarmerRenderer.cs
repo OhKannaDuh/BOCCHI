@@ -15,7 +15,6 @@ public class MobFarmerRenderer
     IMobScanner scanner,
     MobFarmerPanelState panelState,
     MobFarmerConfig config,
-    UIConfig uiConfig,
     ITranslator<MainWindow> translator
 ) : IDynamicRenderer
 {
@@ -62,5 +61,5 @@ public class MobFarmerRenderer
         }
     }
 
-    public bool ShouldRender() => uiConfig.ShowMobFarmerSection;
+    public bool ShouldRender() => true;
 }
