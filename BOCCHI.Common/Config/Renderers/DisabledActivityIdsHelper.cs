@@ -34,8 +34,6 @@ internal static class DisabledActivityIdsHelper
             prop.SetValue(target, disabled);
         }
 
-        BocchiUi.SectionTitle(prop.Label(owner, translator));
-        prop.Tooltip(owner, translator);
 
         if (activities.Count == 0)
         {

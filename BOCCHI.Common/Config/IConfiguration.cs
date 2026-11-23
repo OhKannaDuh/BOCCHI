@@ -15,6 +15,8 @@ public interface IConfiguration : IPluginConfiguration
 
     BuffConfig BuffConfig { get; set; }
 
+    CombatMovementConfig CombatMovementConfig { get; set; }
+
     MobFarmerConfig MobFarmerConfig { get; set; }
 
     FatesConfig FatesConfig { get; set; }
