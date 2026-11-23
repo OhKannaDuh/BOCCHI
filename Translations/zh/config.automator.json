@@ -147,7 +147,7 @@
     },
     "should_cast_treasure_sight": {
       "label": "在营地使用魔寻宝",
-      "tooltip": "在营地每隔一段时间使用魔寻宝，查看还剩多少宝箱。间隔在下面设置。",
+      "tooltip": "在营地每2分钟使用一次魔寻宝，手动寻宝时也能让顶部的宝箱数量保持最新。",
       "tooltip_disabled": "开启自动寻宝时无需此项：自动寻宝已经会使用魔寻宝。"
     },
     "auto_repair_threshold": {

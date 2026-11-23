@@ -55,4 +55,6 @@
 - Shared chest spots and pot timers are more reliable and harder to fake
 - FATE and CE names in your game language, shorter times (01:30 instead of 00:01:30), and clearer warnings
 - Easier-to-read logs when you report a problem
+- Sounds you add for "hunt finished" now survive plugin updates ("Open sounds folder" opens their new place; sounds already there are copied over)
+- The settings window opens at a usable size the first time, and text not yet translated shows in English instead of a key name
 - Smoother frame rate with the settings, logs or Completionist open, and during Mob Farmer, Carrot Hunt and pot chests

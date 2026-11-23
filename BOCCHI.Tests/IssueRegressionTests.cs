@@ -1,4 +1,6 @@
 using BOCCHI.Common.Data;
+using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 using System.Numerics;
 using BOCCHI.Automator.Services.Paths;
 using BOCCHI.Common.Data.Aethernet;
@@ -16,6 +18,38 @@ namespace BOCCHI.Tests;
 // One test per problem that reached players or was found in review, named after what went wrong.
 public class IssueRegressionTests
 {
+    // Audit 119: a class was resolved through its interface, so with two implementations it got the last one.
+    [Fact]
+    public void EachClassIsBuiltUnderItsOwnTypeAndItsHooksSeeIt()
+    {
+        Ocelot.Registry.RegisterAssemblies(typeof(Ocelot.OcelotPlugin).Assembly);
+        IServiceCollection collection = (IServiceCollection)Activator.CreateInstance(
+            typeof(Ocelot.Services.OcelotServiceCollection),
+            BindingFlags.NonPublic | BindingFlags.Instance,
+            null,
+            [null],
+            null)!;
+        collection.AddSingleton<IWiringShape, WiringCircle>();
+        collection.AddSingleton<IWiringShape, WiringSquare>();
+
+        using ServiceProvider services = collection.BuildServiceProvider();
+        WiringCircle circle = services.GetRequiredService<WiringCircle>();
+
+        Assert.Same(circle, services.GetServices<IWiringShape>().OfType<WiringCircle>().Single());
+        Assert.Same(circle, services.GetServices<Ocelot.Lifecycle.IOnUpdate>().Single());
+    }
+
+    private interface IWiringShape;
+
+    private sealed class WiringCircle : IWiringShape, Ocelot.Lifecycle.IOnUpdate
+    {
+        public void Update()
+        {
+        }
+    }
+
+    private sealed class WiringSquare : IWiringShape;
+
     private static readonly DateTimeOffset Start = new(2026, 11, 21, 12, 0, 0, TimeSpan.Zero);
 
     private static readonly AutoReviveState Dead = new(

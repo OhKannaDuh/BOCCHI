@@ -147,7 +147,7 @@
     },
     "should_cast_treasure_sight": {
       "label": "Cast Treasure Sight at camp",
-      "tooltip": "Cast Treasure Sight at camp every so often to see how many coffers are left. The interval is set below.",
+      "tooltip": "Cast Treasure Sight at camp every 2 minutes, so the coffer count at the top stays current while you hunt by hand.",
       "tooltip_disabled": "Not needed while Auto treasure hunt is on: it already casts Treasure Sight."
     },
     "auto_repair_threshold": {

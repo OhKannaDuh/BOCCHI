@@ -12,13 +12,52 @@ public sealed class Mp3SoundPlayer(IDalamudPluginInterface plugin, IPluginLog lo
     private Mp3FileReader? reader;
     private WaveOutEvent? waveOut;
 
+    private string BuiltInDirectory => Path.Combine(plugin.AssemblyLocation.DirectoryName ?? ".", "Sounds");
+
+    private bool copiedOldSounds;
+
+    // Added sounds live in the settings folder: a plugin update replaces the install folder and took them with it.
     public string SoundsDirectory
     {
         get
         {
-            string dir = Path.Combine(plugin.AssemblyLocation.DirectoryName ?? ".", "Sounds");
+            string dir = Path.Combine(plugin.GetPluginConfigDirectory(), "Sounds");
             Directory.CreateDirectory(dir);
+            CopyOldSoundsOnce(dir);
             return dir;
+        }
+    }
+
+    private void CopyOldSoundsOnce(string dir)
+    {
+        if (copiedOldSounds)
+        {
+            return;
+        }
+
+        copiedOldSounds = true;
+        string marker = Path.Combine(dir, ".copied-from-install");
+        if (File.Exists(marker) || !Directory.Exists(BuiltInDirectory))
+        {
+            return;
+        }
+
+        try
+        {
+            foreach (string file in Directory.GetFiles(BuiltInDirectory, "*.mp3"))
+            {
+                string target = Path.Combine(dir, Path.GetFileName(file));
+                if (!File.Exists(target))
+                {
+                    File.Copy(file, target);
+                }
+            }
+
+            File.WriteAllText(marker, string.Empty);
+        }
+        catch (Exception ex)
+        {
+            log.Warning(ex, "Could not copy sounds into {0}", dir);
         }
     }
 
@@ -40,15 +79,12 @@ public sealed class Mp3SoundPlayer(IDalamudPluginInterface plugin, IPluginLog lo
 
     private IReadOnlyList<string> ReadSounds()
     {
-        string dir = SoundsDirectory;
-        if (!Directory.Exists(dir))
-        {
-            return [];
-        }
-
-        return Directory.GetFiles(dir, "*.mp3")
+        return new[] { SoundsDirectory, BuiltInDirectory }
+            .Where(Directory.Exists)
+            .SelectMany(dir => Directory.GetFiles(dir, "*.mp3"))
             .Select(Path.GetFileNameWithoutExtension)
             .Where(n => !string.IsNullOrWhiteSpace(n))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
             .OrderBy(n => n, StringComparer.CurrentCultureIgnoreCase)
             .Cast<string>()
             .ToArray();
@@ -62,6 +98,11 @@ public sealed class Mp3SoundPlayer(IDalamudPluginInterface plugin, IPluginLog lo
         }
 
         string path = Path.Combine(SoundsDirectory, $"{soundName}.mp3");
+        if (!File.Exists(path))
+        {
+            path = Path.Combine(BuiltInDirectory, $"{soundName}.mp3");
+        }
+
         if (!File.Exists(path))
         {
             log.Warning("Hunt complete sound not found: {0}", path);
