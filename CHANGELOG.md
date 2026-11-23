@@ -32,6 +32,7 @@
 ### Mob Farmer
 - No more waiting forever for a pull, looping when every nearby enemy was skipped, getting stuck on "Buffing", or spending cooldowns before the pack is gathered
 - Enemies picked in an older version can be unticked again
+- "Include special enemies" now also covers the night-only enemies of North Horn that it missed
 - Walks back to its spot after you die, ignores your own party on a spot, and only uses spots saved in the zone you are in
 - Pulls stay around the farm spot instead of drifting away and losing the enemies already pulled, and the fight starts as soon as the pack is gathered (no more running across the spot first, unless you set a stack point)
 - Waits for your HP to recover before the next pull (new setting, 80% by default)

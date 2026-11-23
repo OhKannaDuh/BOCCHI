@@ -22,11 +22,6 @@ public static class MobData
 
     private static readonly HashSet<Mob> HiddenLegacyMobs = LegacyToCrescent.Keys.ToHashSet();
 
-    /// <summary>
-    ///     Weather / time-gated open-world mobs. When ConsiderSpecialMobs is on, Mob Farmer
-    ///     will pull these even if they are not in the selected list.
-    ///     NH weather quartet (Mousse / Dhruva / Bomb / Mimic) still needs distinct NameIds.
-    /// </summary>
     public static readonly IReadOnlySet<Mob> MobsWithSpawnCondition = new HashSet<Mob>
     {
         // South Horn
@@ -45,7 +40,11 @@ public static class MobData
         // North Horn (night)
         Mob.Bicephalus,
         Mob.Glutton,
-        Mob.Ankou
+        Mob.Ankou,
+        Mob.Geshunpest2,
+        Mob.Necrodium,
+        Mob.Rothound,
+        Mob.Skatene
     };
 
     public static ZoneId GetZone(Mob mob) =>
