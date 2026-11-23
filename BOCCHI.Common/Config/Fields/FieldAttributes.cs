@@ -18,6 +18,9 @@ public sealed class FarmSpotListAttribute()
 public sealed class LogsViewerAttribute()
     : UIFieldAttribute(typeof(LogsViewerRenderer));
 
+public sealed class RebuildPathMapAttribute()
+    : UIFieldAttribute(typeof(RebuildPathMapRenderer));
+
 public sealed class MobMultiSelectAttribute()
     : UIFieldAttribute(typeof(MobMultiSelectRenderer));
 

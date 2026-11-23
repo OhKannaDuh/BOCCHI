@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using BOCCHI.Common.Config.Fields;
 using Ocelot.Config;
 using Ocelot.Config.Fields;
@@ -20,9 +21,12 @@ public class MovementConfig : IAutoConfig
     [Checkbox(Order = 3, Section = "unstuck")]
     public bool ShouldJumpWhenStuck { get; set; } = true;
 
-    [IntRange(1, 15, Order = 4, Section = "unstuck")]
-    public int JumpWhenStuckSeconds { get; set; } = 3;
+    [JsonIgnore]
+    public int JumpWhenStuckSeconds => 3;
 
     [Checkbox(Order = 5, Section = "travel")]
     public bool PreferReturnOverShardWalk { get; set; } = false;
+
+    [RebuildPathMap(Order = 6, Section = "travel")]
+    public bool RebuildPathMap { get; set; }
 }

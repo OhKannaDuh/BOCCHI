@@ -11,7 +11,7 @@ using Ocelot.Services.Translation;
 
 namespace BOCCHI.Common.Config.Renderers;
 
-public sealed class BossModPresetOptionsRenderer(ICombatRotationSession session, IPlayer player)
+public sealed class BossModPresetOptionsRenderer(ICombatRotationSession session, IPlayer player, AutomatorConfig config)
     : IFieldRenderer<BossModPresetOptionsAttribute>
 {
     private const string MovementKey = "config.automator.fields.boss_mod_movement";
@@ -25,12 +25,12 @@ public sealed class BossModPresetOptionsRenderer(ICombatRotationSession session,
                 + $"{prop.DeclaringType?.Name}.{prop.Name} is {prop.PropertyType.Name}.");
         }
 
-        if (target is not AutomatorConfig config || !config.CombatAutorotation.UsesCombatAutomation())
+        if (!config.CombatAutorotation.UsesCombatAutomation())
         {
             return false;
         }
 
-        string fieldKey = $"config.automator.fields.{prop.Name.ToSnakeCase()}";
+        const string fieldKey = "config.automator.fields.update_boss_mod_presets_automatically";
         bool changed = false;
         bool recreate = false;
         bool updateAuto = config.UpdateBossModPresetsAutomatically;
@@ -54,13 +54,16 @@ public sealed class BossModPresetOptionsRenderer(ICombatRotationSession session,
                 Ocelot.Extensions.PropertyInfoExtensions.DrawWrappedTooltip(buttonTip);
             }
 
-            if (ImGui.Checkbox(prop.Label(owner, translator), ref updateAuto))
+            if (ImGui.Checkbox(translator.T($"{fieldKey}.label"), ref updateAuto))
             {
                 config.UpdateBossModPresetsAutomatically = updateAuto;
                 changed = true;
             }
 
-            prop.Tooltip(owner, translator);
+            if (ImGui.IsItemHovered())
+            {
+                Ocelot.Extensions.PropertyInfoExtensions.DrawWrappedTooltip(translator.T($"{fieldKey}.tooltip"));
+            }
 
             bool byRole = config.BossModMaxDistanceByRole;
             if (Checkbox(translator, "max_distance_by_role", ref byRole))

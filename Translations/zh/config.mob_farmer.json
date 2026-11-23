@@ -15,17 +15,9 @@
       "label": "自动选取目标",
       "tooltip": "拉怪时由 BOCCHI 选择目标。战斗开始后由你的战斗插件选择。"
     },
-    "force_target_central_enemy": {
-      "label": "优先怪群中心",
-      "tooltip": "以怪群中间的敌人为目标，而不是最近的敌人。仅在不使用战斗插件战斗时生效。"
-    },
     "consider_special_mobs": {
       "label": "包含特殊敌人",
       "tooltip": "也拉只在特定天气或时间出现的敌人。"
-    },
-    "count_special_mobs_toward_minimum": {
-      "label": "特殊敌人计入最少数量",
-      "tooltip": "特殊敌人计入下面的最少数量。不计入时也照样会拉。"
     },
     "max_mob_level": {
       "label": "敌人最高等级"
@@ -50,26 +42,6 @@
       "set_stack": "把当前位置设为堆叠点",
       "min_fight": "开战最少数量（0 = 全局）"
     },
-    "claimed_spot_seconds": {
-      "label": "被占后离开（秒）",
-      "tooltip": "如果其他玩家持续抢怪或站在你的刷怪点上达到这个时间，BOCCHI 会去下一个点，并且在你重新开始前不再使用这个点。"
-    },
-    "claimed_player_radius": {
-      "label": "占用判定半径（米）",
-      "tooltip": "其他玩家在离刷怪点多近的地方停留才算被占。"
-    },
-    "min_euclidean_distance_to_return_home": {
-      "label": "超过此距离才走回去（米）",
-      "tooltip": "战斗结束后，只有离刷怪点比这更远时才走回去。"
-    },
-    "return_to_start_in_waiting_phase": {
-      "label": "战斗结束后返回地点",
-      "tooltip": "战斗结束后走回刷怪点。没有刷怪点时，就是你按下开始的位置。"
-    },
-    "render_debug_lines": {
-      "label": "显示调试连线",
-      "tooltip": "刷怪时，向 BOCCHI 可以拉的敌人画红线，向正在战斗的敌人画绿线。"
-    },
     "apply_battle_bell": {
       "label": "使用战斗之铃",
       "tooltip": "每次拉怪前，切到风水师，使用战斗之铃，再切回来。"
@@ -85,14 +57,6 @@
     "apply_counterstance": {
       "label": "使用对策架势",
       "tooltip": "即将拉怪时使用幻僧的对策架势。需要僧 3 级。"
-    },
-    "maximum_battle_bell_wait_time": {
-      "label": "等待增益的最长时间（秒）",
-      "tooltip": "战斗之铃、鸣响安息或对策架势的冷却比这更长时，不用它直接拉怪。"
-    },
-    "quickstep_skip_if_remaining_minutes": {
-      "label": "“更快一步”剩余分钟数不少于此值时跳过快步",
-      "tooltip": "水晶增益“更快一步”还剩至少这么多分钟时，不使用快步。0＝每次拉怪都用。"
     },
     "minimum_mobs_to_start_loop": {
       "label": "开始拉怪的最少敌人"

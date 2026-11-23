@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using BOCCHI.Common.Config.Fields;
 using Ocelot.Config;
 using Ocelot.Config.Fields;
@@ -20,8 +21,8 @@ public class TreasureConfig : IAutoConfig
     [Checkbox(Order = 3, Section = "radar")]
     public bool DrawLineToCarrots { get; set; } = true;
 
-    [Checkbox(Order = 4, Section = "radar")]
-    public bool ShowPercentageActiveTreasureCount { get; set; } = false;
+    [JsonIgnore]
+    public bool ShowPercentageActiveTreasureCount => false;
 
     [Checkbox(Order = 5, Section = "completion")]
     public bool ReturnToBaseCampAfterHunt { get; set; } = true;
@@ -41,8 +42,8 @@ public class TreasureConfig : IAutoConfig
     [Checkbox(Order = 10, Section = "treasure_hunt")]
     public bool CastTreasureSightDuringHunt { get; set; } = true;
 
-    [IntRange(1, 50, Order = 11, Indent = 1, Requires = nameof(CastTreasureSightDuringHunt), Section = "treasure_hunt")]
-    public int TreasureSightEveryNLocations { get; set; } = 10;
+    [JsonIgnore]
+    public int TreasureSightEveryNLocations => 10;
 
     [IntRange(1, 50, Order = 12, Section = "treasure_hunt")]
     public int HuntMaxLevel { get; set; } = 50;
@@ -56,8 +57,8 @@ public class TreasureConfig : IAutoConfig
     [IntRange(0, 100, Order = 15, Section = "treasure_hunt")]
     public int HuntMinSilverPercent { get; set; } = 50;
 
-    [FloatRange(10f, 60f, Format = "%.0f", Order = 16, Section = "treasure_hunt")]
-    public float EmptyPadTrustDistance { get; set; } = 60f;
+    [JsonIgnore]
+    public float EmptyPadTrustDistance => 60f;
 
     [Checkbox(Order = 17, Section = "treasure_hunt")]
     public bool SkipUnsafeTreasureWindows { get; set; } = true;
@@ -71,14 +72,14 @@ public class TreasureConfig : IAutoConfig
     [IntRange(0, 100, Order = 20, Section = "ninja_hide")]
     public int NinjaGearsetNumber { get; set; } = 0;
 
-    [IntRange(-5, 10, Order = 21, Section = "ninja_hide")]
-    public int KnowledgeHideOffset { get; set; } = 0;
+    [JsonIgnore]
+    public int KnowledgeHideOffset => 0;
 
-    [FloatRange(5f, 40f, Format = "%.0f", Order = 22, Section = "ninja_hide")]
-    public float KnowledgeThreatEnterDistance { get; set; } = 10f;
+    [JsonIgnore]
+    public float KnowledgeThreatEnterDistance => 10f;
 
-    [FloatRange(10f, 60f, Format = "%.0f", Order = 23, Section = "ninja_hide")]
-    public float KnowledgeThreatExitDistance { get; set; } = 20f;
+    [JsonIgnore]
+    public float KnowledgeThreatExitDistance => 20f;
 
     [ConfigHidden]
     public string? LastSouthHornStartSegment { get; set; }

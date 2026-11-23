@@ -1,0 +1,9 @@
+{
+  "label": "전투 이동",
+  "tooltip": "전투 중 BossMod AI가 움직이는 방식: 대상과의 거리, 회피, 프리셋. 전투 플러그인을 쓸 때만 사용됩니다.",
+  "fields": {
+    "update_boss_mod_presets_automatically": {
+      "label": "프리셋 자동 업데이트"
+    }
+  }
+}

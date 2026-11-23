@@ -14,9 +14,6 @@
       "label": "Show registration countdown",
       "tooltip": "Show how long Forked Tower registration stays open in the Critical Encounters list."
     },
-    "trap_draw_range": {
-      "label": "Only show traps within (yalms)"
-    },
     "auto_register_in_illegal_mode": {
       "label": "Go to the tower when registration opens",
       "tooltip": "When Forked Tower registration opens, BOCCHI stops what it is doing, goes to the entry pad and waits there until you are teleported in. Illegal Mode switches off once you are inside.\nNorth Horn: skipped below Knowledge Level 40.\nSouth Horn: you still have to offer your Sanguine Ciphers yourself. BOCCHI reminds you."

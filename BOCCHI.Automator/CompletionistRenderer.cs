@@ -43,15 +43,6 @@ public class CompletionistRenderer
             automator.ToggleCompletionist();
         }
 
-        if (automator.IsCompletionist)
-        {
-            AutomatorPathControls.Draw(automator, zones, translator, showRefresh: true);
-        }
-        else
-        {
-            AutomatorPathControls.Draw(automator, zones, translator, showRefresh: false);
-        }
-
         ImGui.Spacing();
 
         ImGui.PushStyleColor(ImGuiCol.Text, BocchiUi.Header);

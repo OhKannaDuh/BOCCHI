@@ -26,9 +26,6 @@
       "label": "Lines to carrots",
       "tooltip": "Draw a green line to carrots near you. Hidden while you fight."
     },
-    "show_percentage_active_treasure_count": {
-      "label": "Show remaining coffers as %"
-    },
     "return_to_base_camp_after_hunt": {
       "label": "Cast Return after hunt",
       "tooltip": "Cast Return when a Treasure Hunt or Carrot Hunt finishes. With Loop Carrot Hunt on, Return waits until you stop the loop."
@@ -53,9 +50,6 @@
       "label": "Cast Treasure Sight during hunt",
       "tooltip": "Cast Treasure Sight at the start and every few locations. The hunt ends early when it shows nothing is left."
     },
-    "treasure_sight_every_n_locations": {
-      "label": "Locations between casts"
-    },
     "hunt_max_level": {
       "label": "Max coffer level",
       "tooltip": "Coffers guarded by enemies above this level are skipped. 50 = skip nothing."
@@ -70,10 +64,6 @@
     "hunt_min_silver_percent": {
       "label": "Min silver remaining to auto-hunt (%)",
       "tooltip": "Auto treasure hunts start when at least this share of the 8 silver coffers is left, or when enough bronze is left. Used by Illegal Mode and Mob Farmer."
-    },
-    "empty_pad_trust_distance": {
-      "label": "Empty chest check distance",
-      "tooltip": "How close BOCCHI walks to a spot before it decides no coffer is there. Lower is safer, because coffers can show up late. Higher is faster."
     },
     "skip_unsafe_treasure_windows": {
       "label": "Skip dangerous weather / Ashkin",
@@ -90,18 +80,6 @@
     "ninja_gearset_number": {
       "label": "Ninja gearset number",
       "tooltip": "The number of your Ninja gearset in the gearset list. 0 = don't switch gear. You then have to be on Ninja already."
-    },
-    "knowledge_hide_offset": {
-      "label": "Hide vs enemies this many Knowledge above you",
-      "tooltip": "Hide from enemies whose Knowledge Level is at least yours plus this number. 0 = your level or higher. A negative number also hides from weaker enemies."
-    },
-    "knowledge_threat_enter_distance": {
-      "label": "Start Hide within (yalms)",
-      "tooltip": "Hide starts when a strong enemy is this close. On a mount it starts 5 yalms sooner."
-    },
-    "knowledge_threat_exit_distance": {
-      "label": "Keep Hide until farther than (yalms)",
-      "tooltip": "Once hidden, stay hidden until the enemies are farther away than this."
     }
   }
 }

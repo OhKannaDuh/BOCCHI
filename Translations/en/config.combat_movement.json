@@ -1,0 +1,9 @@
+{
+  "label": "Combat movement",
+  "tooltip": "How the BossMod AI moves you in fights: distance to the target, dodging and presets. Only used with a combat plugin.",
+  "fields": {
+    "update_boss_mod_presets_automatically": {
+      "label": "Update presets automatically"
+    }
+  }
+}

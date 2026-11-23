@@ -1,0 +1,9 @@
+{
+  "label": "战斗移动",
+  "tooltip": "战斗中 BossMod AI 如何移动：与目标的距离、躲避和预设。仅在使用战斗插件时有效。",
+  "fields": {
+    "update_boss_mod_presets_automatically": {
+      "label": "自动更新预设"
+    }
+  }
+}

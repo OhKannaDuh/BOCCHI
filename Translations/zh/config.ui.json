@@ -21,28 +21,15 @@
     "show_experience_tracker": {
       "label": "显示经验值统计"
     },
-    "show_experience_tracker_graph": {
-      "label": "显示经验值图表"
-    },
     "show_currency_tracker": {
       "label": "显示货币统计"
     },
-    "show_currency_tracker_graph": {
-      "label": "显示货币图表"
+    "show_tracker_graphs": {
+      "label": "显示追踪图表"
     },
     "show_active_treasure_tracker": {
       "label": "显示可采青铜 / 白银",
       "tooltip": "把鼠标移到统计行上时，显示还剩多少青铜和白银宝箱。使用魔寻宝后数字会更新。"
-    },
-    "show_demiatma_drops": {
-      "label": "显示魂晶掉落（南部）",
-      "tooltip": "绿框：你还需要。\n红框：你已有 3 个。"
-    },
-    "show_note_drops": {
-      "label": "显示调查笔记掉落"
-    },
-    "show_soul_shard_drops": {
-      "label": "显示灵魂碎晶掉落（南部）"
     },
     "show_buff_section": {
       "label": "显示附加增益按钮"
@@ -50,6 +37,10 @@
     "show_bocchi_chat_prefix": {
       "label": "显示 BOCCHI 聊天消息",
       "tooltip": "在聊天栏中输出 BOCCHI 的消息，并标注 [BOCCHI]。每日消息始终显示。"
+    },
+    "show_reward_icons": {
+      "label": "显示奖励图标",
+      "tooltip": "在危命和紧急遭遇战列表中显示魂晶、勘察记录和灵魂碎晶图标。"
     }
   }
 }

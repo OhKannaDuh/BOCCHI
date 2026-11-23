@@ -67,4 +67,19 @@ public class ConfigMigrationTests
 
         Assert.Equal(CurrentVersion, version);
     }
+
+    [Fact]
+    public void MergedUiSwitchesKeepWhatYouHadOn()
+    {
+        JObject old = JObject.Parse("""
+            { "Version": 24, "UIConfig": { "ShowExperienceTrackerGraph": false, "ShowCurrencyTrackerGraph": true,
+              "ShowDemiatmaDrops": false, "ShowNoteDrops": false, "ShowSoulShardDrops": false } }
+            """);
+
+        JObject ui = (JObject)new ConfigMigratorV24ToV25().Migrate(old)["UIConfig"]!;
+
+        Assert.True(ui["ShowTrackerGraphs"]!.Value<bool>());
+        Assert.False(ui["ShowRewardIcons"]!.Value<bool>());
+        Assert.Null(ui["ShowCurrencyTrackerGraph"]);
+    }
 }

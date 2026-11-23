@@ -284,21 +284,14 @@ public sealed class Plugin(IDalamudPluginInterface plugin, IPluginLog logger) : 
 
     private static void SanitizeAutomatorConfig(AutomatorConfig automator)
     {
-        automator.MaxRemoteIdleTimeSeconds = Math.Clamp(automator.MaxRemoteIdleTimeSeconds, 2, 60);
-        automator.MaxBaseTeleportDelaySeconds = Math.Clamp(automator.MaxBaseTeleportDelaySeconds, 0, 60);
-        automator.TreasureSightRecastIntervalSeconds =
-            Math.Clamp(automator.TreasureSightRecastIntervalSeconds, 60, 600);
-        automator.LeaveFateTravelForCeSeconds = Math.Clamp(automator.LeaveFateTravelForCeSeconds, 0, 180);
         automator.AutoRepairThreshold = Math.Clamp(automator.AutoRepairThreshold, 1, 99);
     }
 
     private static void SanitizeTreasureConfig(TreasureConfig treasure)
     {
-        treasure.TreasureSightEveryNLocations = Math.Clamp(treasure.TreasureSightEveryNLocations, 1, 50);
         treasure.HuntMaxLevel = Math.Clamp(treasure.HuntMaxLevel, 1, 50);
         treasure.HuntMinBronzePercent = Math.Clamp(treasure.HuntMinBronzePercent, 0, 100);
         treasure.HuntMinSilverPercent = Math.Clamp(treasure.HuntMinSilverPercent, 0, 100);
-        treasure.EmptyPadTrustDistance = Math.Clamp(treasure.EmptyPadTrustDistance, 10f, 60f);
     }
 
     private static void SanitizeBuffConfig(BuffConfig buff)

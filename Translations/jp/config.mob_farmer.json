@@ -15,17 +15,9 @@
       "label": "敵を自動でターゲット",
       "tooltip": "釣っている間は BOCCHI がターゲットを選びます。戦闘が始まったら戦闘プラグインが選びます。"
     },
-    "force_target_central_enemy": {
-      "label": "群れの中央を優先",
-      "tooltip": "一番近い敵ではなく、群れの中央にいる敵をターゲットします。戦闘プラグインなしで戦うときだけ使われます。"
-    },
     "consider_special_mobs": {
       "label": "特殊モブも含める",
       "tooltip": "特定の天候や時間帯にだけ現れる敵も釣ります。"
-    },
-    "count_special_mobs_toward_minimum": {
-      "label": "特殊モブを必要数に数える",
-      "tooltip": "特殊な敵も下の最低数に数えます。数えなくても釣りはします。"
     },
     "max_mob_level": {
       "label": "対象の最大レベル"
@@ -50,26 +42,6 @@
       "set_stack": "今の位置を集合地点に",
       "min_fight": "戦闘開始の最低数（0＝全体設定）"
     },
-    "claimed_spot_seconds": {
-      "label": "取られたとみなす秒数",
-      "tooltip": "他のプレイヤーが敵を取り続けたり、狩り場に居続けたりする状態がこの秒数続くと、次の狩り場へ移ります。その狩り場は再開するまで使いません。"
-    },
-    "claimed_player_radius": {
-      "label": "取られた判定の半径（ヤルム）",
-      "tooltip": "他のプレイヤーが狩り場からどれだけ近くに居続けると「取られた」とみなすか。"
-    },
-    "min_euclidean_distance_to_return_home": {
-      "label": "これより遠ければ歩いて戻る（ヤルム）",
-      "tooltip": "戦闘のあと、これより遠くに離れた場合だけ狩り場へ歩いて戻ります。"
-    },
-    "return_to_start_in_waiting_phase": {
-      "label": "戦闘後に地点へ戻る",
-      "tooltip": "戦闘が終わったら狩り場へ歩いて戻ります。狩り場がない場合は、開始を押した場所です。"
-    },
-    "render_debug_lines": {
-      "label": "デバッグ線を表示",
-      "tooltip": "狩りの間、釣れる敵へ赤い線、戦闘中の敵へ緑の線を描きます。"
-    },
     "apply_battle_bell": {
       "label": "バトルベルを使う",
       "tooltip": "釣る前にジオマンサーへ切り替え、バトルベルを使ってから元に戻します。"
@@ -85,14 +57,6 @@
     "apply_counterstance": {
       "label": "カウンタースタンスを使う",
       "tooltip": "釣る直前に、モンクのカウンタースタンスを使います。モンクレベル 3 が必要です。"
-    },
-    "maximum_battle_bell_wait_time": {
-      "label": "バフを待つ最長時間（秒）",
-      "tooltip": "バトルベル、リンギングレスパイト、カウンタースタンスのリキャストがこれより長いときは、使わずに釣ります。"
-    },
-    "quickstep_skip_if_remaining_minutes": {
-      "label": "クイッカーステップの残りがこの分数以上ならクイックステップを飛ばす",
-      "tooltip": "クリスタルのクイッカーステップがこの分数以上残っている間は、クイックステップを使いません。0＝毎回使う。"
     },
     "minimum_mobs_to_start_loop": {
       "label": "開始に必要な敵の数"

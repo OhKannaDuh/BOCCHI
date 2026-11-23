@@ -15,17 +15,9 @@
       "label": "적 자동 타겟",
       "tooltip": "끌어오는 동안에는 BOCCHI가 대상을 고릅니다. 전투가 시작되면 전투 플러그인이 고릅니다."
     },
-    "force_target_central_enemy": {
-      "label": "무리 가운데 우선",
-      "tooltip": "가장 가까운 적이 아니라 무리 한가운데의 적을 대상으로 잡습니다. 전투 플러그인 없이 싸울 때만 쓰입니다."
-    },
     "consider_special_mobs": {
       "label": "특수 몬스터 포함",
       "tooltip": "특정 날씨나 시간에만 나오는 적도 끌어옵니다."
-    },
-    "count_special_mobs_toward_minimum": {
-      "label": "특수를 최소 수에 포함",
-      "tooltip": "특수 적도 아래의 최소 수에 포함합니다. 포함하지 않아도 끌어오기는 합니다."
     },
     "max_mob_level": {
       "label": "최대 적 레벨"
@@ -50,26 +42,6 @@
       "set_stack": "현재 위치를 스택 지점으로",
       "min_fight": "전투 최소 수 (0 = 기본값)"
     },
-    "claimed_spot_seconds": {
-      "label": "점유되면 떠나기 (초)",
-      "tooltip": "다른 플레이어가 이 시간 동안 계속 적을 가져가거나 지점에 서 있으면, 다음 지점으로 옮기고 다시 시작할 때까지 이 지점은 쓰지 않습니다."
-    },
-    "claimed_player_radius": {
-      "label": "점유 판정 반경 (일름)",
-      "tooltip": "다른 플레이어가 사냥 지점에 얼마나 가까이 머물러야 빼앗긴 것으로 볼지 정합니다."
-    },
-    "min_euclidean_distance_to_return_home": {
-      "label": "이보다 멀면 걸어서 복귀(얄름)",
-      "tooltip": "전투 후 이보다 멀리 떨어졌을 때만 사냥 지점으로 걸어서 돌아갑니다."
-    },
-    "return_to_start_in_waiting_phase": {
-      "label": "전투 후 지점으로 복귀",
-      "tooltip": "전투가 끝나면 사냥 지점으로 걸어서 돌아갑니다. 지점이 없으면 시작을 누른 곳입니다."
-    },
-    "render_debug_lines": {
-      "label": "디버그 선 표시",
-      "tooltip": "사냥하는 동안 끌어올 수 있는 적에게는 빨간 선, 싸우는 중인 적에게는 초록 선을 그립니다."
-    },
     "apply_battle_bell": {
       "label": "전투의 종 사용",
       "tooltip": "끌어오기 전에 풍수사로 바꿔 전투의 종을 쓰고 다시 돌아옵니다."
@@ -85,14 +57,6 @@
     "apply_counterstance": {
       "label": "카운터스탠스 사용",
       "tooltip": "끌어오기 직전에 환상 몽크의 카운터스탠스를 씁니다. 몽크 레벨 3이 필요합니다."
-    },
-    "maximum_battle_bell_wait_time": {
-      "label": "버프를 기다리는 최대 시간(초)",
-      "tooltip": "전투의 종, 울림의 안식, 카운터스탠스의 재사용 대기가 이보다 길면 쓰지 않고 끌어옵니다."
-    },
-    "quickstep_skip_if_remaining_minutes": {
-      "label": "퀴커 스텝이 이 분 이상 남으면 퀵스텝 생략",
-      "tooltip": "크리스탈의 퀴커 스텝 버프가 이 분 이상 남아 있으면 퀵스텝을 쓰지 않습니다. 0 = 매번 사용."
     },
     "minimum_mobs_to_start_loop": {
       "label": "시작에 필요한 적 수"

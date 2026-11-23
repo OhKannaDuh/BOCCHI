@@ -6,6 +6,7 @@
 - Each tab shows its most-used settings at the bottom, and the World tab is now called FATEs & CEs
 - The Illegal Mode tab says why it is waiting or paused (for example when "Stop after return and teleport" is on)
 - Search box in the settings; the cog in the title bar opens the settings for the tab you are on
+- Fewer, simpler settings: rarely needed timing and distance options are gone, the graph and reward icon switches are one each, and BossMod movement in fights has its own page
 - Completionist is now a switch in the Illegal Mode tab
 - Auto revive (off by default): accept raises, and go back to camp if nobody raises you. Never inside Forked Tower, and in a FATE or CE it waits until that is over so you keep the reward
 - Triage Mode can wait a moment before raising, so nearby healers get the first chance
@@ -42,6 +43,7 @@
 - Changes made with the chat command `/bocchi config set` are now kept after a restart
 - Your chosen mount and combat plugin are no longer reset by themselves
 - Removed the settings that hid tabs; every tab is always shown
+- "Rebuild path map" moved to Movement → Routes; "Replan route" is gone (Stop and Start does the same)
 
 ### Other fixes
 - Gold and silver per hour stay correct when you spend down to 0 or move a stack

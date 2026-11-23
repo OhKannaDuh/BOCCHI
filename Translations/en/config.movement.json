@@ -23,12 +23,13 @@
       "label": "Jump when stuck",
       "tooltip": "Jump when you are stuck on a rock, ledge or stairs."
     },
-    "jump_when_stuck_seconds": {
-      "label": "Seconds before jumping"
-    },
     "prefer_return_over_shard_walk": {
       "label": "Use Return instead of walking to a shard",
       "tooltip": "For long trips, uses Return to camp when it is ready, so you don't walk past enemies to reach a shard."
+    },
+    "rebuild_path_map": {
+      "label": "Rebuild path map",
+      "tooltip": "Reload BOCCHI's path map of this zone. Try this if it can't find a route or stands still near camp."
     }
   }
 }

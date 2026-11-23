@@ -21,28 +21,15 @@
     "show_experience_tracker": {
       "label": "Show experience tracker"
     },
-    "show_experience_tracker_graph": {
-      "label": "Show experience graph"
-    },
     "show_currency_tracker": {
       "label": "Show currency tracker"
     },
-    "show_currency_tracker_graph": {
-      "label": "Show currency graph"
+    "show_tracker_graphs": {
+      "label": "Show tracker graphs"
     },
     "show_active_treasure_tracker": {
       "label": "Show active bronze / silver",
       "tooltip": "Show how many bronze and silver coffers are left when you hover the tracker line. The numbers update when Treasure Sight is used."
-    },
-    "show_demiatma_drops": {
-      "label": "Show demiatma drops (South Horn)",
-      "tooltip": "Green border: you still need it.\nRed border: you already have 3."
-    },
-    "show_note_drops": {
-      "label": "Show field note drops"
-    },
-    "show_soul_shard_drops": {
-      "label": "Show soul shard drops (South Horn)"
     },
     "show_buff_section": {
       "label": "Show Apply Buffs button"
@@ -50,6 +37,10 @@
     "show_bocchi_chat_prefix": {
       "label": "Show BOCCHI chat messages",
       "tooltip": "Print BOCCHI's messages in your chat, marked [BOCCHI]. The message of the day always shows."
+    },
+    "show_reward_icons": {
+      "label": "Show reward icons",
+      "tooltip": "Demiatma, field note and soul shard icons in the FATE and CE lists."
     }
   }
 }

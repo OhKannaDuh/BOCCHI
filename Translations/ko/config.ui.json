@@ -21,28 +21,15 @@
     "show_experience_tracker": {
       "label": "경험치 추적기 표시"
     },
-    "show_experience_tracker_graph": {
-      "label": "경험치 그래프 표시"
-    },
     "show_currency_tracker": {
       "label": "화폐 추적기 표시"
     },
-    "show_currency_tracker_graph": {
-      "label": "화폐 그래프 표시"
+    "show_tracker_graphs": {
+      "label": "추적기 그래프 표시"
     },
     "show_active_treasure_tracker": {
       "label": "활성 청동 / 은 표시",
       "tooltip": "트래커 줄에 마우스를 올리면 청동과 은 보물상자가 몇 개 남았는지 보여 줍니다. 숫자는 마기 보물 탐색을 쓰면 갱신됩니다."
-    },
-    "show_demiatma_drops": {
-      "label": "데미아트마 드롭 표시 (남부)",
-      "tooltip": "초록 테두리: 아직 필요합니다.\n빨간 테두리: 이미 3개 있습니다."
-    },
-    "show_note_drops": {
-      "label": "필드 노트 드롭 표시"
-    },
-    "show_soul_shard_drops": {
-      "label": "소울 샤드 드롭 표시 (남부)"
     },
     "show_buff_section": {
       "label": "버프 적용 버튼 표시"
@@ -50,6 +37,10 @@
     "show_bocchi_chat_prefix": {
       "label": "BOCCHI 채팅 메시지 표시",
       "tooltip": "BOCCHI의 메시지를 [BOCCHI] 표시와 함께 채팅에 출력합니다. 오늘의 메시지는 항상 표시됩니다."
+    },
+    "show_reward_icons": {
+      "label": "보상 아이콘 표시",
+      "tooltip": "돌발과 비상 조우 목록에 데미아트마, 필드 노트, 소울 샤드 아이콘을 표시합니다."
     }
   }
 }

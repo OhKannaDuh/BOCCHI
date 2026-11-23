@@ -31,10 +31,6 @@
     "should_do_critical_encounters": {
       "label": "비상 조우 수행"
     },
-    "leave_fate_travel_for_ce_seconds": {
-      "label": "비상 조우 남은 시간이 이 초 이하면 전환",
-      "tooltip": "돌발로 이동하는 중, 비상 조우 등록 시간이 이 초 이하로 남으면 비상 조우로 방향을 바꿉니다. 숫자가 클수록 더 일찍 전환합니다. 0 = 비상 조우가 뜨면 바로 전환.\n이미 시작한 돌발은 아래 설정이 꺼져 있으면 먼저 끝냅니다."
-    },
     "leave_engaged_fate_for_critical_encounter": {
       "label": "돌발 중에도 CE로 떠나기",
       "tooltip": "싸우는 중인 돌발도 비상 조우 등록이 곧 끝나면 나옵니다(위와 같은 초). '항아리 돌발 우선'일 때 항아리 돌발은 나오지 않습니다."
@@ -153,18 +149,6 @@
       "label": "캠프에서 마기 보물 탐색",
       "tooltip": "캠프에서 주기적으로 마기 보물 탐색을 써서 남은 상자 수를 확인합니다. 간격은 아래에서 정합니다.",
       "tooltip_disabled": "자동 보물 찾기가 켜져 있으면 필요 없습니다. 그쪽에서 이미 마기 보물 탐색을 씁니다."
-    },
-    "treasure_sight_recast_interval_seconds": {
-      "label": "마기 보물 탐색 간격(초)",
-      "tooltip": "캠프에서 기다리는 동안 마기 보물 탐색을 쓰는 간격입니다."
-    },
-    "max_remote_idle_time_seconds": {
-      "label": "귀환 전 최대 대기(초)",
-      "tooltip": "돌발이나 비상 조우 후, 2초에서 이 값 사이의 무작위 시간을 기다린 뒤 귀환을 씁니다."
-    },
-    "max_base_teleport_delay_seconds": {
-      "label": "캠프 출발 전 최대 대기(초)",
-      "tooltip": "캠프에서 이 값까지의 무작위 시간을 기다린 뒤 돌발이나 비상 조우로 떠납니다. 0 = 바로 출발."
     },
     "auto_repair_threshold": {
       "label": "이 내구도 이하에서 수리(%)"

@@ -256,27 +256,6 @@ public class Automator
         TryStartPotChestFarm(new FateId((ushort)source.Id));
     }
 
-    public void RefreshPathfinding()
-    {
-        if (!IsActive || SuspendedForTreasure || SuspendedForShopping)
-        {
-            return;
-        }
-
-        logger.Debug("Refreshing pathfinding from current position");
-        memory.Forget<NavigationInterruptedMemory>();
-        IllegalModeActivityWork.ForgetTravelLatches(memory, includePotChests: true);
-        SoftStopPathfinding();
-
-        if (!memory.TryRemember<GoalMemory>(out GoalMemory _))
-        {
-            BocchiChat.Print(chat, uiConfig, translator.T(".automation.automator.pathfinding_refreshed_no_goal"));
-            return;
-        }
-
-        BocchiChat.Print(chat, uiConfig, translator.T(".automation.automator.pathfinding_refreshed"));
-    }
-
     public void RebuildPathMap()
     {
         IZone zone = zones.GetZone();

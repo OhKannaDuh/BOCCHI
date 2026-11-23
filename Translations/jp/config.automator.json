@@ -31,10 +31,6 @@
     "should_do_critical_encounters": {
       "label": "クリティカルエンカウントをやる"
     },
-    "leave_fate_travel_for_ce_seconds": {
-      "label": "CE の残り秒数がこれ以下なら CE に切り替える",
-      "tooltip": "FATE へ移動中、CE の受付の残り時間がこの秒数以下になると CE へ向かいます。数値が大きいほど早く切り替えます。0＝CE が出たらすぐ切り替え。\nすでに始めた FATE は、下の設定がオンでない限り先に終わらせます。"
-    },
     "leave_engaged_fate_for_critical_encounter": {
       "label": "FATE 途中でも CE へ",
       "tooltip": "戦闘中の FATE でも、CE の受付が終わりそうなら抜けます（秒数は上と同じ）。「マジックポットFATEを優先」の間、ポット FATE は抜けません。"
@@ -153,18 +149,6 @@
       "label": "キャンプでトレジャーサイト",
       "tooltip": "キャンプで定期的にトレジャーサイトを使い、残っている宝箱の数を調べます。間隔は下で設定します。",
       "tooltip_disabled": "自動トレジャーハントがオンの間は不要です。そちらがトレジャーサイトを使います。"
-    },
-    "treasure_sight_recast_interval_seconds": {
-      "label": "トレジャーサイトを使う間隔（秒）",
-      "tooltip": "キャンプで待機中にトレジャーサイトを使う間隔。"
-    },
-    "max_remote_idle_time_seconds": {
-      "label": "デジョンまでの最大待機（秒）",
-      "tooltip": "FATE や CE のあと、2 秒からこの秒数までのランダムな時間を待ってからデジョンを使います。"
-    },
-    "max_base_teleport_delay_seconds": {
-      "label": "キャンプ出発前の最大待機（秒）",
-      "tooltip": "キャンプで、この秒数までのランダムな時間を待ってから FATE や CE へ向かいます。0＝すぐ出発。"
     },
     "auto_repair_threshold": {
       "label": "この耐久以下で修理（%）"

@@ -26,9 +26,6 @@
       "label": "재물당근 연결선",
       "tooltip": "근처의 당근까지 초록 선을 그립니다. 전투 중에는 숨깁니다."
     },
-    "show_percentage_active_treasure_count": {
-      "label": "남은 상자를 %로 표시"
-    },
     "return_to_base_camp_after_hunt": {
       "label": "보물 찾기 후 귀환",
       "tooltip": "보물 찾기나 재물당근 찾기가 끝나면 귀환을 씁니다. 반복 중인 재물당근 찾기는 멈출 때 귀환합니다."
@@ -53,9 +50,6 @@
       "label": "보물 찾기 중 마기 보물 탐색",
       "tooltip": "시작할 때와 상자 몇 개마다 마기 보물 탐색을 씁니다. 남은 것이 없다고 나오면 일찍 끝냅니다."
     },
-    "treasure_sight_every_n_locations": {
-      "label": "재시전까지 지점 수"
-    },
     "hunt_max_level": {
       "label": "상자 최대 레벨",
       "tooltip": "이 레벨보다 높은 적이 지키는 상자는 건너뜁니다. 50 = 건너뛰지 않음."
@@ -70,10 +64,6 @@
     "hunt_min_silver_percent": {
       "label": "자동 찾기 최소 은 상자 남은량 (%)",
       "tooltip": "은 보물상자 8개 중 이 비율 이상이 남았거나 청동 상자가 충분히 남았을 때 자동 찾기를 시작합니다. 자동 모드와 몹 파머에서 쓰입니다."
-    },
-    "empty_pad_trust_distance": {
-      "label": "빈 상자 판정 거리",
-      "tooltip": "상자가 없다고 판단하기 전에 그 위치에 얼마나 가까이 갈지 정합니다. 낮을수록 안전합니다(상자가 늦게 보일 수 있기 때문). 높을수록 빠릅니다."
     },
     "skip_unsafe_treasure_windows": {
       "label": "위험 날씨 / 불사류 몬스터 건너뛰기",
@@ -90,18 +80,6 @@
     "ninja_gearset_number": {
       "label": "닌자 기어셋 번호",
       "tooltip": "장비 세트 목록에서 닌자 장비 세트의 번호입니다. 0 = 장비를 바꾸지 않음. 이 경우 이미 닌자여야 합니다."
-    },
-    "knowledge_hide_offset": {
-      "label": "지식이 이만큼 높으면 은신",
-      "tooltip": "지식 레벨이 내 레벨 + 이 수 이상인 적에게서 숨습니다. 0 = 내 레벨 이상. 음수면 더 약한 적에게서도 숨습니다."
-    },
-    "knowledge_threat_enter_distance": {
-      "label": "이 거리 이내에서 은신 시작(일름)",
-      "tooltip": "강한 적이 이만큼 가까워지면 은신을 시작합니다. 탈것을 타고 있으면 5얄름 더 일찍 시작합니다."
-    },
-    "knowledge_threat_exit_distance": {
-      "label": "이 거리보다 멀어질 때까지 은신 유지(일름)",
-      "tooltip": "한번 숨으면 적이 이보다 멀어질 때까지 계속 숨습니다."
     }
   }
 }

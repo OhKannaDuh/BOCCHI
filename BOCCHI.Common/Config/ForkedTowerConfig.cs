@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using Ocelot.Config;
 using Ocelot.Config.Fields;
 
@@ -13,8 +14,8 @@ public class ForkedTowerConfig : IAutoConfig
     [Checkbox(Order = 1, Section = "helpers")]
     public bool ShowRegistrationCountdown { get; set; } = true;
 
-    [FloatRange(20f, 300f, Format = "%.0f", Order = 2, Section = "helpers")]
-    public float TrapDrawRange { get; set; } = 150f;
+    [JsonIgnore]
+    public float TrapDrawRange => 150f;
 
     [Checkbox(Order = 3, Section = "illegal_mode")]
     public bool AutoRegisterInIllegalMode { get; set; } = false;

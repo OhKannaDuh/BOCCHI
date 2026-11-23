@@ -11,6 +11,7 @@ using BOCCHI.Treasure.Services;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Plugin.Services;
 using Ocelot.Services.Translation;
+using Ocelot.UI;
 using Ocelot.Windows;
 
 namespace BOCCHI.Automator;
@@ -44,7 +45,6 @@ public class AutomatorRenderer
             Automator.Toggle();
         }
 
-        AutomatorPathControls.Draw(Automator, zones, translator, showRefresh: Automator.Enabled);
 
         bool inOccult = zones.GetZone().IsOccultCrescentZone();
         if (!Automator.Enabled && !HasDetails() && !inOccult)
@@ -91,14 +91,17 @@ public class AutomatorRenderer
             }
         }
 
-        if (memory.TryRemember<GoalPathStepMemory>(out GoalPathStepMemory goalPathStepMemory))
+        if (memory.TryRemember<GoalPathStepMemory>(out GoalPathStepMemory goalPathStepMemory)
+            && goalPathStepMemory.PathSteps.Count > 0)
         {
-            int stepIndex = 1;
-            foreach (IPathStep step in goalPathStepMemory.PathSteps)
+            List<string> steps = goalPathStepMemory.PathSteps.Select(step => PathStepFormatHelper.Describe(step, translator, data)).ToList();
+            ImGui.TextColored(BocchiUi.Header, translator.T(".status.route"));
+            ImGui.SameLine(0f, 8f);
+            ImGui.TextColored(OcelotTheme.GoldBright, steps[0]);
+            if (steps.Count > 1)
             {
-                BocchiUi.LabelledValue(
-                    $"{translator.T(".status.current_step")} {stepIndex++}",
-                    PathStepFormatHelper.Describe(step, translator, data));
+                ImGui.SameLine(0f, 8f);
+                BocchiUi.MutedText("→  " + string.Join("  →  ", steps.Skip(1)));
             }
         }
     }

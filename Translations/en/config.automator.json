@@ -31,10 +31,6 @@
     "should_do_critical_encounters": {
       "label": "Do Critical Encounters"
     },
-    "leave_fate_travel_for_ce_seconds": {
-      "label": "Switch to a CE when it has this many seconds left",
-      "tooltip": "While walking to a FATE, BOCCHI turns around for a Critical Encounter once its registration has this many seconds left or fewer. A higher number means it leaves sooner. 0 = switch as soon as a CE appears.\nA FATE you already started is finished first, unless Leave mid-FATE for a CE is on."
-    },
     "leave_engaged_fate_for_critical_encounter": {
       "label": "Leave mid-FATE for a CE",
       "tooltip": "Also leaves a FATE you are fighting in when a Critical Encounter's registration is about to close (same seconds as above). Pot FATEs are never left while Prefer pot FATEs is on."
@@ -153,18 +149,6 @@
       "label": "Cast Treasure Sight at camp",
       "tooltip": "Cast Treasure Sight at camp every so often to see how many coffers are left. The interval is set below.",
       "tooltip_disabled": "Not needed while Auto treasure hunt is on: it already casts Treasure Sight."
-    },
-    "treasure_sight_recast_interval_seconds": {
-      "label": "Seconds between Treasure Sight casts",
-      "tooltip": "How often Treasure Sight is used while waiting at camp."
-    },
-    "max_remote_idle_time_seconds": {
-      "label": "Max wait before Return (seconds)",
-      "tooltip": "After a FATE or CE, BOCCHI waits a random time between 2 seconds and this before it uses Return."
-    },
-    "max_base_teleport_delay_seconds": {
-      "label": "Max wait before leaving camp (seconds)",
-      "tooltip": "At camp, BOCCHI waits a random time up to this before it leaves for a FATE or CE. 0 = leave right away."
     },
     "auto_repair_threshold": {
       "label": "Repair gear below (%)"

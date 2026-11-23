@@ -23,12 +23,13 @@
       "label": "卡住时跳跃",
       "tooltip": "卡在石头、台阶或楼梯上时跳跃。"
     },
-    "jump_when_stuck_seconds": {
-      "label": "跳跃前等待秒数"
-    },
     "prefer_return_over_shard_walk": {
       "label": "使用返回代替步行到以太之晶",
       "tooltip": "长途移动时，如果返回可用就返回营地，这样不必从敌人身边走到以太之晶。"
+    },
+    "rebuild_path_map": {
+      "label": "重建路径图",
+      "tooltip": "重新加载 BOCCHI 的本区域地图。找不到路线或在营地附近站着不动时可以试试。"
     }
   }
 }

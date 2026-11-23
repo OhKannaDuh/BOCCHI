@@ -1,0 +1,9 @@
+{
+  "label": "戦闘中の移動",
+  "tooltip": "戦闘中の BossMod AI の動き方：対象との距離、回避、プリセット。戦闘プラグインを使うときだけ使われます。",
+  "fields": {
+    "update_boss_mod_presets_automatically": {
+      "label": "プリセットを自動更新"
+    }
+  }
+}

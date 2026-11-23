@@ -26,9 +26,6 @@
       "label": "连线到胡萝卜",
       "tooltip": "向附近的胡萝卜画一条绿色的线。战斗时隐藏。"
     },
-    "show_percentage_active_treasure_count": {
-      "label": "以百分比显示剩余宝箱"
-    },
     "return_to_base_camp_after_hunt": {
       "label": "寻宝结束后返回",
       "tooltip": "寻宝或胡萝卜狩猎结束时使用返回。重复进行的胡萝卜狩猎在你停止时返回。"
@@ -53,9 +50,6 @@
       "label": "寻宝途中使用魔寻宝",
       "tooltip": "开始时以及每隔几个宝箱使用魔寻宝。显示没有剩余时提前结束寻宝。"
     },
-    "treasure_sight_every_n_locations": {
-      "label": "再次施放前的地点数"
-    },
     "hunt_max_level": {
       "label": "宝箱最高等级",
       "tooltip": "由高于此等级的敌人看守的宝箱会被跳过。50＝不跳过。"
@@ -70,10 +64,6 @@
     "hunt_min_silver_percent": {
       "label": "自动寻宝最低银箱剩余％",
       "tooltip": "8 个白银宝箱中至少剩余这个比例，或青铜宝箱剩余足够时，开始自动寻宝。违规模式和刷怪都会使用。"
-    },
-    "empty_pad_trust_distance": {
-      "label": "空箱确认距离",
-      "tooltip": "BOCCHI 走到离某个位置多近，才判定那里没有宝箱。数值越小越稳妥，因为宝箱可能显示得晚。数值越大越快。"
     },
     "skip_unsafe_treasure_windows": {
       "label": "跳过危险天气／妖灵",
@@ -90,18 +80,6 @@
     "ninja_gearset_number": {
       "label": "忍者套装编号",
       "tooltip": "忍者套装在套装列表中的编号。0＝不切换装备，此时你必须已经是忍者。"
-    },
-    "knowledge_hide_offset": {
-      "label": "知见高出这么多时隐遁",
-      "tooltip": "躲开知识等级至少为“你的等级 + 此数值”的敌人。0＝与你同级或更高。负数表示也躲开更弱的敌人。"
-    },
-    "knowledge_threat_enter_distance": {
-      "label": "该距离内开始隐遁（米）",
-      "tooltip": "强敌靠近到这个距离时开始隐遁。骑乘时会提前 5 米开始。"
-    },
-    "knowledge_threat_exit_distance": {
-      "label": "远于该距离前保持隐遁（米）",
-      "tooltip": "隐遁后，保持隐遁直到敌人比这更远。"
     }
   }
 }

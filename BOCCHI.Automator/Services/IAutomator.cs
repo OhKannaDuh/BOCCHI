@@ -1,8 +1,9 @@
+using BOCCHI.Common.Services;
 ﻿using BOCCHI.Automator.Data;
 
 namespace BOCCHI.Automator.Services;
 
-public interface IAutomator
+public interface IAutomator : IPathMapRebuilder
 {
     bool Enabled { get; }
 
@@ -32,9 +33,6 @@ public interface IAutomator
 
     void ToggleCompletionist();
 
-    void RefreshPathfinding();
-
-    void RebuildPathMap();
 
     void Render();
 }

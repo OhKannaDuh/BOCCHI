@@ -21,28 +21,15 @@
     "show_experience_tracker": {
       "label": "経験値トラッカーを表示"
     },
-    "show_experience_tracker_graph": {
-      "label": "経験値グラフを表示"
-    },
     "show_currency_tracker": {
       "label": "通貨トラッカーを表示"
     },
-    "show_currency_tracker_graph": {
-      "label": "通貨グラフを表示"
+    "show_tracker_graphs": {
+      "label": "トラッカーのグラフを表示"
     },
     "show_active_treasure_tracker": {
       "label": "アクティブな銅箱／銀箱を表示",
       "tooltip": "トラッカーの行にカーソルを合わせると、銅と銀の宝箱の残り数を表示します。数はトレジャーサイトを使うと更新されます。"
-    },
-    "show_demiatma_drops": {
-      "label": "デミアートマを表示（南征編）",
-      "tooltip": "緑枠：まだ必要です。\n赤枠：すでに 3 個持っています。"
-    },
-    "show_note_drops": {
-      "label": "探査記録を表示"
-    },
-    "show_soul_shard_drops": {
-      "label": "ソウルシャードを表示（南征編）"
     },
     "show_buff_section": {
       "label": "バフ付与ボタンを表示"
@@ -50,6 +37,10 @@
     "show_bocchi_chat_prefix": {
       "label": "BOCCHI チャットメッセージを表示",
       "tooltip": "BOCCHI のメッセージを [BOCCHI] 付きでチャットに表示します。今日のメッセージは常に表示されます。"
+    },
+    "show_reward_icons": {
+      "label": "報酬アイコンを表示",
+      "tooltip": "FATE と CE の一覧にデミアートマ、フィールドノート、ソウルシャードのアイコンを表示します。"
     }
   }
 }

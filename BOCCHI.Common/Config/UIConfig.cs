@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using Ocelot.Config;
 using Ocelot.Config.Fields;
 using Ocelot.Config.Renderers.Enum;
@@ -58,26 +59,32 @@ public class UIConfig : IAutoConfig
     [Checkbox(Order = 3, Section = "trackers")]
     public bool ShowExperienceTracker { get; set; } = true;
 
-    [Checkbox(Order = 4, Section = "trackers")]
-    public bool ShowExperienceTrackerGraph { get; set; } = false;
+    [JsonIgnore]
+    public bool ShowExperienceTrackerGraph => ShowTrackerGraphs;
 
     [Checkbox(Order = 5, Section = "trackers")]
     public bool ShowCurrencyTracker { get; set; } = true;
 
     [Checkbox(Order = 6, Section = "trackers")]
-    public bool ShowCurrencyTrackerGraph { get; set; } = false;
+    public bool ShowTrackerGraphs { get; set; } = false;
+
+    [JsonIgnore]
+    public bool ShowCurrencyTrackerGraph => ShowTrackerGraphs;
 
     [Checkbox(Order = 7, Section = "trackers")]
     public bool ShowActiveTreasureTracker { get; set; } = true;
 
     [Checkbox(Order = 8, Section = "events")]
-    public bool ShowDemiatmaDrops { get; set; } = true;
+    public bool ShowRewardIcons { get; set; } = true;
 
-    [Checkbox(Order = 9, Section = "events")]
-    public bool ShowNoteDrops { get; set; } = true;
+    [JsonIgnore]
+    public bool ShowDemiatmaDrops => ShowRewardIcons;
 
-    [Checkbox(Order = 10, Section = "events")]
-    public bool ShowSoulShardDrops { get; set; } = true;
+    [JsonIgnore]
+    public bool ShowNoteDrops => ShowRewardIcons;
+
+    [JsonIgnore]
+    public bool ShowSoulShardDrops => ShowRewardIcons;
 
     [Checkbox(Order = 2, Section = "general")]
     public bool ShowBuffSection { get; set; } = true;

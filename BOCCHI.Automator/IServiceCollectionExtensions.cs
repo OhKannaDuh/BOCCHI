@@ -23,6 +23,7 @@ public static class IServiceCollectionExtensions
 
         services.AddSingleton<IAutomator, Services.Automator>();
         services.AddSingleton<Func<IAutomator>>(sp => () => sp.GetRequiredService<IAutomator>());
+        services.AddSingleton<IPathMapRebuilder>(sp => sp.GetRequiredService<IAutomator>());
         services.AddSingleton<IAutomatorContext, AutomatorContext>();
         services.AddSingleton<IPotsTreasureMode, PotsTreasureService>();
         services.AddSingleton<Func<IPotsTreasureMode>>(sp => () => sp.GetRequiredService<IPotsTreasureMode>());

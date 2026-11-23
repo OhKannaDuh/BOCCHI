@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using BOCCHI.Common.Config.Fields;
 using BOCCHI.Common.Data.Mobs;
 using BOCCHI.Common.Data.MobFarmer;
@@ -16,8 +17,8 @@ public class MobFarmerConfig : IAutoConfig
     [Checkbox(Order = 1, Section = "targets")]
     public bool ShouldHandleTargeting { get; set; } = true;
 
-    [Checkbox(Order = 2, Section = "targets")]
-    public bool ForceTargetCentralEnemy { get; set; } = true;
+    [JsonIgnore]
+    public bool ForceTargetCentralEnemy => true;
 
     [Checkbox(Order = 3, Section = "targets")]
     public bool ConsiderSpecialMobs { get; set; } = false;
@@ -31,14 +32,14 @@ public class MobFarmerConfig : IAutoConfig
     [FarmSpotList(Order = 6, Section = "spots")]
     public List<FarmSpot> Spots { get; set; } = [];
 
-    [FloatRange(3f, 30f, Format = "%.0f", Order = 7, Section = "spots")]
-    public float ClaimedSpotSeconds { get; set; } = 8f;
+    [JsonIgnore]
+    public float ClaimedSpotSeconds => 8f;
 
-    [FloatRange(3f, 15f, Format = "%.0f", Order = 8, Section = "spots")]
-    public float ClaimedPlayerRadius { get; set; } = 5f;
+    [JsonIgnore]
+    public float ClaimedPlayerRadius => 5f;
 
-    [Checkbox(Order = 9, Section = "pulls")]
-    public bool CountSpecialMobsTowardMinimum { get; set; } = false;
+    [JsonIgnore]
+    public bool CountSpecialMobsTowardMinimum => false;
 
     [IntRange(0, 20, Order = 11, Section = "pulls")]
     public int MinimumMobsToStartLoop { get; set; } = 0;
@@ -61,11 +62,11 @@ public class MobFarmerConfig : IAutoConfig
     [Checkbox(Order = 16, Section = "pulls")]
     public bool UseGapCloser { get; set; } = false;
 
-    [Checkbox(Order = 17, Section = "home")]
-    public bool ReturnToStartInWaitingPhase { get; set; } = false;
+    [JsonIgnore]
+    public bool ReturnToStartInWaitingPhase => false;
 
-    [FloatRange(10f, 1000f, Format = "%.0f", Order = 18, Section = "home")]
-    public float MinEuclideanDistanceToReturnHome { get; set; } = 200f;
+    [JsonIgnore]
+    public float MinEuclideanDistanceToReturnHome => 200f;
 
     [Checkbox(Order = 19, Section = "buffs")]
     public bool ApplyBattleBell { get; set; } = false;
@@ -79,11 +80,11 @@ public class MobFarmerConfig : IAutoConfig
     [Checkbox(Order = 22, Section = "buffs")]
     public bool ApplyCounterstance { get; set; } = false;
 
-    [FloatRange(0f, 30f, Format = "%.0f", Order = 23, Section = "buffs")]
-    public float MaximumBattleBellWaitTime { get; set; } = 10f;
+    [JsonIgnore]
+    public float MaximumBattleBellWaitTime => 10f;
 
-    [IntRange(0, 30, Order = 24, Section = "buffs")]
-    public int QuickstepSkipIfRemainingMinutes { get; set; } = 0;
+    [JsonIgnore]
+    public int QuickstepSkipIfRemainingMinutes => 0;
 
     [Checkbox(Order = 25, Section = "yields")]
     public bool YieldToPots { get; set; } = false;
@@ -106,6 +107,6 @@ public class MobFarmerConfig : IAutoConfig
     [Checkbox(Order = 31, Section = "yields")]
     public bool YieldToCrystalBuffs { get; set; } = false;
 
-    [Checkbox(Order = 32, Section = "debug")]
-    public bool RenderDebugLines { get; set; } = false;
+    [JsonIgnore]
+    public bool RenderDebugLines => false;
 }

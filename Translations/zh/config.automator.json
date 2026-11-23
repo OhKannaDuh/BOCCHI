@@ -31,10 +31,6 @@
     "should_do_critical_encounters": {
       "label": "执行紧急遭遇战"
     },
-    "leave_fate_travel_for_ce_seconds": {
-      "label": "紧急遭遇战剩余秒数不超过此值时转去",
-      "tooltip": "前往危命途中，紧急遭遇战的报名剩余时间不超过此秒数时，BOCCHI 会掉头去紧急遭遇战。数值越大，越早转去。0＝紧急遭遇战一出现就转去。\n已经开始的危命会先打完，除非开启了下面的设置。"
-    },
     "leave_engaged_fate_for_critical_encounter": {
       "label": "危命中途改去紧急遭遇",
       "tooltip": "紧急遭遇战报名即将结束时，也会离开正在打的危命（秒数同上）。开启“优先魔法罐危命任务”时不会离开魔法罐危命。"
@@ -153,18 +149,6 @@
       "label": "在营地使用魔寻宝",
       "tooltip": "在营地每隔一段时间使用魔寻宝，查看还剩多少宝箱。间隔在下面设置。",
       "tooltip_disabled": "开启自动寻宝时无需此项：自动寻宝已经会使用魔寻宝。"
-    },
-    "treasure_sight_recast_interval_seconds": {
-      "label": "魔寻宝的间隔（秒）",
-      "tooltip": "在营地等待时使用魔寻宝的间隔。"
-    },
-    "max_remote_idle_time_seconds": {
-      "label": "返回前最长等待（秒）",
-      "tooltip": "危命或紧急遭遇战结束后，BOCCHI 会随机等待 2 秒到此值之间的时间，再使用返回。"
-    },
-    "max_base_teleport_delay_seconds": {
-      "label": "离开营地前最长等待（秒）",
-      "tooltip": "在营地，BOCCHI 会随机等待不超过此值的时间，再出发去危命或紧急遭遇战。0＝立即出发。"
     },
     "auto_repair_threshold": {
       "label": "耐久低于（%）时修理"

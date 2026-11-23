@@ -15,17 +15,9 @@
       "label": "Auto-target enemies",
       "tooltip": "BOCCHI picks the targets while pulling. Once the fight starts, your combat plugin picks them."
     },
-    "force_target_central_enemy": {
-      "label": "Prefer the middle of the pack",
-      "tooltip": "Target the enemy in the middle of the pack, not the closest one. Only used when you fight without a combat plugin."
-    },
     "consider_special_mobs": {
       "label": "Include special enemies",
       "tooltip": "Also pull enemies that only appear in certain weather or at certain times."
-    },
-    "count_special_mobs_toward_minimum": {
-      "label": "Count specials toward minimums",
-      "tooltip": "Special enemies count towards the minimums below. They are pulled either way."
     },
     "max_mob_level": {
       "label": "Max enemy level"
@@ -50,26 +42,6 @@
       "set_stack": "Set stack point here",
       "min_fight": "Min enemies to fight (0 = default)"
     },
-    "claimed_spot_seconds": {
-      "label": "Leave if claimed after (seconds)",
-      "tooltip": "If other players keep claiming the enemies or stand on your spot for this long, BOCCHI treats the spot as claimed and moves to the next one until you restart."
-    },
-    "claimed_player_radius": {
-      "label": "Claimed player radius (yalms)",
-      "tooltip": "How close another player has to stay to your farm spot before it counts as claimed."
-    },
-    "min_euclidean_distance_to_return_home": {
-      "label": "Walk back if farther than (yalms)",
-      "tooltip": "After a fight, only walk back to the farm spot if you ended up farther away than this."
-    },
-    "return_to_start_in_waiting_phase": {
-      "label": "Return to spot after combat",
-      "tooltip": "Walk back to the farm spot when combat ends. With no spots, that is where you pressed Start."
-    },
-    "render_debug_lines": {
-      "label": "Show debug lines",
-      "tooltip": "While farming, draw red lines to enemies BOCCHI can pull and green lines to enemies you are fighting."
-    },
     "apply_battle_bell": {
       "label": "Use Battle Bell",
       "tooltip": "Before each pull, switch to Geomancer, use Battle Bell, then switch back."
@@ -85,14 +57,6 @@
     "apply_counterstance": {
       "label": "Use Counterstance",
       "tooltip": "Just before the pull, use the Phantom Monk's Counterstance. Needs Monk level 3."
-    },
-    "maximum_battle_bell_wait_time": {
-      "label": "Longest wait for a buff (seconds)",
-      "tooltip": "If Battle Bell, Ringing Respite or Counterstance is on cooldown for longer than this, pull without it."
-    },
-    "quickstep_skip_if_remaining_minutes": {
-      "label": "Skip Quickstep if Quicker Step has (minutes left)",
-      "tooltip": "Don't use Quickstep while your Quicker Step crystal buff still has at least this many minutes left. 0 = use it every pull."
     },
     "minimum_mobs_to_start_loop": {
       "label": "Minimum enemies to start"

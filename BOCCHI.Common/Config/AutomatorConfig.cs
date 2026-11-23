@@ -24,8 +24,8 @@ public class AutomatorConfig : IAutoConfig
     [Checkbox(Order = 4, Section = "activities")]
     public bool ShouldDoCriticalEncounters { get; set; } = true;
 
-    [IntRange(0, 180, Order = 5, Section = "activities")]
-    public int LeaveFateTravelForCeSeconds { get; set; } = 90;
+    [JsonIgnore]
+    public int LeaveFateTravelForCeSeconds => 90;
 
     [Checkbox(Order = 6, Indent = 1, Section = "activities")]
     public bool LeaveEngagedFateForCriticalEncounter { get; set; } = false;
@@ -39,7 +39,6 @@ public class AutomatorConfig : IAutoConfig
 
     public bool UsesWrathCombo => CombatAutorotation == CombatAutorotation.WrathCombo;
 
-    [BossModPresetOptions(Order = 8, Indent = 1, Section = "combat")]
     public bool UpdateBossModPresetsAutomatically { get; set; } = false;
 
     public bool BossModMaxDistanceByRole { get; set; } = true;
@@ -109,23 +108,14 @@ public class AutomatorConfig : IAutoConfig
         Section = "treasure")]
     public bool ShouldCastTreasureSight { get; set; } = false;
 
-    [IntRange(
-        60,
-        600,
-        Order = 18,
-        Indent = 2,
-        Requires = nameof(UsesTreasureSightInterval),
-        Section = "treasure")]
-    public int TreasureSightRecastIntervalSeconds { get; set; } = 120;
+    [JsonIgnore]
+    public int TreasureSightRecastIntervalSeconds => 120;
 
-    public bool UsesTreasureSightInterval =>
-        EnableAutomaticTreasureHuntDuringIllegalMode || ShouldCastTreasureSight;
+    [JsonIgnore]
+    public int MaxRemoteIdleTimeSeconds => 10;
 
-    [IntRange(2, 60, Order = 19, Section = "delays")]
-    public int MaxRemoteIdleTimeSeconds { get; set; } = 10;
-
-    [IntRange(0, 60, Order = 20, Section = "delays")]
-    public int MaxBaseTeleportDelaySeconds { get; set; } = 0;
+    [JsonIgnore]
+    public int MaxBaseTeleportDelaySeconds => 0;
 
     [IntRange(1, 99, Order = 21, Section = "repair")]
     public int AutoRepairThreshold { get; set; } = 30;
