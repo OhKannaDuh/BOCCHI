@@ -35,7 +35,7 @@
 
 ### Settings
 - Safer updates: a backup is made before your settings change, and a broken settings file no longer stops BOCCHI from loading
-- `/bocchi config set` now saves your change
+- Changes made with the chat command `/bocchi config set` are now kept after a restart
 - Your chosen mount and combat plugin are no longer reset by themselves
 
 ### Other fixes
