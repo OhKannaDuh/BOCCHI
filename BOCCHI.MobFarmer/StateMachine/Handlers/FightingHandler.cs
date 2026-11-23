@@ -1,3 +1,4 @@
+using BOCCHI.Common.Data.SupportJobs;
 using BOCCHI.Common.Config;
 using BOCCHI.Common.Data.Zones;
 using BOCCHI.Common.Targeting;
@@ -51,6 +52,7 @@ public class FightingHandler
 
     public override void Exit(FarmerPhase next)
     {
+        PhantomJobChangeGate.NoteCombatEnded();
         combat.Disable();
         stuckAssist.Reset();
         abandonHomeReturn = false;

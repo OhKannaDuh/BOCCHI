@@ -25,16 +25,16 @@ public class MobFarmerConfig : IAutoConfig
     [IntRange(1, 50, Order = 4, Section = "targets")]
     public int MaxMobLevel { get; set; } = 40;
 
-    [FloatRange(10f, 1000f, Order = 5, Section = "targets")]
-    public float MaxEuclideanDistance { get; set; } = 75f;
+    [FloatRange(10f, 100f, Format = "%.0f", Order = 5, Section = "targets")]
+    public float MaxEuclideanDistance { get; set; } = 50f;
 
     [FarmSpotList(Order = 6, Section = "spots")]
     public List<FarmSpot> Spots { get; set; } = [];
 
-    [FloatRange(3f, 30f, Order = 7, Section = "spots")]
+    [FloatRange(3f, 30f, Format = "%.0f", Order = 7, Section = "spots")]
     public float ClaimedSpotSeconds { get; set; } = 8f;
 
-    [FloatRange(3f, 15f, Order = 8, Section = "spots")]
+    [FloatRange(3f, 15f, Format = "%.0f", Order = 8, Section = "spots")]
     public float ClaimedPlayerRadius { get; set; } = 5f;
 
     [Checkbox(Order = 9, Section = "pulls")]
@@ -46,7 +46,7 @@ public class MobFarmerConfig : IAutoConfig
     [IntRange(1, 20, Order = 12, Section = "pulls")]
     public int MinimumMobsToStartFight { get; set; } = 5;
 
-    [FloatRange(5f, 60f, Order = 13, Section = "pulls")]
+    [FloatRange(5f, 60f, Format = "%.0f", Order = 13, Section = "pulls")]
     public float StackingTimeoutSeconds { get; set; } = 15f;
 
     [Checkbox(Order = 14, Section = "pulls")]
@@ -61,7 +61,7 @@ public class MobFarmerConfig : IAutoConfig
     [Checkbox(Order = 17, Section = "home")]
     public bool ReturnToStartInWaitingPhase { get; set; } = false;
 
-    [FloatRange(10f, 1000f, Order = 18, Section = "home")]
+    [FloatRange(10f, 1000f, Format = "%.0f", Order = 18, Section = "home")]
     public float MinEuclideanDistanceToReturnHome { get; set; } = 200f;
 
     [Checkbox(Order = 19, Section = "buffs")]
@@ -76,7 +76,7 @@ public class MobFarmerConfig : IAutoConfig
     [Checkbox(Order = 22, Section = "buffs")]
     public bool ApplyCounterstance { get; set; } = false;
 
-    [FloatRange(0f, 30f, Order = 23, Section = "buffs")]
+    [FloatRange(0f, 30f, Format = "%.0f", Order = 23, Section = "buffs")]
     public float MaximumBattleBellWaitTime { get; set; } = 10f;
 
     [IntRange(0, 30, Order = 24, Section = "buffs")]

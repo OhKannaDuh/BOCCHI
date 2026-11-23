@@ -56,7 +56,7 @@ public class TreasureConfig : IAutoConfig
     [IntRange(0, 100, Order = 15, Section = "treasure_hunt")]
     public int HuntMinSilverPercent { get; set; } = 50;
 
-    [FloatRange(10f, 60f, Order = 16, Section = "treasure_hunt")]
+    [FloatRange(10f, 60f, Format = "%.0f", Order = 16, Section = "treasure_hunt")]
     public float EmptyPadTrustDistance { get; set; } = 60f;
 
     [Checkbox(Order = 17, Section = "treasure_hunt")]
@@ -74,10 +74,10 @@ public class TreasureConfig : IAutoConfig
     [IntRange(-5, 10, Order = 21, Section = "ninja_hide")]
     public int KnowledgeHideOffset { get; set; } = 0;
 
-    [FloatRange(5f, 40f, Order = 22, Section = "ninja_hide")]
+    [FloatRange(5f, 40f, Format = "%.0f", Order = 22, Section = "ninja_hide")]
     public float KnowledgeThreatEnterDistance { get; set; } = 10f;
 
-    [FloatRange(10f, 60f, Order = 23, Section = "ninja_hide")]
+    [FloatRange(10f, 60f, Format = "%.0f", Order = 23, Section = "ninja_hide")]
     public float KnowledgeThreatExitDistance { get; set; } = 20f;
 
     [ConfigHidden]

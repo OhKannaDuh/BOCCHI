@@ -295,7 +295,10 @@ public static class NavigationApproach
         float range = NavigationConstants.PotPrepositionMinRadius
                       + Random.Shared.NextSingle()
                       * (NavigationConstants.PotPrepositionMaxRadius - NavigationConstants.PotPrepositionMinRadius);
-        float angle = Random.Shared.NextSingle() * MathF.PI * 2f;
+
+        // A random angle sent a short step outside the ring across the pot (and onto a mount); stay on your side.
+        float towardYou = dist > 0.1f ? MathF.Atan2(from.Z - potCenter.Z, from.X - potCenter.X) : Random.Shared.NextSingle() * MathF.PI * 2f;
+        float angle = towardYou + (Random.Shared.NextSingle() - 0.5f) * (MathF.PI / 3f);
 
         return potCenter + new Vector3(MathF.Cos(angle) * range, 0f, MathF.Sin(angle) * range);
     }

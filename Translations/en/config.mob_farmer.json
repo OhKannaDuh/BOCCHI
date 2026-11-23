@@ -32,7 +32,7 @@
     },
     "max_euclidean_distance": {
       "label": "Max pull range",
-      "tooltip": "Enemies farther away than this are ignored."
+      "tooltip": "Enemies farther than this from the farm spot are ignored."
     },
     "spots": {
       "label": "Farm spots",

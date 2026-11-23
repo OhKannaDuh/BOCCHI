@@ -16,6 +16,7 @@
 - BOCCHI now fights back when attacked: while riding (mobs your level or lower), while waiting for a pot, CE or Return, and during Treasure Hunt, Carrot Hunt and Triage Mode
 - With combat set to None, BOCCHI keeps moving when attacked and fully lets go of your rotation plugin
 - Rotation plugins and BossMod presets are switched on and off more reliably
+- Warrior with the BossMod rotation no longer uses AoE skills on a single enemy
 
 ### Pots and treasure
 - Pots now work with "Do FATEs" turned off
@@ -27,6 +28,7 @@
 ### Mob Farmer
 - No more waiting forever for a pull, getting stuck on "Buffing", or spending cooldowns before the pack is gathered
 - Walks back to its spot after you die, ignores your own party on a spot, and only uses spots saved in the zone you are in
+- Pulls stay around the farm spot instead of drifting away and losing the enemies already pulled
 - Removed the setting "Wait until combat fully ends"; it never did anything
 
 ### Fewer stalls

@@ -40,12 +40,18 @@ public class GatheringHandler
 
     private ulong aiPullMobId;
 
+    private readonly HashSet<ulong> pulledIds = [];
+
+    private ulong walkMobId;
+
     private DateTime aiPullSinceUtc;
 
     public override void Exit(FarmerPhase next)
     {
         stuckAssist.Reset();
         aiPullMobId = 0;
+        walkMobId = 0;
+        pulledIds.Clear();
         base.Exit(next);
     }
 
@@ -56,9 +62,13 @@ public class GatheringHandler
             .Where(o => !skippedMobs.IsSkipped(o.GameObjectId, DateTime.UtcNow))
             .ToList();
 
-        if (MobFarmerPack.CountTowardMinimum(inCombat, config.CountSpecialMobsTowardMinimum)
-            >= farmer.EffectiveMinimumMobsToStartFight)
+        ReportLostPulls(inCombat);
+
+        int gathered = MobFarmerPack.CountTowardMinimum(inCombat, config.CountSpecialMobsTowardMinimum);
+        int wanted = farmer.EffectiveMinimumMobsToStartFight;
+        if (gathered >= wanted)
         {
+            logger.Info("Mob Farmer: gathered {Gathered} of {Wanted} — fighting", gathered, wanted);
             pathfinder.Stop();
             stuckAssist.Reset();
             return FarmerPhase.Stacking;
@@ -68,6 +78,11 @@ public class GatheringHandler
             && TimeInState >= TimeSpan.FromSeconds(config.StackingTimeoutSeconds)
             && inCombat.Count > 0)
         {
+            logger.Info(
+                "Mob Farmer: gather timeout ({Seconds}s) with {Gathered} of {Wanted} — fighting",
+                (int)config.StackingTimeoutSeconds,
+                gathered,
+                wanted);
             pathfinder.Stop();
             stuckAssist.Reset();
             return FarmerPhase.Stacking;
@@ -75,13 +90,16 @@ public class GatheringHandler
 
         if (notInCombat.Count == 0)
         {
+            logger.Info("Mob Farmer: no more free enemies nearby, {Gathered} of {Wanted} gathered", gathered, wanted);
             pathfinder.Stop();
             stuckAssist.Reset();
             return inCombat.Count > 0 ? FarmerPhase.Stacking : FarmerPhase.Waiting;
         }
 
+        // Nearest to you dragged the pack across the circle (early pulls gave up); nearest to the spot ran past close mobs.
+        Vector3 spot = farmer.StartingPoint;
         List<IBattleNpc> ordered = notInCombat
-            .OrderBy(o => player.Position.Distance2D(o.Position))
+            .OrderBy(o => spot.Distance2D(o.Position) + player.Position.Distance2D(o.Position))
             .ToList();
         IBattleNpc current = ordered[0];
         Vector3? nextPos = ordered.Count > 1
@@ -148,6 +166,13 @@ public class GatheringHandler
             return null;
         }
 
+        // The mob we were walking to is tagged (or no longer the closest free one): stop instead of walking onto its old spot.
+        if (walkMobId != 0 && walkMobId != current.GameObjectId && pathfinder.GetState() != PathfindingState.Idle)
+        {
+            pathfinder.Stop();
+            walkMobId = 0;
+        }
+
         if (pathfinder.GetState() != PathfindingState.Idle)
         {
             return null;
@@ -159,7 +184,28 @@ public class GatheringHandler
         }
 
         IssuePath(destination);
+        walkMobId = current.GameObjectId;
         return null;
+    }
+
+    private void ReportLostPulls(List<IBattleNpc> inCombat)
+    {
+        HashSet<ulong> now = inCombat.Select(m => m.GameObjectId).ToHashSet();
+        foreach (ulong id in pulledIds)
+        {
+            if (!now.Contains(id) && objects.SearchById(id) is IBattleNpc { IsDead: false } lost)
+            {
+                logger.Info(
+                    "Mob Farmer: lost {Name} while gathering ({Spot:F0}y from the spot, {You:F0}y from you), {Count} still on you",
+                    lost.Name.TextValue,
+                    farmer.StartingPoint.Distance2D(lost.Position),
+                    player.Position.Distance2D(lost.Position),
+                    now.Count);
+            }
+        }
+
+        pulledIds.Clear();
+        pulledIds.UnionWith(now);
     }
 
     private bool TryRecoverFromStuck(IBattleNpc current, FarmerWalkStuckAssist.Recovery recovery)

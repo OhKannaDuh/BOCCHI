@@ -5,11 +5,14 @@ namespace BOCCHI.Common.Data.SupportJobs;
 
 public static class PhantomJobChangeGate
 {
-    private static readonly TimeSpan PostCombatSettle = TimeSpan.FromSeconds(4);
+    private static readonly TimeSpan PostCombatSettle = TimeSpan.FromSeconds(5);
 
     private static bool wasInCombat;
 
     private static DateTimeOffset combatClearedUtc = DateTimeOffset.MinValue;
+
+    // The gate only sees combat end if it is asked during combat; callers that wait out a fight elsewhere report it here.
+    public static void NoteCombatEnded() => combatClearedUtc = DateTimeOffset.UtcNow;
 
     public static bool IsBlocked(ICondition conditions)
     {

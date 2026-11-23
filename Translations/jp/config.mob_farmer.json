@@ -32,7 +32,7 @@
     },
     "max_euclidean_distance": {
       "label": "釣りの最大距離",
-      "tooltip": "これより遠い敵は無視します。"
+      "tooltip": "ファームの地点からこれより遠い敵は無視します。"
     },
     "spots": {
       "label": "ファーム地点",

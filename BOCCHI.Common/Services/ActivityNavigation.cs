@@ -50,6 +50,24 @@ public class ActivityNavigation
 
     public bool CanPathfind => vnav.IsNavmeshReady();
 
+    private int planning;
+
+    private Task? travel;
+
+    public bool IsBusy => Volatile.Read(ref planning) > 0 || travel is { IsCompleted: false };
+
+    public void Cancel()
+    {
+        BeginNavigation();
+        pathfinder.Stop();
+    }
+
+    private Task<ChainResult> Track(Task<ChainResult> task)
+    {
+        travel = task;
+        return task;
+    }
+
     public bool CanTeleport(Vector3 destination, out string? disabledReason)
     {
         _ = destination;
@@ -147,11 +165,12 @@ public class ActivityNavigation
 
         logger.Debug("Pathfinding to {Name} at {Destination:f1}", name, approach);
         CancelActivityChains();
-        _ = manager.Manage(BuildPathChain($"{ChainPrefix}Path::{id}", () => approach, treatAsActivity: true));
+        _ = Track(manager.Manage(BuildPathChain($"{ChainPrefix}Path::{id}", () => approach, treatAsActivity: true)));
     }
 
     private async Task PathToSurveyAsync(Vector3 destination, string name, string id, int generation)
     {
+        Interlocked.Increment(ref planning);
         try
         {
             Vector3 start = player.Position;
@@ -254,6 +273,10 @@ public class ActivityNavigation
         {
             logger.Error(ex, "Failed survey path toward {Name}", name);
         }
+        finally
+        {
+            Interlocked.Decrement(ref planning);
+        }
     }
 
     private bool CanOfferSurveyReturn()
@@ -286,7 +309,7 @@ public class ActivityNavigation
         if (route == SurveyRoute.Direct)
         {
             logger.Debug("Pathfinding directly to survey {Name} at {Destination:f1}", name, approach);
-            _ = manager.Manage(BuildPathChain(chainName, walkTo, treatAsActivity: false));
+            _ = Track(manager.Manage(BuildPathChain(chainName, walkTo, treatAsActivity: false)));
             return;
         }
 
@@ -455,7 +478,7 @@ public class ActivityNavigation
                     logger,
                     target.Id);
 
-                _ = manager.Manage(chain);
+                _ = Track(manager.Manage(chain));
             }).ConfigureAwait(false);
         }
         catch (Exception ex)
@@ -481,7 +504,7 @@ public class ActivityNavigation
                 logger.Debug("Already at best aethernet — vnav to {Name}", name);
             }
 
-            _ = manager.Manage(AppendPath(chain, chainName, walkTo, treatAsActivity));
+            _ = Track(manager.Manage(AppendPath(chain, chainName, walkTo, treatAsActivity)));
             return;
         }
 
@@ -500,7 +523,7 @@ public class ActivityNavigation
             logger,
             target.Id);
 
-        _ = manager.Manage(AppendPath(chain, chainName, walkTo, treatAsActivity));
+        _ = Track(manager.Manage(AppendPath(chain, chainName, walkTo, treatAsActivity)));
     }
 
     private IChain BuildPathChain(string name, Func<Vector3> destination, bool treatAsActivity = true) =>

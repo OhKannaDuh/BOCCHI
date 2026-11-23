@@ -32,7 +32,7 @@
     },
     "max_euclidean_distance": {
       "label": "最大拉怪距离",
-      "tooltip": "比这更远的敌人会被忽略。"
+      "tooltip": "离刷怪地点比这更远的敌人会被忽略。"
     },
     "spots": {
       "label": "刷怪地点",

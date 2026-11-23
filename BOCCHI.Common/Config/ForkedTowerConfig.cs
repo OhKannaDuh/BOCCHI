@@ -13,7 +13,7 @@ public class ForkedTowerConfig : IAutoConfig
     [Checkbox(Order = 1, Section = "helpers")]
     public bool ShowRegistrationCountdown { get; set; } = true;
 
-    [FloatRange(20f, 300f, Order = 2, Section = "helpers")]
+    [FloatRange(20f, 300f, Format = "%.0f", Order = 2, Section = "helpers")]
     public float TrapDrawRange { get; set; } = 150f;
 
     [Checkbox(Order = 3, Section = "illegal_mode")]

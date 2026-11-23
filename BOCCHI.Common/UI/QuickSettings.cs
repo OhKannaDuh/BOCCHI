@@ -41,6 +41,7 @@ public static class QuickSettings
             [
                 (typeof(MobFarmerConfig), nameof(MobFarmerConfig.MinimumMobsToStartLoop)),
                 (typeof(MobFarmerConfig), nameof(MobFarmerConfig.MinimumMobsToStartFight)),
+                (typeof(MobFarmerConfig), nameof(MobFarmerConfig.StackingTimeoutSeconds)),
                 (typeof(MobFarmerConfig), nameof(MobFarmerConfig.MaxMobLevel)),
                 (typeof(MobFarmerConfig), nameof(MobFarmerConfig.ConsiderSpecialMobs)),
                 (typeof(MobFarmerConfig), nameof(MobFarmerConfig.YieldToPots)),

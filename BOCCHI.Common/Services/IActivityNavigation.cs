@@ -6,6 +6,10 @@ public interface IActivityNavigation
 {
     bool CanPathfind { get; }
 
+    bool IsBusy { get; }
+
+    void Cancel();
+
     bool CanTeleport(Vector3 destination, out string? disabledReason);
 
     void PathTo(Vector3 destination, string name, string id);

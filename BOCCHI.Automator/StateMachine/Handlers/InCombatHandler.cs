@@ -1,5 +1,6 @@
 ﻿using BOCCHI.Automator.Data;
 using BOCCHI.Automator.Services;
+using BOCCHI.Common.Data.Goals;
 using BOCCHI.Common.Data.StateMemory;
 using BOCCHI.Common.Data.Zones;
 using BOCCHI.Common.Services;
@@ -41,7 +42,8 @@ public class InCombatHandler
             return StatePriority.Never;
         }
 
-        if (criticalEncounterContext.IsInCriticalEncounter() || fateContext.IsInFate())
+        // InFate / InCriticalEncounter only take over for the goal; yielding to any other event left nothing fighting.
+        if (IsInGoalActivity())
         {
             return StatePriority.Never;
         }
@@ -84,6 +86,15 @@ public class InCombatHandler
 
         return StatePriority.High;
     }
+
+    private bool IsInGoalActivity() =>
+        memory.TryRemember<GoalMemory>(out GoalMemory goal)
+        && goal.Goal.GoalType switch
+        {
+            CriticalEncounterGoal ce => criticalEncounterContext.GetCriticalEncounterId() == ce.id,
+            FateGoal fate => fateContext.GetFateId() == fate.id,
+            _ => false,
+        };
 
     public override void Handle()
     {

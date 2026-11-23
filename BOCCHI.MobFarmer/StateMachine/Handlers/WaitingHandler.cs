@@ -1,5 +1,6 @@
 using BOCCHI.Common.Config;
 using BOCCHI.Common.Data.Zones;
+using BOCCHI.Common.Services;
 using BOCCHI.MobFarmer.Data;
 using BOCCHI.MobFarmer.Services;
 using Dalamud.Game.ClientState.Conditions;
@@ -24,6 +25,7 @@ public class WaitingHandler
     IPathfinder pathfinder,
     IZoneProvider zones,
     IPlayer player,
+    IActivityNavigation navigation,
     ILogger<WaitingHandler> logger
 ) : FlowStateHandler<FarmerPhase>(FarmerPhase.Waiting)
 {
@@ -35,10 +37,21 @@ public class WaitingHandler
 
     private readonly FarmerWalkStuckAssist stuckAssist = new();
 
+    // Beyond this a plain walk loses to Return / aethernet; same planner as Completionist survey points.
+    private const float TravelDistance = 150f;
+
     private DateTime? readySinceUtc;
+
+    private bool travelStarted;
 
     public override void Exit(FarmerPhase next)
     {
+        if (travelStarted && navigation.IsBusy)
+        {
+            navigation.Cancel();
+        }
+
+        travelStarted = false;
         stuckAssist.Reset();
         readySinceUtc = null;
         base.Exit(next);
@@ -58,9 +71,24 @@ public class WaitingHandler
             {
                 farmer.MarkArrivedAtSpot();
                 stuckAssist.Reset();
+                travelStarted = false;
             }
             else
             {
+                if (travelStarted && navigation.IsBusy)
+                {
+                    return null;
+                }
+
+                if (!travelStarted && homeDistance > TravelDistance && navigation.CanPathfind)
+                {
+                    travelStarted = true;
+                    logger.Info("Mob Farmer: farm spot is {Distance:F0}y away — travelling there", homeDistance);
+                    pathfinder.Stop();
+                    navigation.PathToPoint(farmer.StartingPoint, "farm spot", "mob_farmer_spot");
+                    return null;
+                }
+
                 if (TryRecoverFromStuck(homeDistance, farmer.StartingPoint))
                 {
                     return null;
@@ -77,7 +105,8 @@ public class WaitingHandler
                     farmer.StartingPoint,
                     movementConfig.ShouldAutoMount,
                     movementConfig.PreferredMountId,
-                    zones.GetZone().IsInBasecamp());
+                    zones.GetZone().IsInBasecamp(),
+                    zones.GetZone());
 
                 return null;
             }

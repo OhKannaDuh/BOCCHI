@@ -37,6 +37,13 @@ public sealed class FarmerPullAssist(
 
     private static readonly Action Trajectory = new(ActionType.Action, 36934);
 
+    // A pull lands a moment after the cast; trying again meanwhile spent Tomahawk, Provoke and the gap closer on one mob.
+    private static readonly TimeSpan PullSettle = TimeSpan.FromSeconds(2.5);
+
+    private ulong lastPulledId;
+
+    private DateTime lastPullUtc = DateTime.MinValue;
+
     public bool TryPull(IBattleNpc current)
     {
         if (!player.IsTank())
@@ -60,27 +67,29 @@ public sealed class FarmerPullAssist(
             return false;
         }
 
+        if (targetId == lastPulledId && DateTime.UtcNow - lastPullUtc < PullSettle)
+        {
+            return false;
+        }
+
         if (config.ShouldHandleTargeting)
         {
             targets.Target = current;
         }
 
-        if (config.UseRangedPull && TryRanged() is { } ranged && ranged.CanCast())
+        Action? tool = config.UseRangedPull && TryRanged() is { } ranged && ranged.CanCast() ? ranged
+            : config.UseProvoke && Provoke.CanCast() ? Provoke
+            : config.UseGapCloser && TryGapCloser() is { } gap && gap.CanCast() ? gap
+            : null;
+        if (tool == null)
         {
-            return ranged.Cast(targetId);
+            return false;
         }
 
-        if (config.UseProvoke && Provoke.CanCast())
-        {
-            return Provoke.Cast(targetId);
-        }
-
-        if (config.UseGapCloser && TryGapCloser() is { } gap && gap.CanCast())
-        {
-            return gap.Cast(targetId);
-        }
-
-        return false;
+        // UseAction can report false for an action it queued, so the wait starts on the attempt.
+        lastPulledId = targetId;
+        lastPullUtc = DateTime.UtcNow;
+        return tool.Cast(targetId);
     }
 
     private Action? TryRanged()

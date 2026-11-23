@@ -9,6 +9,7 @@ using ECommons.GameFunctions;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using Ocelot.Extensions;
 using Ocelot.Services.PlayerState;
+using System.Numerics;
 
 namespace BOCCHI.MobFarmer.Services;
 
@@ -68,9 +69,13 @@ public class MobScanner
             return;
         }
 
+        // Measured from your position, each pull reaches a bit further and the farm drifts until early pulls give up the chase.
+        Vector3 center = farmerRunning ? mobFarmer.StartingPoint : player.Position;
+        // Older settings files can hold up to 1000 from before the slider was capped.
+        float range = Math.Min(config.MaxEuclideanDistance, 100f);
         List<IBattleNpc> mobs = objects.OfType<IBattleNpc>()
             .Where(o => o is { IsDead: false, IsTargetable: true })
-            .Where(o => player.Position.Distance2D(o.Position) <= config.MaxEuclideanDistance)
+            .Where(o => o.IsTargetingPlayer(localPlayer) || center.Distance2D(o.Position) <= range)
             .Where(o =>
             {
                 // Anything already attacking us must be fought, whatever the mob/level filters say.

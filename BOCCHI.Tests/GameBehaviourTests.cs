@@ -1,3 +1,5 @@
+using BOCCHI.Common.Data.CriticalEncounters;
+using BOCCHI.Common.Data.Goals;
 using BOCCHI.Automator.Data;
 using BOCCHI.Automator.Services;
 using BOCCHI.Automator.Services.Paths;
@@ -50,6 +52,36 @@ public class GameBehaviourTests
 
         inCombat = true;
         Assert.Equal(StatePriority.High, handler.GetScore());
+    }
+
+    // Stepping just outside the pot ring picked a random point across the pot, far enough to mount.
+    [Fact]
+    public void LeavingThePotRingWalksBackOnYourSide()
+    {
+        System.Numerics.Vector3 pot = new(100f, 0f, 100f);
+        System.Numerics.Vector3 you = new(125f, 0f, 100f);
+        for (int i = 0; i < 50; i++)
+        {
+            System.Numerics.Vector3 back = NavigationApproach.GetPotPrepositionPosition(pot, you);
+            float fromPot = System.Numerics.Vector3.Distance(back, pot);
+            Assert.InRange(fromPot, NavigationConstants.PotPrepositionMinRadius - 0.01f, NavigationConstants.PotPrepositionMaxRadius + 0.01f);
+            Assert.True(System.Numerics.Vector3.Distance(back, you) < NavigationConstants.MountMinDistance);
+        }
+    }
+
+    // Died on a Mob Farmer pot trip: a CE that was not the goal switched off fighting back, and nothing else took the fight.
+    [Fact]
+    public void BeingInsideAnotherCeDoesNotStopFightingBack()
+    {
+        AutomatorMemory memory = new();
+        memory.TryAdd(new GoalMemory(StandIn.For<IGoal>(g => g.Answers("GoalType", new FateGoal(new FateId(1977))))));
+        InCombatHandler handler = CombatHandler(memory, () => true, new CriticalEncounterId(45));
+
+        Assert.Equal(StatePriority.High, handler.GetScore());
+
+        memory.Forget<GoalMemory>();
+        memory.TryAdd(new GoalMemory(StandIn.For<IGoal>(g => g.Answers("GoalType", new CriticalEncounterGoal(new CriticalEncounterId(45))))));
+        Assert.Equal(StatePriority.Never, handler.GetScore());
     }
 
     [Fact]
@@ -170,12 +202,12 @@ public class GameBehaviourTests
         Assert.Equal(0f, scorer.Score(LiveFate(2073)).Value);
     }
 
-    private static InCombatHandler CombatHandler(AutomatorMemory memory, Func<bool> inCombat) =>
+    private static InCombatHandler CombatHandler(AutomatorMemory memory, Func<bool> inCombat, CriticalEncounterId? insideCe = null) =>
         new(
             StandIn.For<IObjectTable>(o => o.Answers("LocalPlayer", StandIn.For<IPlayerCharacter>())),
             StandIn.For<ICondition>(c => c.Answers("get_Item", args => args[0] is ConditionFlag.InCombat && inCombat())),
             StandIn.For<IFateContext>(),
-            StandIn.For<ICriticalEncounterContext>(),
+            StandIn.For<ICriticalEncounterContext>(c => c.Answers("GetCriticalEncounterId", insideCe).Answers("IsInCriticalEncounter", insideCe != null)),
             StandIn.For<IPathfinder>(),
             memory,
             null!,

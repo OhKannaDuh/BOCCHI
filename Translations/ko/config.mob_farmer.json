@@ -32,7 +32,7 @@
     },
     "max_euclidean_distance": {
       "label": "최대 끌어오기 거리",
-      "tooltip": "이보다 먼 적은 무시합니다."
+      "tooltip": "파밍 지점에서 이보다 먼 적은 무시합니다."
     },
     "spots": {
       "label": "파밍 지점",

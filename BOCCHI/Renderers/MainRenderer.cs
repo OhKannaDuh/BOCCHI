@@ -7,6 +7,7 @@ using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Utility.Raii;
 using Microsoft.Extensions.DependencyInjection;
 using Ocelot.Config;
+using Ocelot.Extensions;
 using Ocelot.Ipc.Lifestream;
 using Ocelot.Ipc.RotationSolverReborn;
 using Ocelot.Ipc.VNavmesh;
@@ -227,6 +228,12 @@ public class MainRenderer
             return;
         }
 
+        // Sliders default to a share of the window width, which pushes long labels past the panel edge.
+        ITranslator root = services.GetRequiredService<ITranslator>();
+        float labelWidth = fields.Max(f => f.Config.GetProperty(f.Property) is { } p ? ImGui.CalcTextSize(p.Label(f.Config, root)).X : 0f);
+        float available = ImGui.GetContentRegionAvail().X;
+        ImGui.PushItemWidth(MathF.Max(available * 0.35f, available - labelWidth - ImGui.GetStyle().ItemInnerSpacing.X - 24f));
+
         foreach ((Type configType, string property) in fields)
         {
             if (services.GetService(configType) is IAutoConfig config)
@@ -235,6 +242,7 @@ public class MainRenderer
             }
         }
 
+        ImGui.PopItemWidth();
         BocchiUi.EndPanel();
     }
 

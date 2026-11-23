@@ -51,6 +51,13 @@ public class MobFarmerRenderer
 
         if (Farmer.Running)
         {
+            if (Farmer.Suspended)
+            {
+                BocchiUi.LabelledValue(
+                    translator.T(".automation.mob_farmer.yield"),
+                    translator.T($".automation.mob_farmer.yield_reasons.{Farmer.YieldReason.ToString().ToSnakeCase()}"));
+            }
+
             Farmer.Render();
         }
     }
