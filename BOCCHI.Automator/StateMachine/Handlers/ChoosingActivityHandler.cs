@@ -50,6 +50,7 @@ public class ChoosingActivityHandler
         }
 
         if (buffConfig.ShouldAutomateBuffs
+            && DateTime.UtcNow >= ApplyingBuffsHandler.RetryAfterUtc
             && buffs.ShouldRefreshAny()
             && zones.GetZone().GetNearbyKnowledgeCrystals().Any())
         {

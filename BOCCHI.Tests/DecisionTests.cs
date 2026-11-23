@@ -1,5 +1,6 @@
 using System.Numerics;
 using BOCCHI.Common.Config;
+using BOCCHI.Common.Data.Mobs;
 using BOCCHI.Common.Data.Paths;
 using BOCCHI.Common.Data.Zones.Graph;
 using BOCCHI.Common.Data.Zones.Graph.Traversal;
@@ -15,6 +16,16 @@ namespace BOCCHI.Tests;
 
 public class DecisionTests
 {
+    [Fact]
+    public void OldSavedMobsAreSwappedForTheirNewIds()
+    {
+        List<Mob> mobs = [Mob.Goobbue, Mob.Taurus, Mob.Taurus2];
+
+        MobData.ReplaceLegacyMobs(mobs);
+
+        Assert.Equal([Mob.Goobbue2, Mob.Taurus2], mobs);
+    }
+
     [Theory]
     [InlineData(75, 74, false)]
     [InlineData(75, 75, true)]

@@ -79,30 +79,26 @@ public class WalkTeleportWalkCalculator : IGraphCandidateCalculator
             return (baseCamp, start.Distance(baseCamp.Position));
         }
 
-        if (graph.TryGetNode(start, GraphSnapRadius, out Node node) && node.IsTeleport())
+        if (graph.TryGetNode(start, GraphSnapRadius, out Node node) && node.IsTeleport() && ZoneGraph.IsTeleportUsable(node))
         {
             return (node, start.Distance(node.Position));
         }
 
-        Node? nearest = graph.GetNearestTeleport(start);
-        if (nearest == null)
+        foreach (Node candidate in graph.GetUsableTeleportNodes().OrderBy(n => Vector3.Distance(n.Position, start)).Take(3))
         {
-            return null;
+            Path walk = await pathfinder.Pathfind(new(candidate.GetCampStandOffPosition(start))
+            {
+                From = start,
+                AllowFlying = false
+            });
+
+            if (walk.IsReachable())
+            {
+                return (candidate, walk.Distance);
+            }
         }
 
-        Vector3 approach = nearest.GetCampStandOffPosition(start);
-        Path walkToNearestTeleportPath = await pathfinder.Pathfind(new(approach)
-        {
-            From = start,
-            AllowFlying = false
-        });
-
-        if (!walkToNearestTeleportPath.IsReachable())
-        {
-            return null;
-        }
-
-        return (nearest, walkToNearestTeleportPath.Distance);
+        return null;
     }
 
     private static bool IsSameAetheryte(Node departure, Node inbound, TeleportNodeMetadata inboundMeta)

@@ -16,9 +16,7 @@ public class StackingHandler
     MobFarmerConfig config,
     IMobFarmer farmer,
     IMobScanner scanner,
-    ITargetManager targets,
-    IPathfinder pathfinder,
-    IPlayer player
+    IPathfinder pathfinder
 ) : FlowStateHandler<FarmerPhase>(FarmerPhase.Stacking)
 {
     private bool hasRunStack;
@@ -56,33 +54,18 @@ public class StackingHandler
             return FarmerPhase.Waiting;
         }
 
-        Vector3 destination;
-        if (farmer.StackPoint is { } stack)
+        // The gathered pack is already chasing you; walking to the furthest one only ran the pack back across the spot.
+        if (farmer.StackPoint is not { } destination)
         {
-            destination = stack;
-        }
-        else
-        {
-            IBattleNpc? furthest = inCombat
-                .Where(o => o.GameObjectId != targets.Target?.GameObjectId)
-                .OrderBy(o => player.Position.Distance2D(o.Position))
-                .LastOrDefault();
-
-            if (furthest == null)
-            {
-                return FarmerPhase.Fighting;
-            }
-
-            destination = furthest.Position;
+            return FarmerPhase.Fighting;
         }
 
-        pathfinder.PathfindAndMoveTo(new(destination)
+        hasRunStack = pathfinder.PathfindAndMoveTo(new(destination)
         {
             AllowFlying = false,
             ShouldSnapToFloor = true,
         });
-        hasRunStack = true;
 
-        return null;
+        return hasRunStack || TimeInState < TimeSpan.FromSeconds(config.StackingTimeoutSeconds) ? null : FarmerPhase.Fighting;
     }
 }

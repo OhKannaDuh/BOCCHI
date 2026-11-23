@@ -115,7 +115,9 @@ public class WaitingHandler
         }
 
         readySinceUtc ??= DateTime.UtcNow;
-        int free = MobFarmerPack.CountTowardMinimum(scanner.NotInCombat, config.CountSpecialMobsTowardMinimum);
+        int free = MobFarmerPack.CountTowardMinimum(
+            scanner.NotInCombat.Where(o => !GatheringHandler.SkippedMobs.IsSkipped(o.GameObjectId, DateTime.UtcNow)),
+            config.CountSpecialMobsTowardMinimum);
         if (!MobFarmerRules.ShouldStartPull(
                 free,
                 config.MinimumMobsToStartLoop,

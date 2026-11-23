@@ -36,7 +36,7 @@ public class GatheringHandler
 
     private static readonly TimeSpan AiPullPatience = TimeSpan.FromSeconds(8);
 
-    private readonly SkipList skippedMobs = new(TimeSpan.FromMinutes(5));
+    internal static readonly SkipList SkippedMobs = new(TimeSpan.FromMinutes(5));
 
     private ulong aiPullMobId;
 
@@ -59,7 +59,7 @@ public class GatheringHandler
     {
         List<IBattleNpc> inCombat = scanner.InCombat.ToList();
         List<IBattleNpc> notInCombat = scanner.NotInCombat
-            .Where(o => !skippedMobs.IsSkipped(o.GameObjectId, DateTime.UtcNow))
+            .Where(o => !SkippedMobs.IsSkipped(o.GameObjectId, DateTime.UtcNow))
             .ToList();
 
         ReportLostPulls(inCombat);
@@ -183,8 +183,11 @@ public class GatheringHandler
             return null;
         }
 
-        IssuePath(destination);
-        walkMobId = current.GameObjectId;
+        if (IssuePath(destination))
+        {
+            walkMobId = current.GameObjectId;
+        }
+
         return null;
     }
 
@@ -233,7 +236,7 @@ public class GatheringHandler
                     "Mob Farmer: giving up on {Name} after stuck recoveries — trying another mob",
                     current.Name.TextValue);
                 pathfinder.Stop();
-                skippedMobs.Skip(current.GameObjectId, DateTime.UtcNow);
+                SkippedMobs.Skip(current.GameObjectId, DateTime.UtcNow);
                 return true;
 
             default:
@@ -241,9 +244,9 @@ public class GatheringHandler
         }
     }
 
-    private void IssuePath(Vector3 destination)
+    private bool IssuePath(Vector3 destination)
     {
-        pathfinder.PathfindAndMoveTo(new(destination)
+        return pathfinder.PathfindAndMoveTo(new(destination)
         {
             AllowFlying = false,
             DistanceThreshold = PathArriveRange,

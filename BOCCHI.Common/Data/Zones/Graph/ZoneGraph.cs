@@ -280,18 +280,11 @@ public class ZoneGraph
 
     public IEnumerable<Node> GetUsableTeleportNodes() => GetTeleportNodes().Where(IsTeleportUsable);
 
-    private static bool IsTeleportUsable(Node node) =>
+    public static bool IsTeleportUsable(Node node) =>
         node.Metadata is not TeleportNodeMetadata teleport
         || OccultCrescentHelper.IsAethernetUnlocked(teleport.AetheryteId);
 
     public IEnumerable<Node> GetActivityNodes() => GetNodesByTypes(NodeType.NormalFate, NodeType.PotFate, NodeType.CriticalEncounter);
-
-    public Node? GetNearestTeleport(Vector3 pos)
-    {
-        return GetTeleportNodes()
-            .OrderBy(n => Vector3.Distance(n.Position, pos))
-            .FirstOrDefault();
-    }
 
     public async Task ConnectToBaseCamp(List<Node> nodes, GraphConfig config)
     {

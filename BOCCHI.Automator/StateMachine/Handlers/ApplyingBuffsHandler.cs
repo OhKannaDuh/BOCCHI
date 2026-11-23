@@ -32,7 +32,7 @@ public class ApplyingBuffsHandler
 
     private IStateMachine<BuffState>? stateMachine;
 
-    private DateTime retryAfterUtc;
+    internal static DateTime RetryAfterUtc { get; private set; }
 
     public override StatePriority GetScore()
     {
@@ -48,7 +48,7 @@ public class ApplyingBuffsHandler
             return StatePriority.Never;
         }
 
-        if (!config.ShouldAutomateBuffs || !buffs.ShouldRefreshAny() || DateTime.UtcNow < retryAfterUtc)
+        if (!config.ShouldAutomateBuffs || !buffs.ShouldRefreshAny() || DateTime.UtcNow < RetryAfterUtc)
         {
             return StatePriority.Never;
         }
@@ -69,6 +69,7 @@ public class ApplyingBuffsHandler
 
     public override void Enter()
     {
+        base.Enter();
         stateMachine = factory();
 
         memory.TryAdd<ApplyingBuffsMemory>();
@@ -124,7 +125,7 @@ public class ApplyingBuffsHandler
             pathfinder.Stop();
             ClearBuffLatch();
             stateMachine = null;
-            retryAfterUtc = DateTime.UtcNow + RetryAfter;
+            RetryAfterUtc = DateTime.UtcNow + RetryAfter;
             return;
         }
 

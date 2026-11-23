@@ -11,18 +11,23 @@ public static class PhantomJobChangeGate
 
     private static DateTimeOffset combatClearedUtc = DateTimeOffset.MinValue;
 
-    // The gate only sees combat end if it is asked during combat; callers that wait out a fight elsewhere report it here.
     public static void NoteCombatEnded() => combatClearedUtc = DateTimeOffset.UtcNow;
 
-    public static bool IsBlocked(ICondition conditions)
+    // Must run every frame (PhantomJobCombatTracker): callers that only ask after combat miss the edge.
+    public static void Track(bool inCombat)
     {
-        bool inCombat = conditions[ConditionFlag.InCombat];
         if (wasInCombat && !inCombat)
         {
             combatClearedUtc = DateTimeOffset.UtcNow;
         }
 
         wasInCombat = inCombat;
+    }
+
+    public static bool IsBlocked(ICondition conditions)
+    {
+        bool inCombat = conditions[ConditionFlag.InCombat];
+        Track(inCombat);
 
         if (inCombat
             || DateTimeOffset.UtcNow - combatClearedUtc < PostCombatSettle

@@ -129,6 +129,11 @@ public class PathfindingHandler
 
         if (path.RoutingFailed && currentPathTask == null)
         {
+            if (path.PlanError != null)
+            {
+                logger.Error(path.PlanError, "Route calc crashed");
+            }
+
             consecutiveRoutingFails++;
             if (consecutiveRoutingFails < MaxRoutingRetries)
             {

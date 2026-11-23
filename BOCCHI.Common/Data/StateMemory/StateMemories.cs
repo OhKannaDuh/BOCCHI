@@ -347,6 +347,8 @@ public sealed class GoalPathStepMemory(IGoal goal, IPathCalculator calculator, b
 
     public bool RoutingFailed => routingFailed && pathStepTask == null;
 
+    public Exception? PlanError { get; private set; }
+
     public bool IsValid => pathStepTask != null || PathSteps.Count != 0 || emptyPlan || routingFailed;
 
     public void Update()
@@ -373,6 +375,7 @@ public sealed class GoalPathStepMemory(IGoal goal, IPathCalculator calculator, b
             routingFailed = true;
             emptyPlan = false;
             PathSteps = [];
+            PlanError = pathStepTask.Exception?.GetBaseException();
         }
 
         pathStepTask = null;

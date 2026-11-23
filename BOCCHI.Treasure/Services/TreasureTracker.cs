@@ -226,7 +226,8 @@ public class TreasureTracker : ITreasureTracker, IOnUpdate, IDisposable
             return;
         }
 
-        AtkTextNode* textNode = addon->GetNodeById(3)->GetAsAtkTextNode();
+        AtkResNode* node = addon->GetNodeById(3);
+        AtkTextNode* textNode = node == null ? null : node->GetAsAtkTextNode();
         if (textNode == null)
         {
             return;
@@ -238,7 +239,7 @@ public class TreasureTracker : ITreasureTracker, IOnUpdate, IDisposable
             return;
         }
 
-        string emptyPattern = LogMessageHelper.GetLogMessagePattern(data, NoActiveChestsLogMessageId);
+        string emptyPattern = noChestsPattern ??= LogMessageHelper.GetLogMessagePattern(data, NoActiveChestsLogMessageId);
         if (!string.IsNullOrEmpty(emptyPattern) && Regex.IsMatch(text, emptyPattern))
         {
             lastParseWideText = DateTime.Now;
@@ -246,7 +247,7 @@ public class TreasureTracker : ITreasureTracker, IOnUpdate, IDisposable
             return;
         }
 
-        string pattern = LogMessageHelper.GetLogMessagePattern(data, ActiveChestLogMessageId);
+        string pattern = activeChestsPattern ??= LogMessageHelper.GetLogMessagePattern(data, ActiveChestLogMessageId);
         Match match = Regex.Match(text, pattern);
         if (!match.Success)
         {
@@ -262,6 +263,10 @@ public class TreasureTracker : ITreasureTracker, IOnUpdate, IDisposable
         lastParseWideText = DateTime.Now;
         ApplySightCounts(silver, bronze);
     }
+
+    private string? noChestsPattern;
+
+    private string? activeChestsPattern;
 
     private void ApplySightCounts(int silver, int bronze)
     {

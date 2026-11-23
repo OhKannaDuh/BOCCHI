@@ -20,7 +20,6 @@ public enum PotTreasureHintKind
     None,
     Hint,
     CofferReveal,
-    ElixirPrompt,
     BonusOffer,
 }
 
@@ -63,8 +62,6 @@ public static class PotTreasureIds
     public const uint HintFarLogMessageId = 10988;
 
     public const uint HintBeyondFarLogMessageId = 10989;
-
-    public const uint ElixirPromptLogMessageId = 10990;
 
     public const uint BonusOfferLogMessageId = 10994;
 

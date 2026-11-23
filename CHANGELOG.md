@@ -28,15 +28,18 @@
 - After you die, Treasure Hunt and Carrot Hunt plan a fresh route instead of riding straight from camp
 
 ### Mob Farmer
-- No more waiting forever for a pull, getting stuck on "Buffing", or spending cooldowns before the pack is gathered
+- No more waiting forever for a pull, looping when every nearby enemy was skipped, getting stuck on "Buffing", or spending cooldowns before the pack is gathered
+- Enemies picked in an older version can be unticked again
 - Walks back to its spot after you die, ignores your own party on a spot, and only uses spots saved in the zone you are in
-- Pulls stay around the farm spot instead of drifting away and losing the enemies already pulled
+- Pulls stay around the farm spot instead of drifting away and losing the enemies already pulled, and the fight starts as soon as the pack is gathered (no more running across the spot first, unless you set a stack point)
 - Waits for your HP to recover before the next pull (new setting, 80% by default)
 - Removed the setting "Wait until combat fully ends"; it never did anything
 
 ### Fewer stalls
 - Buffs, Treasure Sight, phantom job leveling, repairs and shopping no longer hold BOCCHI up forever; they give up after a while and carry on
+- Switching to Phantom Dancer no longer waits 5 seconds and reports a failed switch
 - The jump when stuck gives up after five tries instead of jumping forever
+- Trips no longer start from an aethernet shard you have not unlocked, and no longer walk to the crystal when you are already at the shard you want
 
 ### Settings
 - Safer updates: a backup is made before your settings change, and a broken settings file no longer stops BOCCHI from loading

@@ -104,16 +104,6 @@ public sealed class PotTreasureHintTracker(IChatGui chat, IPlayer player) : IOnS
             return true;
         }
 
-        if (id == PotTreasureIds.ElixirPromptLogMessageId)
-        {
-            parsed = new PotTreasureHintEvent
-            {
-                Kind = PotTreasureHintKind.ElixirPrompt,
-                LogMessageId = id,
-            };
-            return true;
-        }
-
         if (id == PotTreasureIds.BonusOfferLogMessageId)
         {
             parsed = new PotTreasureHintEvent

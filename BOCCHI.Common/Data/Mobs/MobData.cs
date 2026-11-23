@@ -77,6 +77,26 @@ public static class MobData
     public static bool IsSpecialMob(uint nameId) =>
         TryFromNameId(nameId, out Mob mob) && MobsWithSpawnCondition.Contains(mob);
 
+    public static void ReplaceLegacyMobs(List<Mob> mobs)
+    {
+        for (int i = mobs.Count - 1; i >= 0; i--)
+        {
+            if (!LegacyToCrescent.TryGetValue(mobs[i], out Mob crescent))
+            {
+                continue;
+            }
+
+            if (mobs.Contains(crescent))
+            {
+                mobs.RemoveAt(i);
+            }
+            else
+            {
+                mobs[i] = crescent;
+            }
+        }
+    }
+
     public static bool IsSelected(uint nameId, IReadOnlyCollection<Mob> selected)
     {
         if (!TryFromNameId(nameId, out Mob mob))

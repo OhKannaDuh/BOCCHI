@@ -50,12 +50,11 @@ public class SupportJobChanger
             return;
         }
 
-        if (objects.LocalPlayer is not { } player)
+        if (objects.LocalPlayer is null)
         {
             return;
         }
 
-        SupportJob job = supportJobs.Create(id);
         target = id;
 
         task = chainManager.ExecuteAsync(chains =>
@@ -67,8 +66,9 @@ public class SupportJobChanger
                     "SupportJobChanger::CheckCurrentJob"
                 )
                 .Then(_ => PublicContentOccultCrescent.ChangeSupportJob((byte)id), "SupportJobChanger::Change")
+                // The job status looked up by name never matched Phantom Dancer, so every switch to it "timed out".
                 .WaitUntil(
-                    _ => ValueTask.FromResult(player.StatusList.Has(job.StatusId)),
+                    _ => ValueTask.FromResult(supportJobs.TryGetCurrent(out SupportJob now) && now.Id == id),
                     TimeSpan.FromSeconds(5),
                     TimeSpan.FromMilliseconds(250),
                     "SupportJobChanger::WaitForChange"

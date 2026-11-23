@@ -45,6 +45,8 @@ public sealed class TreasureHuntPrecomputePanel
 
     private bool includeFullPaths;
 
+    private int failedPaths;
+
     public string Name => "Treasure Hunt Bake";
 
     public void Render()
@@ -103,6 +105,12 @@ public sealed class TreasureHuntPrecomputePanel
 
         if (ImGui.Button("Run bake"))
         {
+            if (!vnav.IsNavmeshReady())
+            {
+                lastError = "vnavmesh not ready; wait for the navmesh to load.";
+                return;
+            }
+
             RefreshTreasures(zone);
             if (treasures.Count == 0)
             {
@@ -121,6 +129,7 @@ public sealed class TreasureHuntPrecomputePanel
         lastError = null;
         lastOutputPath = null;
         progress = 0;
+        failedPaths = 0;
         runCts = new CancellationTokenSource();
         CancellationToken ct = runCts.Token;
         stopwatch.Restart();
@@ -169,7 +178,11 @@ public sealed class TreasureHuntPrecomputePanel
 
                     ct.ThrowIfCancellationRequested();
                     List<Vector3> path = await vnav.Pathfind(treasure.Position, other.Position, false);
-                    schema.NodeToNodeDistances[treasure.Id].Add(new(other.Id, PathLength(path), ToHuntPath(path)));
+                    if (IsFound(path))
+                    {
+                        schema.NodeToNodeDistances[treasure.Id].Add(new(other.Id, PathLength(path), ToHuntPath(path)));
+                    }
+
                     progress++;
                 }
 
@@ -178,13 +191,31 @@ public sealed class TreasureHuntPrecomputePanel
                     ct.ThrowIfCancellationRequested();
 
                     List<Vector3> fromShard = await vnav.Pathfind(destination, treasure.Position, false);
-                    schema.AethernetToNodeDistances[hunt].Add(new(treasure.Id, PathLength(fromShard), ToHuntPath(fromShard)));
+                    if (IsFound(fromShard))
+                    {
+                        schema.AethernetToNodeDistances[hunt].Add(new(treasure.Id, PathLength(fromShard), ToHuntPath(fromShard)));
+                    }
+
                     progress++;
 
                     List<Vector3> toShard = await vnav.Pathfind(treasure.Position, destination, false);
-                    schema.NodeToAethernetDistances[treasure.Id].Add(new(hunt, PathLength(toShard), ToHuntPath(toShard)));
+                    if (IsFound(toShard))
+                    {
+                        schema.NodeToAethernetDistances[treasure.Id].Add(new(hunt, PathLength(toShard), ToHuntPath(toShard)));
+                    }
+
                     progress++;
                 }
+            }
+
+            if (failedPaths > 0)
+            {
+                log.Warning("[TreasureHuntBake] {Failed} path(s) not found; left out instead of written as distance 0", failedPaths);
+            }
+
+            if (zones.GetZone().ZoneId != zone.ZoneId)
+            {
+                throw new InvalidOperationException("Left the zone during the bake; nothing written.");
             }
 
             string json = JsonSerializer.Serialize(
@@ -216,6 +247,18 @@ public sealed class TreasureHuntPrecomputePanel
             runCts?.Dispose();
             runCts = null;
         }
+    }
+
+    // A failed vnav query returns an empty path; written as distance 0 the planner would treat it as free.
+    private bool IsFound(List<Vector3> path)
+    {
+        if (path.Count >= 2)
+        {
+            return true;
+        }
+
+        failedPaths++;
+        return false;
     }
 
     private void RefreshTreasures(IZone zone)

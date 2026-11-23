@@ -37,6 +37,7 @@ public static class AethernetTeleport
     {
         string chainName = chain.Name;
         bool sprintEnabled = movementConfig.SprintOnAetheryteApproach;
+        bool alreadyThere = false;
 
         return chain
             .UseMiddleware<LogChainMiddleware>()
@@ -50,8 +51,9 @@ public static class AethernetTeleport
             .Then(_ =>
                 {
                     IZone zone = zones.GetZone();
-                    if (objects.LocalPlayer is { } player
-                        && AetheryteApproach.IsAtPlaceName(zone, placeNameId, player.Position))
+                    alreadyThere = objects.LocalPlayer is { } player
+                                   && AetheryteApproach.IsAtPlaceName(zone, placeNameId, player.Position);
+                    if (alreadyThere)
                     {
                         if (lifestream.IsBusy())
                         {
@@ -75,7 +77,8 @@ public static class AethernetTeleport
                 conditions,
                 movementConfig,
                 $"{chainName}::Approach",
-                sprintEnabled))
+                sprintEnabled,
+                () => alreadyThere))
             .Then(_ =>
                 {
                     if (objects.LocalPlayer is not { } player)

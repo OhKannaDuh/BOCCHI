@@ -4,6 +4,7 @@ using BOCCHI.Common.Config;
 using BOCCHI.Common.Config.Fields;
 using BOCCHI.Common.Config.Renderers;
 using BOCCHI.Common.Data.Aethernet;
+using BOCCHI.Common.Data.Mobs;
 using BOCCHI.Common.Data.SupportJobs;
 using BOCCHI.Common.Data.Zones;
 using BOCCHI.Common.Data.Zones.Graph.Factory;
@@ -123,6 +124,7 @@ public sealed class Plugin(IDalamudPluginInterface plugin, IPluginLog logger) : 
 
         services.AddSingleton<ISupportJobFactory, SupportJobFactory>();
         services.AddSingleton<ISupportJobChanger, SupportJobChanger>();
+        services.AddSingleton<PhantomJobCombatTracker>();
 
         services.AddZones()
             .AddZone<SouthHorn>()
@@ -234,6 +236,7 @@ public sealed class Plugin(IDalamudPluginInterface plugin, IPluginLog logger) : 
         SanitizeTreasureConfig(cfg.TreasureConfig);
         SanitizeBuffConfig(cfg.BuffConfig);
         SanitizeShoppingConfig(cfg.ShoppingConfig);
+        MobData.ReplaceLegacyMobs(cfg.MobFarmerConfig.Mobs);
     }
 
     private static Configuration LoadConfiguration(IDalamudPluginInterface plugin, IPluginLog logger, bool migrated)

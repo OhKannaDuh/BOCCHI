@@ -25,7 +25,8 @@ public static class AetheryteApproach
         ICondition conditions,
         MovementConfig movement,
         string chainName,
-        bool sprintEnabled = true)
+        bool sprintEnabled = true,
+        Func<bool>? skip = null)
     {
         if (objects.LocalPlayer is null)
         {
@@ -36,6 +37,11 @@ public static class AetheryteApproach
         return chains.Create(chainName)
             .Then(_ =>
                 {
+                    if (skip?.Invoke() == true)
+                    {
+                        return StepResult.Success();
+                    }
+
                     pathfinder.Stop();
                     vnav.Stop();
                     return StepResult.Success();
@@ -47,7 +53,7 @@ public static class AetheryteApproach
                         return StepResult.Failure("No local player.");
                     }
 
-                    if (zone.IsWithinLifestreamRange(current.Position))
+                    if (skip?.Invoke() == true || zone.IsWithinLifestreamRange(current.Position))
                     {
                         return StepResult.Success();
                     }

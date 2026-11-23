@@ -1134,11 +1134,13 @@ public class FarmingPotChestsHandler
         string throttleKey = $"PotChestFarm::Path::{MathF.Round(pathable.X)}::{MathF.Round(pathable.Z)}";
         if ((pathfinder.IsIdle() || drifted) && EzThrottler.Throttle(throttleKey, 750))
         {
-            lastPathDestination = pathable;
-            lastPathIssueAt = now;
             // Already snapped in TreasurePathing. A second 40y floor snap pulled east Daylight
             // Pottery pads ~30y onto unreachable mesh (#194).
-            pathfinder.PathfindAndMoveTo(new(pathable));
+            if (pathfinder.PathfindAndMoveTo(new(pathable)))
+            {
+                lastPathDestination = pathable;
+                lastPathIssueAt = now;
+            }
         }
 
         // Remount only for longer walks — not while already on top of a reveal,

@@ -112,6 +112,12 @@ public sealed class Mp3SoundPlayer(IDalamudPluginInterface plugin, IPluginLog lo
     {
         lock (gate)
         {
+            // A late stop from the previous sound must not cut off the one playing now.
+            if (!ReferenceEquals(sender, waveOut))
+            {
+                return;
+            }
+
             DisposeAudio();
         }
     }
