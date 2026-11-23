@@ -13,7 +13,7 @@
       "label": "语言"
     },
     "open_on_occult_crescent_entry": {
-      "label": "进入 Occult Crescent 时打开 BOCCHI"
+      "label": "进入新月岛时打开 BOCCHI"
     },
     "use_bocchi_theme": {
       "label": "使用 BOCCHI 主题",
@@ -36,7 +36,7 @@
       "tooltip": "把鼠标移到统计行上时，显示还剩多少青铜和白银宝箱。使用魔寻宝后数字会更新。"
     },
     "show_world_section": {
-      "label": "显示“世界”标签页（危命和紧急遭遇战）"
+      "label": "显示“危命与紧急遭遇战”标签页"
     },
     "show_demiatma_drops": {
       "label": "显示魂晶掉落（南部）",

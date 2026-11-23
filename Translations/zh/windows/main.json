@@ -1,4 +1,5 @@
 {
+  "quick_settings": "快捷设置",
   "title": "BOCCHI",
   "unsupported_zone": "请前往新月岛（新月岛南部或北部）以使用 BOCCHI。",
   "support": {
@@ -14,7 +15,7 @@
     "completionist": "收集者",
     "potstreasure": "魔法罐与寻宝",
     "mobfarmer": "刷怪",
-    "world": "世界",
+    "world": "危命与紧急遭遇战",
     "treasure": "寻宝",
     "automation_normal": "普通"
   },
@@ -89,13 +90,13 @@
     "disable": "停止收集者模式",
     "mode_on": "[BOCCHI] 收集者模式已开启",
     "mode_off": "[BOCCHI] 收集者模式已关闭",
-    "mode_off_left_zone": "[BOCCHI] 已离开神典石 — 收集者模式已关闭",
+    "mode_off_left_zone": "[BOCCHI] 已离开新月岛 — 收集者模式已关闭",
     "about": "说明",
     "description": "与违规模式相同，但只去你还缺调查笔记的危命和紧急遭遇战。调查点：单击在地图上标记，Ctrl+单击前往。两歧塔的笔记仅列出。",
     "legend": "勾选 = 已拥有 · × = 仍需 · 星 = 辅助职业满级",
     "notes_header": "勘察记录",
     "jobs_header": "辅助职业",
-    "outside_zone": "进入南角或北角后，会显示该区域的勘察记录列表。",
+    "outside_zone": "进入南部或北部后，会显示该区域的勘察记录列表。",
     "survey_tooltip": "单击插旗。Ctrl+单击前往。",
     "survey_tooltip_flag_only": "单击插旗。Ctrl+单击前往需要寻路就绪。",
     "sources": {
@@ -107,7 +108,7 @@
       "shark_attack": "Shark Attack",
       "cursed_concern": "Cursed Concern",
       "survey_point": "调查点",
-      "forked_tower_blood": "仅分叉塔：血",
+      "forked_tower_blood": "两歧塔：仅力之塔",
       "persistent_pots_nh": "Daylight Pottery / In a Pot of Bother",
       "doubled_trouble": "Doubled Trouble",
       "quarried_away": "Quarried Away",
@@ -119,7 +120,7 @@
       "tiny_terror": "Tiny Terror",
       "lost_on_the_wind": "Lost on the Wind",
       "accept_no_imitators": "Accept No Imitators",
-      "forked_tower_magic": "仅分叉塔：魔"
+      "forked_tower_magic": "两歧塔：仅魔之塔"
     }
   },
   "automation": {
@@ -140,10 +141,10 @@
       "path_map_ready_shipped": "已就绪（随 BOCCHI 附带）",
       "path_map_ready_built": "已就绪（为本区域构建）",
       "path_map_rebuilding": "[BOCCHI] 正在重建本区域路径图…",
-      "path_map_rebuild_wrong_zone": "[BOCCHI] 仅可在神典石内重建路径图。",
+      "path_map_rebuild_wrong_zone": "[BOCCHI] 仅可在新月岛内重建路径图。",
       "illegal_mode_on": "[BOCCHI] 违规模式已开启",
       "illegal_mode_off": "[BOCCHI] 违规模式已关闭",
-      "illegal_mode_off_left_zone": "[BOCCHI] 已离开神典石 — 违规模式已关闭",
+      "illegal_mode_off_left_zone": "[BOCCHI] 已离开新月岛 — 违规模式已关闭",
       "illegal_mode_off_forked_tower": "[BOCCHI] 已进入两歧塔 — 违规模式已关闭",
       "forked_tower_offer_ciphers": "[BOCCHI] 已到达两歧塔平台 — 请在传送魔纹启动灯处献上「魔纹启动凭证：力之塔」完成报名，传送前不要离开平台。",
       "forked_tower_on_pad": "[BOCCHI] 已到达两歧塔平台 — 传送前不要离开平台。",
@@ -173,7 +174,7 @@
         "shopping": "购物"
       },
       "configure_mobs": "在设置中选择要刷的敌人（本标签页上的齿轮）。",
-      "off_left_zone": "[BOCCHI] 已离开神典石 — 刷怪已关闭",
+      "off_left_zone": "[BOCCHI] 已离开新月岛 — 刷怪已关闭",
       "description": "把你选的敌人拉成一群再打，如此反复。"
     },
     "pots_treasure": {
@@ -186,7 +187,7 @@
       "paused": "已暂停",
       "on": "[BOCCHI] 魔法罐与寻宝已开启",
       "off": "[BOCCHI] 魔法罐与寻宝已关闭",
-      "off_left_zone": "[BOCCHI] 已离开神典石 — 魔法罐与寻宝已关闭",
+      "off_left_zone": "[BOCCHI] 已离开新月岛 — 魔法罐与寻宝已关闭",
       "description": "做每一个魔法罐及其宝箱，并在间隙寻宝。",
       "phase": "阶段",
       "requires_vnav": "[BOCCHI] 魔法罐与寻宝需要旅行插件（vnavmesh）。",
@@ -233,8 +234,8 @@
     "pause_hunt": "暂停",
     "resume_hunt": "继续",
     "stop_hunt": "停止寻宝",
-    "off_left_zone": "[BOCCHI] 已离开神典石 — 寻宝已关闭",
-    "carrot_hunt_off_left_zone": "[BOCCHI] 已离开神典石 — 胡萝卜狩猎已关闭",
+    "off_left_zone": "[BOCCHI] 已离开新月岛 — 寻宝已关闭",
+    "carrot_hunt_off_left_zone": "[BOCCHI] 已离开新月岛 — 胡萝卜狩猎已关闭",
     "paused": "已暂停",
     "waiting_safe_window": "等待安全天气",
     "waiting_safe_window_detail": "因南部的妖灵或危险天气而暂停。安全后继续。",
@@ -247,7 +248,7 @@
     "managed_by_pots": "这次寻宝由“魔法罐与寻宝”控制。请在那个标签页开始或停止。",
     "managed_by_illegal_mode": "这次寻宝由违规模式在活动间隙进行。",
     "managed_by_mob_farmer": "这次寻宝由刷怪按计时进行。",
-    "managed_by_carrot": "胡萝卜寻宝正在进行。开始寻宝前请先在下面停止它。",
+    "managed_by_carrot": "胡萝卜狩猎正在进行。开始寻宝前请先在下面停止它。",
     "distance_to_chest": "距宝箱距离",
     "nearby_title": "附近的宝箱",
     "none_nearby": "附近没有宝箱。",

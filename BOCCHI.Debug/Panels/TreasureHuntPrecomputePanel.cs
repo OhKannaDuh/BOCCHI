@@ -168,7 +168,7 @@ public sealed class TreasureHuntPrecomputePanel
                     }
 
                     ct.ThrowIfCancellationRequested();
-                    List<Vector3> path = await vnav.Pathfind(treasure.Position, other.Position, false, ct);
+                    List<Vector3> path = await vnav.Pathfind(treasure.Position, other.Position, false);
                     schema.NodeToNodeDistances[treasure.Id].Add(new(other.Id, PathLength(path), ToHuntPath(path)));
                     progress++;
                 }
@@ -177,11 +177,11 @@ public sealed class TreasureHuntPrecomputePanel
                 {
                     ct.ThrowIfCancellationRequested();
 
-                    List<Vector3> fromShard = await vnav.Pathfind(destination, treasure.Position, false, ct);
+                    List<Vector3> fromShard = await vnav.Pathfind(destination, treasure.Position, false);
                     schema.AethernetToNodeDistances[hunt].Add(new(treasure.Id, PathLength(fromShard), ToHuntPath(fromShard)));
                     progress++;
 
-                    List<Vector3> toShard = await vnav.Pathfind(treasure.Position, destination, false, ct);
+                    List<Vector3> toShard = await vnav.Pathfind(treasure.Position, destination, false);
                     schema.NodeToAethernetDistances[treasure.Id].Add(new(hunt, PathLength(toShard), ToHuntPath(toShard)));
                     progress++;
                 }

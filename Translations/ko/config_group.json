@@ -6,7 +6,7 @@
     "label": "몹 파머"
   },
   "treasure": {
-    "label": "트레저 헌터"
+    "label": "보물 찾기"
   },
   "shopping": {
     "label": "쇼핑"
@@ -15,7 +15,7 @@
     "label": "UI"
   },
   "forked_tower": {
-    "label": "포크드 타워"
+    "label": "포크 타워"
   },
   "dependencies": {
     "label": "의존성"

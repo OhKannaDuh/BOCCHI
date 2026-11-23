@@ -36,7 +36,7 @@
       "tooltip": "Show how many bronze and silver coffers are left when you hover the tracker line. The numbers update when Treasure Sight is used."
     },
     "show_world_section": {
-      "label": "Show the World tab (FATEs and CEs)"
+      "label": "Show the FATEs & CEs tab"
     },
     "show_demiatma_drops": {
       "label": "Show demiatma drops (South Horn)",

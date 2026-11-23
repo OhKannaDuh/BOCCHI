@@ -1,4 +1,5 @@
 {
+  "quick_settings": "クイック設定",
   "title": "BOCCHI",
   "unsupported_zone": "BOCCHI を使うには、クレセントアイル（南征編または北征編）へ行ってください。",
   "support": {
@@ -14,7 +15,7 @@
     "completionist": "コンプリーショニスト",
     "potstreasure": "ポット＆トレジャー",
     "mobfarmer": "モブファーム",
-    "world": "ワールド",
+    "world": "FATE・CE",
     "treasure": "トレジャーハンター",
     "automation_normal": "通常"
   },
@@ -89,7 +90,7 @@
     "disable": "コンプリーショニストモードを停止",
     "mode_on": "[BOCCHI] コンプリーショニストモード オン",
     "mode_off": "[BOCCHI] コンプリーショニストモード オフ",
-    "mode_off_left_zone": "[BOCCHI] オカルトクレセントを離れたためコンプリーショニストモード オフ",
+    "mode_off_left_zone": "[BOCCHI] クレセントアイルを離れたためコンプリーショニストモード オフ",
     "about": "説明",
     "description": "不正モードと同じですが、まだ持っていない探査記録の FATE と CE だけに行きます。調査ポイント：クリックでマップに印、Ctrl＋クリックでそこへ移動。フォークタワーのノートは一覧表示のみです。",
     "legend": "チェック＝所持 · ×＝未所持 · 星＝サポートジョブ最大",
@@ -107,7 +108,7 @@
       "shark_attack": "Shark Attack",
       "cursed_concern": "Cursed Concern",
       "survey_point": "調査ポイント",
-      "forked_tower_blood": "フォークドタワー：ブラッドのみ",
+      "forked_tower_blood": "フォークタワー：力の塔のみ",
       "persistent_pots_nh": "Daylight Pottery / In a Pot of Bother",
       "doubled_trouble": "Doubled Trouble",
       "quarried_away": "Quarried Away",
@@ -119,7 +120,7 @@
       "tiny_terror": "Tiny Terror",
       "lost_on_the_wind": "Lost on the Wind",
       "accept_no_imitators": "Accept No Imitators",
-      "forked_tower_magic": "フォークドタワー：マジックのみ"
+      "forked_tower_magic": "フォークタワー：魔の塔のみ"
     }
   },
   "automation": {
@@ -140,10 +141,10 @@
       "path_map_ready_shipped": "準備完了（BOCCHI 同梱）",
       "path_map_ready_built": "準備完了（このゾーン用に構築）",
       "path_map_rebuilding": "[BOCCHI] このゾーンの経路マップを再構築しています…",
-      "path_map_rebuild_wrong_zone": "[BOCCHI] 経路マップの再構築はオカルトクレセント内でのみ使えます。",
+      "path_map_rebuild_wrong_zone": "[BOCCHI] 経路マップの再構築はクレセントアイル内でのみ使えます。",
       "illegal_mode_on": "[BOCCHI] 不正モード オン",
       "illegal_mode_off": "[BOCCHI] 不正モード オフ",
-      "illegal_mode_off_left_zone": "[BOCCHI] オカルトクレセントを離れたため不正モード オフ",
+      "illegal_mode_off_left_zone": "[BOCCHI] クレセントアイルを離れたため不正モード オフ",
       "illegal_mode_off_forked_tower": "[BOCCHI] フォークタワーに入場 — 不正モード オフ",
       "forked_tower_offer_ciphers": "[BOCCHI] フォークタワーの入場地点に到着 — 転送魔紋起動灯で「魔紋起動証:力の塔」を奉納して受付してください。転送されるまで地点から離れないでください。",
       "forked_tower_on_pad": "[BOCCHI] フォークタワーの入場地点に到着 — 転送されるまで地点から離れないでください。",
@@ -173,7 +174,7 @@
         "shopping": "買い物"
       },
       "configure_mobs": "狩る敵は設定で選びます（このタブの歯車）。",
-      "off_left_zone": "[BOCCHI] オカルトクレセントを離れたためモブファーム オフ",
+      "off_left_zone": "[BOCCHI] クレセントアイルを離れたためモブファーム オフ",
       "description": "選んだ敵を集めてまとめて倒す、を繰り返します。"
     },
     "pots_treasure": {
@@ -186,7 +187,7 @@
       "paused": "一時停止中",
       "on": "[BOCCHI] ポット＆トレジャー オン",
       "off": "[BOCCHI] ポット＆トレジャー オフ",
-      "off_left_zone": "[BOCCHI] オカルトクレセントを離れたためポット＆トレジャー オフ",
+      "off_left_zone": "[BOCCHI] クレセントアイルを離れたためポット＆トレジャー オフ",
       "description": "すべてのマジックポットとその宝箱をやり、合間にトレジャーハントをします。",
       "phase": "フェーズ",
       "requires_vnav": "[BOCCHI] ポット＆トレジャーには移動プラグイン（vnavmesh）が必要です。",
@@ -233,8 +234,8 @@
     "pause_hunt": "一時停止",
     "resume_hunt": "再開",
     "stop_hunt": "トレジャーハント停止",
-    "off_left_zone": "[BOCCHI] オカルトクレセントを離れたためトレジャーハント オフ",
-    "carrot_hunt_off_left_zone": "[BOCCHI] オカルトクレセントを離れたためキャロットハント オフ",
+    "off_left_zone": "[BOCCHI] クレセントアイルを離れたためトレジャーハント オフ",
+    "carrot_hunt_off_left_zone": "[BOCCHI] クレセントアイルを離れたためキャロットハント オフ",
     "paused": "一時停止中",
     "waiting_safe_window": "安全な天候待ち",
     "waiting_safe_window_detail": "南征編のアシュキンや危険な天候のため中断中。安全になったら再開します。",

@@ -3,6 +3,7 @@
 ### New
 - New look with a tab per mode. Your status and gold / silver / XP per hour stay on top, and the window switches to the mode that is running. Prefer Dalamud's own colours? Turn off "Use BOCCHI theme" under Settings → UI
 - Each tab explains its mode in one line and warns you when a plugin it needs isn't running
+- Each tab shows its most-used settings at the bottom, and the World tab is now called FATEs & CEs
 - Search box in the settings; the cog in the title bar opens the settings for the tab you are on
 - Completionist is now a switch in the Illegal Mode tab
 - Auto revive (off by default): accept raises, and go back to camp if nobody raises you. Never inside Forked Tower, and in a FATE or CE it waits until that is over so you keep the reward
@@ -30,7 +31,6 @@
 
 ### Fewer stalls
 - Buffs, Treasure Sight, phantom job leveling, repairs and shopping no longer hold BOCCHI up forever; they give up after a while and carry on
-- Emergency Stop now also stops a walk that is still being planned
 - The jump when stuck gives up after five tries instead of jumping forever
 
 ### Settings

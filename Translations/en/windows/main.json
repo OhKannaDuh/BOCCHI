@@ -1,4 +1,5 @@
 {
+  "quick_settings": "Quick settings",
   "title": "BOCCHI",
   "unsupported_zone": "Go to Occult Crescent (South or North Horn) to use BOCCHI.",
   "support": {
@@ -14,7 +15,7 @@
     "completionist": "Completionist",
     "potstreasure": "Pots & Treasure",
     "mobfarmer": "Mob Farmer",
-    "world": "World",
+    "world": "FATEs & CEs",
     "treasure": "Treasure Hunter",
     "automation_normal": "Normal"
   },

@@ -3,7 +3,7 @@
     "Name": "Better Occult Crescent & Chest Helper Interface",
     "InternalName": "BOCCHI",
     "Punchline": "BOCCHI is here to smooth out your Occult Crescent experience.",
-    "Description": "Helps with Occult Crescent (South Horn and North Horn).\n- Illegal Mode: full autopilot for FATEs, Critical Encounters and Magic Pots, with treasure hunting in between\n- Treasure Hunter: bronze and silver coffer routes, and Carrot Hunt\n- Mob Farmer: pulls and clears packs at spots you save\n- World: live FATE and CE lists with rewards; walk or teleport there\n\nOpen it with /bocchi (or /och). Needs vnavmesh and Lifestream.",
+    "Description": "Helps with Occult Crescent (South Horn and North Horn).\n- Illegal Mode: full autopilot for FATEs, Critical Encounters and Magic Pots, with treasure hunting in between\n- Treasure Hunter: bronze and silver coffer routes, and Carrot Hunt\n- Mob Farmer: pulls and clears packs at spots you save\n- World: live FATE and CE lists with rewards; walk or teleport there",
     "IconUrl": "https://raw.githubusercontent.com/OhKannaDuh/BOCCHI/master/assets/icon.png",
     "ApplicableVersion": "any",
     "RepoUrl": "https://github.com/OhKannaDuh/BOCCHI",

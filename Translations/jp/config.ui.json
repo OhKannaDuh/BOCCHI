@@ -36,7 +36,7 @@
       "tooltip": "トラッカーの行にカーソルを合わせると、銅と銀の宝箱の残り数を表示します。数はトレジャーサイトを使うと更新されます。"
     },
     "show_world_section": {
-      "label": "ワールドタブを表示（FATE と CE）"
+      "label": "FATE・CE タブを表示"
     },
     "show_demiatma_drops": {
       "label": "デミアートマを表示（南征編）",

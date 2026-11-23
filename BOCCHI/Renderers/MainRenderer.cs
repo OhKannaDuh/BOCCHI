@@ -6,6 +6,7 @@ using BOCCHI.UI;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Utility.Raii;
 using Microsoft.Extensions.DependencyInjection;
+using Ocelot.Config;
 using Ocelot.Ipc.Lifestream;
 using Ocelot.Ipc.RotationSolverReborn;
 using Ocelot.Ipc.VNavmesh;
@@ -29,6 +30,7 @@ public class MainRenderer
     IPluginStatus pluginStatus,
     IRotationSolverRebornIpc rsr,
     AutomatorConfig automatorConfig,
+    IConfigRenderer configRenderer,
     ITranslator<MainWindow> translator
 ) : IMainRenderer
 {
@@ -38,7 +40,7 @@ public class MainRenderer
         (MainWindowSection.PotsTreasure, [MainWindowSection.PotsTreasure], "treasure"),
         (MainWindowSection.MobFarmer, [MainWindowSection.MobFarmer], "mob_farmer"),
         (MainWindowSection.Treasure, [MainWindowSection.Treasure], "treasure"),
-        (MainWindowSection.World, [MainWindowSection.World], "automation"),
+        (MainWindowSection.World, [MainWindowSection.World], "fates"),
     ];
 
     private IEnumerable<IDynamicRenderer>? renderers;
@@ -208,6 +210,32 @@ public class MainRenderer
 
             ImGui.Spacing();
         }
+
+        DrawQuickSettings(tab);
+    }
+
+    private void DrawQuickSettings(MainWindowSection tab)
+    {
+        if (!QuickSettings.Tabs.TryGetValue(tab, out (Type Config, string Property)[]? fields)
+            || !ImGui.CollapsingHeader($"{translator.T(".quick_settings")}###quick_settings_{tab}", ImGuiTreeNodeFlags.DefaultOpen))
+        {
+            return;
+        }
+
+        if (!BocchiUi.BeginPanel($"quick_settings_{tab}"))
+        {
+            return;
+        }
+
+        foreach ((Type configType, string property) in fields)
+        {
+            if (services.GetService(configType) is IAutoConfig config)
+            {
+                configRenderer.RenderField(config, property);
+            }
+        }
+
+        BocchiUi.EndPanel();
     }
 
     private void DrawMissingPlugin(MainWindowSection tab)

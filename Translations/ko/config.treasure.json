@@ -77,7 +77,7 @@
     },
     "skip_unsafe_treasure_windows": {
       "label": "위험 날씨 / 불사류 몬스터 건너뛰기",
-      "tooltip": "남쪽 뿔에서 불사류나 다른 위험한 날씨 동안 보물 찾기를 멈추고, 끝나면 이어 갑니다."
+      "tooltip": "남부에서 불사류나 다른 위험한 날씨 동안 보물 찾기를 멈추고, 끝나면 이어 갑니다."
     },
     "use_ninja_hide_on_dangerous_routes": {
       "label": "강한 적 근처에서 닌자 은신",
