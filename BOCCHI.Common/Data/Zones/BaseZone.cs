@@ -90,13 +90,13 @@ public abstract class BaseZone
 
     private List<KnowledgeCrystalData> nearbyCrystals = [];
 
-    private long nearbyCrystalsAtMs = long.MinValue;
+    private long? nearbyCrystalsAtMs;
 
     // Called from several handlers' scoring every frame; the object scan is reused for 200 ms.
     public List<KnowledgeCrystalData> GetNearbyKnowledgeCrystals()
     {
         long now = Environment.TickCount64;
-        if (now - nearbyCrystalsAtMs >= 200)
+        if (nearbyCrystalsAtMs is not { } at || now - at >= 200)
         {
             nearbyCrystals = FindNearbyKnowledgeCrystals();
             nearbyCrystalsAtMs = now;
